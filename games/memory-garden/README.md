@@ -1,6 +1,6 @@
 # Memory Garden
 
-A senior and a grandchild share one phone. Pick a heritage object, answer three gentle questions by tapping chips, and a plant grows in the family garden. The plant is composed from the answers: the object sets its silhouette, the person sets the blooms, the feeling sets the colours, the place hangs a small ornament beside it. The garden persists on the device and fills over sessions. Tap any plant to hear its story again.
+A senior and a grandchild share one phone. Pick a heritage object, answer three gentle questions by tapping chips, and a plant grows in the family garden. The plant is composed from the answers: the object sets its silhouette, the person sets the blooms, the feeling sets the colours, the place hangs a small ornament beside it. The garden persists on the device and fills over sessions. Tap any plant to read its story again.
 
 ## How to run
 
