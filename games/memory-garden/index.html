@@ -7,32 +7,71 @@
 <title>Memory Garden</title>
 <link rel="stylesheet" href="/shared/ui/tokens.css">
 <link rel="stylesheet" href="/shared/ui/base.css">
+<link rel="stylesheet" href="/games/memory-garden/css/garden.css">
 <style>
   :root {
     --accent: var(--accent-garden);
     --accent-tint: var(--accent-garden-tint);
   }
-
-  .game-title {
-    color: var(--accent);
-  }
 </style>
 </head>
 <body>
-<main class="page stack">
+<main class="page">
 
-  <header class="stack stack-tight">
-    <h1 class="game-title">Memory Garden</h1>
-    <p class="lead muted">Gardening, reminiscence, and a plant grown from a story.</p>
-  </header>
+  <section id="view-garden" class="view">
+    <header class="stack stack-tight">
+      <h1 class="game-title" id="garden-heading" tabindex="-1">Memory Garden</h1>
+      <p class="muted">One phone, two people, and a plant for every story.</p>
+    </header>
 
-  <section class="card card-accent stack stack-tight">
-    <p class="card-title">Being built tonight</p>
-    <p>This screen is a placeholder. It proves the route, the shared tokens and the tap target floor. The real garden lands here shortly.</p>
+    <div class="card card-accent" id="welcome-card">
+      <p id="welcome-line" aria-live="polite">Loading the garden.</p>
+    </div>
+
+    <div class="plots" id="plots"></div>
+
+    <button type="button" class="btn btn-block" id="start-grow">Grow a new memory</button>
+
+    <p class="centered"><a class="btn btn-plain btn-block" href="/">Back to hub</a></p>
   </section>
 
-  <a class="btn btn-plain" href="/">Back to hub</a>
+  <section id="view-picker" class="view" hidden>
+    <h2 id="picker-heading" tabindex="-1">Which old friend calls up a memory?</h2>
+    <p class="muted">Pick one. You can always plant another later.</p>
+    <div class="objects" id="objects"></div>
+    <button type="button" class="btn btn-quiet btn-block" data-back="garden">Back to the garden</button>
+  </section>
+
+  <section id="view-prompt" class="view" hidden>
+    <p class="muted" id="prompt-step">Question 1 of 3</p>
+    <h2 id="prompt-heading" tabindex="-1">Who is in this memory with you?</h2>
+    <div class="row" id="prompt-chips"></div>
+    <button type="button" class="btn btn-block" id="prompt-next" aria-disabled="true">Next</button>
+    <button type="button" class="btn btn-quiet btn-block" id="prompt-back">Back</button>
+  </section>
+
+  <section id="view-ceremony" class="view" hidden>
+    <h2 id="ceremony-heading" tabindex="-1">Watch it grow</h2>
+    <p class="lead" id="ceremony-line" aria-live="polite"></p>
+    <div class="stage" id="ceremony-stage"></div>
+    <button type="button" class="btn btn-block" id="ceremony-done">See the garden</button>
+  </section>
 
 </main>
+
+<div id="view-replay" class="overlay" role="dialog" aria-modal="true" aria-labelledby="replay-title" hidden>
+  <div class="overlay-panel card">
+    <h2 id="replay-title" tabindex="-1">Your story</h2>
+    <div class="stage stage-small" id="replay-plant"></div>
+    <div class="row" id="replay-answers"></div>
+    <p id="replay-caption"></p>
+    <p class="muted" id="replay-line" aria-live="polite"></p>
+    <div class="overlay-foot">
+      <button type="button" class="btn btn-block" id="replay-close">Back to garden</button>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="/games/memory-garden/js/main.js"></script>
 </body>
 </html>

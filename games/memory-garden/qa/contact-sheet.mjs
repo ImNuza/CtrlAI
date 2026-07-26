@@ -1,0 +1,95 @@
+#!/usr/bin/env node
+/*
+  Composes a matrix of plants and writes one self contained HTML sheet so a human
+  can judge at a glance whether the six species read differently and whether the
+  trait axes actually change the picture. Node only, no browser, no server.
+*/
+
+import { mkdir, writeFile } from 'node:fs/promises';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { composePlant } from '../js/composer.js';
+
+const here = path.dirname(fileURLToPath(import.meta.url));
+const repoRoot = path.resolve(here, '../../..');
+const outDir = path.join(repoRoot, 'tools', 'qa', 'output');
+const outFile = path.join(outDir, 'mg-contact-sheet.html');
+
+const OBJECT_IDS = ['kopitiam-cup', 'sewing-machine', 'rotary-phone', 'tingkat', 'cassette', 'five-stones'];
+const FEELINGS = ['warm', 'happy', 'wistful', 'calm', 'proud'];
+const WHOS = ['my-mother', 'my-father', 'my-grandmother', 'my-friends', 'my-siblings'];
+const WHERES = ['kampung', 'first-flat', 'kopitiam', 'market', 'seaside'];
+
+const BASE = { who: 'my-mother', where: 'kampung', feeling: 'warm' };
+
+function cell(objectId, answers, label) {
+  const built = composePlant({ objectId: objectId, answers: answers });
+  return '<figure class="cell">' + built.svg +
+    '<figcaption>' + label + '<br>' + built.traits.species + '</figcaption></figure>';
+}
+
+function row(title, note, cells) {
+  return '<section><h2>' + title + '</h2><p>' + note + '</p><div class="grid">' +
+    cells.join('') + '</div></section>';
+}
+
+function build() {
+  const rows = [];
+
+  rows.push(row(
+    'Row 1: six objects, same answers',
+    'Same who, where and feeling every time. Only the object changes, so every silhouette here must be tellable apart from across the room.',
+    OBJECT_IDS.map(function (id) { return cell(id, BASE, id); })
+  ));
+
+  rows.push(row(
+    'Row 2: one object, five feelings',
+    'Kopitiam cup throughout. Feeling drives the palette.',
+    FEELINGS.map(function (feeling) {
+      return cell('kopitiam-cup', { who: BASE.who, where: BASE.where, feeling: feeling }, feeling);
+    })
+  ));
+
+  rows.push(row(
+    'Row 3: one object, five people',
+    'Kopitiam cup throughout. Who drives bloom count and arrangement.',
+    WHOS.map(function (who) {
+      return cell('kopitiam-cup', { who: who, where: BASE.where, feeling: BASE.feeling }, who);
+    })
+  ));
+
+  rows.push(row(
+    'Row 4: one object, five places',
+    'Kopitiam cup throughout. Where drives the ornament tucked beside the pot.',
+    WHERES.map(function (where) {
+      return cell('kopitiam-cup', { who: BASE.who, where: where, feeling: BASE.feeling }, where);
+    })
+  ));
+
+  return '<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n' +
+    '<meta name="viewport" content="width=device-width, initial-scale=1">\n' +
+    '<title>Memory Garden contact sheet</title>\n<style>\n' +
+    'body { margin: 0; padding: 24px; background: #ffffff; color: #1c1c1c;' +
+    ' font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif; font-size: 28px; }\n' +
+    'h1 { font-size: 40px; margin: 0 0 24px; }\n' +
+    'h2 { font-size: 32px; margin: 32px 0 8px; }\n' +
+    'p { margin: 0 0 16px; }\n' +
+    '.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 16px; }\n' +
+    '.cell { margin: 0; padding: 12px; border: 2px solid #c9c1b4; border-radius: 12px; background: #fffcf7; }\n' +
+    '.cell svg { width: 140px; max-width: 100%; height: auto; display: block; margin: 0 auto; }\n' +
+    'figcaption { margin-top: 12px; text-align: center; font-size: 28px; overflow-wrap: break-word; }\n' +
+    '</style>\n</head>\n<body>\n<h1>Memory Garden contact sheet</h1>\n' +
+    rows.join('\n') + '\n</body>\n</html>\n';
+}
+
+async function main() {
+  await mkdir(outDir, { recursive: true });
+  await writeFile(outFile, build());
+  process.stdout.write('contact sheet written to ' + outFile + '\n');
+  process.stdout.write('cells: ' + (OBJECT_IDS.length + FEELINGS.length + WHOS.length + WHERES.length) + '\n');
+}
+
+main().catch(function (error) {
+  process.stderr.write(String(error && error.stack ? error.stack : error) + '\n');
+  process.exit(1);
+});

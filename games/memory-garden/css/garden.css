@@ -1,0 +1,220 @@
+/*
+  Memory Garden styles. Sits on top of shared tokens and base classes and adds
+  only what this game needs: plots, object cards, the ceremony stage and the
+  story overlay. Every size comes from a token so the senior UX floor holds.
+*/
+
+:root {
+  --accent: var(--accent-garden);
+  --accent-tint: var(--accent-garden-tint);
+}
+
+/* Views are flex columns, so the UA hidden rule needs to win outright. */
+[hidden] {
+  display: none !important;
+}
+
+.game-title {
+  color: var(--accent);
+}
+
+.view {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+}
+
+.btn-block {
+  width: 100%;
+}
+
+/* ---- Garden plots ------------------------------------------------------- */
+
+.plots {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-3);
+}
+
+.plot {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  min-height: 116px;
+  padding: var(--sp-2);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface-sunk);
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform var(--dur-fast) var(--ease-out),
+              border-color var(--dur-fast) var(--ease-out);
+}
+
+.plot:active {
+  transform: scale(0.97);
+}
+
+.plot-filled {
+  border-color: var(--accent);
+  background-color: var(--color-surface);
+}
+
+.plot svg {
+  width: 100%;
+  height: auto;
+}
+
+/* ---- Object picker ------------------------------------------------------ */
+
+.objects {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--sp-3);
+}
+
+.object-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--sp-2);
+  min-height: 200px;
+  padding: var(--sp-3);
+  border: 3px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  font-size: var(--fs-body);
+  line-height: var(--lh-tight);
+  text-align: center;
+  cursor: pointer;
+  overflow-wrap: break-word;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform var(--dur-fast) var(--ease-out),
+              border-color var(--dur-fast) var(--ease-out);
+}
+
+.object-card:active {
+  transform: scale(0.97);
+}
+
+.object-art {
+  width: 96px;
+  height: 96px;
+  flex: none;
+}
+
+/* ---- Chips -------------------------------------------------------------- */
+
+.chip {
+  max-width: 100%;
+}
+
+.chip-static {
+  cursor: default;
+}
+
+/* ---- Stage -------------------------------------------------------------- */
+
+.stage {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  min-height: 300px;
+}
+
+.stage svg {
+  width: 230px;
+  max-width: 100%;
+  height: auto;
+}
+
+.stage-small {
+  min-height: 220px;
+}
+
+.stage-small svg {
+  width: 170px;
+}
+
+/* The ceremony assembles the plant in layers. Delays are multiples of a token,
+   so a reduced-motion request collapses the whole thing to instant. */
+
+.stage-grow .plant > g {
+  opacity: 0;
+  transition: opacity var(--dur-base) var(--ease-out);
+}
+
+.stage-grow .plant > .layer-stem {
+  transition-delay: var(--dur-base);
+}
+
+.stage-grow .plant > .layer-leaves {
+  transition-delay: calc(var(--dur-base) * 2);
+}
+
+.stage-grow .plant > .layer-blooms {
+  transition-delay: calc(var(--dur-base) * 3);
+}
+
+.stage-grow .plant > .layer-ornament {
+  transition-delay: calc(var(--dur-base) * 4);
+}
+
+.stage-grow.is-grown .plant > g {
+  opacity: 1;
+}
+
+/* ---- Story overlay ------------------------------------------------------ */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding:
+    calc(var(--safe-top) + var(--sp-5))
+    calc(var(--safe-right) + var(--sp-4))
+    0
+    calc(var(--safe-left) + var(--sp-4));
+  background-color: var(--color-bg);
+  overflow-y: auto;
+}
+
+.overlay-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  width: 100%;
+  max-width: var(--page-max);
+}
+
+/* A long story can outrun the screen, so the way out stays pinned in view.
+   The band carries the card colour, otherwise text slides through the button. */
+.overlay-panel {
+  padding-bottom: 0;
+}
+
+.overlay-foot {
+  position: sticky;
+  bottom: 0;
+  padding: var(--sp-4) 0 calc(var(--safe-bottom) + var(--sp-5));
+  background-color: var(--color-surface);
+}
+
+/* Story text fades out into the band instead of being sliced mid line. */
+.overlay-foot::before {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 100%;
+  left: 0;
+  height: var(--sp-5);
+  background: linear-gradient(to top, var(--color-surface), transparent);
+  pointer-events: none;
+}

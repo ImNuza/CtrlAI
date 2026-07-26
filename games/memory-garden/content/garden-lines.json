@@ -1,0 +1,32 @@
+{
+  "welcome_first": [
+    "Nothing planted yet. Start with one small thing you still remember.",
+    "The soil is ready when you are. No rush, and no wrong answer.",
+    "This garden is empty for now. One memory is enough to begin.",
+    "Sit a while first. When you are ready, pick something old and dear."
+  ],
+  "welcome_back": [
+    "Welcome back. There are {count} memories growing here now.",
+    "Your garden has {count} plants in it. Tap any one to hear its story again.",
+    "Everything you planted is still here, all {count} of them. Take a look.",
+    "Good to see you again. The garden kept all {count} of your stories safe."
+  ],
+  "ceremony_grow": [
+    "Look at this one. The garden took {object} and made something green out of it.",
+    "Slowly now. This plant remembers {object} and the afternoon that came with it.",
+    "Here it comes. The roots know {object} better than we do.",
+    "Steady, steady. This one carries {object} inside it now."
+  ],
+  "caption": [
+    "Hold {object} again and we are back {where} in a second. There is {who} in this one too, and it still feels {feeling}.",
+    "Nobody planned it. Just {object} on the table, an afternoon {where}, and {who} talking through all of it. Feels {feeling} to remember.",
+    "Funny how {object} keeps so much. One afternoon {where}, {who} nearby, and a feeling that is still {feeling}.",
+    "Worth keeping, this one. It has {who} in the middle of it, an afternoon {where}, and {object} sitting there through all of it. Still feels {feeling}."
+  ],
+  "replay_open": [
+    "Take your time with this one. The story is not going anywhere.",
+    "Here it is again, the same afternoon, kept safe.",
+    "Read it slowly lah. Some stories are better the second time.",
+    "This one is still here, exactly as you planted it."
+  ]
+}
