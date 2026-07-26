@@ -35,7 +35,7 @@ node server.js then open http://localhost:4173 in a phone-sized viewport. Each g
 
 - memory-garden: CORE COMMITTED (3bb08da, 45a1b05) and conductor-verified: 34 loop checks pass under an independent run (two answer sets give plants differing in 4 of 4 traits, persistence and corrupt-save fallback proven, 9-tap loop), inspector clean, ceremony screenshot eyeballed. Orchestrator paused, then released into milestone B.
 - mahjong-kakis: CORE COMMITTED (92b686d) and conductor-verified: core QA passes under an independent run (four banter events through the AI seam, storage and hidden dial state correct), inspector clean, name screen eyeballed. Released into milestone B, speaker-ring cosmetic fix queued.
-- scam-dojo: CORE COMMITTED (be90cca) and conductor-verified: 11 smoke checks pass under an independent run, inspector clean, home screen eyeballed. Released into milestone B.
+- scam-dojo: MILESTONE B COMPLETE and conductor-verified. Full definition of done: 9 of 9 DoD suite sections pass under an independent conductor rerun (9 scripts across 8 families, 294 templates through the AI seam, 14-round variety, streak survives reload, comply path teaches kindly, zero errors). README committed by the orchestrator (f94a98b). Commits be90cca, 38bcf60, 91b4782, d869f5a, f94a98b.
 
 ## Verification results
 
