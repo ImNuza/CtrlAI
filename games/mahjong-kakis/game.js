@@ -17,6 +17,10 @@ const BANK_URL = '/games/mahjong-kakis/content/kaki-banter.json';
 const CLEAR_MS = 240;
 const MISS_HOLD_MS = 600;
 const NUDGE_TAPS = 6;
+// Two offers of help in a row with nothing found in between, and one pair
+// breathes for a moment. Never named, never written down, never a fail state.
+const GLOW_AFTER_NUDGES = 2;
+const GLOW_MS = 900;
 const RECENT_KEPT = 3;
 const FIRST_ROUND = { tileCount: 8, lookalike: 0.25 };
 const DEFAULT_NAME = 'Friend';
@@ -43,6 +47,7 @@ const el = {
   input: document.querySelector('#mk-name-input'),
   playerName: document.querySelector('[data-player-name]'),
   progress: document.querySelector('[data-progress]'),
+  dots: document.querySelector('[data-dots]'),
   winName: document.querySelector('[data-win-name]'),
   winNote: document.querySelector('[data-win-note]')
 };
@@ -58,7 +63,9 @@ boot();
 
 async function boot() {
   renderPortraits(document);
-  banter = createBanter(document);
+  // The celebration card starts under the bubble, and the bubble is not a fixed
+  // height any more, so every render and dismissal re-measures the slot.
+  banter = createBanter(document, { onChange: syncWinTop });
   wireControls();
 
   const bank = await loadBank();
@@ -73,6 +80,7 @@ async function boot() {
     // A name on its own is not a shared history. Only somebody who finished a
     // round has something for a kaki to remember.
     pendingReturn = state.roundsPlayed >= 1;
+    banter.seat(state.visits);
     persist();
     startPlaying();
     return;
@@ -114,6 +122,7 @@ function chooseName(raw) {
   const name = String(raw || '').trim().slice(0, 20) || DEFAULT_NAME;
   state = blankState(name);
   state.visits = 1;
+  banter.seat(state.visits);
   persist();
   startPlaying();
 }
@@ -139,10 +148,12 @@ function deal() {
     resolving: false,
     matches: 0,
     misses: 0,
-    taps: 0
+    taps: 0,
+    nudges: 0
   };
 
   renderTiles();
+  renderDots();
   updateBar();
   el.grid.focus({ preventScroll: true });
 
@@ -278,6 +289,19 @@ function renderTiles() {
   el.grid.replaceChildren(...nodes);
 }
 
+// One dot per pair, drawn once a deal and only ever filled in after that, so
+// the dot that has just been won is the only one that pops.
+function renderDots() {
+  const pairs = round.tiles.length / 2;
+  const nodes = [];
+  for (let i = 0; i < pairs; i += 1) {
+    const dot = document.createElement('span');
+    dot.className = 'mk-dot';
+    nodes.push(dot);
+  }
+  el.dots.replaceChildren(...nodes);
+}
+
 function onTileTap(index) {
   if (round === null || round.resolving) {
     return;
@@ -318,6 +342,7 @@ function resolveMatch(a, b) {
   round.resolving = true;
   round.matches += 1;
   round.taps = 0;
+  round.nudges = 0;
   state.totalMatches += 1;
 
   const last = round.matches * 2 >= round.tiles.length;
@@ -365,7 +390,43 @@ function maybeNudge() {
     return;
   }
   round.taps = 0;
+  round.nudges += 1;
   banter.speak('idle_nudge', { name: state.name });
+
+  if (round.nudges >= GLOW_AFTER_NUDGES) {
+    round.nudges = 0;
+    breathePair();
+  }
+}
+
+// Light one real pair for a moment. Silent on purpose: the kaki is already
+// talking, and nothing anywhere calls this help.
+function breathePair() {
+  const seen = new Map();
+  for (let i = 0; i < round.tiles.length; i += 1) {
+    const tile = round.tiles[i];
+    if (tile.state === 'cleared') {
+      continue;
+    }
+    const twin = seen.get(tile.id);
+    if (twin !== undefined) {
+      breathe(twin);
+      breathe(i);
+      return;
+    }
+    seen.set(tile.id, i);
+  }
+}
+
+function breathe(index) {
+  const node = nodeAt(index);
+  if (!node) {
+    return;
+  }
+  node.classList.add('is-glow');
+  window.setTimeout(function () {
+    node.classList.remove('is-glow');
+  }, GLOW_MS);
 }
 
 function finishRound() {
@@ -381,11 +442,20 @@ function finishRound() {
 
   el.winName.textContent = state.name;
   el.winNote.textContent = 'All ' + pairs + ' pairs found.';
-  // Start the card under the bubble so the kakis keep cheering above it.
+  el.win.hidden = false;
+  // Start the card under the bubble so the kakis keep cheering above it. The
+  // win line has not landed yet, so this is the slot as it stands; createBanter
+  // calls back and this runs again once the line is on screen.
+  syncWinTop();
+  banter.speak('round_win', { name: state.name });
+}
+
+function syncWinTop() {
+  if (el.win.hidden) {
+    return;
+  }
   const slot = el.bubbleSlot.getBoundingClientRect();
   el.win.style.setProperty('--mk-win-top', Math.max(0, Math.round(slot.bottom)) + 'px');
-  el.win.hidden = false;
-  banter.speak('round_win', { name: state.name });
 }
 
 /* ---- small helpers ------------------------------------------------------ */
@@ -402,6 +472,9 @@ function setTileState(index, value) {
 function updateBar() {
   el.playerName.textContent = state.name;
   el.progress.textContent = round.matches + ' of ' + round.tiles.length / 2 + ' pairs';
+  for (let i = 0; i < el.dots.children.length; i += 1) {
+    el.dots.children[i].classList.toggle('is-found', i < round.matches);
+  }
 }
 
 function wireControls() {

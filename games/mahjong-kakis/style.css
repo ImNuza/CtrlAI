@@ -125,10 +125,16 @@ body {
 
 /* ---- Bubble ------------------------------------------------------------- */
 
+/* Three lines is the resting shape of the slot, and the flex stretch keeps the
+   bubble filling it. A long name pushes the longest lines onto a fourth line,
+   so the slot is a floor rather than a ceiling: it grows by one line and the
+   table below simply starts lower. game.js re-measures --mk-win-top whenever
+   the bubble changes, so the celebration card follows the slot either way. */
 .mk-bubble-slot {
   position: relative;
   z-index: 2;
-  height: var(--mk-bubble-height);
+  display: flex;
+  min-height: var(--mk-bubble-height);
   padding-top: var(--sp-3);
 }
 
@@ -140,8 +146,7 @@ body {
   justify-content: center;
   gap: var(--sp-1);
   width: 100%;
-  height: 100%;
-  min-height: var(--tap-min);
+  min-height: calc(var(--mk-bubble-height) - var(--sp-3));
   padding: var(--sp-3) var(--sp-4);
   border: 3px solid var(--accent);
   border-radius: var(--radius-md);
@@ -171,13 +176,14 @@ body {
   color: var(--accent);
 }
 
-/* Three lines is what the slot holds. Clamping the text and not the bubble
-   keeps the pointer, which lives outside the box, from being clipped away. */
+/* Four lines covers every line in the bank at the longest name the input will
+   take, measured at 360px. Clamping the text and not the bubble keeps the
+   pointer, which lives outside the box, from being clipped away. */
 .mk-bubble-text {
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-  line-clamp: 3;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
   overflow: hidden;
   overflow-wrap: break-word;
 }
@@ -357,14 +363,39 @@ body {
   animation: mk-wiggle var(--dur-base) var(--ease-out) 1;
 }
 
+/* When a kaki has offered help twice with nothing found in between, one pair
+   breathes for a moment. Nothing on screen calls it a hint and the tile stays
+   an ordinary tap. Reduced motion gets the same news as a steady accent edge
+   instead of a pulse. */
+.mk-tile.is-glow {
+  border-color: var(--accent);
+  animation: mk-glow calc(var(--dur-slow) * 2) var(--ease-in-out) 1;
+}
+
+@keyframes mk-glow {
+  0% { box-shadow: inset 0 -10px 0 var(--accent-tint), 0 4px 0 rgba(122, 63, 6, 0.32), var(--shadow-card); }
+  50% { box-shadow: inset 0 -10px 0 var(--accent-tint), 0 0 0 6px var(--accent-tint), 0 4px 0 rgba(122, 63, 6, 0.32), var(--shadow-raised); }
+  100% { box-shadow: inset 0 -10px 0 var(--accent-tint), 0 4px 0 rgba(122, 63, 6, 0.32), var(--shadow-card); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-tile.is-glow {
+    border-width: 5px;
+  }
+}
+
 @keyframes mk-deal {
   from { opacity: 0; transform: translateY(10px) scale(0.94); }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
+/* A pair pops before it goes home: a small swell in the first third, then the
+   fade out that was always here. The whole thing still runs inside --dur-base,
+   which is the same 240ms game.js waits before clearing the pair. */
 @keyframes mk-clear {
-  from { opacity: 1; transform: translateY(-4px) scale(1); }
-  to { opacity: 0; transform: translateY(-4px) scale(0.62); }
+  0% { opacity: 1; transform: translateY(-4px) scale(1); }
+  30% { opacity: 1; transform: translateY(-7px) scale(1.06); }
+  100% { opacity: 0; transform: translateY(-4px) scale(0.62); }
 }
 
 @keyframes mk-wiggle {
@@ -403,18 +434,59 @@ body {
   color: var(--color-text-muted);
 }
 
+/* One dot per pair, filled as they come home. Decoration only: the row is aria
+   hidden and the sentence beside it carries the same news, so the dots stay
+   small without costing anybody a tap target.
+
+   The row never shrinks and never wraps. Eight dots plus the sentence plus a
+   three sided gap is more than 360px of player bar, so the name is the piece
+   that gives way; it has ellipsised since the bar was built, and a kaki says it
+   in full every time one of them speaks. */
+.mk-dots {
+  display: flex;
+  flex: none;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: var(--sp-1);
+}
+
+.mk-dot {
+  flex: none;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background-color: transparent;
+  box-shadow: inset 0 0 0 2px var(--color-border);
+}
+
+.mk-dot.is-found {
+  background-color: var(--accent);
+  box-shadow: none;
+  animation: mk-dot-in var(--dur-fast) var(--ease-out) 1;
+}
+
+@keyframes mk-dot-in {
+  from { transform: scale(0.4); }
+  to { transform: scale(1); }
+}
+
 /* ---- Celebration -------------------------------------------------------- */
 
 /* The scrim dims the table but the kakis and their bubble stay lit above it,
    so the round ends with the three of them still cheering. The card starts
-   below the bubble: game.js measures the slot and sets --mk-win-top. */
+   below the bubble: game.js measures the slot and sets --mk-win-top.
+
+   The card is pushed down by an auto margin rather than by flex end alignment.
+   When a four line bubble leaves too little room, an auto margin collapses to
+   nothing and the card simply starts under the bubble and scrolls, where flex
+   end alignment would have shoved it up underneath the bubble instead. */
 .mk-win {
   position: fixed;
   inset: 0;
   z-index: 1;
   display: flex;
-  align-items: flex-end;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
   padding:
     calc(var(--mk-win-top, 0px) + var(--sp-3))
     calc(var(--safe-right) + var(--sp-4))
@@ -426,17 +498,71 @@ body {
 }
 
 .mk-win-card {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: var(--sp-3);
   width: 100%;
   max-width: var(--page-max);
+  margin-top: auto;
   padding: var(--sp-4);
   border: 3px solid var(--accent);
   border-radius: var(--radius-lg);
   background-color: var(--color-surface);
   box-shadow: var(--shadow-raised);
+  overflow: hidden;
   animation: mk-rise-in var(--dur-base) var(--ease-out) 1;
+}
+
+/* The card's own words sit above the celebration behind them. */
+.mk-win-card > :not(.mk-cheer) {
+  position: relative;
+  z-index: 1;
+}
+
+/* Four pale shapes drifting up behind the card, painted by two elements. Off by
+   default so that anybody who asked for less motion never sees them at all. */
+.mk-cheer {
+  display: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .mk-cheer {
+    display: block;
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .mk-cheer::before,
+  .mk-cheer::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-repeat: no-repeat;
+    animation: mk-cheer-rise calc(var(--dur-slow) * 6) var(--ease-in-out) infinite;
+  }
+
+  .mk-cheer::before {
+    background-image:
+      radial-gradient(circle 13px at 14% 88%, var(--accent-tint) 98%, transparent 100%),
+      radial-gradient(circle 9px at 78% 96%, var(--accent-tint) 98%, transparent 100%);
+  }
+
+  .mk-cheer::after {
+    background-image:
+      radial-gradient(circle 8px at 44% 94%, rgba(122, 63, 6, 0.12) 98%, transparent 100%),
+      radial-gradient(circle 11px at 92% 90%, rgba(122, 63, 6, 0.1) 98%, transparent 100%);
+    animation-delay: var(--dur-slow);
+  }
+}
+
+@keyframes mk-cheer-rise {
+  0% { opacity: 0; transform: translateY(0); }
+  20% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0; transform: translateY(-100%); }
 }
 
 .mk-win-title {
@@ -461,6 +587,29 @@ body {
 @keyframes mk-rise-in {
   from { opacity: 0; transform: translateY(14px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* ---- Narrow phones ------------------------------------------------------ */
+
+/* At 400px and under, a four row table plus the bubble slot is more than 844px
+   of phone. The tiles are never allowed to give way, so the gaps do: the space
+   between the header, the kakis, the bubble and the table closes up by four
+   pixels each and the page edge follows. That buys back enough for the biggest
+   deal to land with the player bar still on screen at 360. */
+@media (max-width: 25rem) {
+  body {
+    padding-top: calc(var(--safe-top) + var(--sp-3));
+    padding-bottom: calc(var(--safe-bottom) + var(--sp-3));
+  }
+
+  .mk-shell,
+  .mk-play {
+    gap: var(--sp-2);
+  }
+
+  .mk-player-bar {
+    gap: var(--sp-2);
+  }
 }
 
 /* ---- Wider phones ------------------------------------------------------- */

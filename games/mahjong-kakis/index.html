@@ -19,17 +19,20 @@
   </header>
 
   <section class="mk-kakis" aria-label="Your kakis at the table">
+    <!-- One short word under each portrait so the row never wraps on a narrow
+         phone. The title stays in the label for a screen reader, and the bubble
+         says the full name every time a kaki speaks. -->
     <div class="mk-kaki" data-kaki-slot="lily">
       <span class="mk-portrait" data-portrait="lily" aria-hidden="true"></span>
-      <span class="mk-kaki-name">Auntie Lily</span>
+      <span class="mk-kaki-name"><span class="visually-hidden">Auntie </span>Lily</span>
     </div>
     <div class="mk-kaki" data-kaki-slot="beng">
       <span class="mk-portrait" data-portrait="beng" aria-hidden="true"></span>
-      <span class="mk-kaki-name">Uncle Beng</span>
+      <span class="mk-kaki-name"><span class="visually-hidden">Uncle </span>Beng</span>
     </div>
     <div class="mk-kaki" data-kaki-slot="rose">
       <span class="mk-portrait" data-portrait="rose" aria-hidden="true"></span>
-      <span class="mk-kaki-name">Auntie Rose</span>
+      <span class="mk-kaki-name"><span class="visually-hidden">Auntie </span>Rose</span>
     </div>
   </section>
 
@@ -61,12 +64,14 @@
     </div>
     <div class="mk-player-bar">
       <span class="mk-player-name" data-player-name></span>
+      <span class="mk-dots" data-dots aria-hidden="true"></span>
       <span class="mk-progress" data-progress></span>
     </div>
   </section>
 
   <div class="mk-win" data-screen="win" hidden>
     <div class="mk-win-card">
+      <span class="mk-cheer" aria-hidden="true"></span>
       <h2 class="mk-win-title">Table cleared, <span data-win-name></span></h2>
       <p class="mk-win-note" data-win-note></p>
       <button class="btn mk-win-again" type="button" data-action="again">One more round</button>

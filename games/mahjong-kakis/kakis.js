@@ -6,6 +6,10 @@
   rotates, and nobody speaks twice in a row. The bubble is a button so a tap
   puts it away; it also fades itself after four seconds. Nothing in the game
   waits on that timeout, it is only a convenience.
+
+  The rotation starts wherever seat() puts it. game.js seats it from the number
+  of visits, so the kaki who says hello changes from one visit to the next
+  instead of Lily opening the door every single time.
 */
 
 import { aiGenerate } from '/shared/ai.js';
@@ -15,11 +19,13 @@ const DISMISS_MS = 4000;
 
 const ARROW_X = ['16.6%', '50%', '83.4%'];
 
+// A moment inside a round belongs to whoever suits it. The hello at the door is
+// deliberately not on this list: it belongs to the seated rotation, so a
+// returning player is met by a different face each time they come back.
 const AFFINITY = {
   near_miss: 'lily',
   round_win: 'beng',
-  idle_nudge: 'rose',
-  return_visit: 'lily'
+  idle_nudge: 'rose'
 };
 
 export const KAKIS = [
@@ -45,10 +51,14 @@ export function renderPortraits(root) {
 /**
  * Wire the shared bubble.
  * @param {ParentNode} root
- * @returns {{speak: Function, dismiss: Function}}
+ * @param {{onChange?: Function}} [options]  onChange runs after the bubble is
+ *   painted and after it is put away, for anything measuring the slot.
+ * @returns {{speak: Function, dismiss: Function, seat: Function}}
  */
-export function createBanter(root) {
+export function createBanter(root, options) {
   const scope = root || document;
+  const settings = options === null || typeof options !== 'object' ? {} : options;
+  const onChange = typeof settings.onChange === 'function' ? settings.onChange : null;
   const bubble = scope.querySelector('[data-bubble]');
   const nameEl = scope.querySelector('[data-bubble-name]');
   const textEl = scope.querySelector('[data-bubble-text]');
@@ -62,6 +72,16 @@ export function createBanter(root) {
     bubble.addEventListener('click', function () {
       dismiss();
     });
+  }
+
+  /**
+   * Choose which chair the rotation starts from.
+   * @param {number} visits  How many times this player has opened the game.
+   */
+  function seat(visits) {
+    const whole = Number.isFinite(visits) ? Math.floor(visits) : 0;
+    rotation = ((whole % KAKIS.length) + KAKIS.length) % KAKIS.length;
+    lastId = null;
   }
 
   function pick(event) {
@@ -101,6 +121,10 @@ export function createBanter(root) {
 
     window.clearTimeout(timer);
     timer = window.setTimeout(dismiss, DISMISS_MS);
+
+    if (onChange) {
+      onChange();
+    }
   }
 
   function dismiss() {
@@ -121,6 +145,10 @@ export function createBanter(root) {
       if (slot) {
         slot.classList.remove('is-speaking');
       }
+    }
+
+    if (onChange) {
+      onChange();
     }
   }
 
@@ -145,7 +173,7 @@ export function createBanter(root) {
     return { kaki: kaki.id, text: line.text };
   }
 
-  return { speak: speak, dismiss: dismiss };
+  return { speak: speak, dismiss: dismiss, seat: seat };
 }
 
 /* ---- internals ---------------------------------------------------------- */

@@ -36,6 +36,15 @@ const DASHES = /[\u2013\u2014]/;
 const EXPECTED_ROUNDS = 'a few rounds';
 const BEST_MARKERS = ['first try', 'found every pair', 'to the last pair'];
 
+// A long name is the worst case for the bubble: it pushes the longest lines in
+// the bank onto a fourth line. The two phrases below are the longest game.js
+// can put in the {rounds} and {best} slots, so the sweep measures the widest
+// sentence the game can ever say.
+const LONG_NAME = 'Josephine Tan';
+const LONGEST_ROUNDS = 'a few rounds';
+const LONGEST_BEST = 'how you cleared it first try';
+const SPEAKERS = { lily: 'Auntie Lily', beng: 'Uncle Beng', rose: 'Auntie Rose' };
+
 function check(condition, message) {
   if (!condition) {
     throw new Error(message);
@@ -127,9 +136,9 @@ async function lintBank() {
 
 /* ---- browser helpers ---------------------------------------------------- */
 
-async function openSeeded(browser, seed) {
+async function openSeeded(browser, seed, viewport) {
   const context = await browser.newContext({
-    viewport: { width: 390, height: 844 },
+    viewport: viewport || { width: 390, height: 844 },
     deviceScaleFactor: 2,
     isMobile: true,
     hasTouch: true,
@@ -166,13 +175,63 @@ async function readBubble(page, event) {
       event: el.dataset.event || '',
       kaki: el.dataset.kaki || '',
       text: (text?.textContent || '').trim(),
-      // The bubble clamps at three lines. A memory callback that gets cut off
-      // is a broken beat, so the rendered text has to fit the box it lives in.
-      // The tolerance is half a line: the clamp itself leaves a couple of
-      // subpixels on a full three line message, and that loses no words.
+      // The bubble clamps at four lines and the slot grows to hold them. A
+      // memory callback that gets cut off is a broken beat, so the rendered
+      // text has to fit the box it lives in. Two tolerances: half a line for
+      // the loose reading, and two pixels for the strict one, which is the
+      // subpixel the clamp leaves on a message that fills its last line.
       clipped: text ? text.scrollHeight > text.clientHeight + 20 : false,
+      tight: text ? text.scrollHeight > text.clientHeight + 2 : false,
+      lines: text ? Math.round(text.scrollHeight / parseFloat(getComputedStyle(text).lineHeight)) : 0,
     };
   });
+}
+
+/*
+  Every line a kaki can say about a shared history, rendered into the real
+  bubble at the longest name the name field will take. Driving all thirty
+  through the speak path would need thirty page loads, so the sweep writes each
+  candidate into the live element and measures it there: same element, same
+  font, same width, same clamp.
+*/
+async function sweepLongLines(page, bank, name) {
+  const cases = [];
+  for (const [key, lines] of Object.entries(bank)) {
+    if (!key.startsWith('return_visit__') && !key.startsWith('round_win__')) {
+      continue;
+    }
+    const kaki = key.split('__')[1];
+    for (const line of lines) {
+      cases.push({
+        key,
+        speaker: SPEAKERS[kaki] || '',
+        text: line
+          .replace(/\{name\}/g, name)
+          .replace(/\{rounds\}/g, LONGEST_ROUNDS)
+          .replace(/\{best\}/g, LONGEST_BEST),
+      });
+    }
+  }
+
+  const measured = await page.evaluate((list) => {
+    const nameEl = document.querySelector('[data-bubble-name]');
+    const textEl = document.querySelector('[data-bubble-text]');
+    const slot = document.querySelector('[data-bubble-slot]');
+    const lineHeight = parseFloat(getComputedStyle(textEl).lineHeight);
+    return list.map((item) => {
+      nameEl.textContent = item.speaker;
+      textEl.textContent = item.text;
+      return {
+        key: item.key,
+        text: item.text,
+        lines: Math.round(textEl.scrollHeight / lineHeight),
+        slotHeight: Math.round(slot.getBoundingClientRect().height),
+        clipped: textEl.scrollHeight > textEl.clientHeight + 2,
+      };
+    });
+  }, cases);
+
+  return measured;
 }
 
 async function main() {
@@ -248,6 +307,74 @@ async function main() {
 
       summary.scenarios.fresh = { nameScreen: true };
       await context.close();
+    }
+
+    /*
+      (e) the long name on the narrow phone. Three visits in a row, because the
+      rotation is seated from the visit count: the same kaki must not be the one
+      who opens the door every time somebody comes back. Each greeting has to
+      fit the bubble, and so does every other line about a shared history.
+    */
+    {
+      const bank = JSON.parse(await readFile(BANK_PATH, 'utf8'));
+      const greetings = [];
+      let sweep = [];
+
+      for (const visits of [1, 2, 3]) {
+        const { context, page, errors } = await openSeeded(
+          browser,
+          profile({ name: LONG_NAME, visits }),
+          { width: 360, height: 844 }
+        );
+        const bubble = await readBubble(page, 'return_visit');
+        check(
+          bubble.text.includes(LONG_NAME),
+          `visit ${visits}: the long name did not survive: "${bubble.text}"`
+        );
+        check(!/\{|\}/.test(bubble.text), `visit ${visits}: unfilled slot: "${bubble.text}"`);
+        check(!bubble.clipped, `visit ${visits}: line is clipped: "${bubble.text}"`);
+        check(
+          !bubble.tight,
+          `visit ${visits}: line loses its last pixels: "${bubble.text}"`
+        );
+        if (visits === 2) {
+          sweep = await sweepLongLines(page, bank, LONG_NAME);
+        }
+        check(errors.length === 0, `visit ${visits}: page errors: ${errors.join(' | ')}`);
+        greetings.push({ visits, kaki: bubble.kaki, lines: bubble.lines, text: bubble.text });
+        await context.close();
+      }
+
+      check(
+        greetings[1].kaki !== greetings[0].kaki,
+        `visits 1 and 2 were both greeted by ${greetings[0].kaki}`
+      );
+      check(
+        greetings[2].kaki !== greetings[1].kaki,
+        `visits 2 and 3 were both greeted by ${greetings[1].kaki}`
+      );
+      check(
+        new Set(greetings.map((g) => g.kaki)).size === KAKIS.length,
+        `three visits were greeted by ${JSON.stringify(greetings.map((g) => g.kaki))}`
+      );
+
+      const cut = sweep.filter((item) => item.clipped);
+      check(
+        cut.length === 0,
+        `${cut.length} of ${sweep.length} history lines are clipped at 360px, first: "${
+          cut.length ? cut[0].text : ''
+        }"`
+      );
+
+      summary.scenarios.longName = {
+        name: LONG_NAME,
+        viewport: '360x844',
+        greetings,
+        swept: sweep.length,
+        clipped: cut.length,
+        widestLine: Math.max(...sweep.map((item) => item.lines)),
+        tallestSlot: Math.max(...sweep.map((item) => item.slotHeight)),
+      };
     }
 
     process.stdout.write(JSON.stringify(summary, null, 2) + '\n');
