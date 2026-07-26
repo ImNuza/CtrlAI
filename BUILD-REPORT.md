@@ -4,7 +4,7 @@ Live status document for the unattended overnight build of three game prototypes
 
 ## Status
 
-Phase 2 in progress. All three games reached full definition of done, each independently verified by the conductor. Conductor integration sweep passed (all four routes clean from one server, back links present, no console.log, no emojis, no em dashes in shipped game code; one em dash in a QA script queued for the fix round). A nine-agent adversarial QA workflow (fresh-player drive, senior floor deep audit, content and honesty audit, per game) is running now.
+COMPLETE, about 03:50. All three games playable, at or past their definitions of done, adversarially QA'd, fix rounds closed, everything committed. Final verification battery run from scratch by the conductor immediately before this status: all nine QA suites exit 0 (shared selftest, memory garden loop and lint-bank, mahjong core, memory, dial, and stability, scam dojo smoke and dod), all four routes inspect clean at a phone viewport with zero errors and zero senior-floor warnings, no stray servers, no console.log, no em dashes in shipped files, working tree clean.
 
 ## Mission recap
 
@@ -37,17 +37,32 @@ node server.js then open http://localhost:4173 in a phone-sized viewport. Each g
 - mahjong-kakis: MILESTONE B COMPLETE and conductor-verified. Full definition of done exceeded: six banter events live (four required), memory callback with stored name and history fact proven via seeded storage, hidden dial verified at four performance profiles, 93 banter lines with per-kaki voice through the AI seam. core, memory, and dial QA suites all pass under independent conductor reruns, inspector clean. README committed. Commits 92b686d, 84f1fae, 64fdfc9, 34404ee, 254f41a.
 - scam-dojo: MILESTONE B COMPLETE and conductor-verified. Full definition of done: 9 of 9 DoD suite sections pass under an independent conductor rerun (9 scripts across 8 families, 294 templates through the AI seam, 14-round variety, streak survives reload, comply path teaches kindly, zero errors). README committed by the orchestrator (f94a98b). Commits be90cca, 38bcf60, 91b4782, d869f5a, f94a98b.
 
-## Verification results
+## Verification results (final matrix)
 
-None yet. Definitions of done will each be verified by driving the games headless and on the browser pane, evidence recorded here.
+Every definition of done item was verified by driving the real UI headless at 390x844 with touch, by scripts asserting outcomes, plus screenshots read by actual eyes (orchestrators and conductor separately). Conductor reran every suite from scratch at the end.
 
-## Known issues
+Memory Garden: two sessions with different answers produce plants differing in 4 of 4 traits and substantially different SVGs, PASS. Revisit renders everything from storage, corrupt saves recover, PASS. Full loop is 9 taps, zero required typing, well under the 4 minute budget, PASS. 84 loop checks plus 57 bank lint checks green.
 
-None yet.
+Mahjong Kakis: full round playable warm from name chip to celebration, PASS. Banter reacts to six distinct events, four required, PASS. Seeded second visit skips the name screen and greets with the stored name plus a history fact, with real variety across visits, PASS. Zero-instruction start, one obvious action, PASS. Hidden dial deals 8 to 16 tiles by stored performance, invisible in UI, PASS. core, memory, dial, stability suites green.
+
+Scam Dojo: three consecutive rounds rotate scam families with pairwise different transcripts, PASS across multiple independent runs drawing different families. Wrong taps teach gently with zero penalty, comply path teaches kindly and still awards the shield, PASS. Streak survives reload (proven at 3 and at 14), PASS. Home has exactly one filled primary action, PASS. 13 of 13 dod sections plus 16 smoke checks green, content clean of real institution names.
+
+Cross-cutting: senior floor audited on every reachable screen state by the adversarial sweep and re-verified after fixes (no sub-60px targets, no sub-28px text, no horizontal scroll, reduced motion safe). Hub and all three routes serve clean from one command.
+
+## Known issues (honest, also in each game README)
+
+- Memory Garden: picker blurbs stay hidden at phone widths (every layout variant tried broke 360px, decision recorded in code); woven palm is the least plant-like silhouette; long captions scroll within the replay panel.
+- Mahjong Kakis: reloading mid-round resets the round (session stats survive; in-round resume needs a state-shape decision that was wrong to rush at 4am); banter variety ceilings noted in README.
+- Scam Dojo: streak counts completed rounds, not calendar days; three variants per call line can show patterns over very long sessions.
+- Repo-wide: fresh-clone QA needs one npm install for playwright (QA only, games have zero dependencies). The package.json stderr warning under node is cosmetic, see decision 9.
 
 ## What Dewa should check first
 
-Placeholder until final. If the run halted early, check git log and the Status line above.
+1. node server.js, open localhost:4173 on a phone viewport, play all three games twice each (second visits trigger the memory beats). This is the point of the whole night.
+2. Read the three game READMEs for what is mocked and known issues; they were fact-checked against the code.
+3. Skim the Decision log above, especially: game-creator skill install skipped (upstream repo restructured, off-brief monetization), the amend incident (fully recovered, rule issued), and the adversarial QA sweep section (20 serious findings found and fixed after definitions of done were already met).
+4. The scoring rubric for Matthew and Zoe is in the top-level README.
+5. Obsidian build-log entry was intentionally not written (blast-radius rule); say the word after waking and it gets backfilled from this report.
 
 ## Phase 1 gate log
 
