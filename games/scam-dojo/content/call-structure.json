@@ -4,7 +4,10 @@
     "secrecy": "Keep it secret",
     "unusual_payment": "Odd way to pay",
     "no_callback": "Blocks you from checking",
-    "detail_fishing": "Fishing for your details"
+    "detail_fishing": "Fishing for your details",
+    "too_good": "Too good to be true",
+    "penalty_threat": "Scaring you with trouble",
+    "official_transfer": "Move it to their account"
   },
   "scripts": [
     {
@@ -67,6 +70,133 @@
         "item": ["watch", "health supplement", "phone charger"],
         "place": ["Changi", "Jurong", "Paya Lebar"],
         "amount": ["$38", "$62", "$115"]
+      }
+    },
+    {
+      "id": "official-1",
+      "family": "official",
+      "callerName": "Central Registry Office",
+      "callerNumber": "+65 0000 3105",
+      "lines": [
+        { "event": "official1_1", "tell": null, "benign": "greeting" },
+        { "event": "official1_2", "tell": null, "benign": "identity" },
+        { "event": "official1_3", "tell": null, "benign": "logistics" },
+        { "event": "official1_4", "tell": "penalty_threat" },
+        { "event": "official1_5", "tell": null, "benign": "smalltalk" },
+        { "event": "official1_6", "tell": "urgency" },
+        { "event": "official1_7", "tell": null, "benign": "logistics" },
+        { "event": "official1_8", "tell": "official_transfer" }
+      ],
+      "slots": {
+        "officer": ["Tan Wei Ming", "Nadia Rahim", "Loh Kok Wah"],
+        "ref": ["CR-70412", "CR-33861", "CR-92057"],
+        "amount": ["$1,200", "$2,850", "$4,600"],
+        "deadline": ["four o'clock", "five thirty", "noon"]
+      }
+    },
+    {
+      "id": "luckydraw-1",
+      "family": "luckydraw",
+      "callerName": "Lucky Star Draw",
+      "callerNumber": "+65 0000 9264",
+      "lines": [
+        { "event": "luckydraw1_1", "tell": null, "benign": "greeting" },
+        { "event": "luckydraw1_2", "tell": null, "benign": "identity" },
+        { "event": "luckydraw1_3", "tell": "too_good" },
+        { "event": "luckydraw1_4", "tell": null, "benign": "smalltalk" },
+        { "event": "luckydraw1_5", "tell": "detail_fishing" },
+        { "event": "luckydraw1_6", "tell": null, "benign": "logistics" },
+        { "event": "luckydraw1_7", "tell": "unusual_payment" }
+      ],
+      "slots": {
+        "host": ["Jason Neo", "Melissa Koh", "Ryan Baskaran"],
+        "prize": ["$4,800", "$3,600", "$2,900"],
+        "fee": ["$180", "$240", "$320"],
+        "place": ["Bugis", "Tampines", "Serangoon"]
+      }
+    },
+    {
+      "id": "techsupport-1",
+      "family": "techsupport",
+      "callerName": "TechCare Support",
+      "callerNumber": "Private Number",
+      "lines": [
+        { "event": "techsupport1_1", "tell": null, "benign": "greeting" },
+        { "event": "techsupport1_2", "tell": null, "benign": "identity" },
+        { "event": "techsupport1_3", "tell": "urgency" },
+        { "event": "techsupport1_4", "tell": null, "benign": "logistics" },
+        { "event": "techsupport1_5", "tell": "detail_fishing" },
+        { "event": "techsupport1_6", "tell": null, "benign": "smalltalk" },
+        { "event": "techsupport1_7", "tell": "unusual_payment" }
+      ],
+      "slots": {
+        "tech": ["Ariff", "Winston", "Charmaine"],
+        "device": ["laptop", "tablet", "home computer"],
+        "code": ["TB-4471", "TB-2093", "TB-8810"],
+        "amount": ["$180", "$260", "$420"]
+      }
+    },
+    {
+      "id": "charity-1",
+      "family": "charity",
+      "callerName": "Harmony Rain Relief",
+      "callerNumber": "+65 0000 5518",
+      "lines": [
+        { "event": "charity1_1", "tell": null, "benign": "greeting" },
+        { "event": "charity1_2", "tell": null, "benign": "identity" },
+        { "event": "charity1_3", "tell": "urgency" },
+        { "event": "charity1_4", "tell": null, "benign": "smalltalk" },
+        { "event": "charity1_5", "tell": "unusual_payment" },
+        { "event": "charity1_6", "tell": "no_callback" }
+      ],
+      "slots": {
+        "volunteer": ["Grace", "Hafiz", "Daniel"],
+        "disaster": ["flood", "landslide", "fire"],
+        "amount": ["$180", "$350", "$500"],
+        "place": ["Sembawang", "Hougang", "Queenstown"]
+      }
+    },
+    {
+      "id": "investment-1",
+      "family": "investment",
+      "callerName": "Golden Ox Capital",
+      "callerNumber": "+65 0000 2247",
+      "lines": [
+        { "event": "investment1_1", "tell": null, "benign": "greeting" },
+        { "event": "investment1_2", "tell": null, "benign": "identity" },
+        { "event": "investment1_3", "tell": "too_good" },
+        { "event": "investment1_4", "tell": null, "benign": "smalltalk" },
+        { "event": "investment1_5", "tell": "secrecy" },
+        { "event": "investment1_6", "tell": null, "benign": "logistics" },
+        { "event": "investment1_7", "tell": "penalty_threat" }
+      ],
+      "slots": {
+        "advisor": ["Kenneth Yeo", "Serene Tay", "Marcus Pillai"],
+        "fund": ["Harvest", "Silver Rice", "Evergreen"],
+        "rate": ["twelve percent", "eighteen percent", "twenty percent"],
+        "amount": ["$2,000", "$3,500", "$4,800"]
+      }
+    },
+    {
+      "id": "grandchild-2",
+      "family": "grandchild",
+      "callerName": "Unknown Caller",
+      "callerNumber": "+65 0000 6390",
+      "lines": [
+        { "event": "grandchild2_1", "tell": null, "benign": "greeting" },
+        { "event": "grandchild2_2", "tell": null, "benign": "identity" },
+        { "event": "grandchild2_3", "tell": null, "benign": "logistics" },
+        { "event": "grandchild2_4", "tell": "penalty_threat" },
+        { "event": "grandchild2_5", "tell": null, "benign": "smalltalk" },
+        { "event": "grandchild2_6", "tell": "no_callback" },
+        { "event": "grandchild2_7", "tell": "official_transfer" }
+      ],
+      "slots": {
+        "grandname": ["Mei Ling", "Aaron", "Siti"],
+        "amount": ["$2,900", "$3,600", "$4,800"],
+        "place": ["Clementi", "Woodlands", "Kallang"],
+        "hospital": ["Eastview General", "Sunbridge General", "Harbourlight General"],
+        "relation": ["Ah Ma", "Ah Gong", "Auntie"]
       }
     }
   ]

@@ -107,6 +107,222 @@
     "Please stay on the line. If you check with somebody else, the parcel goes back overseas tonight."
   ],
 
+  "official1_1": [
+    "Good morning. Is this the person listed at this address?",
+    "Hello. Sorry to disturb your morning, this is an official call.",
+    "Good afternoon. Please stay on the line, this one concerns your own record."
+  ],
+  "official1_2": [
+    "This is officer {officer} from the Central Registry Office.",
+    "Central Registry Office here, officer {officer} speaking.",
+    "My name is on the notice we posted last week. Officer {officer}, Central Registry Office."
+  ],
+  "official1_3": [
+    "Your file is open under reference {ref}. Please write that down.",
+    "Reference {ref} is on my screen now, in case you need it later.",
+    "We opened the case last Thursday under reference {ref}."
+  ],
+  "official1_4": [
+    "If this is not settled today, the fine goes up, {amount} at least, and an officer will come to your door.",
+    "The step after a fine is an arrest warrant. I do not want that for you, but the system moves on its own.",
+    "Refusing to cooperate is an offence by itself. That means a court date, and at your age that is a hard morning."
+  ],
+  "official1_5": [
+    "I know, it is a lot before lunch. Sit down first if you are standing.",
+    "Yes, many people get this call and none of them expected it. You are not the only one.",
+    "Take a sip of water. I can wait a moment."
+  ],
+  "official1_6": [
+    "The window closes before {deadline} today, so please do not put the phone down.",
+    "I have to key in your answer now. Once my shift ends, nobody can help you with this.",
+    "Every minute you spend thinking about it, the file moves closer to the enforcement side."
+  ],
+  "official1_7": [
+    "Our counter is open nine to five on weekdays.",
+    "This call is recorded for the case file, as usual.",
+    "There is a second page to the notice, but it is only the address."
+  ],
+  "official1_8": [
+    "Move your savings into the government safety account I will read out, just until we clear your name.",
+    "Transfer {amount} into the holding account under the Central Registry Office and it comes back after the check.",
+    "The safest place for your money now is our verification account. Write the numbers down and go to the machine."
+  ],
+
+  "luckydraw1_1": [
+    "Good afternoon. Am I speaking to the winner of our draw?",
+    "Hello, hello. Congratulations, you picked up at the right time.",
+    "Good morning. This is a happy call for once, not a bad one."
+  ],
+  "luckydraw1_2": [
+    "This is {host} calling from the Lucky Star Draw office.",
+    "Lucky Star Draw here, {host} from the prize desk.",
+    "I am {host} from the prize desk, and your name came out today."
+  ],
+  "luckydraw1_3": [
+    "Your number came out first at the {place} roadshow, and the prize money {prize} is already under your name.",
+    "You have won the top prize, {prize} in cash, no purchase and no catch.",
+    "Out of forty thousand entries yours came out top, so the {prize} cheque is waiting."
+  ],
+  "luckydraw1_4": [
+    "Wah, you sound so calm. Most people shout when I tell them.",
+    "Yes, it is real. Sit down first, take your time.",
+    "The office here is noisy because everybody is calling winners today."
+  ],
+  "luckydraw1_5": [
+    "To put the prize in your name I need your full name, identity card number and date of birth.",
+    "Which bank do you use, and what is the account number? The cheque cannot be issued without it.",
+    "Read me the numbers on your card and the three digits behind, that is how we confirm the winner."
+  ],
+  "luckydraw1_6": [
+    "Collection is at our office on the twelfth floor, weekdays only.",
+    "The cheque takes about five working days to clear after that.",
+    "I will note this call under the {place} roadshow list."
+  ],
+  "luckydraw1_7": [
+    "There is a small processing fee, {fee} only. Buy shopping vouchers and read me the codes.",
+    "Before we release the money you settle the stamp fee, {fee} in gift cards, that is our system.",
+    "Do not transfer to a bank. Buy the cards from the shop downstairs and send me a photo of the back."
+  ],
+
+  "techsupport1_1": [
+    "Hello, good morning. Sorry to call you out of the blue.",
+    "Good afternoon. Am I speaking to the owner of the computer in this house?",
+    "Hello. Please do not hang up, this is about your own device."
+  ],
+  "techsupport1_2": [
+    "This is {tech} from TechCare Support, the team that watches your device.",
+    "TechCare Support here, {tech} speaking from the security desk.",
+    "I am one of the engineers here, {tech} from TechCare Support."
+  ],
+  "techsupport1_3": [
+    "Your {device} is sending out data as we speak, so please stay with me now.",
+    "We have maybe ten minutes before the files start copying out. Do not switch it off, just follow me.",
+    "This is happening right now, not later. Every minute the hidden program spreads a bit more."
+  ],
+  "techsupport1_4": [
+    "Our ticket for you is {code}, keep it near the phone.",
+    "The scan report came in last night, about four pages long.",
+    "Support hours are eight in the morning to ten at night, every day."
+  ],
+  "techsupport1_5": [
+    "Read me the password you use for the computer so I can match it with our record.",
+    "I need your full name, your identity card number, and the card you used to buy the {device}.",
+    "What is the code the bank sent to your phone just now? Say it slowly."
+  ],
+  "techsupport1_6": [
+    "Aiyah, these machines are all like that. Even my own one gave me trouble last week.",
+    "Take your time. I can hear the radio, no need to turn it off.",
+    "No, you did nothing wrong. It happens to many people on your street."
+  ],
+  "techsupport1_7": [
+    "The repair licence costs {amount}. Buy gift cards from the shop downstairs and read me the numbers.",
+    "We cannot take a normal transfer for this, only shopping vouchers, {amount} worth.",
+    "Pay the {amount} in cards today and I will refund it to you at the counter next month."
+  ],
+
+  "charity1_1": [
+    "Good evening. Sorry to knock on your phone so late.",
+    "Hello Auntie, hello Uncle, good evening. Just two minutes of your time.",
+    "Good afternoon. I am calling every home on this street today."
+  ],
+  "charity1_2": [
+    "This is {volunteer} from the Harmony Rain Relief Fund.",
+    "Harmony Rain Relief Fund here, {volunteer} speaking, I am one of the volunteers.",
+    "Volunteer {volunteer} here, calling for the Harmony Rain Relief Fund."
+  ],
+  "charity1_3": [
+    "The lorries leave tonight, so the pledge has to come in within the hour.",
+    "Please decide now. After eight o'clock the list closes and the {disaster} families get nothing from this street.",
+    "I know it is sudden. There is no time to sleep on it, the need is today."
+  ],
+  "charity1_4": [
+    "You have a kind voice. Many people just put down the phone on me.",
+    "Yes, the news has been showing it since Monday. Very sad to watch.",
+    "Do not worry, I am not asking you to come down anywhere."
+  ],
+  "charity1_5": [
+    "Just transfer the {amount} to my own account, the fund account is still being opened.",
+    "Buy shopping vouchers for {amount} and read me the codes, we use them to buy rice directly.",
+    "Cash is best. Our volunteer can come to your void deck tonight and collect it."
+  ],
+  "charity1_6": [
+    "No need to check the charity register, we are a new group, you will not find us there yet.",
+    "Do not call back on this number, it is a borrowed phone from the {place} collection point.",
+    "Please do not go and ask your neighbours first. By then the lorries are gone."
+  ],
+
+  "investment1_1": [
+    "Good morning. Do you have five minutes for something good?",
+    "Hello. I hope I am not calling at a bad time.",
+    "Good afternoon. A friend of yours passed me this number, I hope that is alright."
+  ],
+  "investment1_2": [
+    "This is {advisor} from Golden Ox Capital.",
+    "Golden Ox Capital here, {advisor} speaking, I look after the older clients.",
+    "I am {advisor}, one of the advisers at Golden Ox Capital."
+  ],
+  "investment1_3": [
+    "Our {fund} portfolio pays a {rate} return every month, and the capital is guaranteed.",
+    "There is no risk in this one. Every client last year took their money back plus a {rate} share on top.",
+    "Put in {amount} today and by the next festive season it has grown by half. Guaranteed, in writing."
+  ],
+  "investment1_4": [
+    "How is the weather on your side? Here the office window is all fogged up.",
+    "You sound like my own mother. She also asks a lot of questions, that is good.",
+    "Take your time. I am not going anywhere this afternoon."
+  ],
+  "investment1_5": [
+    "Do not mention this to your bank. They will only push their own products and block ours.",
+    "Better not tell your children yet. Young people panic and then you lose the slot.",
+    "Keep it between us. If the neighbours hear, the allocation is finished by tomorrow."
+  ],
+  "investment1_6": [
+    "Your slot is number nineteen on the list, out of twenty five.",
+    "The paperwork is two pages and I can bring it over any weekday.",
+    "We are on the fourteenth floor, the office with the wooden door."
+  ],
+  "investment1_7": [
+    "Your name is already on the allocation, so pulling out now means a breach fee, {amount} in your case.",
+    "If the money does not come in by Friday, our legal side sends a letter and that stays on your record.",
+    "Cancelling at this stage is a contract matter. I would rather not pass your file to them."
+  ],
+
+  "grandchild2_1": [
+    "Hello, good morning. Please sit down first {relation}.",
+    "Hello. Sorry to call so early, this is about your family.",
+    "Good morning. Please stay calm and listen to me carefully."
+  ],
+  "grandchild2_2": [
+    "I am the duty officer at the {hospital} admissions counter.",
+    "The {hospital} admissions counter is calling, duty officer speaking.",
+    "I work at the counter downstairs, {hospital} admissions."
+  ],
+  "grandchild2_3": [
+    "Your grandchild {grandname} came in at six this morning, a motorcycle accident near the {place} junction.",
+    "The bike went down at the {place} junction. The helmet held, the leg did not.",
+    "Your grandchild is in the observation ward now, second bed from the window."
+  ],
+  "grandchild2_4": [
+    "The other rider has already filed a report, so there is a case waiting and a fine on top.",
+    "If nothing is settled today the file goes to the enforcement side, and your grandchild answers for it alone.",
+    "Right now it is only a claim. Leave it until tomorrow and it becomes a court matter, {amount} in penalties."
+  ],
+  "grandchild2_5": [
+    "Yes, the line here is noisy. The counter is right beside the lift.",
+    "Drink some water first {relation}. I know this is a hard morning.",
+    "No, no, the injury is not life threatening. Please breathe."
+  ],
+  "grandchild2_6": [
+    "The ward line does not take calls from outside, so please do not put the phone down.",
+    "Do not try the handphone, it was damaged in the fall and we are holding it here.",
+    "If you hang up to check with the family, my shift ends and the file goes back into the queue."
+  ],
+  "grandchild2_7": [
+    "The deposit {amount} goes into the hospital holding account, and I will read the numbers out slowly.",
+    "Please transfer the deposit today into our official account, not to any person, and keep the receipt.",
+    "Go to the machine downstairs and put {amount} into the account under our admissions office. Then the doctor can start."
+  ],
+
   "affirm_catch": [
     "Good ear. That one is a classic.",
     "Yes lah, that line is the giveaway.",
@@ -168,6 +384,27 @@
     "Real staff verify you, they do not collect you. Being asked to read out everything is backwards.",
     "If a caller is building a form out of your life, stop answering and put the phone down."
   ],
+  "recap_too_good": [
+    "Nothing pays a guaranteed return every month, and nothing is won in a draw you never entered. The good news is the bait.",
+    "A prize that costs you money first is not a prize. Real winnings never need a fee to come out.",
+    "If the offer is far better than anything a real office would give you, that gap is the whole trick.",
+    "Luck does not telephone people. When the good news arrives by itself, slow down and look at who is really calling.",
+    "Free money with one small condition attached is the oldest line in the book."
+  ],
+  "recap_penalty_threat": [
+    "Fear is the tool here. Real offices send letters and give you time, they do not threaten arrest down the phone.",
+    "No genuine officer settles a fine over a call. A threat that keeps you talking is the tell by itself.",
+    "Real trouble comes with paperwork you can read and a number you can ring back. A voice alone is not proof.",
+    "A threat is meant to stop you thinking. Put the phone down and it has nowhere left to go.",
+    "When a caller starts talking about court or arrest, the aim is panic, not justice."
+  ],
+  "recap_official_transfer": [
+    "No office, no ward and no agency asks you to move your savings into an account read out over the phone.",
+    "A safety account, a holding account, a verification account. Different names, same trap, and the money does not come back.",
+    "Real fees are paid at a counter you can walk to, not to numbers dictated on a call.",
+    "Officials never need your savings to prove anything. They already hold their own records.",
+    "If somebody with an official voice tells you where to send your money, that is the moment to hang up."
+  ],
   "shield_earned": [
     "One more shield on the wall. That is practice, not luck.",
     "Shield earned. You will hear that voice coming next time.",
@@ -180,5 +417,61 @@
     "No harm done, this is only practice. Let us walk through it together.",
     "That is how it catches people, and it catches sharp people too. Have a look at what was really going on.",
     "Alright, let us rewind and look at that call properly."
+  ],
+  "walkthrough_step_urgency": [
+    "The rush was the point. Next would have come a stream of instructions while you were still catching up, with no gap to ring anyone.",
+    "Had you stayed inside that hurry, the caller would have kept the clock running right through the payment.",
+    "The next step would have been more pressure, then one small payment made while the panic was still fresh.",
+    "Going along with the countdown, you would have been kept on the line until it was done, and the checking never happens.",
+    "A real office would have let you take the day. The hurry existed to close that day down to a minute."
+  ],
+  "walkthrough_step_secrecy": [
+    "Had you kept it quiet, there would have been nobody to say wait a minute. That is exactly what the secret is for.",
+    "The next step would have been a second call, still just between the two of you, and the amounts grow each time.",
+    "Keeping it from your family leaves you alone with the caller. One sentence to a daughter or a neighbour usually ends it.",
+    "Had you promised to say nothing, the caller would have come back tomorrow with a bigger favour to ask.",
+    "The silence is the plan. Next would have come a reason why telling anyone makes it worse for you."
+  ],
+  "walkthrough_step_unusual_payment": [
+    "Next you would have been sent downstairs for vouchers, then asked to read the codes aloud. Once those numbers are spoken, they are spent.",
+    "The next step would have been a shop downstairs, then codes read into the phone. The money, {amount} in this case, does not come back.",
+    "Cash handed to somebody at your door leaves no trail, so afterwards there is nothing for anyone to reverse.",
+    "Going along with it, you would have made one small payment first, then a bigger one to release the first.",
+    "The odd payment is the part they cannot fake through a normal bank, so the next step is always away from one."
+  ],
+  "walkthrough_step_no_callback": [
+    "Staying on the line was the goal. The next step would have been a long call with no gap for you to check anything.",
+    "Had you agreed not to ring back, there would have been no moment for a second voice to say that sounds wrong.",
+    "The next step would have been more reasons the line cannot be called, each one keeping you in the same conversation.",
+    "Going along with it, you would have been talked through everything without once dialling the number on your own card or letter.",
+    "Nobody honest fears you calling back. Next would have come a fresh excuse the moment you tried."
+  ],
+  "walkthrough_step_too_good": [
+    "Going along with it, the next step would have been a small fee to release something that was never there.",
+    "The next step would have been paperwork that looks real, then one payment, then a reason why one more is needed.",
+    "The prize or the return keeps growing while the questions get quieter. That is how the good news pays for itself.",
+    "Had the offer been taken up, the first payment would have been small and the second one much less small.",
+    "A win you never entered and a return nobody else gets are the same promise, and both need your money first."
+  ],
+  "walkthrough_step_detail_fishing": [
+    "Once those details were read out, the caller would not have needed you again. The next call would have been to your bank, as you.",
+    "The next step would have been one more harmless question, then another, until the form was complete.",
+    "Your name, your card numbers and the code sent to your phone are the whole set. With them an account opens without you.",
+    "Had you answered, the details would have been used quietly, and the first sign would have been a message you did not expect.",
+    "Real staff already hold what they need to check you, so the next question would have been the one they actually wanted."
+  ],
+  "walkthrough_step_penalty_threat": [
+    "The threat was there to keep you moving. Next would have come a way to make it all go away, and it would have cost money.",
+    "Had the fear taken hold, the caller would have offered a settlement on the spot, payable right now.",
+    "A real case gives you a letter, a reference and time. The next step here would have been paying to stop something that was never happening.",
+    "Going along with it, you would have paid to avoid a court date that does not exist.",
+    "Nobody is arrested over the telephone. The next words would have been the amount that makes it stop."
+  ],
+  "walkthrough_step_official_transfer": [
+    "The next step would have been an account number read out slowly, and a walk to the machine while still on the phone.",
+    "Had the money moved into that safe account, it would have been out of reach within minutes.",
+    "A holding account, a safety account, a verification account. Whatever the name, the next step is always your money leaving your side.",
+    "Going along with it, you would have transferred {amount} to strangers who opened that account this morning.",
+    "No office asks you to move savings by phone. The next step would have been a receipt that helps nobody."
   ]
 }
