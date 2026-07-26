@@ -4,35 +4,77 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#fbf6ee">
+<meta name="description" content="Tile matching at a kopitiam table with three AI kakis who banter.">
 <title>Mahjong Kakis</title>
 <link rel="stylesheet" href="/shared/ui/tokens.css">
 <link rel="stylesheet" href="/shared/ui/base.css">
-<style>
-  :root {
-    --accent: var(--accent-kopitiam);
-    --accent-tint: var(--accent-kopitiam-tint);
-  }
-
-  .game-title {
-    color: var(--accent);
-  }
-</style>
+<link rel="stylesheet" href="/games/mahjong-kakis/style.css">
 </head>
 <body>
-<main class="page stack">
+<main class="page mk-shell">
 
-  <header class="stack stack-tight">
-    <h1 class="game-title">Mahjong Kakis</h1>
-    <p class="lead muted">Tiles at the kopitiam table, with three companions who remember you.</p>
+  <header class="mk-header">
+    <p class="mk-game-name">Mahjong Kakis</p>
+    <a class="btn btn-plain mk-back" href="/">Back<span class="visually-hidden"> to hub</span></a>
   </header>
 
-  <section class="card card-accent stack stack-tight">
-    <p class="card-title">Being built tonight</p>
-    <p>This screen is a placeholder. It proves the route, the shared tokens and the tap target floor. The table and the kakis land here shortly.</p>
+  <section class="mk-kakis" aria-label="Your kakis at the table">
+    <div class="mk-kaki" data-kaki-slot="lily">
+      <span class="mk-portrait" data-portrait="lily" aria-hidden="true"></span>
+      <span class="mk-kaki-name">Auntie Lily</span>
+    </div>
+    <div class="mk-kaki" data-kaki-slot="beng">
+      <span class="mk-portrait" data-portrait="beng" aria-hidden="true"></span>
+      <span class="mk-kaki-name">Uncle Beng</span>
+    </div>
+    <div class="mk-kaki" data-kaki-slot="rose">
+      <span class="mk-portrait" data-portrait="rose" aria-hidden="true"></span>
+      <span class="mk-kaki-name">Auntie Rose</span>
+    </div>
   </section>
 
-  <a class="btn btn-plain" href="/">Back to hub</a>
+  <div class="mk-bubble-slot" data-bubble-slot hidden>
+    <button class="mk-bubble" type="button" data-bubble role="status" aria-live="polite" disabled>
+      <span class="mk-bubble-name" data-bubble-name></span>
+      <span class="mk-bubble-text" data-bubble-text></span>
+    </button>
+  </div>
+
+  <section class="mk-name" data-screen="name" hidden>
+    <h1 class="mk-question">What should the kakis call you?</h1>
+    <div class="mk-chips">
+      <button class="chip mk-chip" type="button" data-name-chip="Ah Ma">Ah Ma</button>
+      <button class="chip mk-chip" type="button" data-name-chip="Ah Gong">Ah Gong</button>
+      <button class="chip mk-chip" type="button" data-name-chip="Auntie">Auntie</button>
+      <button class="chip mk-chip" type="button" data-name-chip="Uncle">Uncle</button>
+    </div>
+    <div class="mk-typed">
+      <label class="mk-label" for="mk-name-input">Or type your own name</label>
+      <input class="mk-input" id="mk-name-input" type="text" name="player-name" autocomplete="off" maxlength="20" spellcheck="false">
+      <button class="btn mk-confirm" type="button" data-action="confirm-name">Start with this name</button>
+    </div>
+  </section>
+
+  <section class="mk-play" data-screen="play" hidden>
+    <div class="mk-table">
+      <div class="mk-grid" data-grid tabindex="-1" aria-label="Tiles on the table"></div>
+    </div>
+    <div class="mk-player-bar">
+      <span class="mk-player-name" data-player-name></span>
+      <span class="mk-progress" data-progress></span>
+    </div>
+  </section>
+
+  <div class="mk-win" data-screen="win" hidden>
+    <div class="mk-win-card">
+      <h2 class="mk-win-title">Table cleared, <span data-win-name></span></h2>
+      <p class="mk-win-note" data-win-note></p>
+      <button class="btn mk-win-again" type="button" data-action="again">One more round</button>
+      <a class="btn btn-quiet mk-win-back" href="/">Back to hub</a>
+    </div>
+  </div>
 
 </main>
+<script type="module" src="/games/mahjong-kakis/game.js"></script>
 </body>
 </html>

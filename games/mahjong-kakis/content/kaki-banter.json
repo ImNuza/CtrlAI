@@ -1,0 +1,89 @@
+{
+  "round_start__lily": [
+    "Eh {name}, come sit. All the tiles are face up.",
+    "Wah {name}, good you came. Two same tiles, tap both.",
+    "Morning {name}. Find two tiles that match.",
+    "Come {name}, the table is warm. Tap a pair and see."
+  ],
+  "round_start__beng": [
+    "Oi {name}, my kopi just came. Tap two same tiles.",
+    "Sit down {name}. Two same tiles, tap tap, they gone.",
+    "Aiyoh {name}, you again. Good, now I have company.",
+    "Eh {name}, table is set. Match two same tiles."
+  ],
+  "round_start__rose": [
+    "Sit slowly {name}. No hurry, the tiles will wait.",
+    "Welcome {name}. Find two tiles that look alike.",
+    "Take a breath {name}. Then find one pair, any pair.",
+    "Good to see you {name}. We play slow, like always."
+  ],
+  "match_found__lily": [
+    "There you go {name}. Clean pair.",
+    "Wah {name}, your eyes still sharp.",
+    "Nice one {name}. That pair was hiding also.",
+    "See {name}, they match. Two friends going home."
+  ],
+  "match_found__beng": [
+    "Steady lah {name}. Faster than my kopi cooling.",
+    "Oi {name}, you sure you never play before?",
+    "Wah {name}, that one even I never spot.",
+    "Aiyoh {name}, so quick. My toast not finished yet."
+  ],
+  "match_found__rose": [
+    "Slow and sure {name}. That is how pairs come.",
+    "Good {name}. One down, the rest will follow.",
+    "Nice {name}. Like finding the right stitch, no rush.",
+    "That was patient work {name}. Well done."
+  ],
+  "near_miss__lily": [
+    "Close one {name}. Those two sit very near.",
+    "Aiyoh, so near {name}. Try the one beside it.",
+    "Never mind {name}, they really do look alike.",
+    "Almost {name}. Maybe the twin is in the corner."
+  ],
+  "near_miss__beng": [
+    "Those two look like brothers {name}. Not twins.",
+    "Aiyoh {name}, even I thought that pair matched.",
+    "Close leh {name}. Take your time, my kopi still hot.",
+    "Tricky one {name}. These tiles very naughty ah."
+  ],
+  "near_miss__rose": [
+    "Not that pair {name}. Look slowly, they will show.",
+    "No harm done {name}. Even my knitting drops a stitch.",
+    "Those two are cousins {name}, not twins. Look again.",
+    "It is alright {name}. Nothing spoiled, look again."
+  ],
+  "round_win__lily": [
+    "Table cleared {name}. Every tile went home.",
+    "Wah {name}, all gone. Beautiful.",
+    "Well done {name}. That was a warm round.",
+    "See {name}, all matched. Auntie very happy today."
+  ],
+  "round_win__beng": [
+    "Wah {name}, table clean. Who buying the next kopi?",
+    "Steady {name}. Uncle lost count halfway already.",
+    "All gone {name}. My toast also not finished.",
+    "Aiyoh {name}, so clean. Next time I bring glasses."
+  ],
+  "round_win__rose": [
+    "All the pairs found {name}. Nice and steady.",
+    "There {name}, the table is quiet again. Good work.",
+    "Finished {name}. Like casting off the last row.",
+    "A calm round {name}. Thank you for the company."
+  ],
+  "idle_nudge__lily": [
+    "Take your time {name}. The tiles not going anywhere.",
+    "Still looking {name}? Start from the top row.",
+    "Try the left side first {name}. Just a hunch."
+  ],
+  "idle_nudge__beng": [
+    "Eh {name}, my kopi getting cold, but you carry on.",
+    "No rush {name}. I also stare blur blur sometimes.",
+    "Try the bottom row {name}. I always find one there."
+  ],
+  "idle_nudge__rose": [
+    "Slowly {name}. Look at one tile, then find its twin.",
+    "No hurry {name}. The table has all day.",
+    "Rest your eyes a moment {name}, then look again."
+  ]
+}

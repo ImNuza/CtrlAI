@@ -1,0 +1,470 @@
+/*
+  Mahjong Kakis. Kopitiam table, three kakis, one bubble slot.
+  Loads after tokens.css and base.css, so every colour, size and duration below
+  comes from a token. No hardcoded millisecond values anywhere: reduced motion
+  zeroes the duration tokens and every animation here dies with them.
+*/
+
+:root {
+  --accent: var(--accent-kopitiam);
+  --accent-tint: var(--accent-kopitiam-tint);
+
+  /* Decorative portrait palette. Aria hidden art only, never text. */
+  --mk-skin: #e7bd94;
+  --mk-hair-dark: #33261c;
+  --mk-hair-grey: #9b968f;
+  --mk-lily-shirt: #d98aa3;
+  --mk-lily-flower: #c2506e;
+  --mk-flower-heart: #e8b34a;
+  --mk-beng-cap: #2f4858;
+  --mk-beng-cup: #efe0c9;
+  --mk-rose-shirt: #8579ad;
+
+  --mk-tile-gap: var(--sp-2);
+  --mk-bubble-height: 12.5rem;
+  --mk-portrait-size: 4.5rem;
+}
+
+/* Sections toggle with the hidden attribute, and several of them are flex or
+   grid, which would otherwise beat the user agent rule. */
+[hidden] {
+  display: none !important;
+}
+
+/* Tighter page gutter than the shared default so four tiles clear 64px at 360px. */
+body {
+  padding:
+    calc(var(--safe-top) + var(--sp-4))
+    calc(var(--safe-right) + var(--sp-4))
+    calc(var(--safe-bottom) + var(--sp-4))
+    calc(var(--safe-left) + var(--sp-4));
+}
+
+.mk-shell {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+/* ---- Header ------------------------------------------------------------- */
+
+.mk-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+}
+
+.mk-game-name {
+  font-size: var(--fs-body);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-tight);
+  color: var(--accent);
+}
+
+.mk-back {
+  flex: none;
+  padding: var(--sp-3) var(--sp-4);
+}
+
+/* ---- Kaki row ----------------------------------------------------------- */
+
+.mk-kakis {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-2);
+}
+
+.mk-kaki {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-1);
+  text-align: center;
+}
+
+.mk-portrait {
+  display: block;
+  width: var(--mk-portrait-size);
+  height: var(--mk-portrait-size);
+  border-radius: 50%;
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-card);
+  transition: transform var(--dur-fast) var(--ease-out),
+              box-shadow var(--dur-fast) var(--ease-out);
+}
+
+.mk-portrait svg {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
+.mk-kaki-name {
+  font-size: var(--fs-body);
+  font-weight: var(--fw-medium);
+  line-height: var(--lh-tight);
+  color: var(--color-text);
+}
+
+.mk-kaki.is-speaking .mk-portrait {
+  transform: translateY(-4px);
+  box-shadow: 0 0 0 4px var(--accent), var(--shadow-raised);
+}
+
+.mk-kaki.is-speaking .mk-kaki-name {
+  font-weight: var(--fw-bold);
+  color: var(--accent);
+}
+
+/* ---- Bubble ------------------------------------------------------------- */
+
+.mk-bubble-slot {
+  position: relative;
+  z-index: 2;
+  height: var(--mk-bubble-height);
+  padding-top: var(--sp-3);
+}
+
+.mk-bubble {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: var(--sp-1);
+  width: 100%;
+  height: 100%;
+  min-height: var(--tap-min);
+  padding: var(--sp-3) var(--sp-4);
+  border: 3px solid var(--accent);
+  border-radius: var(--radius-md);
+  background-color: var(--accent-tint);
+  color: var(--color-text);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  text-align: left;
+  opacity: 0;
+  pointer-events: none;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+  transition: opacity var(--dur-base) var(--ease-out);
+}
+
+.mk-bubble[data-event] {
+  opacity: 1;
+  pointer-events: auto;
+  animation: mk-bubble-in var(--dur-base) var(--ease-out) 1;
+}
+
+.mk-bubble-name {
+  font-size: var(--fs-body);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-tight);
+  color: var(--accent);
+}
+
+/* Three lines is what the slot holds. Clamping the text and not the bubble
+   keeps the pointer, which lives outside the box, from being clipped away. */
+.mk-bubble-text {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+  overflow-wrap: break-word;
+}
+
+/* Two stacked triangles make the pointer: the outer one is the border colour,
+   the inner one is the bubble face. Both sit under the speaking portrait. */
+.mk-bubble::before,
+.mk-bubble::after {
+  content: "";
+  position: absolute;
+  left: var(--mk-arrow-x, 50%);
+  width: 0;
+  height: 0;
+  border-left: 15px solid transparent;
+  border-right: 15px solid transparent;
+  transform: translateX(-50%);
+}
+
+.mk-bubble::before {
+  top: -16px;
+  border-bottom: 16px solid var(--accent);
+}
+
+.mk-bubble::after {
+  top: -11px;
+  border-left-width: 12px;
+  border-right-width: 12px;
+  border-bottom: 13px solid var(--accent-tint);
+}
+
+@keyframes mk-bubble-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ---- Name screen -------------------------------------------------------- */
+
+.mk-name {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+  padding-top: var(--sp-4);
+}
+
+.mk-question {
+  font-size: var(--fs-title);
+  line-height: var(--lh-tight);
+  color: var(--color-text);
+}
+
+.mk-chips {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: var(--tap-gap);
+}
+
+.mk-chip {
+  flex: 1 1 auto;
+}
+
+.mk-typed {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding-top: var(--sp-4);
+  border-top: 2px solid var(--color-border);
+}
+
+.mk-label {
+  font-size: var(--fs-body);
+  color: var(--color-text-muted);
+}
+
+.mk-input {
+  width: 100%;
+  min-height: var(--tap-min);
+  padding: var(--sp-3) var(--sp-4);
+  border: 3px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  font-size: var(--fs-body);
+}
+
+.mk-confirm {
+  width: 100%;
+}
+
+/* ---- Table and tiles ---------------------------------------------------- */
+
+.mk-play {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+/* Light marble, made of two soft veins and a corner sheen over the surface. */
+.mk-table {
+  padding: var(--sp-2);
+  border: 6px solid var(--accent);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface);
+  background-image:
+    linear-gradient(118deg, rgba(122, 63, 6, 0.07) 0 6%, rgba(122, 63, 6, 0) 6% 48%),
+    linear-gradient(296deg, rgba(122, 63, 6, 0.05) 0 4%, rgba(122, 63, 6, 0) 4% 60%),
+    radial-gradient(circle at 26% 18%, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 62%);
+  box-shadow: var(--shadow-card);
+}
+
+.mk-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--mk-tile-gap);
+}
+
+.mk-grid:focus {
+  outline: none;
+}
+
+.mk-tile {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-width: var(--tap-min);
+  min-height: var(--tap-min);
+  aspect-ratio: 1 / 1.08;
+  padding: var(--sp-1);
+  border: 3px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-surface);
+  box-shadow:
+    inset 0 -10px 0 var(--accent-tint),
+    0 4px 0 rgba(122, 63, 6, 0.32),
+    var(--shadow-card);
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  cursor: pointer;
+  animation: mk-deal var(--dur-base) var(--ease-out) backwards;
+  animation-delay: calc(var(--mk-i, 0) * var(--dur-instant) / 4);
+  transition: transform var(--dur-fast) var(--ease-out),
+              border-color var(--dur-fast) var(--ease-out),
+              background-color var(--dur-fast) var(--ease-out);
+}
+
+.mk-tile svg {
+  width: 100%;
+  height: 100%;
+}
+
+.mk-tile text {
+  font-family: var(--font-sans);
+}
+
+.mk-tile[data-state="selected"] {
+  border-color: var(--accent);
+  background-color: var(--accent-tint);
+  transform: translateY(-4px);
+  box-shadow:
+    inset 0 -10px 0 rgba(122, 63, 6, 0.18),
+    0 8px 0 rgba(122, 63, 6, 0.32),
+    var(--shadow-raised);
+}
+
+/* Space is kept so the grid never reflows when a pair goes home. */
+.mk-tile[data-state="cleared"] {
+  visibility: hidden;
+  pointer-events: none;
+  animation: none;
+}
+
+.mk-tile.is-clearing {
+  animation: mk-clear var(--dur-base) var(--ease-out) forwards;
+}
+
+.mk-tile.is-wiggle {
+  animation: mk-wiggle var(--dur-base) var(--ease-out) 1;
+}
+
+@keyframes mk-deal {
+  from { opacity: 0; transform: translateY(10px) scale(0.94); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes mk-clear {
+  from { opacity: 1; transform: translateY(-4px) scale(1); }
+  to { opacity: 0; transform: translateY(-4px) scale(0.62); }
+}
+
+@keyframes mk-wiggle {
+  0% { transform: translateY(-4px) rotate(0deg); }
+  25% { transform: translateY(-4px) translateX(-4px) rotate(-3deg); }
+  60% { transform: translateY(-4px) translateX(4px) rotate(3deg); }
+  100% { transform: translateY(-4px) translateX(0) rotate(0deg); }
+}
+
+/* ---- Player bar --------------------------------------------------------- */
+
+.mk-player-bar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface-sunk);
+  font-size: var(--fs-body);
+  line-height: var(--lh-tight);
+}
+
+.mk-player-name {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-weight: var(--fw-bold);
+  color: var(--accent);
+}
+
+.mk-progress {
+  flex: none;
+  color: var(--color-text-muted);
+}
+
+/* ---- Celebration -------------------------------------------------------- */
+
+/* The scrim dims the table but the kakis and their bubble stay lit above it,
+   so the round ends with the three of them still cheering. The card starts
+   below the bubble: game.js measures the slot and sets --mk-win-top. */
+.mk-win {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding:
+    calc(var(--mk-win-top, 0px) + var(--sp-3))
+    calc(var(--safe-right) + var(--sp-4))
+    calc(var(--safe-bottom) + var(--sp-5))
+    calc(var(--safe-left) + var(--sp-4));
+  overflow-y: auto;
+  background-color: rgba(36, 28, 20, 0.5);
+  animation: mk-fade-in var(--dur-base) var(--ease-out) 1;
+}
+
+.mk-win-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  width: 100%;
+  max-width: var(--page-max);
+  padding: var(--sp-4);
+  border: 3px solid var(--accent);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-raised);
+  animation: mk-rise-in var(--dur-base) var(--ease-out) 1;
+}
+
+.mk-win-title {
+  color: var(--accent);
+}
+
+.mk-win-note {
+  font-size: var(--fs-body);
+  color: var(--color-text-muted);
+}
+
+.mk-win-again,
+.mk-win-back {
+  width: 100%;
+}
+
+@keyframes mk-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes mk-rise-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ---- Wider phones ------------------------------------------------------- */
+
+@media (min-width: 25rem) {
+  :root {
+    --mk-tile-gap: var(--sp-3);
+    --mk-portrait-size: 5rem;
+  }
+}
