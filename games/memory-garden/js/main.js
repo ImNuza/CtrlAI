@@ -32,6 +32,9 @@ const VIEWS = {
 let garden = emptyGarden();
 const draft = { objectId: null, answers: {}, step: 0 };
 let lastPlot = null;
+// The plant that was just grown, so the garden can point at it once and then
+// forget. Cleared by the render that used it, never by a timer.
+let freshPlantId = null;
 const el = {};
 
 /* ---- state -------------------------------------------------------------- */
@@ -132,8 +135,11 @@ function renderPlots() {
     const plant = plants[i];
     if (plant) {
       const built = composePlant({ objectId: plant.objectId, answers: plant.answers });
-      parts.push('<button type="button" class="plot plot-filled" data-plant-id="' + plant.id +
-        '" aria-label="' + objectById(plant.objectId).name + ' memory. Tap to open the story.">' +
+      const fresh = plant.id === freshPlantId;
+      parts.push('<button type="button" class="plot plot-filled' + (fresh ? ' plot-new' : '') +
+        '" data-plant-id="' + plant.id +
+        '" aria-label="' + objectById(plant.objectId).name + ' memory' +
+        (fresh ? ', just planted' : '') + '. Tap to open the story.">' +
         built.svg + '</button>');
     } else {
       parts.push('<button type="button" class="plot" data-empty="true"' +
@@ -141,6 +147,7 @@ function renderPlots() {
     }
   }
   el.plots.innerHTML = parts.join('');
+  freshPlantId = null;
 }
 
 async function renderWelcome() {
@@ -236,6 +243,7 @@ async function growPlant() {
 
   garden.plants.push(plant);
   saveState(NS, garden);
+  freshPlantId = plant.id;
 
   el.ceremonyStage.className = 'stage stage-grow';
   el.ceremonyStage.innerHTML = built.svg;

@@ -61,6 +61,46 @@
   background-color: var(--color-surface);
 }
 
+/* The plot that was just planted, for one render only. The ring is a resting
+   state on the class, so a reduced-motion request still gets the mark, it just
+   never sees it move or fade. */
+.plot-new {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-tint), 0 0 0 6px var(--accent);
+}
+
+/* Backwards, not both, on the entrance: once it has played the plot goes back to
+   its own styles, so the press feedback on :active is not left overridden. */
+@media (prefers-reduced-motion: no-preference) {
+  .plot-new {
+    animation: plot-arrive var(--dur-slow) var(--ease-out) backwards,
+               plot-ring calc(var(--dur-slow) * 2.4) var(--ease-out) forwards;
+  }
+}
+
+@keyframes plot-arrive {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes plot-ring {
+  0%,
+  60% {
+    box-shadow: 0 0 0 3px var(--accent-tint), 0 0 0 6px var(--accent);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 transparent, 0 0 0 0 transparent;
+  }
+}
+
 .plot svg {
   width: 100%;
   height: auto;
@@ -190,13 +230,21 @@
   width: 170px;
 }
 
-/* The ceremony assembles the plant in layers. Delays are multiples of a token,
-   so a reduced-motion request collapses the whole thing to instant. Animation
-   rather than transition on purpose: the fill mode carries the final state, so
-   the plant is never left invisible waiting on a frame that has not come. */
+/* The ceremony assembles the plant in layers: the pot settles, the stem rises
+   into it, leaves fill in, blooms open with a small overshoot, the ornament
+   arrives last. Delays are multiples of a token, so a reduced-motion request
+   collapses the whole thing to instant. Animation rather than transition on
+   purpose: the fill mode carries the final state, so the plant is never left
+   invisible waiting on a frame that has not come. Five stages of 240ms land the
+   last one at 1200ms, and the leaves, which carry the whole flower face on the
+   sunburst species, are done by 720ms. */
 
 .stage-grow .plant > g {
   animation: layer-in var(--dur-base) var(--ease-out) both;
+}
+
+.stage-grow .plant > .layer-pot {
+  animation-name: pot-settle;
 }
 
 .stage-grow .plant > .layer-stem {
@@ -215,6 +263,31 @@
   animation-delay: calc(var(--dur-base) * 4);
 }
 
+/* Movement rides on the inner group of each layer. The outer group carries the
+   lean and the ornament position as SVG transform attributes, and a CSS
+   transform on that element would throw both away. */
+
+.stage-grow .plant > .layer-stem > g {
+  animation: stem-rise var(--dur-base) var(--ease-out) both;
+  animation-delay: var(--dur-base);
+}
+
+.stage-grow .plant > .layer-blooms > g,
+.stage-grow .plant > .layer-ornament > g {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.stage-grow .plant > .layer-blooms > g {
+  animation: bloom-pop var(--dur-base) var(--ease-out) both;
+  animation-delay: calc(var(--dur-base) * 3);
+}
+
+.stage-grow .plant > .layer-ornament > g {
+  animation: ornament-pop var(--dur-base) var(--ease-out) both;
+  animation-delay: calc(var(--dur-base) * 4);
+}
+
 @keyframes layer-in {
   from {
     opacity: 0;
@@ -222,6 +295,52 @@
 
   to {
     opacity: 1;
+  }
+}
+
+@keyframes pot-settle {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes stem-rise {
+  from {
+    transform: translateY(7px);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes bloom-pop {
+  from {
+    transform: scale(0.72);
+  }
+
+  60% {
+    transform: scale(1.06);
+  }
+
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes ornament-pop {
+  from {
+    transform: scale(0.8);
+  }
+
+  to {
+    transform: scale(1);
   }
 }
 

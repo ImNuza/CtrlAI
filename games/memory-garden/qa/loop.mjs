@@ -216,6 +216,43 @@ async function run(browser) {
     check('first plant svg has real structure', afterOne[0].length > 400, 'svg inner length ' + afterOne[0].length);
   }
 
+  /* ---- The new plant is pointed at once, then left alone ---------------- */
+  const arrival = await page.evaluate(function () {
+    const marked = Array.from(document.querySelectorAll('.plot-new'));
+    const planted = document.querySelectorAll('[data-plant-id]');
+    const style = marked.length === 1 ? window.getComputedStyle(marked[0]) : null;
+    return {
+      marked: marked.length,
+      label: marked.length === 1 ? marked[0].getAttribute('aria-label') : '',
+      // The name, not the live value: the ring fades on its own, so reading the
+      // painted shadow would make this check a race against the clock.
+      animation: style === null ? '' : style.animationName,
+      onNewest: marked.length === 1 && marked[0] === planted[planted.length - 1]
+    };
+  });
+  check('the plot just planted is highlighted on the way back to the garden',
+    arrival.marked === 1 && arrival.onNewest &&
+      arrival.animation.indexOf('plot-arrive') !== -1 && arrival.animation.indexOf('plot-ring') !== -1,
+    'marked ' + arrival.marked + ', on newest ' + arrival.onNewest + ', animation ' + arrival.animation);
+  check('the new plot says so in its aria-label',
+    arrival.label.indexOf('just planted') !== -1, arrival.label);
+
+  // Any later render drops it: no pulse that never ends, no stale ring.
+  await page.locator('#start-grow').click();
+  await page.locator('#view-picker').waitFor({ state: 'visible' });
+  await page.locator('[data-back="garden"]').click();
+  await page.locator('#view-garden').waitFor({ state: 'visible' });
+  const settled = await page.evaluate(function () {
+    const plot = document.querySelector('[data-plant-id]');
+    return {
+      marked: document.querySelectorAll('.plot-new').length,
+      label: plot === null ? '' : plot.getAttribute('aria-label')
+    };
+  });
+  check('the highlight is gone on the next render of the garden',
+    settled.marked === 0 && settled.label.indexOf('just planted') === -1,
+    'still marked ' + settled.marked + ', label "' + settled.label + '"');
+
   const storedAfterOne = await page.evaluate(function (key) {
     return window.localStorage.getItem(key);
   }, STORAGE_KEY);
@@ -345,6 +382,50 @@ async function run(browser) {
   check('a different feeling changes the palette attribute',
     determinism.palette !== determinism.otherPalette && determinism.changed,
     determinism.palette + ' vs ' + determinism.otherPalette);
+
+  /* ---- The bellflower actually hangs bells ------------------------------ */
+  const bells = await page.evaluate(async function () {
+    const module = await import('/games/memory-garden/js/composer.js');
+    const read = function (who) {
+      const built = module.composePlant({
+        objectId: 'rotary-phone',
+        answers: { who: who, where: 'kampung', feeling: 'warm' }
+      });
+      const doc = new DOMParser().parseFromString(built.svg, 'image/svg+xml');
+      const groups = Array.from(doc.querySelectorAll('.layer-blooms .bloom'));
+      return {
+        who: who,
+        blooms: groups.length,
+        shapes: groups.map(function (group) { return group.children.length; }),
+        pedicels: groups.filter(function (group) { return group.querySelector('.pedicel') !== null; }).length,
+        bells: groups.filter(function (group) { return group.querySelector('.bell') !== null; }).length
+      };
+    };
+    const round = function (who) {
+      const built = module.composePlant({
+        objectId: 'kopitiam-cup',
+        answers: { who: who, where: 'kampung', feeling: 'warm' }
+      });
+      const doc = new DOMParser().parseFromString(built.svg, 'image/svg+xml');
+      return doc.querySelectorAll('.layer-blooms .bell').length;
+    };
+    return { hung: [read('my-mother'), read('my-father'), read('my-grandmother')], vineBells: round('my-mother') };
+  });
+  const everyBloomHangs = bells.hung.every(function (entry) {
+    return entry.blooms > 0 && entry.blooms === entry.pedicels && entry.blooms === entry.bells &&
+      entry.shapes.every(function (count) { return count > 1; });
+  });
+  check('every bellflower bloom is a hanging bell, pedicel plus bell shape, not a dot',
+    everyBloomHangs,
+    bells.hung.map(function (entry) {
+      return entry.who + ' ' + entry.blooms + ' blooms, shapes ' + entry.shapes.join('/') +
+        ', pedicels ' + entry.pedicels;
+    }).join(' | '));
+  check('the bloom count still follows the who on the bellflower',
+    bells.hung[0].blooms === 3 && bells.hung[1].blooms === 1 && bells.hung[2].blooms === 5,
+    bells.hung.map(function (entry) { return entry.who + ':' + entry.blooms; }).join(' '));
+  check('bells belong to the bellflower alone', bells.vineBells === 0,
+    'bells found on the kopi vine: ' + bells.vineBells);
 
   /* ---- The two Milestone B objects, one of them with a written line ------ */
   const tvCeremony = await growMemory(page, 'setron-tv', 'my-siblings', 'first-flat', 'happy');
@@ -528,6 +609,22 @@ async function run(browser) {
   check('reduced motion shows every plant layer at once',
     layerOpacity.length === 5 && layerOpacity.every(function (value) { return value === 1; }),
     'layer opacities ' + JSON.stringify(layerOpacity));
+
+  await calmPage.click('#ceremony-done');
+  await calmPage.locator('#view-garden').waitFor({ state: 'visible' });
+  const calmArrival = await calmPage.evaluate(function () {
+    const plot = document.querySelector('.plot-new');
+    if (plot === null) {
+      return { marked: 0, shadow: '', animation: '' };
+    }
+    const style = window.getComputedStyle(plot);
+    return { marked: 1, shadow: style.boxShadow, animation: style.animationName };
+  });
+  check('reduced motion still marks the new plot, it just never moves',
+    calmArrival.marked === 1 && calmArrival.animation === 'none' &&
+      calmArrival.shadow !== 'none' && calmArrival.shadow !== '',
+    'marked ' + calmArrival.marked + ', animation ' + calmArrival.animation +
+      ', shadow ' + calmArrival.shadow);
 
   /* ---- Unreadable saved state falls back instead of breaking ------------ */
   const brokenContext = await browser.newContext({ viewport: VIEWPORT, hasTouch: true });
