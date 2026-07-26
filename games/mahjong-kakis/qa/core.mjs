@@ -2,6 +2,10 @@
 // Mahjong Kakis core QA. Drives the real UI at a phone viewport: fresh player,
 // name chip, a forced near miss, then a full round cleared by tapping real
 // pairs. Captures one banter line per event and reads the saved profile back.
+//
+// The four events a first sitting produces are first_visit, near_miss,
+// match_found and round_win. round_start belongs to the second deal onwards,
+// which this run never reaches, so it is not in the set below.
 
 import { chromium } from 'playwright';
 
@@ -115,11 +119,17 @@ async function main() {
       check(tile.w >= 60 && tile.h >= 60, `tile ${tile.id} is ${tile.w}x${tile.h}`);
     }
 
-    // (c) the kakis greet the player by name.
-    const start = await waitForBubble(page, 'round_start');
+    // (c) the kakis welcome the player by name. A player who has never finished
+    //     a round is met with first_visit, not a round start: the opening line
+    //     teaches the rule and claims no history it cannot have.
+    const start = await waitForBubble(page, 'first_visit');
     seen.add(start.event);
-    events.round_start = start.text;
-    check(start.text.includes('Ah Ma'), `round_start line missing the name: "${start.text}"`);
+    events.first_visit = start.text;
+    check(start.text.includes('Ah Ma'), `first_visit line missing the name: "${start.text}"`);
+    check(
+      !/\{|\}/.test(start.text),
+      `first_visit line has an unfilled slot: "${start.text}"`
+    );
 
     // (d) force a near miss with two different identities.
     const differing = [];
@@ -189,7 +199,7 @@ async function main() {
       check(text.length > 0, 'recorded an empty banter line');
     }
     check(new Set(texts).size === 4, `banter lines repeated: ${JSON.stringify(texts)}`);
-    for (const name of ['round_start', 'match_found', 'near_miss', 'round_win']) {
+    for (const name of ['first_visit', 'match_found', 'near_miss', 'round_win']) {
       check(seen.has(name), `never observed the ${name} event on the bubble`);
     }
 

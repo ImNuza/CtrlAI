@@ -17,6 +17,7 @@ const BANK_PATH = path.join(HERE, '..', 'content', 'kaki-banter.json');
 
 const KAKIS = ['lily', 'beng', 'rose'];
 const MINIMUMS = {
+  first_visit: 3,
   round_start: 5,
   match_found: 6,
   near_miss: 6,
@@ -279,16 +280,21 @@ async function main() {
       await context.close();
     }
 
-    // (b) named but never finished a round: nothing to remember yet.
+    /*
+      (b) named but never finished a round: nothing to remember yet, so this is
+      still a first visit. A name in storage is not a shared history, and the
+      opening line has to welcome and teach rather than call back to a round
+      that never happened.
+    */
     {
       const { context, page, errors } = await openSeeded(
         browser,
         profile({ roundsPlayed: 0, totalMatches: 0, bestClear: null, recent: [], visits: 1 })
       );
       await page.waitForSelector('[data-tile]', { timeout: 5000 });
-      const bubble = await readBubble(page, 'round_start');
-      check(bubble.event === 'round_start', `first bubble was ${bubble.event}, expected round_start`);
-      check(bubble.text.includes('Mabel'), `round_start line missing the name: "${bubble.text}"`);
+      const bubble = await readBubble(page, 'first_visit');
+      check(bubble.event === 'first_visit', `first bubble was ${bubble.event}, expected first_visit`);
+      check(bubble.text.includes('Mabel'), `first_visit line missing the name: "${bubble.text}"`);
       const everReturn = await page.locator('[data-bubble][data-event="return_visit"]').count();
       check(everReturn === 0, 'a player with no finished round saw a return_visit line');
       check(errors.length === 0, `page errors: ${errors.join(' | ')}`);

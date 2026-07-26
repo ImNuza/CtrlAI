@@ -29,6 +29,8 @@ const DEFAULT_NAME = 'Friend';
 // two row table and a four row one, and the lookalike share moves with it.
 const MIN_TILES = 8;
 const MAX_TILES = 16;
+// From here up, the table is four rows and the page has to close up around it.
+const BIG_WALL = 14;
 const TILE_STEP = 2;
 const MIN_LOOKALIKE = 0.25;
 const MAX_LOOKALIKE = 1;
@@ -55,17 +57,28 @@ const el = {
 let banter = null;
 let state = blankState('');
 let round = null;
-// True until the first deal of a session that a returning player opened. That
-// one deal is greeted with the memory callback instead of a plain round start.
-let pendingReturn = false;
+/*
+  Which hello the next deal owes the player, cleared once it is paid.
+
+  "first_visit"  nobody has finished a round here yet, so the opening line
+                 welcomes and teaches instead of claiming a shared past.
+  "return_visit" somebody who has finished a round opened the game again, so
+                 the first deal of the load is the memory callback.
+  null           an ordinary deal later in the same sitting.
+*/
+let pendingGreeting = null;
+// The tallest the bubble slot has been measured since the current wall was
+// dealt. The slot is allowed to grow when a taller line lands, never to shrink
+// under the player mid round.
+let slotFloor = 0;
 
 boot();
 
 async function boot() {
   renderPortraits(document);
-  // The celebration card starts under the bubble, and the bubble is not a fixed
-  // height any more, so every render and dismissal re-measures the slot.
-  banter = createBanter(document, { onChange: syncWinTop });
+  // The celebration card starts under the bubble, so every line that lands
+  // re-measures the slot. Nothing else does: no timer touches this.
+  banter = createBanter(document, { onChange: onBubbleChange });
   wireControls();
 
   const bank = await loadBank();
@@ -77,10 +90,10 @@ async function boot() {
   if (saved && typeof saved.name === 'string' && saved.name.trim() !== '') {
     state = adopt(saved);
     state.visits += 1;
-    // A name on its own is not a shared history. Only somebody who finished a
-    // round has something for a kaki to remember.
-    pendingReturn = state.roundsPlayed >= 1;
-    banter.seat(state.visits);
+    // A name on its own is not a shared history. Somebody who never finished a
+    // round is still being welcomed for the first time.
+    pendingGreeting = state.roundsPlayed >= 1 ? 'return_visit' : 'first_visit';
+    banter.seat(state.visits - 1);
     persist();
     startPlaying();
     return;
@@ -88,6 +101,12 @@ async function boot() {
   showNameScreen();
 }
 
+/*
+  A missing bank is never fatal. Every failure the fetch can hand back (offline,
+  a 404, a truncated body that will not parse) lands here as null, the bank goes
+  unregistered, and shared/ai.js answers every event with its neutral line. The
+  table still deals and the round still plays.
+*/
 async function loadBank() {
   try {
     const response = await fetch(BANK_URL);
@@ -96,7 +115,6 @@ async function loadBank() {
     }
     return await response.json();
   } catch (err) {
-    // A missing bank is not fatal: shared/ai.js answers with a neutral line.
     return null;
   }
 }
@@ -122,7 +140,9 @@ function chooseName(raw) {
   const name = String(raw || '').trim().slice(0, 20) || DEFAULT_NAME;
   state = blankState(name);
   state.visits = 1;
-  banter.seat(state.visits);
+  pendingGreeting = 'first_visit';
+  // Seat one behind the visit count so a first visit lands on the front chair.
+  banter.seat(state.visits - 1);
   persist();
   startPlaying();
 }
@@ -130,6 +150,7 @@ function chooseName(raw) {
 /* ---- a round ------------------------------------------------------------ */
 
 function deal() {
+  resetSlotFloor();
   const dial = nextDial();
   state.dial = dial;
   persist();
@@ -152,14 +173,24 @@ function deal() {
     nudges: 0
   };
 
+  // Fourteen and sixteen tiles are the two walls that need the whole phone. The
+  // stylesheet closes the page up around them and leaves every smaller deal
+  // alone, so it has to know which one is on the table.
+  document.body.dataset.wall = round.tiles.length >= BIG_WALL ? 'big' : 'normal';
+
   renderTiles();
   renderDots();
   updateBar();
   el.grid.focus({ preventScroll: true });
 
-  if (pendingReturn) {
-    pendingReturn = false;
+  if (pendingGreeting === 'return_visit') {
+    pendingGreeting = null;
     banter.speak('return_visit', returnContext());
+    return;
+  }
+  if (pendingGreeting === 'first_visit') {
+    pendingGreeting = null;
+    banter.speak('first_visit', firstContext());
     return;
   }
   banter.speak('round_start', { name: state.name });
@@ -233,7 +264,14 @@ function clampDial(dial) {
   never a count of what the player got wrong.
 */
 function returnContext() {
-  const context = { name: state.name };
+  const context = {
+    name: state.name,
+    // shared/ai.js otherwise picks a template from a counter that resets with
+    // the page, and this event fires once per page, so every visit would land
+    // on the same line forever. Seeding from the name and the visit number
+    // spreads a player across the whole set and keeps two people apart.
+    seed: hashString(state.name + '|visit|' + state.visits)
+  };
   const rounds = roundsPhrase(state.roundsPlayed);
   if (rounds) {
     context.rounds = rounds;
@@ -243,6 +281,15 @@ function returnContext() {
     context.best = best;
   }
   return context;
+}
+
+// Same reason as returnContext: a first hello also fires once per page, so it
+// is seeded too. Otherwise every new player on earth meets the same sentence.
+function firstContext() {
+  return {
+    name: state.name,
+    seed: hashString(state.name + '|first|' + state.visits)
+  };
 }
 
 function roundsPhrase(played) {
@@ -299,6 +346,9 @@ function renderDots() {
     dot.className = 'mk-dot';
     nodes.push(dot);
   }
+  // The stylesheet needs the count to decide whether the row still fits beside
+  // the player's name on a narrow phone.
+  el.dots.dataset.count = String(pairs);
   el.dots.replaceChildren(...nodes);
 }
 
@@ -448,6 +498,30 @@ function finishRound() {
   // calls back and this runs again once the line is on screen.
   syncWinTop();
   banter.speak('round_win', { name: state.name });
+}
+
+/*
+  Runs once per line that lands, and never on a timer. Two jobs: hold the floor
+  under the bubble slot so the table below can only ever be pushed down by
+  something the player did, and follow the slot with the celebration card.
+*/
+function onBubbleChange() {
+  latchSlotFloor();
+  syncWinTop();
+}
+
+// A taller line may grow the slot. Nothing may shrink it until the next wall.
+function latchSlotFloor() {
+  const height = el.bubbleSlot.getBoundingClientRect().height;
+  if (height > slotFloor) {
+    slotFloor = height;
+    el.bubbleSlot.style.setProperty('--mk-slot-floor', Math.ceil(height) + 'px');
+  }
+}
+
+function resetSlotFloor() {
+  slotFloor = 0;
+  el.bubbleSlot.style.removeProperty('--mk-slot-floor');
 }
 
 function syncWinTop() {

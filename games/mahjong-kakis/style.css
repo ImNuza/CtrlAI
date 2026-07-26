@@ -23,6 +23,36 @@
   --mk-tile-gap: var(--sp-2);
   --mk-bubble-height: 12.5rem;
   --mk-portrait-size: 4.5rem;
+  /* A tile stops growing here. Past this width the table would keep eating
+     height on a wider phone until the player bar fell off the bottom, so the
+     grid centres its leftover space instead. */
+  --mk-tile-max: 78px;
+}
+
+/* The two biggest walls, fourteen and sixteen tiles, are the only deals that
+   need every pixel of a phone. game.js flags them and the page closes up a
+   little around them: smaller ceiling on a tile, tighter gutters, tighter
+   boxes. Every other deal keeps the roomier shape. */
+body[data-wall="big"] {
+  --mk-tile-max: 70px;
+  padding-top: calc(var(--safe-top) + var(--sp-2));
+  padding-bottom: calc(var(--safe-bottom) + var(--sp-2));
+}
+
+body[data-wall="big"] .mk-table {
+  padding: var(--sp-1);
+}
+
+body[data-wall="big"] .mk-player-bar {
+  padding: var(--sp-1) var(--sp-3);
+}
+
+body[data-wall="big"] .mk-bubble-slot {
+  padding-top: var(--sp-2);
+}
+
+body[data-wall="big"] .mk-bubble {
+  padding: var(--sp-2) var(--sp-4);
 }
 
 /* Sections toggle with the hidden attribute, and several of them are flex or
@@ -126,15 +156,19 @@ body {
 /* ---- Bubble ------------------------------------------------------------- */
 
 /* Three lines is the resting shape of the slot, and the flex stretch keeps the
-   bubble filling it. A long name pushes the longest lines onto a fourth line,
-   so the slot is a floor rather than a ceiling: it grows by one line and the
-   table below simply starts lower. game.js re-measures --mk-win-top whenever
-   the bubble changes, so the celebration card follows the slot either way. */
+   bubble filling it. A long name can push the longest lines onto a fourth line,
+   so the slot grows by one line and the table below starts lower.
+
+   It only ever grows. game.js measures the slot after every line that lands and
+   writes the tallest it has seen this deal into --mk-slot-floor, so a shorter
+   line afterwards cannot pull the table back up under the player's finger. The
+   floor is cleared when a new wall is dealt, which is the one moment the player
+   is expecting the table to change. */
 .mk-bubble-slot {
   position: relative;
   z-index: 2;
   display: flex;
-  min-height: var(--mk-bubble-height);
+  min-height: max(var(--mk-bubble-height), var(--mk-slot-floor, 0px));
   padding-top: var(--sp-3);
 }
 
@@ -294,9 +328,13 @@ body {
   box-shadow: var(--shadow-card);
 }
 
+/* Four columns that grow with the phone up to a ceiling and no further. Without
+   the ceiling a sixteen tile wall on a 430px phone is taller than the phone,
+   and the player bar is the piece that falls off the bottom. */
 .mk-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(4, minmax(var(--tap-min), var(--mk-tile-max)));
+  justify-content: center;
   gap: var(--mk-tile-gap);
 }
 
@@ -420,8 +458,13 @@ body {
   line-height: var(--lh-tight);
 }
 
+/* The name wins the space fight. It is the whole promise of the game, so it
+   takes what it needs and the decoration around it gives way. The ellipsis is
+   still here as a last resort for a name longer than the bar, which is a name
+   the player typed themselves. */
 .mk-player-name {
-  min-width: 0;
+  flex: 1 1 auto;
+  min-width: 9ch;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
@@ -435,13 +478,9 @@ body {
 }
 
 /* One dot per pair, filled as they come home. Decoration only: the row is aria
-   hidden and the sentence beside it carries the same news, so the dots stay
-   small without costing anybody a tap target.
-
-   The row never shrinks and never wraps. Eight dots plus the sentence plus a
-   three sided gap is more than 360px of player bar, so the name is the piece
-   that gives way; it has ellipsised since the bar was built, and a kaki says it
-   in full every time one of them speaks. */
+   hidden and the sentence beside it carries the same news, which is why it is
+   the row and not the player's name that disappears when the bar runs out of
+   width. See the phone rule further down. */
 .mk-dots {
   display: flex;
   flex: none;
@@ -589,14 +628,14 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* ---- Narrow phones ------------------------------------------------------ */
+/* ---- Phones -------------------------------------------------------------- */
 
-/* At 400px and under, a four row table plus the bubble slot is more than 844px
-   of phone. The tiles are never allowed to give way, so the gaps do: the space
-   between the header, the kakis, the bubble and the table closes up by four
-   pixels each and the page edge follows. That buys back enough for the biggest
-   deal to land with the player bar still on screen at 360. */
-@media (max-width: 25rem) {
+/* Every phone from 360 to 430 gets the same tight shape. A four row table plus
+   the bubble slot is more than a phone is tall, so the gaps give way rather
+   than the tiles: the space between the header, the kakis, the bubble and the
+   table closes up and the page edge follows. Loosening this at 400px was what
+   pushed the player bar off the bottom of a 414 and a 430. */
+@media (max-width: 27rem) {
   body {
     padding-top: calc(var(--safe-top) + var(--sp-3));
     padding-bottom: calc(var(--safe-bottom) + var(--sp-3));
@@ -612,11 +651,62 @@ body {
   }
 }
 
-/* ---- Wider phones ------------------------------------------------------- */
+/* Below 30rem the bar cannot hold the player's name, a dot row and the sentence
+   at the same time. Measured at 360: the sentence takes 136px and the shortest
+   dot row 44px, which leaves 108px for a name that needs 119px, and that is the
+   four pair row, the smallest one. So on a phone the dots stand down. They are
+   aria-hidden decoration repeating "N of M pairs" word for word, and the name
+   is the whole promise of the game, so the name is what stays whole. */
+@media (max-width: 30rem) {
+  .mk-dots {
+    display: none;
+  }
+}
 
-@media (min-width: 25rem) {
+/* ---- Tablets and up ----------------------------------------------------- */
+
+@media (min-width: 27rem) {
   :root {
     --mk-tile-gap: var(--sp-3);
     --mk-portrait-size: 5rem;
+  }
+}
+
+/* ---- Short phones -------------------------------------------------------- */
+
+/* An iPhone SE is 667px tall. The biggest wall cannot fit whole on it however
+   the page is trimmed, so the aim changes: the fourth row has to peek above the
+   fold, because a row that is entirely below it reads as a table with three
+   rows and nobody thinks to scroll. Everything vertical gives a little, and the
+   portraits give the most, since they are decoration and the tiles are not. */
+@media (max-height: 43.75rem) {
+  :root {
+    --mk-portrait-size: 3.5rem;
+    --mk-bubble-height: 11rem;
+  }
+
+  body {
+    padding-top: calc(var(--safe-top) + var(--sp-2));
+    padding-bottom: calc(var(--safe-bottom) + var(--sp-2));
+  }
+
+  .mk-shell,
+  .mk-play {
+    gap: var(--sp-2);
+  }
+
+  /* The four row wall on a short phone. The tile keeps its 64px floor with room
+     to spare, the gaps close to the last notch, and the portraits shrink again,
+     all so the fourth row breaks the fold instead of hiding under it. */
+  body[data-wall="big"] {
+    --mk-tile-max: 66px;
+    --mk-tile-gap: var(--sp-1);
+    --mk-portrait-size: 3.25rem;
+    padding-top: calc(var(--safe-top) + var(--sp-1));
+  }
+
+  body[data-wall="big"] .mk-shell,
+  body[data-wall="big"] .mk-play {
+    gap: var(--sp-1);
   }
 }

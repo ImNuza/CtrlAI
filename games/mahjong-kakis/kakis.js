@@ -3,9 +3,12 @@
 
   Only one of them talks at a time. Affinity decides who owns a moment (Lily
   softens a near miss, Beng crows over a win, Rose nudges), everything else
-  rotates, and nobody speaks twice in a row. The bubble is a button so a tap
-  puts it away; it also fades itself after four seconds. Nothing in the game
-  waits on that timeout, it is only a convenience.
+  rotates, and nobody speaks twice in a row.
+
+  No line ever erases itself. There is no timer here: a kaki's words stay on the
+  table until the next line replaces them or the player taps the bubble to put
+  it away. A tap fades the bubble, and the words stay in the DOM so the slot
+  keeps the height it was measured at and nothing below it moves.
 
   The rotation starts wherever seat() puts it. game.js seats it from the number
   of visits, so the kaki who says hello changes from one visit to the next
@@ -15,14 +18,15 @@
 import { aiGenerate } from '/shared/ai.js';
 
 const GAME = 'mahjong-kakis';
-const DISMISS_MS = 4000;
 
 const ARROW_X = ['16.6%', '50%', '83.4%'];
 
-// A moment inside a round belongs to whoever suits it. The hello at the door is
-// deliberately not on this list: it belongs to the seated rotation, so a
-// returning player is met by a different face each time they come back.
+// A moment inside a round belongs to whoever suits it. A very first hello is
+// Lily's, because hers are the lines that teach the rule. The hello a returning
+// player gets is deliberately not on this list: it belongs to the seated
+// rotation, so a different face meets them each time they come back.
 const AFFINITY = {
+  first_visit: 'lily',
   near_miss: 'lily',
   round_win: 'beng',
   idle_nudge: 'rose'
@@ -51,8 +55,9 @@ export function renderPortraits(root) {
 /**
  * Wire the shared bubble.
  * @param {ParentNode} root
- * @param {{onChange?: Function}} [options]  onChange runs after the bubble is
- *   painted and after it is put away, for anything measuring the slot.
+ * @param {{onChange?: Function}} [options]  onChange runs after a line is
+ *   painted, for anything measuring the slot. Putting a line away never fires
+ *   it, because putting a line away never changes the slot.
  * @returns {{speak: Function, dismiss: Function, seat: Function}}
  */
 export function createBanter(root, options) {
@@ -66,7 +71,6 @@ export function createBanter(root, options) {
   let lastId = null;
   let rotation = -1;
   let turn = 0;
-  let timer = 0;
 
   if (bubble) {
     bubble.addEventListener('click', function () {
@@ -119,36 +123,24 @@ export function createBanter(root, options) {
     bubble.dataset.kaki = kaki.id;
     bubble.disabled = false;
 
-    window.clearTimeout(timer);
-    timer = window.setTimeout(dismiss, DISMISS_MS);
-
     if (onChange) {
       onChange();
     }
   }
 
+  // Putting a line away is a fade, not a delete. The words stay in the box so
+  // the box keeps its height, and the tiles under it do not move a pixel.
   function dismiss() {
-    window.clearTimeout(timer);
     if (bubble) {
       delete bubble.dataset.event;
       delete bubble.dataset.kaki;
       bubble.disabled = true;
-    }
-    if (nameEl) {
-      nameEl.textContent = '';
-    }
-    if (textEl) {
-      textEl.textContent = '';
     }
     for (let i = 0; i < KAKIS.length; i += 1) {
       const slot = scope.querySelector('[data-kaki-slot="' + KAKIS[i].id + '"]');
       if (slot) {
         slot.classList.remove('is-speaking');
       }
-    }
-
-    if (onChange) {
-      onChange();
     }
   }
 

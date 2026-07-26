@@ -1,4 +1,22 @@
 {
+  "first_visit__lily": [
+    "Welcome {name}, sit here. Two same tiles, tap both.",
+    "Hello {name}, so nice you came. Find two that match.",
+    "Come {name}, the table is warm. All tiles are face up.",
+    "First time {name}? Tap one tile, then tap its twin."
+  ],
+  "first_visit__beng": [
+    "Oi {name}, new face. Two same tiles, tap tap, gone.",
+    "Sit down {name}, kopi just came. Tap two same tiles.",
+    "Eh {name}, welcome. No rush, the tiles cannot run.",
+    "First time {name}? Find two same tiles and tap both."
+  ],
+  "first_visit__rose": [
+    "Welcome {name}. Breathe, then find two tiles that match.",
+    "Sit slowly {name}. Nice to have new company here.",
+    "Hello {name}. Two tiles that look alike, tap both.",
+    "Come {name}, no hurry at all. The tiles will wait."
+  ],
   "round_start__lily": [
     "Eh {name}, come sit. All the tiles are face up.",
     "Wah {name}, good you came. Two same tiles, tap both.",
@@ -11,18 +29,18 @@
     "Sit down {name}. Two same tiles, tap tap, they gone.",
     "Aiyoh {name}, you again. Good, now I have company.",
     "Eh {name}, table is set. Match two same tiles.",
-    "Uncle chope this seat for you {name}."
+    "This seat I chope for you {name}."
   ],
   "round_start__rose": [
     "Sit slowly {name}. No hurry, the tiles will wait.",
     "Welcome {name}. Find two tiles that look alike.",
     "Take a breath {name}. Then find one pair, any pair.",
-    "Good to see you {name}. We play slow, like always.",
-    "One pair at a time {name}."
+    "Sit down {name}. We play slow here, no hurry.",
+    "One pair at a time {name}. Two same tiles, tap both."
   ],
   "match_found__lily": [
     "There you go {name}. Clean pair.",
-    "Wah {name}, your eyes still sharp.",
+    "Wah {name}, your eyes so sharp.",
     "Nice one {name}. That pair was hiding also.",
     "See {name}, they match. Two friends going home.",
     "That one beautiful {name}.",
@@ -50,7 +68,7 @@
     "Never mind {name}, they really do look alike.",
     "Almost {name}. Maybe the twin is in the corner.",
     "So close {name}.",
-    "Wah {name}, these two nearly fooled Auntie also."
+    "Wah {name}, these two nearly fooled me also."
   ],
   "near_miss__beng": [
     "Those two look like brothers {name}. Not twins.",
@@ -72,12 +90,12 @@
     "Table cleared {name}. Every tile went home.",
     "Wah {name}, all gone. Beautiful.",
     "Well done {name}. That was a warm round.",
-    "See {name}, all matched. Auntie very happy today.",
-    "Every single pair {name}. Auntie clapping already."
+    "See {name}, all matched. I am very happy today.",
+    "Every single pair {name}. I am clapping already."
   ],
   "round_win__beng": [
     "Wah {name}, table clean. Who buying the next kopi?",
-    "Steady {name}. Uncle lost count halfway already.",
+    "Steady {name}. I lost count halfway already.",
     "All gone {name}. My toast also not finished.",
     "Aiyoh {name}, so clean. Next time I bring glasses.",
     "Clean table {name}."
@@ -99,7 +117,7 @@
     "Eh {name}, my kopi getting cold, but you carry on.",
     "No rush {name}. I also stare blur blur sometimes.",
     "Try the bottom row {name}. I always find one there.",
-    "Uncle also blur {name}."
+    "My eyes also blur {name}."
   ],
   "idle_nudge__rose": [
     "Slowly {name}. Look at one tile, then find its twin.",
@@ -110,22 +128,22 @@
   "return_visit__lily": [
     "You came back {name}. Last time we played {rounds} together.",
     "Wah {name}, we played {rounds} already.",
-    "Eh {name}, I still remember {best}.",
-    "Wah {name}, Auntie never forget {best}.",
-    "Auntie kept your seat {name}. We sat here {rounds} before."
+    "Eh {name}, I remember {best}, you know.",
+    "Wah {name}, I never forget {best} hor.",
+    "I kept your seat {name}. We sat here {rounds} before."
   ],
   "return_visit__beng": [
     "Oi {name}, back so soon? We played {rounds} last time.",
-    "Aiyoh {name}, Uncle still remember {best}.",
-    "Uncle chope your seat {name}. We finished {rounds} together.",
-    "Steady {name}. Uncle never forget {best}.",
+    "Aiyoh {name}, I remember {best} sia.",
+    "I chope your seat {name}. We finished {rounds} together.",
+    "Steady {name}. I never forget {best} lah.",
     "Eh {name}, kopi first. We played {rounds} sia."
   ],
   "return_visit__rose": [
     "Good to see you {name}. We played {rounds} together already.",
     "Come sit {name}. We finished {rounds} together.",
-    "Ah {name}, I never forget {best}.",
+    "Come {name}, I remember {best}, really.",
     "Welcome back {name}. We played {rounds} at this table.",
-    "Sit slowly {name}. I remember {best}."
+    "Sit here {name}. I remember {best} well."
   ]
 }
