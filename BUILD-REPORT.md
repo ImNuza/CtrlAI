@@ -35,7 +35,7 @@ node server.js then open http://localhost:4173 in a phone-sized viewport. Each g
 
 - memory-garden: orchestrator running toward playable core
 - mahjong-kakis: orchestrator running toward playable core
-- scam-dojo: orchestrator running toward playable core
+- scam-dojo: CORE COMMITTED (be90cca) and conductor-verified: 11 smoke checks pass under an independent run, inspector clean, home screen eyeballed. Orchestrator paused before polish per the gate.
 
 ## Verification results
 
