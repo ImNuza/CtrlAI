@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CtrlAI bake-off: team brief for Matthew and Zoe</title>
+<style>
+  :root {
+    --paper: #f7f3ec; --card: #fffdf8; --ink: #211a13; --muted: #6e6154;
+    --faint: #9a8d7c; --hairline: #e4dccd; --hairline-strong: #cfc4af;
+    --accent: #b4522a; --good: #3f7d3f; --warn: #a8730f; --tint: rgba(180,82,42,0.07);
+    --font-display: "Iowan Old Style", Palatino, "Book Antiqua", Georgia, serif;
+    --font-body: "Avenir Next", Avenir, Seravek, "Segoe UI", sans-serif;
+    --font-mono: "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #1a1712; --card: #211d17; --ink: #ece4d6; --muted: #a2967f;
+      --faint: #7c715e; --hairline: #332d24; --hairline-strong: #453d30;
+      --accent: #d0763f; --good: #5f9c58; --warn: #b3841a; --tint: rgba(208,118,63,0.09);
+    }
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+  .sheet { max-width: 900px; margin: 0 auto; padding: 48px 28px 80px; }
+
+  .kicker { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .rule-double { border-top: 3px solid var(--ink); border-bottom: 1px solid var(--ink); height: 6px; margin: 10px 0 26px; }
+  h1 { font-family: var(--font-display); font-weight: 600; font-size: clamp(40px, 7vw, 64px); line-height: 1.02; letter-spacing: -0.015em; }
+  h1 em { font-style: italic; color: var(--accent); }
+  h2 { font-family: var(--font-display); font-weight: 600; font-size: clamp(22px, 3.4vw, 30px); margin: 40px 0 8px; scroll-margin-top: 16px; }
+  h3 { font-family: var(--font-display); font-weight: 600; font-size: 19px; margin: 20px 0 4px; }
+  .standfirst { margin: 18px 0 6px; max-width: 62ch; font-size: 18px; line-height: 1.5; }
+  p { margin: 12px 0; max-width: 68ch; }
+  li { margin: 6px 0; max-width: 66ch; }
+  ul, ol { padding-left: 22px; margin: 10px 0; }
+  code { font-family: var(--font-mono); font-size: 13.5px; background: var(--tint); padding: 1px 5px; border-radius: 3px; }
+  pre { background: var(--card); border: 1px solid var(--hairline); border-radius: 6px; padding: 12px 14px; overflow-x: auto; margin: 12px 0; }
+  pre code { background: none; padding: 0; font-size: 13px; }
+
+  nav { margin: 30px 0 0; padding: 12px 0; border-top: 1px solid var(--hairline-strong); border-bottom: 1px solid var(--hairline-strong); display: flex; flex-wrap: wrap; gap: 4px 20px; }
+  nav a { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; color: var(--muted); }
+  nav a:hover { color: var(--accent); }
+
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; margin: 22px 0; }
+  .tile { background: var(--card); border: 1px solid var(--hairline); border-radius: 8px; padding: 16px 18px; }
+  .tile-num { font-family: var(--font-display); font-size: 34px; font-variant-numeric: tabular-nums; line-height: 1; }
+  .tile-label { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-top: 8px; }
+
+  .table-wrap { overflow-x: auto; border: 1px solid var(--hairline); border-radius: 6px; background: var(--card); margin: 18px 0; }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--hairline); white-space: nowrap; }
+  td.wrap { white-space: normal; min-width: 260px; }
+  th { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+
+  .caveat { display: inline-block; border: 1px solid var(--warn); color: var(--warn); font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; padding: 3px 9px; border-radius: 3px; margin-top: 14px; }
+  sup.fnref { font-size: 11px; color: var(--accent); }
+  .footnotes { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--hairline-strong); font-size: 13px; color: var(--muted); }
+  .footnotes li { margin: 6px 0; max-width: 74ch; }
+  .footnotes code { font-family: var(--font-mono); font-size: 12px; }
+</style>
+</head>
+<body>
+  <div class="sheet">
+    <div class="kicker"><span>CTRLAI BAKE-OFF, TENCENT AGE WELL GAME TRACK</span><span>27 JUL 2026</span></div>
+    <div class="rule-double"></div>
+    <h1>Three games grew overnight. <em>Your job is to pick one.</em></h1>
+    <p class="standfirst">Matthew, Zoe: while we slept, an AI agent pipeline built three playable prototypes of our three candidate directions. This page tells you how to run them, how to judge them, and where the receipts are.</p>
+
+    <nav>
+      <a href="#overview">Overview</a>
+      <a href="#quickstart">Run it</a>
+      <a href="#games">The games</a>
+      <a href="#scoring">Scoring</a>
+      <a href="#honest">Real vs mocked</a>
+      <a href="#overnight">The overnight run</a>
+      <a href="#edges">Rough edges</a>
+      <a href="#reading">The paper trail</a>
+      <a href="#next">Next steps</a>
+    </nav>
+
+    <section id="overview">
+      <h2>Overview</h2>
+      <p>We had three directions on paper and no way to feel them. So Dewa handed the repo to Claude Code overnight with one goal: make all three playable by morning so the team can decide with thumbs instead of slides.<sup class="fnref"><a href="#fn1">1</a></sup></p>
+      <p>To be clear about what this is not: this repo is not our submission. The hackathon mandates CodeBuddy for the real build and Miora for art. These prototypes exist purely so we pick the right direction before spending two weeks on it. Deadline for the real thing: Aug 9, 11:59 PM.</p>
+      <p>Everything below runs offline on your laptop with one command. No accounts, no installs beyond node, no network calls.</p>
+    </section>
+
+    <section id="quickstart">
+      <h2>Run it</h2>
+      <p>You are both contributors on the repo now. Pull, then:</p>
+      <pre><code>node server.js</code></pre>
+      <p>Open <code>http://localhost:4173</code>. You will see a hub with three big buttons.</p>
+      <p><strong>Judge on a phone, not a laptop.</strong> Every screen targets a senior holding a phone at arm's length, so it looks comically oversized in a desktop window and exactly right on a handset. Two options:</p>
+      <ul>
+        <li>Fastest: browser DevTools, device toolbar, pick a 390 x 844 phone preset.</li>
+        <li>Real thing: with the server running, get your laptop's IP (<code>ipconfig getifaddr en0</code>) and open <code>http://THAT-IP:4173</code> on your actual phone, same wifi. The server binds all interfaces, so this just works.</li>
+      </ul>
+      <p>One warning before you judge anything: play each game <strong>twice</strong>. Two of the three have memory beats that only fire on a return visit, and those beats are the whole point of their design.</p>
+    </section>
+
+    <section id="games">
+      <h2>The games</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Route</th><th>Game</th><th class="wrap">Pitch</th><th>Time</th></tr></thead>
+          <tbody>
+            <tr><td><code>/memory-garden</code></td><td>Memory Garden</td><td class="wrap">Pick a heritage object, answer three gentle prompts, a plant grown from your answers joins a garden that remembers.</td><td>5 min x 2</td></tr>
+            <tr><td><code>/mahjong-kakis</code></td><td>Mahjong Kakis</td><td class="wrap">Face-up tile matching at a kopitiam table with three aunties and uncles who banter, learn your name, and recall your last visit.</td><td>5 min x 2</td></tr>
+            <tr><td><code>/scam-dojo</code></td><td>Scam Dojo</td><td class="wrap">The phone rings, a scammer tries an angle, you tap the tells and hang up. Kind coaching, never a failure screen.</td><td>5 min x 2</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Memory Garden, what to feel for</h3>
+      <p>Grow two plants with different answers. Do they look different from across the table, not just up close? Tap a plant to replay its story. Close the tab, come back, is everything still there? This is the intergenerational one: the free text field is meant for a grandchild's hands.</p>
+
+      <h3>Mahjong Kakis, what to feel for</h3>
+      <p>Give it your name and play a round. Tap two tiles that do not match on purpose and watch how the table treats you. Then close it, reopen, and listen to the greeting. The tiles are the hook, but the kakis are the product; judge the companions, not the matching.</p>
+
+      <h3>Scam Dojo, what to feel for</h3>
+      <p>Play three calls in a row. Do they feel like three different scams or one script wearing hats? Tap a line that is actually innocent and see what happens. On one round, deliberately choose "Do what they say". If that path ever feels like punishment, that is a finding. Reload and check your shield streak survived.</p>
+    </section>
+
+    <section id="scoring">
+      <h2>Scoring</h2>
+      <p>After playing everything twice, score each game out of 5 on four questions:</p>
+      <ol>
+        <li>Did it feel alive?</li>
+        <li>Did the AI beat impress you?</li>
+        <li>Would you proudly demo this on Aug 9?</li>
+        <li>Can you see us building this for two weeks?</li>
+      </ol>
+      <p>Ties break toward the game whose AI story is easiest to explain in one sentence, because 40 of the 100 judging points sit on Use of AI Tools.<sup class="fnref"><a href="#fn2">2</a></sup> Bring your scores; Dewa has the full bake-off argument doc for the discussion.</p>
+    </section>
+
+    <section id="honest">
+      <h2>What is real and what is mocked</h2>
+      <p>Say it plainly so nobody judges on a false impression: every generated line tonight (banter, captions, scam calls, recaps) is template-plus-randomized-slots from content banks, routed through one function in <code>shared/ai.js</code>. No live model was called. That is a deliberate architecture: it runs offline, rounds still feel fresh, and the file carries a labeled SWAP POINT where a real model replaces one function body with zero call sites changing. When we build the winner, that seam is where Tencent's model goes, with the banks kept as the offline fallback.</p>
+      <p>What is genuinely real: the plant generator in Memory Garden is seeded procedural composition, memory in all three games is real persistence, and the difficulty dial in Mahjong Kakis genuinely adapts to how you play without ever showing itself.</p>
+    </section>
+
+    <section id="overnight">
+      <h2>The overnight run</h2>
+      <div class="tiles">
+        <div class="tile"><div class="tile-num">3</div><div class="tile-label">Playable games</div></div>
+        <div class="tile"><div class="tile-num">1</div><div class="tile-label">Night</div></div>
+        <div class="tile"><div class="tile-num">40+</div><div class="tile-label">Verified commits</div></div>
+        <div class="tile"><div class="tile-num">20</div><div class="tile-label">Serious bugs found and fixed</div></div>
+        <div class="tile"><div class="tile-num">250+</div><div class="tile-label">Automated checks green</div></div>
+        <div class="tile"><div class="tile-num">0</div><div class="tile-label">Runtime dependencies</div></div>
+      </div>
+      <p>How it actually ran, in one paragraph: a conductor session planned and verified but wrote no game code. Three orchestrator agents (one per game) planned and reviewed; coder agents under them wrote everything. All three games reached a committed playable core before any polish was allowed anywhere, so a mid-run halt would have been harmless. After all three hit their definitions of done, a nine-agent adversarial sweep attacked them (double-tap attacks, markup injection into the name fields, measuring every screen against the senior UX floor) and found 20 serious issues, including double taps that skipped whole screens and one stored XSS path. All were fixed and regression-tested before sunrise.<sup class="fnref"><a href="#fn3">3</a></sup></p>
+      <p>Nothing here rests on an agent's word. Every claim was verified by driving the real UI headless at a phone viewport with scripted taps, and the full test battery was rerun from scratch at handoff: all suites green, all four routes clean.<sup class="fnref"><a href="#fn4">4</a></sup></p>
+    </section>
+
+    <section id="edges">
+      <h2>Known rough edges</h2>
+      <p>These are documented limitations, not undiscovered bugs. Do not mark a game down for something it already confesses to:</p>
+      <ul>
+        <li><strong>Memory Garden:</strong> object descriptions in the picker are hidden at phone widths (every layout tried broke small screens); one plant silhouette (woven palm) is the least plant-like.</li>
+        <li><strong>Mahjong Kakis:</strong> reloading mid-round resets that round (your name and stats survive); banter repeats eventually in very long sessions.</li>
+        <li><strong>Scam Dojo:</strong> the streak counts rounds, not real calendar days; the daily framing is aspirational in v0.</li>
+        <li><strong>Everywhere:</strong> art is placeholder CSS and SVG on purpose. Miora art comes later. Judge the bones, not the paint.</li>
+      </ul>
+    </section>
+
+    <section id="reading">
+      <h2>The paper trail</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>File</th><th class="wrap">What it is</th><th>Read when</th></tr></thead>
+          <tbody>
+            <tr><td><code>README.md</code></td><td class="wrap">Repo front door: run instructions, the scoring rubric, what is mocked.</td><td>First, 5 min</td></tr>
+            <tr><td><code>games/*/README.md</code></td><td class="wrap">Per-game honesty: what works, what is mocked, known issues, how to run its QA. Fact-checked against the code.</td><td>Before scoring</td></tr>
+            <tr><td><code>BUILD-REPORT.md</code></td><td class="wrap">The whole night: every phase, every autonomous decision, the verification matrix, the incident log.</td><td>If curious</td></tr>
+            <tr><td><code>AI-STORY.md</code></td><td class="wrap">Raw material for the deck's AI creation description section, the 40-point slice.</td><td>Before the PPT</td></tr>
+            <tr><td><code>REBUILD-NOTES.md</code></td><td class="wrap">What to keep vs redo when we rebuild the winner in CodeBuddy. Generated this morning; read it after we pick.</td><td>After deciding</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>The git log is also worth a skim (<code>git log --oneline</code>): forty-plus commits, each a verified milestone, which is itself part of our AI-usage evidence.</p>
+    </section>
+
+    <section id="next">
+      <h2>Next steps</h2>
+      <ol>
+        <li>Both of you play all three, twice, on a phone. Score them.</li>
+        <li>We meet, compare scores, pick one. Tie-break rule above.</li>
+        <li>The winner gets rebuilt properly in CodeBuddy with Miora art, with the AI seam swapped to a real model. Everything in this repo (content banks, state shapes, QA scripts, the senior UX tokens) is written to be carried over.</li>
+        <li>Deck writes itself from AI-STORY.md plus whatever we build. Aug 9, 11:59 PM.</li>
+      </ol>
+      <span class="caveat">PROTOTYPE, NOT SUBMISSION</span>
+    </section>
+
+    <ol class="footnotes" id="footnotes">
+      <li id="fn1">Full goal and constraints: <code>GOAL.md</code> in the repo root. The senior UX floor (64px tap targets, 28px text, measured contrast, no timers, no shame) is enforced in <code>shared/ui/tokens.css</code> with the WCAG math documented inline.</li>
+      <li id="fn2">Judging split per the hackathon brief: 30 Impact and Relevance, 40 Use of AI Tools, 30 Project Quality, +5 social post.</li>
+      <li id="fn3">Findings, dispositions, and the fix-round evidence: <code>BUILD-REPORT.md</code>, sections "Adversarial QA sweep" and "Fix round results". The stored XSS fix is in Memory Garden's fix commit <code>c33096b</code>.</li>
+      <li id="fn4">Reproduce it yourself: <code>node tools/selftest-shared.mjs</code>, the per-game suites listed in <code>README.md</code> (one <code>npm install</code> needed for the QA driver only), and <code>node tools/qa/inspect.mjs --url http://localhost:4173/memory-garden --name spot</code>.</li>
+    </ol>
+  </div>
+</body>
+</html>
