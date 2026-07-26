@@ -5,7 +5,11 @@
     "This garden is empty for now. One memory is enough to begin.",
     "Sit a while first. When you are ready, pick something old and dear.",
     "Empty garden, quiet morning. Whatever you plant here stays here.",
-    "You can start anywhere lah. Small things grow just as well as big ones."
+    "You can start anywhere lah. Small things grow just as well as big ones.",
+    "Nothing here yet, only good soil and time. Take as long as you like.",
+    "The first one is the hardest, and even that is not very hard. Anything you still see clearly will do.",
+    "A quiet plot, waiting. Pick something small, the garden will do the rest.",
+    "No plants yet. Whatever you remember first is the right place to start."
   ],
   "welcome_back": [
     "Welcome back. Everything you planted is still here, {count} growing quietly.",
@@ -13,7 +17,11 @@
     "Your garden is right where you left it, {count} kept safe.",
     "Back again. The soil held on to every bit of it, {count} waiting for you.",
     "Nothing goes missing here. Tap any plant to hear its story again, {count} sitting there for you.",
-    "Take your time lah. The garden was quiet without you, {count} still coming up green."
+    "Take your time lah. The garden was quiet without you, {count} still coming up green.",
+    "You are back. The garden carried on without you, {count} standing quietly in the sun.",
+    "Same soil, same plants, nothing moved. Everything is where you put it, {count} keeping the place warm.",
+    "The garden waited. It does that well, {count} still rooted and in no hurry at all.",
+    "Here again, good. Nothing here needs watering or worrying, {count} doing just fine without any help."
   ],
   "ceremony_grow": [
     "There. Look at it come up, slow at first and then all at once. This one remembers {object}.",
@@ -21,7 +29,11 @@
     "Wah. Leaf by leaf, the whole afternoon is coming back. The soil understands {object}.",
     "Give it a moment. Roots go down first, that is just how it works. After that, nothing in this garden forgets {object}.",
     "Here it is. Still small, still stubborn. The soil took it all in, {object} and the whole afternoon with it.",
-    "There it is, green and quite pleased with itself. The whole garden knows about it now, {object} and every bit of that day."
+    "There it is, green and quite pleased with itself. The whole garden knows about it now, {object} and every bit of that day.",
+    "Watch the stem find its own way up, slow at first and then sure. The garden has taken this one in, {object} and the whole day around it.",
+    "Quiet work, this one. Roots first, leaves after, and by the end the whole plot knows {object}.",
+    "Look at that. Green already, and stubborn with it. The garden will remember {object} long after today.",
+    "Slowly does it. There it comes, one leaf and then another, taking its time. The garden has all of it now, {object} and the whole afternoon that came with it."
   ],
   "caption": [
     "One ordinary afternoon {where}, the light going soft, nobody in a hurry. Somebody talked through all of it, {who} mostly, and it still comes back {feeling} every time the garden remembers {object}.",
@@ -31,7 +43,12 @@
     "Some memories are loud, this one is not. An afternoon {where}, steam off somebody's cup, {who} talking through all of it, a garden that still remembers {object}, and a feeling that has not changed, {feeling} even now.",
     "Small thing, long shadow. The garden took one afternoon {where} with company in it, {who} mostly, and grew it into something green. It still comes back {feeling}, {object} and everything around it.",
     "Nobody thought to write it down, so the garden did it instead: one afternoon {where}, cool tiles underfoot, {who} somewhere close, {object} sitting there through all of it, and a feeling that has not gone anywhere, {feeling} as ever.",
-    "Good company, one afternoon {where}. That was all it took, and it still comes back {feeling}, the sound of {who} laughing, the garden quietly remembering {object}."
+    "Good company, one afternoon {where}. That was all it took, and it still comes back {feeling}, the sound of {who} laughing, the garden quietly remembering {object}.",
+    "A ceiling fan turning slow, a radio somewhere down the corridor, one long afternoon {where}. There was company through all of it, {who} mostly, and the garden still remembers {object}. It comes back {feeling}, every time.",
+    "Rain on a zinc roof, the smell of it rising off hot ground, one afternoon {where} that simply stuck. Somebody talked the whole way through, {who} probably, and the garden grew {object} out of that day. It still sits {feeling} in the chest.",
+    "Mynah birds arguing outside, a fan on low, cold tiles under bare feet. That was the afternoon {where}, and there was good company in it, {who} for certain. The garden remembers {object} from that day, and it comes back {feeling} every single time.",
+    "The kind of afternoon that repeated itself all through those years, {where} and nowhere else, with somebody around the whole time, {who} usually. The garden made a plant out of it, roots and all, and it still knows {object}. Ask it how that day felt and it will tell you, {feeling} from start to end.",
+    "Nothing dramatic about it. A long afternoon {where}, the light going orange on the wall, somebody humming off key, {who} of course. The garden kept every bit of that, {object} and the hum and the orange light, and it still lands {feeling} whenever it comes back up."
   ],
   "replay_open": [
     "Take your time with this one. The story is not going anywhere.",
@@ -39,7 +56,11 @@
     "Read it slowly lah. Some stories are better the second time.",
     "This one is still here, exactly as you planted it.",
     "Nothing changed while it sat here. That is the whole point of a garden.",
-    "Sit with it a while. Nobody is waiting on you."
+    "Sit with it a while. Nobody is waiting on you.",
+    "Still here, word for word. Read it as slowly as you like.",
+    "No rush at all. The garden keeps its stories exactly the way you left them.",
+    "Open this one as often as you want. Nothing in here wears out.",
+    "Take your own sweet time. Nobody has moved a single word of it."
   ],
   "prompt_who": [
     "Who is in this memory with you?",
