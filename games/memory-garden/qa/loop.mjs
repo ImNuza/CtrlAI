@@ -7,6 +7,7 @@
 
 import { chromium } from 'playwright';
 import { spawn } from 'node:child_process';
+import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -16,12 +17,16 @@ const PORT = 4191;
 const ORIGIN = 'http://localhost:' + PORT;
 const GAME_URL = ORIGIN + '/memory-garden';
 const STORAGE_KEY = 'ctrlai:memory-garden';
+const BANK_PATH = path.join(here, '..', 'content', 'garden-lines.json');
 const VIEWPORT = { width: 390, height: 844 };
+const GRANDCHILD_LINE = 'Ah Gong told me this one twice, both times he laughed at the same part.';
 
 const results = [];
 const consoleErrors = [];
 const pageErrors = [];
 const failedRequests = [];
+const headingsSeen = { who: [], where: [], feeling: [] };
+let bank = {};
 let taps = 0;
 let loopTaps = 0;
 
@@ -80,21 +85,50 @@ async function answer(page, optionId) {
   await tap(page, '#prompt-next');
 }
 
-async function growMemory(page, objectId, who, where, feeling) {
+// The heading is written from the bank a tick after the view opens, so wait for a
+// line the bank actually holds, then record whatever is on screen either way.
+async function readHeading(page, promptId) {
+  const variations = bank['prompt_' + promptId] || [];
+  try {
+    await page.waitForFunction(function (list) {
+      const node = document.getElementById('prompt-heading');
+      return node !== null && list.indexOf(node.textContent.trim()) !== -1;
+    }, variations, { timeout: 4000 });
+  } catch (err) {
+    // The membership check below is what reports this, so do not crash the run.
+  }
+  const text = await page.evaluate(function () {
+    return document.getElementById('prompt-heading').textContent.trim();
+  });
+  headingsSeen[promptId].push(text);
+  return text;
+}
+
+async function growMemory(page, objectId, who, where, feeling, freeText) {
   await tap(page, '#start-grow');
   await page.locator('#view-picker').waitFor({ state: 'visible' });
   await tap(page, '[data-object-id="' + objectId + '"]');
   await page.locator('#view-prompt').waitFor({ state: 'visible' });
+  await readHeading(page, 'who');
   await answer(page, who);
+  await readHeading(page, 'where');
   await answer(page, where);
+  await readHeading(page, 'feeling');
+  if (typeof freeText === 'string' && freeText !== '') {
+    await page.locator('#freetext').fill(freeText);
+  }
   await answer(page, feeling);
   await page.locator('#view-ceremony').waitFor({ state: 'visible' });
   await page.waitForFunction(function () {
     const line = document.getElementById('ceremony-line');
     return line !== null && line.textContent.trim().length > 0;
   });
+  const ceremonyLine = await page.evaluate(function () {
+    return document.getElementById('ceremony-line').textContent.trim();
+  });
   await tap(page, '#ceremony-done');
   await page.locator('#view-garden').waitFor({ state: 'visible' });
+  return ceremonyLine;
 }
 
 function readPlots(page) {
@@ -155,17 +189,26 @@ async function run(browser) {
     firstVisit.planted === 0 && firstVisit.empty === 6,
     'planted ' + firstVisit.planted + ', empty ' + firstVisit.empty);
 
+  /* ---- The picker offers every object ----------------------------------- */
+  await page.locator('#start-grow').click();
+  await page.locator('#view-picker').waitFor({ state: 'visible' });
+  const cards = await page.locator('#objects .object-card').count();
+  check('the picker shows 8 object cards', cards === 8, 'cards ' + cards);
+  await page.locator('[data-back="garden"]').click();
+  await page.locator('#view-garden').waitFor({ state: 'visible' });
+
   taps = 0;
-  await growMemory(page, 'kopitiam-cup', 'my-mother', 'kopitiam', 'warm');
+  const firstCeremony = await growMemory(page, 'kopitiam-cup', 'my-mother', 'kopitiam', 'warm');
   const tapsForLoop = taps;
   loopTaps = tapsForLoop;
 
   const afterOne = await readPlots(page);
   check('one plant after the first loop', afterOne.length === 1, 'plots ' + afterOne.length);
   check('whole loop is 15 taps or fewer', tapsForLoop <= 15, tapsForLoop + ' taps');
-  check('no typing needed anywhere in the loop',
-    (await page.locator('input, textarea').count()) === 0,
-    'text inputs on the page: ' + (await page.locator('input, textarea').count()));
+  check('a chips only loop stays at 9 taps or fewer', tapsForLoop <= 9, tapsForLoop + ' taps');
+  check('the ceremony line names the object in article form',
+    firstCeremony.indexOf('the kopitiam cup') !== -1 && firstCeremony.indexOf('{') === -1,
+    firstCeremony);
   if (afterOne.length === 1) {
     check('first plant carries a full trait signature',
       Boolean(afterOne[0].species && afterOne[0].palette && afterOne[0].bloom && afterOne[0].ornament && afterOne[0].seed),
@@ -180,6 +223,22 @@ async function run(browser) {
   const firstCaption = parsedAfterOne.plants[0].caption;
   check('caption stored at creation', typeof firstCaption === 'string' && firstCaption.length > 20, firstCaption);
   check('caption has no leftover slot braces', firstCaption.indexOf('{') === -1, firstCaption);
+  check('the caption names the object in article form',
+    firstCaption.indexOf('the kopitiam cup') !== -1, firstCaption);
+
+  const fields = await page.evaluate(function () {
+    const nodes = Array.from(document.querySelectorAll('input, textarea'));
+    return {
+      total: nodes.length,
+      required: nodes.filter(function (node) {
+        return node.required === true || node.getAttribute('aria-required') === 'true';
+      }).length
+    };
+  });
+  check('no typing needed anywhere in the loop',
+    fields.required === 0 && parsedAfterOne.plants[0].freeText === '',
+    fields.total + ' optional field, ' + fields.required + ' required, plant freeText "' +
+      parsedAfterOne.plants[0].freeText + '"');
 
   /* ---- Session B: same context, a very different memory ---------------- */
   await growMemory(page, 'sewing-machine', 'my-friends', 'seaside', 'wistful');
@@ -243,6 +302,7 @@ async function run(browser) {
       line: document.getElementById('replay-line').textContent.trim(),
       chips: document.querySelectorAll('#replay-answers .chip').length,
       hasPlant: document.querySelectorAll('#replay-plant svg').length === 1,
+      toldShown: document.getElementById('replay-told').hidden === false,
       focused: document.activeElement ? document.activeElement.id : ''
     };
   });
@@ -251,6 +311,8 @@ async function run(browser) {
   check('replay shows three answer chips and the plant', replay.chips === 3 && replay.hasPlant,
     'chips ' + replay.chips + ', plant ' + replay.hasPlant);
   check('replay adds a fresh narration line', replay.line.length > 0, replay.line);
+  check('a plant with no grandchild line shows no quoted block',
+    replay.toldShown === false, 'told block shown ' + replay.toldShown);
   check('focus moves into the replay dialog', replay.focused === 'replay-title', 'focused ' + replay.focused);
 
   taps += 1;
@@ -283,6 +345,82 @@ async function run(browser) {
   check('a different feeling changes the palette attribute',
     determinism.palette !== determinism.otherPalette && determinism.changed,
     determinism.palette + ' vs ' + determinism.otherPalette);
+
+  /* ---- The two Milestone B objects, one of them with a written line ------ */
+  const tvCeremony = await growMemory(page, 'setron-tv', 'my-siblings', 'first-flat', 'happy');
+  check('the Setron TV ceremony line names it in article form',
+    tvCeremony.indexOf('the old Setron TV') !== -1, tvCeremony);
+
+  await growMemory(page, 'rattan-chair', 'my-grandmother', 'kampung', 'calm', GRANDCHILD_LINE);
+
+  const afterFour = await readPlots(page);
+  check('four plants after the two new objects', afterFour.length === 4, 'plots ' + afterFour.length);
+  if (afterFour.length === 4) {
+    const species = afterFour.map(function (plot) { return plot.species; });
+    const unique = species.filter(function (value, index) { return species.indexOf(value) === index; });
+    check('all four plants carry a different species silhouette',
+      unique.length === 4, species.join(', '));
+    check('the two new objects grow the two new species',
+      species[2] === 'sunburst-bloom' && species[3] === 'woven-palm',
+      species[2] + ' and ' + species[3]);
+  }
+
+  const storedFour = await page.evaluate(function (key) {
+    return JSON.parse(window.localStorage.getItem(key));
+  }, STORAGE_KEY);
+  const written = storedFour.plants[3];
+  check('a written line is stored as plant.freeText',
+    written.freeText === GRANDCHILD_LINE, 'stored "' + written.freeText + '"');
+  check('plants nobody wrote on keep an empty freeText',
+    storedFour.plants.slice(0, 3).every(function (plant) { return plant.freeText === ''; }),
+    'first three: ' + storedFour.plants.slice(0, 3).map(function (plant) {
+      return JSON.stringify(plant.freeText);
+    }).join(' '));
+
+  taps += 1;
+  await page.locator('[data-plant-id="' + written.id + '"]').click();
+  await page.locator('#view-replay').waitFor({ state: 'visible' });
+  const toldReplay = await page.evaluate(function () {
+    return {
+      shown: document.getElementById('replay-told').hidden === false,
+      text: document.getElementById('replay-freetext').textContent.trim(),
+      style: window.getComputedStyle(document.getElementById('replay-freetext')).fontStyle,
+      fontPx: parseFloat(window.getComputedStyle(document.getElementById('replay-freetext')).fontSize)
+    };
+  });
+  check('the grandchild line shows in that plant replay, set apart',
+    toldReplay.shown && toldReplay.text === GRANDCHILD_LINE && toldReplay.style === 'italic',
+    toldReplay.style + ', ' + toldReplay.fontPx + 'px, "' + toldReplay.text + '"');
+  check('the grandchild line stays at body size or larger', toldReplay.fontPx >= 28,
+    toldReplay.fontPx + 'px');
+  taps += 1;
+  await page.locator('#replay-close').click();
+  await page.locator('#view-replay').waitFor({ state: 'hidden' });
+
+  /* ---- Every prompt heading came out of the bank ------------------------- */
+  const promptIds = ['who', 'where', 'feeling'];
+  const strays = [];
+  let variedEvents = 0;
+  for (let i = 0; i < promptIds.length; i += 1) {
+    const seen = headingsSeen[promptIds[i]];
+    const variations = bank['prompt_' + promptIds[i]] || [];
+    for (let k = 0; k < seen.length; k += 1) {
+      if (variations.indexOf(seen[k]) === -1) {
+        strays.push(promptIds[i] + ': ' + seen[k]);
+      }
+    }
+    const distinct = seen.filter(function (value, index) { return seen.indexOf(value) === index; });
+    if (distinct.length > 1) {
+      variedEvents += 1;
+    }
+  }
+  const headingCount = headingsSeen.who.length + headingsSeen.where.length + headingsSeen.feeling.length;
+  check('every prompt heading is a line from the bank',
+    strays.length === 0 && headingCount >= 12,
+    headingCount + ' headings read, strays: ' + (strays.join(' | ') || 'none'));
+  check('prompt headings rephrase themselves across plays',
+    variedEvents === 3,
+    variedEvents + ' of 3 events varied, who saw: ' + headingsSeen.who.join(' / '));
 
   /* ---- Return visit in a fresh context ---------------------------------- */
   const contextB = await browser.newContext({ viewport: VIEWPORT, hasTouch: true });
@@ -320,6 +458,12 @@ async function run(browser) {
     gardenFits && pickerFits && promptFits,
     'garden ' + gardenFits + ', picker ' + pickerFits + ', prompt ' + promptFits);
 
+  const hiddenOnStepOne = await returnPage.evaluate(function () {
+    return document.getElementById('freetext-field').hidden;
+  });
+  check('the optional field stays away until the third step', hiddenOnStepOne === true,
+    'hidden on step 1: ' + hiddenOnStepOne);
+
   const targets = await returnPage.evaluate(function () {
     const nodes = Array.from(document.querySelectorAll('button, a, .btn, .chip')).filter(function (node) {
       const box = node.getBoundingClientRect();
@@ -331,6 +475,33 @@ async function run(browser) {
     }).length;
   });
   check('every visible tap target clears 60px at 360px wide', targets === 0, targets + ' undersized');
+
+  await returnPage.locator('#prompt-chips [data-option-id="my-father"]').click();
+  await returnPage.locator('#prompt-next').click();
+  await returnPage.locator('#prompt-chips [data-option-id="seaside"]').click();
+  await returnPage.locator('#prompt-next').click();
+  await returnPage.locator('#freetext').waitFor({ state: 'visible' });
+  const field = await returnPage.evaluate(function () {
+    const input = document.getElementById('freetext');
+    const label = document.querySelector('.freetext-label');
+    const box = input.getBoundingClientRect();
+    return {
+      height: Math.round(box.height),
+      fontPx: parseFloat(window.getComputedStyle(input).fontSize),
+      labelText: label.textContent.trim(),
+      labelFontPx: parseFloat(window.getComputedStyle(label).fontSize),
+      labelFor: label.getAttribute('for'),
+      maxLength: input.maxLength,
+      required: input.required
+    };
+  });
+  const fieldFits = await noHorizontalScroll(returnPage);
+  check('the optional field is labelled, body size and 64px tall or more',
+    field.height >= 64 && field.fontPx >= 28 && field.labelFontPx >= 28 &&
+      field.labelFor === 'freetext' && field.labelText.length > 0 && field.required === false,
+    field.labelText + ' :: ' + field.height + 'px tall, ' + field.fontPx + 'px text, maxlength ' +
+      field.maxLength);
+  check('no horizontal scroll at 360px with the field showing', fieldFits, 'fits ' + fieldFits);
 
   /* ---- Reduced motion collapses the ceremony to instant ----------------- */
   const calmContext = await browser.newContext({
@@ -414,6 +585,8 @@ async function run(browser) {
 }
 
 async function main() {
+  bank = JSON.parse(await readFile(BANK_PATH, 'utf8'));
+
   const server = spawn(process.execPath, ['server.js'], {
     cwd: repoRoot,
     env: Object.assign({}, process.env, { PORT: String(PORT) }),

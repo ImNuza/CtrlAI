@@ -28,7 +28,9 @@ const SPECIES_BY_OBJECT = {
   'rotary-phone': 'bellflower',
   tingkat: 'stacked-bamboo',
   cassette: 'ribbon-fern',
-  'five-stones': 'pebble-succulent'
+  'five-stones': 'pebble-succulent',
+  'setron-tv': 'sunburst-bloom',
+  'rattan-chair': 'woven-palm'
 };
 
 const SPECIES_LABELS = {
@@ -37,7 +39,9 @@ const SPECIES_LABELS = {
   bellflower: 'bellflower',
   'stacked-bamboo': 'stacked bamboo',
   'ribbon-fern': 'ribbon fern',
-  'pebble-succulent': 'pebble succulent'
+  'pebble-succulent': 'pebble succulent',
+  'sunburst-bloom': 'sunburst bloom',
+  'woven-palm': 'woven palm'
 };
 
 const PALETTES = {
@@ -104,6 +108,34 @@ function blade(x, y, angleDeg, len, width) {
   return 'M' + r2(x) + ' ' + r2(y) +
     ' Q' + r2(midX + px) + ' ' + r2(midY + py) + ' ' + r2(tipX) + ' ' + r2(tipY) +
     ' Q' + r2(midX - px) + ' ' + r2(midY - py) + ' ' + r2(x) + ' ' + r2(y) + ' Z';
+}
+
+// A broad palm frond: widest around two thirds out, then to a point. Returned
+// with the geometry the weave lines need so they can be drawn across it.
+function frondShape(x, y, angleDeg, len, halfWidth) {
+  const a = (angleDeg * Math.PI) / 180;
+  const dx = Math.cos(a);
+  const dy = Math.sin(a);
+  const nx = -dy;
+  const ny = dx;
+  const belly = 0.62;
+  const root = halfWidth * 0.26;
+  const bx = x + dx * len * belly;
+  const by = y + dy * len * belly;
+  const path = 'M' + r2(x + nx * root) + ' ' + r2(y + ny * root) +
+    ' L' + r2(bx + nx * halfWidth) + ' ' + r2(by + ny * halfWidth) +
+    ' L' + r2(x + dx * len) + ' ' + r2(y + dy * len) +
+    ' L' + r2(bx - nx * halfWidth) + ' ' + r2(by - ny * halfWidth) +
+    ' L' + r2(x - nx * root) + ' ' + r2(y - ny * root) + ' Z';
+  return { path: path, dx: dx, dy: dy, nx: nx, ny: ny, belly: belly, root: root };
+}
+
+// Width of that frond at a fraction along its length, so a weave line can span it.
+function frondHalfWidth(shape, t, halfWidth) {
+  if (t <= shape.belly) {
+    return shape.root + (halfWidth - shape.root) * (t / shape.belly);
+  }
+  return halfWidth * (1 - (t - shape.belly) / (1 - shape.belly));
 }
 
 function jitter(rng, spread) {
@@ -296,13 +328,130 @@ function pebbleSucculent(rng, pal) {
   return { stem: stem, leaves: leaves.join(''), anchors: anchors, lean: jitter(rng, 2) };
 }
 
+// One tall stem, one big face. The petal ring and disc live in the leaves layer
+// so the who blooms still land last, as inner dots on the face rather than a
+// second ring of flowers fighting the first.
+const SUNBURST_TOP = 46;
+const SUNBURST_DISC = 15;
+
+function sunburstBloom(rng, pal) {
+  const stem = '<path d="M60 128 L60 ' + SUNBURST_TOP + '" fill="none" stroke="' + pal.leafDark +
+    '" stroke-width="7" stroke-linecap="round"/>';
+
+  const parts = [];
+  // Lowest leaf goes right, so it does not sit on the ornament tucked left of the pot.
+  const spots = [104, 88, 72];
+  const leafCount = 2 + Math.floor(rng() * 2);
+  for (let i = 0; i < leafCount; i += 1) {
+    const side = i % 2 === 0 ? 1 : -1;
+    const angle = (side < 0 ? -158 : -22) + jitter(rng, 9);
+    const rad = (angle * Math.PI) / 180;
+    const reach = 17 + rng() * 3;
+    const lx = BASE_X + Math.cos(rad) * reach;
+    const ly = spots[i] + Math.sin(rad) * reach;
+    parts.push('<ellipse cx="' + r2(lx) + '" cy="' + r2(ly) + '" rx="15" ry="9.5" fill="' +
+      (i % 2 === 0 ? pal.leaf : pal.leafDark) + '" transform="rotate(' + r2(angle) + ' ' +
+      r2(lx) + ' ' + r2(ly) + ')"/>');
+  }
+
+  const petals = 11 + Math.floor(rng() * 3);
+  const step = 360 / petals;
+  for (let i = 0; i < petals; i += 1) {
+    const angle = -90 + i * step + jitter(rng, 3);
+    const rad = (angle * Math.PI) / 180;
+    const px = BASE_X + Math.cos(rad) * 24;
+    const py = SUNBURST_TOP + Math.sin(rad) * 24;
+    parts.push('<ellipse cx="' + r2(px) + '" cy="' + r2(py) + '" rx="11" ry="5.2" fill="' +
+      pal.bloom1 + '" transform="rotate(' + r2(angle) + ' ' + r2(px) + ' ' + r2(py) + ')"/>');
+  }
+  for (let i = 0; i < petals; i += 1) {
+    const angle = -90 + (i + 0.5) * step;
+    const rad = (angle * Math.PI) / 180;
+    const px = BASE_X + Math.cos(rad) * 18;
+    const py = SUNBURST_TOP + Math.sin(rad) * 18;
+    parts.push('<ellipse cx="' + r2(px) + '" cy="' + r2(py) + '" rx="8" ry="4" fill="' +
+      pal.bloom2 + '" transform="rotate(' + r2(angle) + ' ' + r2(px) + ' ' + r2(py) + ')"/>');
+  }
+  parts.push('<circle cx="' + BASE_X + '" cy="' + SUNBURST_TOP + '" r="' + SUNBURST_DISC +
+    '" fill="' + CREAM + '" stroke="' + pal.accent + '" stroke-width="3"/>');
+
+  const anchors = [{ x: BASE_X, y: SUNBURST_TOP, pedicel: null }];
+  for (let i = 0; i < 7; i += 1) {
+    const angle = ((-90 + i * (360 / 7)) * Math.PI) / 180;
+    anchors.push({
+      x: BASE_X + Math.cos(angle) * 7,
+      y: SUNBURST_TOP + Math.sin(angle) * 7,
+      pedicel: null
+    });
+  }
+
+  return { stem: stem, leaves: parts.join(''), anchors: anchors, lean: jitter(rng, 4) };
+}
+
+// A fan of solid fronds off one short trunk, each one ribbed and cross banded so
+// the weave of a rattan chair back shows up in the leaf itself.
+function wovenPalm(rng, pal) {
+  const hubY = 96;
+  const stems = ['<path d="M60 128 L60 ' + hubY + '" fill="none" stroke="' + pal.leafDark +
+    '" stroke-width="9" stroke-linecap="round"/>'];
+  for (let y = 122; y > hubY + 4; y -= 9) {
+    stems.push('<path d="M55 ' + y + ' L65 ' + y + '" stroke="' + pal.leaf +
+      '" stroke-width="2.4" stroke-linecap="round"/>');
+  }
+
+  const count = 5 + Math.floor(rng() * 2);
+  const leaves = [];
+  const anchors = [];
+  for (let i = 0; i < count; i += 1) {
+    const angle = -160 + (i / (count - 1)) * 140 + jitter(rng, 4);
+    const len = 46 + rng() * 11;
+    const halfWidth = 8.5;
+    const shape = frondShape(BASE_X, hubY, angle, len, halfWidth);
+    leaves.push('<path d="' + shape.path + '" fill="' + pal.leaf + '" stroke="' + pal.leafDark +
+      '" stroke-width="1.6" stroke-linejoin="round"/>');
+    leaves.push('<path d="M' + BASE_X + ' ' + hubY + ' L' + r2(BASE_X + shape.dx * len) + ' ' +
+      r2(hubY + shape.dy * len) + '" stroke="' + CREAM +
+      '" stroke-width="2" stroke-linecap="round" opacity="0.8"/>');
+    const bands = [0.3, 0.5, 0.7, 0.86];
+    for (let k = 0; k < bands.length; k += 1) {
+      const t = bands[k];
+      const w = frondHalfWidth(shape, t, halfWidth);
+      const cx = BASE_X + shape.dx * len * t;
+      const cy = hubY + shape.dy * len * t;
+      leaves.push('<path d="M' + r2(cx + shape.nx * w) + ' ' + r2(cy + shape.ny * w) + ' L' +
+        r2(cx - shape.nx * w) + ' ' + r2(cy - shape.ny * w) + '" stroke="' + CREAM +
+        '" stroke-width="1.8" stroke-linecap="round" opacity="0.8"/>');
+    }
+    anchors.push({
+      x: BASE_X + shape.dx * len * 0.92,
+      y: hubY + shape.dy * len * 0.92,
+      pedicel: null
+    });
+  }
+
+  let pad = 0;
+  while (anchors.length < 8) {
+    const source = anchors[pad % count];
+    anchors.push({
+      x: source.x * 0.6 + BASE_X * 0.4,
+      y: source.y * 0.6 + hubY * 0.4,
+      pedicel: null
+    });
+    pad += 1;
+  }
+
+  return { stem: stems.join(''), leaves: leaves.join(''), anchors: anchors, lean: jitter(rng, 3) };
+}
+
 const SPECIES_BUILDERS = {
   'kopi-vine': kopiVine,
   'thread-orchid': threadOrchid,
   bellflower: bellflower,
   'stacked-bamboo': stackedBamboo,
   'ribbon-fern': ribbonFern,
-  'pebble-succulent': pebbleSucculent
+  'pebble-succulent': pebbleSucculent,
+  'sunburst-bloom': sunburstBloom,
+  'woven-palm': wovenPalm
 };
 
 /* ---- blooms ------------------------------------------------------------- */

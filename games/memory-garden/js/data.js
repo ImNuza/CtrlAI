@@ -1,7 +1,10 @@
 /*
-  Memory Garden content data: the six heritage objects and the three prompts.
+  Memory Garden content data: the eight heritage objects and the three prompts.
   Art is inline SVG so there is nothing to download and nothing to break offline.
   Four object colours only, all dark enough to read on --color-surface.
+
+  Every object and every option carries a phrase, the form that reads well inside
+  a sentence. One source, so no caller has to invent articles of its own.
 */
 
 const INK = '#2f2a24';
@@ -77,42 +80,86 @@ const FIVE_STONES = art(
   '<path d="M62 53 q9 -4 13 2" fill="none" stroke="' + INK + '" stroke-width="3" stroke-linecap="round"/>'
 );
 
+// Boxy set, bulged screen, two dials on the side panel, stubby legs and rabbit
+// ears. Read at a glance as the television that sat in every hall.
+const SETRON_TV = art(
+  '<path d="M40 28 L27 8 M56 28 L71 6" fill="none" stroke="' + INK + '" stroke-width="4" stroke-linecap="round"/>' +
+  '<circle cx="27" cy="8" r="3.4" fill="' + CLAY + '"/>' +
+  '<circle cx="71" cy="6" r="3.4" fill="' + CLAY + '"/>' +
+  '<path d="M22 78 L15 91 M74 78 L81 91" fill="none" stroke="' + INK + '" stroke-width="5" stroke-linecap="round"/>' +
+  '<rect x="7" y="26" width="82" height="54" rx="9" fill="' + INK + '"/>' +
+  '<path d="M19 35 Q40 31 61 35 Q65 53 61 71 Q40 75 19 71 Q15 53 19 35 Z" fill="' + CREAM + '" stroke="' + CLAY + '" stroke-width="3"/>' +
+  '<circle cx="75" cy="43" r="6" fill="' + CREAM + '"/>' +
+  '<circle cx="75" cy="43" r="2" fill="' + INK + '"/>' +
+  '<circle cx="75" cy="62" r="6" fill="' + CREAM + '"/>' +
+  '<circle cx="75" cy="62" r="2" fill="' + INK + '"/>'
+);
+
+// High rounded back with the weave showing through, one solid seat, splayed legs.
+const RATTAN_CHAIR = art(
+  '<path d="M27 71 L21 90 M69 71 L75 90" fill="none" stroke="' + INK + '" stroke-width="5" stroke-linecap="round"/>' +
+  '<path d="M24 64 V38 a24 26 0 0 1 48 0 V64 Z" fill="' + CLAY + '" stroke="' + INK + '" stroke-width="4" stroke-linejoin="round"/>' +
+  '<path d="M32 30 V60 M40 25 V60 M48 23 V60 M56 25 V60 M64 30 V60" stroke="' + CREAM + '" stroke-width="2.6"/>' +
+  '<path d="M28 34 H68 M26 44 H70 M26 54 H70" stroke="' + CREAM + '" stroke-width="2.6"/>' +
+  '<rect x="17" y="60" width="62" height="12" rx="6" fill="' + INK + '"/>'
+);
+
 export const OBJECTS = [
   {
     id: 'kopitiam-cup',
     name: 'Kopitiam cup',
+    phrase: 'the kopitiam cup',
     blurb: 'Thick white cup, kopi o kosong, morning talk.',
     art: KOPITIAM_CUP
   },
   {
     id: 'sewing-machine',
     name: 'Sewing machine',
+    phrase: 'the sewing machine',
     blurb: 'That foot pedal humming late into the night.',
     art: SEWING_MACHINE
   },
   {
     id: 'rotary-phone',
     name: 'Rotary dial phone',
+    phrase: 'the rotary dial phone',
     blurb: 'One number, dialled slow, remembered for life.',
     art: ROTARY_PHONE
   },
   {
     id: 'tingkat',
     name: 'Tingkat carrier',
+    phrase: 'the tingkat carrier',
     blurb: 'Lunch carried home, four tiers, still warm.',
     art: TINGKAT
   },
   {
     id: 'cassette',
     name: 'Cassette player',
+    phrase: 'the cassette player',
     blurb: 'One tape, played until the ribbon went soft.',
     art: CASSETTE
   },
   {
     id: 'five-stones',
     name: 'Five stones bag',
+    phrase: 'the bag of five stones',
     blurb: 'Small cloth bags, quick hands, void deck afternoons.',
     art: FIVE_STONES
+  },
+  {
+    id: 'setron-tv',
+    name: 'Setron TV',
+    phrase: 'the old Setron TV',
+    blurb: 'Rabbit ears, one channel worth watching, whole family in front.',
+    art: SETRON_TV
+  },
+  {
+    id: 'rattan-chair',
+    name: 'Rattan chair',
+    phrase: 'the rattan chair',
+    blurb: 'Woven back, cool on a hot day, always somebody in it.',
+    art: RATTAN_CHAIR
   }
 ];
 
@@ -121,33 +168,33 @@ export const PROMPTS = [
     id: 'who',
     question: 'Who is in this memory with you?',
     options: [
-      { id: 'my-mother', label: 'My mother' },
-      { id: 'my-father', label: 'My father' },
-      { id: 'my-grandmother', label: 'My grandmother' },
-      { id: 'my-friends', label: 'My good friends' },
-      { id: 'my-siblings', label: 'My brothers and sisters' }
+      { id: 'my-mother', label: 'My mother', phrase: 'my mother' },
+      { id: 'my-father', label: 'My father', phrase: 'my father' },
+      { id: 'my-grandmother', label: 'My grandmother', phrase: 'my grandmother' },
+      { id: 'my-friends', label: 'My good friends', phrase: 'my good friends' },
+      { id: 'my-siblings', label: 'My brothers and sisters', phrase: 'my brothers and sisters' }
     ]
   },
   {
     id: 'where',
     question: 'Where does this memory live?',
     options: [
-      { id: 'kampung', label: 'The old kampung' },
-      { id: 'first-flat', label: 'Our first flat' },
-      { id: 'kopitiam', label: 'The kopitiam downstairs' },
-      { id: 'market', label: 'The wet market' },
-      { id: 'seaside', label: 'By the seaside' }
+      { id: 'kampung', label: 'The old kampung', phrase: 'in the old kampung' },
+      { id: 'first-flat', label: 'Our first flat', phrase: 'in our first flat' },
+      { id: 'kopitiam', label: 'The kopitiam downstairs', phrase: 'at the kopitiam downstairs' },
+      { id: 'market', label: 'The wet market', phrase: 'at the wet market' },
+      { id: 'seaside', label: 'By the seaside', phrase: 'by the seaside' }
     ]
   },
   {
     id: 'feeling',
     question: 'How does it feel to remember this?',
     options: [
-      { id: 'warm', label: 'Warm and cosy' },
-      { id: 'happy', label: 'Happy and light' },
-      { id: 'wistful', label: 'A little wistful' },
-      { id: 'calm', label: 'Calm and peaceful' },
-      { id: 'proud', label: 'Proud' }
+      { id: 'warm', label: 'Warm and cosy', phrase: 'warm and cosy' },
+      { id: 'happy', label: 'Happy and light', phrase: 'happy and light' },
+      { id: 'wistful', label: 'A little wistful', phrase: 'a little wistful' },
+      { id: 'calm', label: 'Calm and peaceful', phrase: 'calm and peaceful' },
+      { id: 'proud', label: 'Proud', phrase: 'proud' }
     ]
   }
 ];

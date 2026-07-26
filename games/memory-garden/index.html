@@ -46,6 +46,10 @@
     <p class="muted" id="prompt-step">Question 1 of 3</p>
     <h2 id="prompt-heading" tabindex="-1">Who is in this memory with you?</h2>
     <div class="row" id="prompt-chips"></div>
+    <div class="freetext" id="freetext-field" hidden>
+      <label class="freetext-label" for="freetext">For the grandchild: add one line of the story (optional)</label>
+      <textarea class="freetext-input" id="freetext" rows="2" maxlength="120"></textarea>
+    </div>
     <button type="button" class="btn btn-block" id="prompt-next" aria-disabled="true">Next</button>
     <button type="button" class="btn btn-quiet btn-block" id="prompt-back">Back</button>
   </section>
@@ -65,6 +69,10 @@
     <div class="stage stage-small" id="replay-plant"></div>
     <div class="row" id="replay-answers"></div>
     <p id="replay-caption"></p>
+    <div class="told" id="replay-told" hidden>
+      <p class="muted told-lead">As told by the grandchild</p>
+      <p class="told-line" id="replay-freetext"></p>
+    </div>
     <p class="muted" id="replay-line" aria-live="polite"></p>
     <div class="overlay-foot">
       <button type="button" class="btn btn-block" id="replay-close">Back to garden</button>

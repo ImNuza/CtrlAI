@@ -13,15 +13,7 @@ const NS = 'memory-garden';
 const STATE_VERSION = 1;
 const BANK_URL = '/games/memory-garden/content/garden-lines.json';
 const MIN_PLOTS = 6;
-
-// Where answers become phrases so a caption reads like a sentence, not a label.
-const WHERE_PHRASES = {
-  kampung: 'in the old kampung',
-  'first-flat': 'in our first flat',
-  kopitiam: 'at the kopitiam downstairs',
-  market: 'at the wet market',
-  seaside: 'by the seaside'
-};
+const FREE_TEXT_STEP = 'feeling';
 
 const SOIL_MOUND = '<svg viewBox="0 0 120 74" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">' +
   '<ellipse cx="60" cy="56" rx="44" ry="15" fill="#6f5a44"/>' +
@@ -84,22 +76,34 @@ function promptById(id) {
   return PROMPTS[0];
 }
 
-function labelFor(promptId, optionId) {
+function optionById(promptId, optionId) {
   const options = promptById(promptId).options;
   for (let i = 0; i < options.length; i += 1) {
     if (options[i].id === optionId) {
-      return options[i].label;
+      return options[i];
     }
   }
-  return '';
+  return null;
+}
+
+function labelFor(promptId, optionId) {
+  const option = optionById(promptId, optionId);
+  return option === null ? '' : option.label;
+}
+
+// Sentence form, never the chip label. data.js owns every phrase, this is only
+// the lookup, so no caller has to guess at an article.
+function phraseFor(promptId, optionId) {
+  const option = optionById(promptId, optionId);
+  return option === null ? '' : option.phrase;
 }
 
 function captionContext(plant) {
   return {
-    object: 'the ' + objectById(plant.objectId).name.toLowerCase(),
-    who: labelFor('who', plant.answers.who).toLowerCase(),
-    where: WHERE_PHRASES[plant.answers.where] || '',
-    feeling: labelFor('feeling', plant.answers.feeling).toLowerCase(),
+    object: objectById(plant.objectId).phrase,
+    who: phraseFor('who', plant.answers.who),
+    where: phraseFor('where', plant.answers.where),
+    feeling: phraseFor('feeling', plant.answers.feeling),
     seed: plant.seed
   };
 }
@@ -172,12 +176,28 @@ function setNextReady(ready) {
   el.promptNext.setAttribute('aria-disabled', ready ? 'false' : 'true');
 }
 
+/* The question itself is generated, so the same three steps never read exactly
+   the same way twice. The written question in data.js is the floor underneath.
+   The token drops a late answer if the player already moved on. */
+let headingToken = 0;
+
+async function renderPromptHeading(prompt) {
+  headingToken += 1;
+  const token = headingToken;
+  el.promptHeading.textContent = prompt.question;
+  const line = await aiGenerate({ game: GAME, event: 'prompt_' + prompt.id, context: {} });
+  if (token === headingToken && line.meta.source === 'bank' && line.text !== '') {
+    el.promptHeading.textContent = line.text;
+  }
+}
+
 function renderPrompt() {
   const prompt = PROMPTS[draft.step];
   const chosen = draft.answers[prompt.id];
 
   el.promptStep.textContent = 'Question ' + (draft.step + 1) + ' of ' + PROMPTS.length;
-  el.promptHeading.textContent = prompt.question;
+  renderPromptHeading(prompt);
+  el.freeTextField.hidden = prompt.id !== FREE_TEXT_STEP;
 
   const parts = [];
   for (let i = 0; i < prompt.options.length; i += 1) {
@@ -206,7 +226,7 @@ async function growPlant() {
       where: draft.answers.where,
       feeling: draft.answers.feeling
     },
-    freeText: '',
+    freeText: el.freeText.value.trim(),
     seed: built.seed,
     caption: ''
   };
@@ -224,7 +244,7 @@ async function growPlant() {
   const line = await aiGenerate({
     game: GAME,
     event: 'ceremony_grow',
-    context: { object: objectById(plant.objectId).name.toLowerCase() }
+    context: { object: objectById(plant.objectId).phrase }
   });
   el.ceremonyLine.textContent = line.text;
 }
@@ -264,6 +284,11 @@ async function openReplay(plantId, source) {
   }
   el.replayAnswers.innerHTML = parts.join('');
   el.replayCaption.textContent = plant.caption;
+
+  const told = typeof plant.freeText === 'string' ? plant.freeText.trim() : '';
+  el.replayFreeText.textContent = told;
+  el.replayTold.hidden = told === '';
+
   el.replayLine.textContent = '';
   el.replay.hidden = false;
   el.replayTitle.focus();
@@ -316,6 +341,7 @@ function startFlow() {
   draft.objectId = null;
   draft.answers = {};
   draft.step = 0;
+  el.freeText.value = '';
   showView('picker', true);
 }
 
@@ -418,6 +444,8 @@ function cacheElements() {
   el.promptChips = document.getElementById('prompt-chips');
   el.promptNext = document.getElementById('prompt-next');
   el.promptBack = document.getElementById('prompt-back');
+  el.freeTextField = document.getElementById('freetext-field');
+  el.freeText = document.getElementById('freetext');
   el.ceremonyStage = document.getElementById('ceremony-stage');
   el.ceremonyLine = document.getElementById('ceremony-line');
   el.ceremonyDone = document.getElementById('ceremony-done');
@@ -426,6 +454,8 @@ function cacheElements() {
   el.replayPlant = document.getElementById('replay-plant');
   el.replayAnswers = document.getElementById('replay-answers');
   el.replayCaption = document.getElementById('replay-caption');
+  el.replayTold = document.getElementById('replay-told');
+  el.replayFreeText = document.getElementById('replay-freetext');
   el.replayLine = document.getElementById('replay-line');
   el.replayClose = document.getElementById('replay-close');
 }

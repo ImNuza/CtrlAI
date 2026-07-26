@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /*
   Composes a matrix of plants and writes one self contained HTML sheet so a human
-  can judge at a glance whether the six species read differently and whether the
+  can judge at a glance whether the eight species read differently and whether the
   trait axes actually change the picture. Node only, no browser, no server.
 */
 
@@ -15,7 +15,8 @@ const repoRoot = path.resolve(here, '../../..');
 const outDir = path.join(repoRoot, 'tools', 'qa', 'output');
 const outFile = path.join(outDir, 'mg-contact-sheet.html');
 
-const OBJECT_IDS = ['kopitiam-cup', 'sewing-machine', 'rotary-phone', 'tingkat', 'cassette', 'five-stones'];
+const OBJECT_IDS = ['kopitiam-cup', 'sewing-machine', 'rotary-phone', 'tingkat', 'cassette',
+  'five-stones', 'setron-tv', 'rattan-chair'];
 const FEELINGS = ['warm', 'happy', 'wistful', 'calm', 'proud'];
 const WHOS = ['my-mother', 'my-father', 'my-grandmother', 'my-friends', 'my-siblings'];
 const WHERES = ['kampung', 'first-flat', 'kopitiam', 'market', 'seaside'];
@@ -37,7 +38,7 @@ function build() {
   const rows = [];
 
   rows.push(row(
-    'Row 1: six objects, same answers',
+    'Row 1: eight objects, same answers',
     'Same who, where and feeling every time. Only the object changes, so every silhouette here must be tellable apart from across the room.',
     OBJECT_IDS.map(function (id) { return cell(id, BASE, id); })
   ));
