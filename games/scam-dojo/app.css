@@ -1,0 +1,433 @@
+/*
+  Scam Dojo game layer. Sits on top of tokens.css and base.css, which own every
+  colour, size and duration used here. Nothing below invents a value.
+*/
+
+/* Screens carry display, so [hidden] has to win outright or a hidden screen
+   would still lay out (and still count as a tap target in the QA inspector). */
+[hidden] {
+  display: none !important;
+}
+
+.screen {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Each screen takes focus on arrival so a screen reader starts reading the new
+   screen. It is tabindex="-1" and never reachable by Tab, so the ring would be
+   noise around the whole page. Real controls keep theirs. */
+.screen:focus,
+.screen:focus-visible {
+  outline: none;
+}
+
+/* ---- Shared shield mark ------------------------------------------------- */
+
+.shield-body {
+  fill: var(--accent-tint);
+  stroke: var(--accent);
+  stroke-width: 6;
+  stroke-linejoin: round;
+}
+
+.shield-tick {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ---- Shared streak block ------------------------------------------------ */
+
+.streak-block {
+  text-align: center;
+}
+
+.streak-figure {
+  font-size: var(--fs-display);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-tight);
+  color: var(--accent);
+}
+
+.streak-label {
+  font-size: var(--fs-body);
+  color: var(--color-text-muted);
+}
+
+/* ---- Home --------------------------------------------------------------- */
+
+.screen-home {
+  align-items: center;
+  text-align: center;
+  padding-top: var(--sp-4);
+}
+
+.game-title {
+  font-size: var(--fs-title);
+  color: var(--accent);
+}
+
+.shield-mark {
+  width: 62%;
+  max-width: 14rem;
+}
+
+.screen-home .btn {
+  width: 100%;
+}
+
+/* ---- Ring --------------------------------------------------------------- */
+
+.screen-ring {
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-6);
+  text-align: center;
+  min-height: calc(100dvh - 7rem);
+}
+
+.ring-label {
+  font-size: var(--fs-body);
+  font-weight: var(--fw-bold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.ring-glyph {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 13rem;
+  height: 13rem;
+}
+
+.ring-pulse {
+  position: absolute;
+  inset: 0;
+  border: 4px solid var(--accent);
+  border-radius: 50%;
+  opacity: 0.28;
+}
+
+.ring-phone {
+  position: relative;
+  width: 6rem;
+  height: 6rem;
+  fill: var(--accent);
+}
+
+.ring-name {
+  font-size: var(--fs-display);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-tight);
+}
+
+.ring-number {
+  font-size: var(--fs-lead);
+  color: var(--color-text-muted);
+}
+
+/* Phone convention beats palette consistency here. White on --accent-garden is
+   7.76:1 (AAA), documented in tokens.css. */
+.ring-answer {
+  width: 100%;
+  background-color: var(--accent-garden);
+  border-color: var(--accent-garden);
+  color: var(--color-text-on-accent);
+}
+
+/* ---- Call --------------------------------------------------------------- */
+
+.screen-call {
+  gap: var(--sp-4);
+  /* Room for the fixed dock so the last bubble is never trapped under it. */
+  padding-bottom: 15rem;
+}
+
+.call-header {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding-bottom: var(--sp-3);
+  border-bottom: 2px solid var(--color-border);
+  background-color: var(--color-bg);
+}
+
+.call-caller {
+  font-size: var(--fs-lead);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-tight);
+}
+
+.call-hint {
+  font-size: var(--fs-body);
+  color: var(--color-text-muted);
+}
+
+.transcript {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--sp-4);
+}
+
+.bubble {
+  display: block;
+  width: 100%;
+  min-height: var(--tap-min);
+  margin: 0;
+  padding: var(--sp-4) var(--sp-5);
+  border: 3px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  border-bottom-left-radius: var(--radius-sm);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-regular);
+  line-height: var(--lh-body);
+  text-align: left;
+  cursor: pointer;
+  scroll-margin-top: 7rem;
+  scroll-margin-bottom: 16rem;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  animation: line-in var(--dur-base) var(--ease-out) both;
+}
+
+/* Pressed feedback stays off transform, which the entrance animation owns. */
+.bubble:active {
+  background-color: var(--color-surface-sunk);
+}
+
+.bubble.is-caught {
+  border-color: var(--accent);
+  background-color: var(--accent-tint);
+  font-weight: var(--fw-medium);
+}
+
+.bubble.is-checked {
+  border-color: var(--color-border);
+  background-color: var(--color-surface-sunk);
+}
+
+/* --color-text on --accent-tint is 14.03:1 (AAA). The accent lives in the
+   border and the fill, never in the sentence itself. */
+.bubble-caught {
+  display: block;
+  margin-top: var(--sp-3);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-bold);
+  color: var(--color-text);
+}
+
+.tap-note {
+  align-self: stretch;
+  padding: var(--sp-4) var(--sp-5);
+  border-left: 8px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface-sunk);
+  color: var(--color-text);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  animation: line-in var(--dur-base) var(--ease-out) both;
+}
+
+.tap-note[data-kind="catch"] {
+  border-left-color: var(--accent);
+  background-color: var(--accent-tint);
+}
+
+.walkthrough {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+  padding: var(--sp-5);
+  border: 3px solid var(--accent);
+  border-radius: var(--radius-lg);
+  background-color: var(--accent-tint);
+  animation: line-in var(--dur-base) var(--ease-out) both;
+}
+
+.walkthrough-line {
+  font-size: var(--fs-lead);
+  line-height: var(--lh-body);
+}
+
+.walkthrough .btn {
+  width: 100%;
+}
+
+.call-dock {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 3;
+  padding:
+    var(--sp-4)
+    calc(var(--safe-right) + var(--sp-5))
+    calc(var(--safe-bottom) + var(--sp-4))
+    calc(var(--safe-left) + var(--sp-5));
+  border-top: 2px solid var(--color-border);
+  background-color: var(--color-bg);
+}
+
+.call-dock-inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  width: 100%;
+  max-width: var(--page-max);
+  margin: 0 auto;
+}
+
+.call-dock .btn {
+  width: 100%;
+}
+
+/* ---- Recap -------------------------------------------------------------- */
+
+.recap-title {
+  font-size: var(--fs-title);
+  color: var(--accent);
+}
+
+.recap-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: var(--sp-5);
+  border: 3px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface);
+}
+
+.recap-item[data-caught="true"] {
+  border-color: var(--accent);
+  background-color: var(--accent-tint);
+}
+
+.recap-line {
+  font-size: var(--fs-body);
+  font-style: italic;
+  line-height: var(--lh-body);
+}
+
+.recap-tell {
+  font-size: var(--fs-body);
+  font-weight: var(--fw-bold);
+  color: var(--accent);
+}
+
+.recap-status {
+  font-size: var(--fs-body);
+  font-weight: var(--fw-bold);
+  color: var(--color-text);
+}
+
+/* Missed lines are muted, never red. Nothing on this screen scolds. */
+.recap-item[data-caught="false"] .recap-status {
+  color: var(--color-text-muted);
+}
+
+.recap-why {
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+}
+
+.ceremony {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-6) var(--sp-5);
+  border-radius: var(--radius-lg);
+  background-color: var(--accent-tint);
+  text-align: center;
+}
+
+.ceremony-shield {
+  width: 9rem;
+}
+
+/* The card is already accent tint, so the shield needs a lighter body or it
+   reads as a hollow outline. The accent stroke keeps the 3:1 boundary. */
+.ceremony .shield-body {
+  fill: var(--color-surface);
+}
+
+.ceremony-line {
+  font-size: var(--fs-lead);
+  font-weight: var(--fw-medium);
+  line-height: var(--lh-body);
+}
+
+.ceremony.is-in .ceremony-shield {
+  animation: shield-in var(--dur-base) var(--ease-out) both;
+}
+
+.screen-recap .btn {
+  width: 100%;
+}
+
+/* ---- Motion -------------------------------------------------------------
+   Entrances only, all on --dur-base (240ms). Under prefers-reduced-motion the
+   token drops to 0ms, so these land instantly instead of being merely quicker.
+*/
+
+@keyframes line-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes shield-in {
+  from {
+    opacity: 0;
+    transform: scale(0.72);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* The ring pulse loops forever, so it is gated rather than shortened. */
+@media (prefers-reduced-motion: no-preference) {
+  .ring-pulse {
+    animation: ring-pulse 2100ms var(--ease-in-out) infinite;
+  }
+
+  .ring-pulse-2 {
+    animation-delay: 700ms;
+  }
+
+  .ring-pulse-3 {
+    animation-delay: 1400ms;
+  }
+
+  @keyframes ring-pulse {
+    0% {
+      opacity: 0.4;
+      transform: scale(0.52);
+    }
+    70% {
+      opacity: 0;
+      transform: scale(1);
+    }
+    100% {
+      opacity: 0;
+      transform: scale(1);
+    }
+  }
+}

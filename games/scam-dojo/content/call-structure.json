@@ -1,0 +1,73 @@
+{
+  "tellLabels": {
+    "urgency": "Rushing you",
+    "secrecy": "Keep it secret",
+    "unusual_payment": "Odd way to pay",
+    "no_callback": "Blocks you from checking",
+    "detail_fishing": "Fishing for your details"
+  },
+  "scripts": [
+    {
+      "id": "grandchild-1",
+      "family": "grandchild",
+      "callerName": "Unknown Caller",
+      "callerNumber": "+65 0000 4821",
+      "lines": [
+        { "event": "grandchild1_1", "tell": null, "benign": "greeting" },
+        { "event": "grandchild1_2", "tell": null, "benign": "identity" },
+        { "event": "grandchild1_3", "tell": "urgency" },
+        { "event": "grandchild1_4", "tell": null, "benign": "smalltalk" },
+        { "event": "grandchild1_5", "tell": "secrecy" },
+        { "event": "grandchild1_6", "tell": null, "benign": "logistics" },
+        { "event": "grandchild1_7", "tell": "no_callback" }
+      ],
+      "slots": {
+        "grandname": ["Wei Jie", "Jun Kai", "Xin Yi"],
+        "amount": ["$800", "$1,500", "$2,300"],
+        "place": ["Bedok", "Toa Payoh", "Yishun"]
+      }
+    },
+    {
+      "id": "bank-1",
+      "family": "bank",
+      "callerName": "Merlion Bank",
+      "callerNumber": "+65 0000 7130",
+      "lines": [
+        { "event": "bank1_1", "tell": null, "benign": "greeting" },
+        { "event": "bank1_2", "tell": null, "benign": "identity" },
+        { "event": "bank1_3", "tell": "urgency" },
+        { "event": "bank1_4", "tell": null, "benign": "smalltalk" },
+        { "event": "bank1_5", "tell": "detail_fishing" },
+        { "event": "bank1_6", "tell": null, "benign": "logistics" },
+        { "event": "bank1_7", "tell": "unusual_payment" }
+      ],
+      "slots": {
+        "officer": ["Kelvin Soh", "Rachel Tan", "Desmond Lim"],
+        "badge": ["M4471", "M2098", "M6612"],
+        "ref": ["FR-88213", "FR-40967", "FR-15530"],
+        "amount": ["$4,000", "$9,250", "$12,700"]
+      }
+    },
+    {
+      "id": "parcel-1",
+      "family": "parcel",
+      "callerName": "ParcelGo Delivery",
+      "callerNumber": "Private Number",
+      "lines": [
+        { "event": "parcel1_1", "tell": null, "benign": "greeting" },
+        { "event": "parcel1_2", "tell": null, "benign": "identity" },
+        { "event": "parcel1_3", "tell": null, "benign": "logistics" },
+        { "event": "parcel1_4", "tell": "detail_fishing" },
+        { "event": "parcel1_5", "tell": null, "benign": "smalltalk" },
+        { "event": "parcel1_6", "tell": "unusual_payment" },
+        { "event": "parcel1_7", "tell": "no_callback" }
+      ],
+      "slots": {
+        "officer": ["Alvin Goh", "Priya Nair", "Sam Ong"],
+        "item": ["watch", "health supplement", "phone charger"],
+        "place": ["Changi", "Jurong", "Paya Lebar"],
+        "amount": ["$38", "$62", "$115"]
+      }
+    }
+  ]
+}

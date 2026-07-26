@@ -1,0 +1,184 @@
+{
+  "grandchild1_1": [
+    "Ah Ma? Ah Ma, can you hear me?",
+    "Hello, hello. Is this Ah Ma speaking?",
+    "Ah Ma, it is me. Please do not put down the phone."
+  ],
+  "grandchild1_2": [
+    "It is your grandson {grandname}. My voice sounds different because I have been crying.",
+    "Your grandson {grandname} here. Ah Ma, I am in very big trouble.",
+    "Ah Ma, your grandson {grandname} is speaking. Something bad happened this morning."
+  ],
+  "grandchild1_3": [
+    "Ah Ma, I need the money within the hour or they will not let me go home.",
+    "They want the money today, {amount} in total, and I only have until noon.",
+    "There is no time to sit and think about this. Please move now, every minute makes it worse for me."
+  ],
+  "grandchild1_4": [
+    "How is your knee, Ah Ma? Sorry I did not come by last Sunday.",
+    "Did you go down to the kopitiam this morning? I keep thinking about your kaya toast.",
+    "I know it is early. Uncle is still sleeping, right?"
+  ],
+  "grandchild1_5": [
+    "Please do not tell Papa and Mama. I cannot face them if they find out.",
+    "Ah Ma, keep this between us only. If the family hears about it, I am finished.",
+    "Do not say anything to anyone at home. Not Uncle, not my sister, nobody."
+  ],
+  "grandchild1_6": [
+    "I am at the {place} office now, sitting outside the room.",
+    "They say the paperwork takes about two hours to finish.",
+    "I will be here the whole morning. Nobody is letting me walk out yet."
+  ],
+  "grandchild1_7": [
+    "Do not call my handphone, Ah Ma. They took it from me, this is a borrowed line.",
+    "You cannot ring me back on this number. Just stay on the phone with me now.",
+    "Please do not check with Papa first. By the time he picks up, it is already too late for me."
+  ],
+
+  "bank1_1": [
+    "Good morning. Am I speaking to the account holder, please?",
+    "Hello, thank you for picking up. This is the Merlion Bank fraud desk.",
+    "Good afternoon. Sorry to trouble you, this call is about your account."
+  ],
+  "bank1_2": [
+    "This is officer {officer} from the Merlion Bank fraud team.",
+    "Merlion Bank fraud desk here, officer {officer} speaking.",
+    "My colleague passed me your file just now. Officer {officer} from Merlion Bank, at your service."
+  ],
+  "bank1_3": [
+    "We have about eleven minutes before the payment leaves your account for good.",
+    "Please stay with me. If we stop now, the money is gone and I cannot pull it back.",
+    "The system is counting down on my screen, so please answer quickly, one question at a time."
+  ],
+  "bank1_4": [
+    "I know this is a lot to take in before breakfast. Take a breath first.",
+    "Yes, the line is a bit noisy. The office here is always like that.",
+    "You are not the first person to be surprised today. It has been a busy morning."
+  ],
+  "bank1_5": [
+    "Read me the sixteen numbers on the front of your card, slowly.",
+    "I need your full name, your identity card number, and the three digits printed behind the card.",
+    "What is the password you use for the app? I have to match it against our record."
+  ],
+  "bank1_6": [
+    "Please write down case reference {ref} on a piece of paper.",
+    "Our office hours are nine to six, Monday to Friday.",
+    "I will note this call in your file under badge {badge} later today."
+  ],
+  "bank1_7": [
+    "Move everything into the holding account I am about to read out. It is a safe account.",
+    "Transfer the balance now, {amount} or whatever is inside, into our protection account.",
+    "Withdraw the cash and hand it to our courier at your door. That is the fastest way to keep it safe."
+  ],
+
+  "parcel1_1": [
+    "Good morning. ParcelGo calling about a package under your name.",
+    "Hello, sorry to disturb. This is ParcelGo delivery support.",
+    "Good day. Am I speaking with the person who lives at this address?"
+  ],
+  "parcel1_2": [
+    "This is {officer} from the ParcelGo customs desk.",
+    "ParcelGo customs clearance here, officer {officer} speaking.",
+    "My name is on your delivery note. Officer {officer}, ParcelGo customs."
+  ],
+  "parcel1_3": [
+    "There is a {item} parcel waiting at our {place} sorting centre.",
+    "It came in on Tuesday night and has been at the {place} centre since then.",
+    "The box is small, about the size of a shoebox. Delivery was attempted once already."
+  ],
+  "parcel1_4": [
+    "Before I release it, give me your full name and your identity card number.",
+    "I need the last four digits of your bank card to match the delivery record.",
+    "Tell me your date of birth and your home address, exactly as it is written."
+  ],
+  "parcel1_5": [
+    "Aiyo, the queue at our counter today is very long. Sorry to keep you waiting.",
+    "Yes, the parcel was sent from overseas. It happens a lot around this time of year.",
+    "Take your time. I can hear the television, please turn it down a little."
+  ],
+  "parcel1_6": [
+    "The customs charge is small, {amount} only. Buy shopping vouchers and read me the codes.",
+    "Go to the shop downstairs, buy gift cards, then scratch them and read me the numbers.",
+    "We cannot take cash or a normal transfer. Vouchers are the only way to clear this parcel."
+  ],
+  "parcel1_7": [
+    "Our hotline is down for maintenance today, so please do not put the phone down.",
+    "Do not call the number on our website, nobody will pick up. Settle it with me now.",
+    "Please stay on the line. If you check with somebody else, the parcel goes back overseas tonight."
+  ],
+
+  "affirm_catch": [
+    "Good ear. That one is a classic.",
+    "Yes lah, that line is the giveaway.",
+    "Nice catch. A real caller would not push like that.",
+    "Spot on. You heard it.",
+    "That is exactly the bit to watch for."
+  ],
+  "benign_greeting": [
+    "A hello is just a hello. Real callers open the same way, so this line on its own tells you nothing.",
+    "Nothing wrong with a greeting. Even the clinic starts a call like this.",
+    "That is only the opening. Keep listening, the tells usually come later.",
+    "Good to be careful. A polite hello is not proof either way, so hold it lightly."
+  ],
+  "benign_identity": [
+    "Callers do introduce themselves. A name and a title alone are not proof, and not a red flag either.",
+    "Real staff say who they are too. The question is what they ask for next.",
+    "Anyone can say a name out loud. Watch what comes after the introduction.",
+    "Introductions are ordinary. Nothing here to act on yet."
+  ],
+  "benign_smalltalk": [
+    "Small talk happens on real calls too. Warmth by itself is not a warning sign.",
+    "A bit of chit chat is ordinary. Scammers use it, so do your neighbours.",
+    "That was just friendly noise. Nothing to act on, nothing to worry about.",
+    "People fill the silence. It costs you nothing to listen through it."
+  ],
+  "benign_logistics": [
+    "Times, places and reference numbers turn up on real calls constantly. This one is ordinary.",
+    "Details like this sound official because ordinary calls have them too. Not a tell on its own.",
+    "A case number is easy to invent and also easy to have for real. It sits in the middle.",
+    "Practical arrangements are normal. Pressure is the thing you are listening for."
+  ],
+  "recap_urgency": [
+    "Real staff let you hang up and think. Anyone who insists it must happen this minute is stopping you from checking.",
+    "Hurry is the whole trick. Fear makes people skip the one phone call that would have saved them.",
+    "A genuine problem is still there in an hour. A countdown on the phone is a pressure tactic.",
+    "When somebody rushes you, that is your cue to slow down instead."
+  ],
+  "recap_secrecy": [
+    "No honest caller needs you to hide the call from your own family. Secrecy keeps your helpers away.",
+    "The moment you are told not to tell anyone, tell someone. That is the whole defence.",
+    "Real offices expect you to talk it over at home. Only a scam needs silence.",
+    "Secrecy is a tool, not shame. It leaves you alone with the person who is lying to you."
+  ],
+  "recap_unusual_payment": [
+    "Vouchers, gift cards and cash handed to a courier cannot be traced or reversed. That is exactly why they ask for them.",
+    "No real office collects a fee in shopping codes. That request alone can end the call.",
+    "A safe account you never opened is not safe. Money that moves there does not come back.",
+    "Watch how they want to be paid. An odd payment method is the clearest sign of all."
+  ],
+  "recap_no_callback": [
+    "Blocking you from ringing back is the tell. A real office is happy for you to call the number you already have.",
+    "Anyone who cannot let you hang up and verify is hiding from that check.",
+    "You can always put the phone down and call the number printed on your own card or letter.",
+    "A dead hotline and a borrowed phone are excuses. Both exist to keep you on this call."
+  ],
+  "recap_detail_fishing": [
+    "Nobody legitimate asks for your full card number, your password, or the digits behind the card. They already hold what they need.",
+    "Your details are the prize. Once they have them, they no longer need your permission for anything.",
+    "Real staff verify you, they do not collect you. Being asked to read out everything is backwards.",
+    "If a caller is building a form out of your life, stop answering and put the phone down."
+  ],
+  "shield_earned": [
+    "One more shield on the wall. That is practice, not luck.",
+    "Shield earned. You will hear that voice coming next time.",
+    "Well done today. Come back tomorrow and the ear gets sharper.",
+    "That is a shield. Keep them stacking up.",
+    "Another one for the collection. Steady."
+  ],
+  "walkthrough_intro": [
+    "Let us slow down and see what would have happened next.",
+    "No harm done, this is only practice. Let us walk through it together.",
+    "That is how it catches people, and it catches sharp people too. Have a look at what was really going on.",
+    "Alright, let us rewind and look at that call properly."
+  ]
+}

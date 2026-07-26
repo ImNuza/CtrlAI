@@ -4,35 +4,92 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#fbf6ee">
+<meta name="description" content="A daily scam drill for seniors. The phone rings, a scammer tries an angle, you tap the lines that feel off.">
 <title>Scam Dojo</title>
 <link rel="stylesheet" href="/shared/ui/tokens.css">
 <link rel="stylesheet" href="/shared/ui/base.css">
+<link rel="stylesheet" href="/games/scam-dojo/app.css">
 <style>
   :root {
     --accent: var(--accent-dojo);
     --accent-tint: var(--accent-dojo-tint);
   }
-
-  .game-title {
-    color: var(--accent);
-  }
 </style>
 </head>
 <body>
-<main class="page stack">
+<main class="page">
 
-  <header class="stack stack-tight">
-    <h1 class="game-title">Scam Dojo</h1>
-    <p class="lead muted">Two minutes a day. The phone rings, you learn the tells.</p>
-  </header>
+  <section class="screen screen-home stack" data-screen="home" tabindex="-1" aria-labelledby="home-title">
+    <h1 class="game-title" id="home-title">Scam Dojo</h1>
 
-  <section class="card card-accent stack stack-tight">
-    <p class="card-title">Being built tonight</p>
-    <p>This screen is a placeholder. It proves the route, the shared tokens and the tap target floor. The call screen and the drills land here shortly.</p>
+    <div class="shield-mark" aria-hidden="true">
+      <svg viewBox="0 0 100 116" focusable="false">
+        <path class="shield-body" d="M50 4 L94 20 V58 C94 84 74 104 50 112 C26 104 6 84 6 58 V20 Z"></path>
+        <path class="shield-tick" d="M31 57 L45 71 L71 43"></path>
+      </svg>
+    </div>
+
+    <div class="streak-block">
+      <p class="streak-figure" id="home-streak">0</p>
+      <p class="streak-label">Shields earned</p>
+    </div>
+
+    <button class="btn" type="button" id="answer-call">Answer today's call</button>
+    <a class="btn btn-plain" href="/">Back to hub</a>
   </section>
 
-  <a class="btn btn-plain" href="/">Back to hub</a>
+  <section class="screen screen-ring" data-screen="ring" tabindex="-1" aria-label="Incoming call" hidden>
+    <p class="ring-label">Incoming call</p>
+
+    <div class="ring-glyph" aria-hidden="true">
+      <span class="ring-pulse ring-pulse-1"></span>
+      <span class="ring-pulse ring-pulse-2"></span>
+      <span class="ring-pulse ring-pulse-3"></span>
+      <svg class="ring-phone" viewBox="0 0 24 24" focusable="false">
+        <path d="M6.6 10.8c1.4 2.8 3.8 5.2 6.6 6.6l2.2-2.2c.3-.3.7-.4 1.1-.3 1.2.4 2.4.6 3.7.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C10.6 21 3 13.4 3 4c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.7.1.4 0 .8-.3 1.1l-2.2 2z"></path>
+      </svg>
+    </div>
+
+    <p class="ring-name" id="ring-name">Unknown Caller</p>
+    <p class="ring-number" id="ring-number">Private Number</p>
+
+    <button class="btn ring-answer" type="button" id="answer-btn">Answer</button>
+  </section>
+
+  <section class="screen screen-call" data-screen="call" tabindex="-1" aria-label="Call in progress" data-family="" data-script="" hidden>
+    <div class="call-header">
+      <p class="call-caller" id="call-caller">Unknown Caller</p>
+      <p class="call-hint">Tap any line that feels off</p>
+    </div>
+
+    <div class="transcript" id="transcript"></div>
+
+    <div class="call-dock" id="call-dock">
+      <div class="call-dock-inner" id="call-dock-inner"></div>
+    </div>
+  </section>
+
+  <section class="screen screen-recap stack" data-screen="recap" tabindex="-1" aria-labelledby="recap-title" hidden>
+    <h2 class="recap-title" id="recap-title">Here is what gave it away</h2>
+
+    <div class="recap-list stack" id="recap-list"></div>
+
+    <div class="ceremony" id="shield-ceremony">
+      <div class="ceremony-shield" aria-hidden="true">
+        <svg viewBox="0 0 100 116" focusable="false">
+          <path class="shield-body" d="M50 4 L94 20 V58 C94 84 74 104 50 112 C26 104 6 84 6 58 V20 Z"></path>
+          <path class="shield-tick" d="M31 57 L45 71 L71 43"></path>
+        </svg>
+      </div>
+      <p class="ceremony-line" id="ceremony-line"></p>
+      <p class="streak-figure" id="streak-count">0</p>
+      <p class="streak-label">Shields earned</p>
+    </div>
+
+    <button class="btn" type="button" id="back-home-btn">Back to the dojo</button>
+  </section>
 
 </main>
+<script type="module" src="/games/scam-dojo/js/app.js"></script>
 </body>
 </html>
