@@ -227,12 +227,6 @@ async function growPlant() {
     context: { object: objectById(plant.objectId).name.toLowerCase() }
   });
   el.ceremonyLine.textContent = line.text;
-
-  window.requestAnimationFrame(function () {
-    window.requestAnimationFrame(function () {
-      el.ceremonyStage.classList.add('is-grown');
-    });
-  });
 }
 
 /* ---- replay ------------------------------------------------------------- */

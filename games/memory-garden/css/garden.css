@@ -141,31 +141,38 @@
 }
 
 /* The ceremony assembles the plant in layers. Delays are multiples of a token,
-   so a reduced-motion request collapses the whole thing to instant. */
+   so a reduced-motion request collapses the whole thing to instant. Animation
+   rather than transition on purpose: the fill mode carries the final state, so
+   the plant is never left invisible waiting on a frame that has not come. */
 
 .stage-grow .plant > g {
-  opacity: 0;
-  transition: opacity var(--dur-base) var(--ease-out);
+  animation: layer-in var(--dur-base) var(--ease-out) both;
 }
 
 .stage-grow .plant > .layer-stem {
-  transition-delay: var(--dur-base);
+  animation-delay: var(--dur-base);
 }
 
 .stage-grow .plant > .layer-leaves {
-  transition-delay: calc(var(--dur-base) * 2);
+  animation-delay: calc(var(--dur-base) * 2);
 }
 
 .stage-grow .plant > .layer-blooms {
-  transition-delay: calc(var(--dur-base) * 3);
+  animation-delay: calc(var(--dur-base) * 3);
 }
 
 .stage-grow .plant > .layer-ornament {
-  transition-delay: calc(var(--dur-base) * 4);
+  animation-delay: calc(var(--dur-base) * 4);
 }
 
-.stage-grow.is-grown .plant > g {
-  opacity: 1;
+@keyframes layer-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 /* ---- Story overlay ------------------------------------------------------ */

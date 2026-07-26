@@ -332,8 +332,85 @@ async function run(browser) {
   });
   check('every visible tap target clears 60px at 360px wide', targets === 0, targets + ' undersized');
 
+  /* ---- Reduced motion collapses the ceremony to instant ----------------- */
+  const calmContext = await browser.newContext({
+    viewport: VIEWPORT,
+    hasTouch: true,
+    reducedMotion: 'reduce'
+  });
+  const calmPage = watch(await calmContext.newPage());
+  await calmPage.goto(GAME_URL, { waitUntil: 'networkidle' });
+  await calmPage.click('#start-grow');
+  await calmPage.click('[data-object-id="rotary-phone"]');
+  await calmPage.click('[data-option-id="my-father"]');
+  await calmPage.click('#prompt-next');
+  await calmPage.click('[data-option-id="seaside"]');
+  await calmPage.click('#prompt-next');
+  await calmPage.click('[data-option-id="happy"]');
+  await calmPage.click('#prompt-next');
+  await calmPage.locator('#view-ceremony').waitFor({ state: 'visible' });
+  const layerOpacity = await calmPage.evaluate(function () {
+    return Array.from(document.querySelectorAll('#ceremony-stage .plant > g')).map(function (layer) {
+      return Number(window.getComputedStyle(layer).opacity);
+    });
+  });
+  check('reduced motion shows every plant layer at once',
+    layerOpacity.length === 5 && layerOpacity.every(function (value) { return value === 1; }),
+    'layer opacities ' + JSON.stringify(layerOpacity));
+
+  /* ---- Unreadable saved state falls back instead of breaking ------------ */
+  const brokenContext = await browser.newContext({ viewport: VIEWPORT, hasTouch: true });
+  await brokenContext.addInitScript(function (key) {
+    window.localStorage.setItem(key, '{ not json at all');
+  }, STORAGE_KEY);
+  const brokenPage = watch(await brokenContext.newPage());
+  await brokenPage.goto(GAME_URL, { waitUntil: 'networkidle' });
+  await brokenPage.waitForFunction(function () {
+    const line = document.getElementById('welcome-line');
+    return line !== null && line.textContent.trim().length > 0;
+  });
+  const recovered = await brokenPage.evaluate(function () {
+    return {
+      planted: document.querySelectorAll('[data-plant-id]').length,
+      empty: document.querySelectorAll('[data-empty]').length,
+      welcome: document.getElementById('welcome-line').textContent.trim()
+    };
+  });
+  check('unreadable saved state falls back to an empty garden',
+    recovered.planted === 0 && recovered.empty === 6 && recovered.welcome.length > 0,
+    'planted ' + recovered.planted + ', empty ' + recovered.empty);
+
+  /* ---- A junk plant entry is dropped, good ones survive ----------------- */
+  const mixedContext = await browser.newContext({ viewport: VIEWPORT, hasTouch: true });
+  await mixedContext.addInitScript(function (key) {
+    window.localStorage.setItem(key, JSON.stringify({
+      version: 1,
+      plants: [
+        null,
+        { nope: true },
+        {
+          id: 'kept-1',
+          objectId: 'kopitiam-cup',
+          answers: { who: 'my-mother', where: 'kampung', feeling: 'warm' },
+          seed: 1,
+          caption: 'kept'
+        }
+      ]
+    }));
+  }, STORAGE_KEY);
+  const mixedPage = watch(await mixedContext.newPage());
+  await mixedPage.goto(GAME_URL, { waitUntil: 'networkidle' });
+  await mixedPage.locator('#view-garden').waitFor({ state: 'visible' });
+  const kept = await mixedPage.evaluate(function () {
+    return document.querySelectorAll('[data-plant-id]').length;
+  });
+  check('a broken plant entry is dropped and the good one still grows', kept === 1, 'plants rendered ' + kept);
+
   await contextA.close();
   await contextB.close();
+  await calmContext.close();
+  await brokenContext.close();
+  await mixedContext.close();
 }
 
 async function main() {
