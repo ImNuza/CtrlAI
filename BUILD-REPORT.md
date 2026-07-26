@@ -4,7 +4,7 @@ Live status document for the unattended overnight build of three game prototypes
 
 ## Status
 
-Phase 1 in progress. Foundation complete and verified. Three Fable orchestrators running in parallel, each driving Opus coders toward a committed playable core, with orders to stop before polish until all three cores exist.
+Phase 2 in progress. All three games reached full definition of done, each independently verified by the conductor. Conductor integration sweep passed (all four routes clean from one server, back links present, no console.log, no emojis, no em dashes in shipped game code; one em dash in a QA script queued for the fix round). A nine-agent adversarial QA workflow (fresh-player drive, senior floor deep audit, content and honesty audit, per game) is running now.
 
 ## Mission recap
 
