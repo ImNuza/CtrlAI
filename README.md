@@ -77,6 +77,10 @@ dependency in the repo and only for QA). Memory Garden's suites start their own 
 others name their port near the top of the file, so start `PORT=<that port> node server.js`
 first (mahjong suites use 4182, scam dojo smoke 4185 and dod 4186):
 
+Every port here is fixed, so two copies of a suite cannot run at once. `loop.mjs` now refuses
+to start rather than quietly driving whoever already holds its port. Give the second copy a
+port of its own with `MG_PORT=<free port> node games/memory-garden/qa/loop.mjs`.
+
 ```
 node games/memory-garden/qa/loop.mjs
 node games/memory-garden/qa/lint-bank.mjs
