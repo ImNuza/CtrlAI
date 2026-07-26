@@ -19,8 +19,20 @@ const MISS_HOLD_MS = 600;
 const NUDGE_TAPS = 6;
 const RECENT_KEPT = 3;
 const FIRST_ROUND = { tileCount: 8, lookalike: 0.25 };
-const LATER_ROUND = { tileCount: 12, lookalike: 0.5 };
 const DEFAULT_NAME = 'Friend';
+
+// The hidden dial. Four columns of tiles, so the count moves in twos between a
+// two row table and a four row one, and the lookalike share moves with it.
+const MIN_TILES = 8;
+const MAX_TILES = 16;
+const TILE_STEP = 2;
+const MIN_LOOKALIKE = 0.25;
+const MAX_LOOKALIKE = 1;
+const LOOKALIKE_STEP = 0.25;
+// Miss rate below FLOWING means the pairs are coming easily, above WORKING
+// means the player is working for them. Between the two, nothing changes.
+const FLOWING = 0.2;
+const WORKING = 0.45;
 
 const el = {
   nameScreen: document.querySelector('[data-screen="name"]'),
@@ -109,8 +121,9 @@ function chooseName(raw) {
 /* ---- a round ------------------------------------------------------------ */
 
 function deal() {
-  const dial = state.roundsPlayed === 0 ? FIRST_ROUND : LATER_ROUND;
-  state.dial = { tileCount: dial.tileCount, lookalike: dial.lookalike };
+  const dial = nextDial();
+  state.dial = dial;
+  persist();
 
   const wall = buildWall({
     tileCount: dial.tileCount,
@@ -139,6 +152,65 @@ function deal() {
     return;
   }
   banter.speak('round_start', { name: state.name });
+}
+
+/* ---- the hidden dial ----------------------------------------------------- */
+
+/*
+  Nothing in the UI ever names this. No level, no difficulty, no badge: the
+  table just arrives a little bigger for somebody the pairs are coming easily
+  for, a little smaller for somebody who is working for them, and the lookalike
+  tiles thin out or crowd in to match. The only visible sign is the size of the
+  table itself, which reads as a different hand of mahjong rather than a
+  verdict on the player.
+
+  It moves one step per finished round. Reopening the page mid profile must not
+  walk it up on its own, so the round it was last computed for is remembered.
+*/
+function nextDial() {
+  if (state.dialAt === state.roundsPlayed) {
+    return clampDial(state.dial);
+  }
+  state.dialAt = state.roundsPlayed;
+
+  if (state.recent.length === 0) {
+    return { tileCount: FIRST_ROUND.tileCount, lookalike: FIRST_ROUND.lookalike };
+  }
+
+  let matches = 0;
+  let misses = 0;
+  for (let i = 0; i < state.recent.length; i += 1) {
+    matches += state.recent[i].matches;
+    misses += state.recent[i].misses;
+  }
+  const missRate = misses / Math.max(1, matches + misses);
+
+  const dial = clampDial(state.dial);
+  if (missRate < FLOWING) {
+    return {
+      tileCount: Math.min(MAX_TILES, dial.tileCount + TILE_STEP),
+      lookalike: Math.min(MAX_LOOKALIKE, dial.lookalike + LOOKALIKE_STEP)
+    };
+  }
+  if (missRate > WORKING) {
+    return {
+      tileCount: Math.max(MIN_TILES, dial.tileCount - TILE_STEP),
+      lookalike: Math.max(MIN_LOOKALIKE, dial.lookalike - LOOKALIKE_STEP)
+    };
+  }
+  return dial;
+}
+
+// A stored dial is only a hint. It gets pulled back into range and onto an even
+// count before anything is built from it.
+function clampDial(dial) {
+  const asked = Number.isFinite(dial.tileCount) ? Math.round(dial.tileCount) : FIRST_ROUND.tileCount;
+  const even = asked - (asked % 2);
+  const lookalike = Number.isFinite(dial.lookalike) ? dial.lookalike : FIRST_ROUND.lookalike;
+  return {
+    tileCount: Math.max(MIN_TILES, Math.min(MAX_TILES, even)),
+    lookalike: Math.max(MIN_LOOKALIKE, Math.min(MAX_LOOKALIKE, lookalike))
+  };
 }
 
 /* ---- what a kaki remembers ---------------------------------------------- */
@@ -185,9 +257,9 @@ function bestPhrase(bestClear) {
     return 'how you cleared it first try';
   }
   if (bestClear <= 2) {
-    return 'how fast you found every pair';
+    return 'how fast you found the pairs';
   }
-  return 'how you stayed to the last pair';
+  return 'how you stayed until the end';
 }
 
 function renderTiles() {
@@ -371,7 +443,10 @@ function blankState(name) {
     totalMatches: 0,
     bestClear: null,
     recent: [],
-    dial: { tileCount: FIRST_ROUND.tileCount, lookalike: FIRST_ROUND.lookalike }
+    dial: { tileCount: FIRST_ROUND.tileCount, lookalike: FIRST_ROUND.lookalike },
+    // Which value of roundsPlayed the dial above was computed for. null means
+    // it has never been computed, so the next deal works it out.
+    dialAt: null
   };
 }
 
@@ -390,6 +465,7 @@ function adopt(saved) {
     : base.bestClear;
   base.recent = adoptRecent(saved.recent, base.recent);
   base.dial = adoptDial(saved.dial, base.dial);
+  base.dialAt = Number.isFinite(saved.dialAt) ? Math.floor(saved.dialAt) : base.dialAt;
   return base;
 }
 
@@ -429,6 +505,7 @@ function persist() {
     totalMatches: state.totalMatches,
     bestClear: state.bestClear,
     recent: state.recent,
-    dial: state.dial
+    dial: state.dial,
+    dialAt: state.dialAt
   });
 }

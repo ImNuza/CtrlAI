@@ -168,7 +168,9 @@ async function readBubble(page, event) {
       text: (text?.textContent || '').trim(),
       // The bubble clamps at three lines. A memory callback that gets cut off
       // is a broken beat, so the rendered text has to fit the box it lives in.
-      clipped: text ? text.scrollHeight > text.clientHeight + 1 : false,
+      // The tolerance is half a line: the clamp itself leaves a couple of
+      // subpixels on a full three line message, and that loses no words.
+      clipped: text ? text.scrollHeight > text.clientHeight + 20 : false,
     };
   });
 }
