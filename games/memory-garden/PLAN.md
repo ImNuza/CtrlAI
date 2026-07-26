@@ -11,7 +11,7 @@ Garden view (plot grid, big "Grow a new memory" button) > object picker (6 SVG c
 - `index.html` app shell, all views as sections toggled by main.js
 - `css/garden.css` game styles over shared tokens
 - `js/main.js` view state machine, wiring, storage, aiGenerate calls
-- `js/data.js` OBJECTS (id, name, blurb, SVG card art), PROMPTS (3 questions, 5 chip options each)
+- `js/data.js` OBJECTS (id, name, phrase, SVG card art, plus blurb copy kept as data only, not rendered: prose broke the two column picker at 360px), PROMPTS (3 questions, 5 chip options each)
 - `js/composer.js` DOM-free deterministic plant builder, exports composePlant(memory)
 - `content/garden-lines.json` bank per shared/content-banks.md, game id `memory-garden`
 - `qa/loop.mjs` Playwright definition-of-done script, spawns its own server on 4191
@@ -49,6 +49,10 @@ B, after go-ahead: 8 objects, full banks, free text field, ceremony polish, firs
 1. A1, one Opus coder: build every Milestone A file, run qa/loop.mjs, contact sheet and tools/qa/inspect.mjs, paste results, commit.
 2. A2 if needed: fixes from orchestrator review, commit.
 3. B1: remaining objects, full banks, free text, welcome states. B2: ceremony feel and composer distinctness audit. B3: final QA sweep. README written by orchestrator.
+
+## Fix round (post adversarial QA)
+
+Stale tap guard on view switches (350ms, tap only, keyboard exempt). Primary button above the optional note on step 3. Replay opener moved under the title, stage tightened, visible More below cue, overscroll contained. Count grammar via pre built phrase ("one memory"). Poisoned save records dropped and DOM built safely. Reentrancy flag plus unique ids. Not yet button stays readable and tappable with a gentle nudge. Wider composer viewBox so ornaments never clip. Per load salt for line freshness. Bank lint enforces the every-slot-empty rule.
 
 ## Decisions logged
 

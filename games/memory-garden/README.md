@@ -17,8 +17,9 @@ Then open http://localhost:4173/memory-garden on a phone, or in a phone sized vi
 - The full loop: garden, object picker, three chip questions, grow ceremony, back to the garden with the new plant placed. About 9 taps, no typing required.
 - 8 Singapore heritage objects, each mapped to its own plant silhouette. Same object with different answers gives visibly different blooms, palette and ornament. Same answers always regrow the identical plant (seeded, deterministic).
 - The garden lives in localStorage and survives reloads and return visits. Corrupt saves fall back safely to an empty garden.
-- Replay on tap: object, the chosen answers, the caption written when the plant was grown, plus a fresh narration line each visit.
+- Replay on tap: object, the chosen answers, the caption written when the plant was grown, plus a fresh narration line each visit. Stories longer than the screen show a visible More below cue above the pinned close button.
 - An optional free text line on the last question, labelled for the grandchild to type. It shows up quoted in that plant's story.
+- Built for shaky fingers and bad luck: a quick double tap cannot skip a screen, an unbroken 120 character note cannot break the layout, tapping the big button before answering gets a gentle nudge instead of silence, a tampered save is dropped safely, and if the content bank fails to load the game still plays on plain fallback lines.
 - Senior UX floor throughout: every tap target 64px or larger, all text 28px or larger, AAA contrast on text, tap only, no timers, no fail states. Reduced motion collapses every animation to instant.
 
 ## What is mocked, and where the seam is
@@ -37,14 +38,15 @@ Run the checks yourself from the repo root:
 
 ```
 node games/memory-garden/qa/loop.mjs
+node games/memory-garden/qa/lint-bank.mjs
 node games/memory-garden/qa/contact-sheet.mjs
 ```
 
-The first drives the real UI headless and prints 59 assertions. The second writes a visual matrix of composed plants to `tools/qa/output/mg-contact-sheet.html` for judging distinctness by eye.
+The first drives the real UI headless through the full loop, the adversarial cases included (double taps, poisoned saves, blocked content, unbroken text). The second renders every bank template with every slot empty and flags fragments. The third writes a visual matrix of composed plants to `tools/qa/output/mg-contact-sheet.html` for judging distinctness by eye.
 
 ## Known issues, honestly
 
 - The woven palm (rattan chair) is the weakest silhouette of the eight. It reads as a woven fan and is clearly distinct, just less plant-like than the rest.
 - The warm yellow in the happy palette sits at 3.0:1 against the card surface. It is a decorative bloom centre, never text and never information on its own, so it clears the graphics floor but not the text bar.
-- Long captions in the replay panel can push the grandchild's quoted line below the fold. The close button stays pinned and the panel scrolls, so nothing is lost.
+- Each object has a short written blurb in data.js that no screen shows. Rendered prose broke the two column picker at 360px, so the copy sits unused until a layout has room for it.
 - The garden recomposes every plant SVG on each render. Harmless at prototype scale.
