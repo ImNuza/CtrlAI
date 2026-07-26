@@ -27,7 +27,15 @@ No build step, no dependencies, nothing leaves localhost.
 - 8 tells taught: rushing you, secrecy, odd ways to pay, blocking verification, too good
   to be true, detail fishing, penalty threats, and transfers to "their" account. Tapping
   a tell earns a warm affirmation. Tapping a normal line gets a gentle note about why
-  that part is actually normal, with zero penalty.
+  that part is actually normal, with zero penalty. Odd-payment explanations are keyed to
+  the payment method the caller actually named (vouchers or cash to a courier), so the
+  recap never explains a different scam than the one on screen.
+- Shaky-finger safety: for a third of a second after the hang up choice appears, and
+  after each walkthrough step, stray second taps are ignored, and the safe action sits
+  where the Listen button was. A double tap can never drop you into a path you did not
+  choose.
+- If the content fails to load (a network blip), the home screen says so kindly at full
+  size and the same button simply retries. Nothing bricks.
 - Choosing "Do what they say" never punishes: a step by step walkthrough shows what
   would have happened at each tell, then the same recap, and the shield is earned anyway.
 - Senior UX floor throughout: 64px tap targets, 28px minimum text, AAA contrast pairs
@@ -52,9 +60,11 @@ No build step, no dependencies, nothing leaves localhost.
 ## QA
 
 - qa/smoke.mjs: fast full loop suite, 16 checks. Expects the server on port 4185.
-- qa/dod.mjs: definition of done suite, 9 sections covering content integrity, a 12
-  round variety sweep, gentle teaching, the comply path, reload persistence and a
-  clean console. Expects the server on port 4186.
+- qa/dod.mjs: definition of done suite, 13 sections (A to N) covering content integrity
+  and typography across every tracked file, a 12 round variety sweep, gentle teaching,
+  the comply path, reload persistence, a clean console, double tap safety, visibility
+  of the coaching notes and walkthrough steps, fetch failure recovery, and
+  mechanism-matched explanations. Expects the server on port 4186.
 
 Start a server on the matching port, then run each with node.
 
