@@ -38,3 +38,7 @@ B (after conductor go-ahead):
 3. Table feel polish (clear animation, celebration warmth), README.md, final inspector + QA sweep. Commit.
 
 Cut order if squeezed: polish first, then dial range (keep 8/12/16 steps), never the memory beat.
+
+## Status (final)
+
+All milestones reached, nothing cut. A core 92b686d, B1 memory beat 84f1fae, B2 hidden dial 64fdfc9, B3 polish 34404ee, README and this status in the final commit. Full verification evidence in BUILD-REPORT.md territory: three QA scripts green, inspector clean, screenshots reviewed by the orchestrator at 360/390/430.
