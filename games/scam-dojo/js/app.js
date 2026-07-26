@@ -31,6 +31,16 @@ const GAME = 'scam-dojo';
 const NS = 'scam-dojo';
 const RECENT_LIMIT = 2;
 
+// A tap that lands within this window of a control appearing is the tail of a
+// double tap aimed at whatever used to sit there. Seniors tap twice when they
+// think the first one missed, so the second one has to cost nothing.
+const INPUT_GUARD_MS = 350;
+
+const HINT_CALL = 'Tap any line that feels off';
+const HINT_WALKTHROUGH = 'Here is what would have happened';
+const HINT_ENDED = 'That call is over';
+const LOAD_FAILED = 'The call could not load. Please try again.';
+
 const state = normalizeState(loadState(NS, null));
 
 const screens = {};
@@ -39,10 +49,12 @@ const refs = {};
 let round = null;
 let revealed = 0;
 let choiceMade = false;
+let choiceShownAt = 0;
 
 let walkthroughSteps = [];
 let walkthroughIndex = 0;
 let walkthroughBusy = false;
+let walkthroughStepAt = 0;
 const walkthroughRefs = { steps: null, button: null };
 
 function normalizeState(raw) {
@@ -86,10 +98,20 @@ function setBusy(node, busy) {
   }
 }
 
+function withinGuard(stamp) {
+  return Date.now() - stamp < INPUT_GUARD_MS;
+}
+
 /* ---- Home ---------------------------------------------------------------- */
 
 function renderHome() {
   renderStreak(refs.homeStreak, state.streak);
+}
+
+// The note is a live region that renders empty, so the sentence is announced the
+// moment it is set. Empty means no box at all, see .load-note:empty in app.css.
+function setLoadNote(text) {
+  refs.loadNote.textContent = text;
 }
 
 async function onAnswerCall() {
@@ -97,9 +119,14 @@ async function onAnswerCall() {
   try {
     round = await buildRound(state);
   } catch (error) {
+    // Content did not arrive. Say so in one plain line and leave the button
+    // live, so the next tap is a retry rather than a guess about whether the
+    // first tap registered at all.
+    setLoadNote(LOAD_FAILED);
     setBusy(refs.answerCall, false);
     return;
   }
+  setLoadNote('');
   renderRing({ name: refs.ringName, number: refs.ringNumber }, round);
   showScreen('ring');
   setBusy(refs.answerCall, false);
@@ -119,7 +146,9 @@ function startCall() {
   screens.call.dataset.family = round.family;
   screens.call.dataset.script = round.id;
   screens.call.dataset.phase = 'call';
+  screens.call.style.removeProperty('--walkthrough-tail');
   refs.callCaller.textContent = round.callerName;
+  refs.callHint.textContent = HINT_CALL;
   clear(refs.transcript);
   renderListenControl();
 
@@ -141,10 +170,15 @@ function renderListenControl() {
   refs.dock.removeAttribute('hidden');
 }
 
+// The dock swaps under the player's thumb the instant the last line lands, so
+// the moment of the swap is recorded and both choices ignore anything that
+// arrives inside the guard window. Hang up also takes the slot Listen vacated,
+// so a tap that arrives after the window lands on the safe action.
 function renderChoiceControl() {
   clear(refs.dockInner);
   const controls = buildChoiceControl();
   refs.dockInner.appendChild(controls);
+  choiceShownAt = Date.now();
   refs.dockInner.querySelector('#hangup-btn').addEventListener('click', onHangUp);
   refs.dockInner.querySelector('#comply-btn').addEventListener('click', onComply);
 }
@@ -166,6 +200,44 @@ function scrollToLatest() {
   window.scrollTo(0, document.documentElement.scrollHeight);
 }
 
+function stickyOffset() {
+  return refs.callHeader === undefined ? 0 : Math.round(refs.callHeader.getBoundingClientRect().height);
+}
+
+// The header floats over the top of the transcript and its height changes with
+// the caller name, so the measured height goes back into the stylesheet as the
+// scroll margin a card is anchored by.
+function syncStickyOffset() {
+  screens.call.style.setProperty('--sticky-offset', stickyOffset() + 'px');
+}
+
+// scrollIntoView can only scroll as far as the document allows, and a tall card
+// appended at the foot of the page has nothing underneath it to scroll into. The
+// reserve below the walkthrough grows by exactly what this card needs, no more.
+function reserveTail(card) {
+  screens.call.style.setProperty('--walkthrough-tail', '0px');
+  const cardTop = window.scrollY + card.getBoundingClientRect().top;
+  const below = document.documentElement.scrollHeight - cardTop;
+  const room = window.innerHeight - stickyOffset();
+  screens.call.style.setProperty('--walkthrough-tail', (below >= room ? 0 : Math.ceil(room - below)) + 'px');
+}
+
+// A new step lands with its own top on screen, under the header. Scrolling to
+// the page bottom instead would drop the player into the middle of a sentence.
+function anchorStep(card) {
+  syncStickyOffset();
+  reserveTail(card);
+  card.scrollIntoView({ block: 'start', behavior: 'auto' });
+}
+
+// The dock is fixed over the foot of the page, so the sentence that does the
+// teaching has to be pulled clear of it. .tap-note carries the scroll margins
+// that keep it above the dock.
+function revealNote(bubble, note) {
+  bubble.insertAdjacentElement('afterend', note);
+  note.scrollIntoView({ block: 'nearest', behavior: 'auto' });
+}
+
 async function onTranscriptClick(event) {
   const bubble = event.target.closest('.bubble');
   if (bubble === null || choiceMade) {
@@ -183,7 +255,7 @@ async function onTranscriptClick(event) {
     bubble.classList.add('is-caught');
     bubble.appendChild(buildCaughtLabel(tellLabel(round.tellLabels, line.tell)));
     const affirm = await aiGenerate({ game: GAME, event: 'affirm_catch', context: round.context });
-    bubble.insertAdjacentElement('afterend', buildTapNote('catch', affirm.text));
+    revealNote(bubble, buildTapNote('catch', affirm.text));
     return;
   }
 
@@ -193,11 +265,25 @@ async function onTranscriptClick(event) {
     event: 'benign_' + line.benign,
     context: round.context
   });
-  bubble.insertAdjacentElement('afterend', buildTapNote('benign', note.text));
+  revealNote(bubble, buildTapNote('benign', note.text));
+}
+
+// Once a choice is made the transcript is a record, not a control. Left live it
+// would answer a tap with pressed feedback and then do nothing at all.
+function freezeTranscript() {
+  const bubbles = refs.transcript.querySelectorAll('.bubble');
+  for (let i = 0; i < bubbles.length; i += 1) {
+    bubbles[i].disabled = true;
+  }
 }
 
 async function onHangUp() {
+  if (choiceMade || withinGuard(choiceShownAt)) {
+    return;
+  }
   choiceMade = true;
+  freezeTranscript();
+  refs.callHint.textContent = HINT_ENDED;
   clear(refs.dockInner);
   refs.dock.setAttribute('hidden', '');
   await finishRound();
@@ -215,12 +301,18 @@ function resetWalkthrough() {
   walkthroughSteps = [];
   walkthroughIndex = 0;
   walkthroughBusy = false;
+  walkthroughStepAt = 0;
   walkthroughRefs.steps = null;
   walkthroughRefs.button = null;
 }
 
 async function onComply() {
+  if (choiceMade || withinGuard(choiceShownAt)) {
+    return;
+  }
   choiceMade = true;
+  freezeTranscript();
+  refs.callHint.textContent = HINT_WALKTHROUGH;
   clear(refs.dockInner);
   refs.dock.setAttribute('hidden', '');
   screens.call.dataset.phase = 'walkthrough';
@@ -239,6 +331,9 @@ async function onComply() {
   const intro = await aiGenerate({ game: GAME, event: 'walkthrough_intro', context: round.context });
   walkthroughRefs.steps.appendChild(buildWalkthroughIntro(intro.text));
   syncWalkthroughButton();
+  // The continue button is new and sits low on the page, near where the comply
+  // button was. It waits out the same guard window before it will answer.
+  walkthroughStepAt = Date.now();
   scrollToLatest();
 }
 
@@ -248,10 +343,11 @@ function syncWalkthroughButton() {
 }
 
 // The continue control lives on through the whole walkthrough, so unlike the
-// dock buttons it is still there to be tapped twice. The flag is what stops a
-// double tap on the last step from banking the round twice.
+// dock buttons it is still there to be tapped twice. The flag stops a double tap
+// from banking the round twice, and the guard window stops the second tap of a
+// double tap from skipping the card that just appeared.
 async function onWalkthroughContinue() {
-  if (walkthroughBusy) {
+  if (walkthroughBusy || withinGuard(walkthroughStepAt)) {
     return;
   }
   walkthroughBusy = true;
@@ -265,25 +361,42 @@ async function onWalkthroughContinue() {
   const line = walkthroughSteps[walkthroughIndex];
   // The round's own rolled slots, so the consequence names the same grandchild,
   // the same amount and the same place the caller just used.
-  const consequence = await aiGenerate({
-    game: GAME,
-    event: 'walkthrough_step_' + line.tell,
-    context: round.context
-  });
+  const consequence = await explainTell('walkthrough_step_', line);
 
   walkthroughIndex += 1;
-  walkthroughRefs.steps.appendChild(buildWalkthroughStep({
+  const card = buildWalkthroughStep({
     position: walkthroughIndex,
     total: walkthroughSteps.length,
     tell: line.tell,
     quote: line.text,
     label: tellLabel(round.tellLabels, line.tell),
     consequence: consequence.text
-  }));
+  });
+  walkthroughRefs.steps.appendChild(card);
 
   syncWalkthroughButton();
+  walkthroughStepAt = Date.now();
   walkthroughBusy = false;
-  scrollToLatest();
+  anchorStep(card);
+}
+
+// Some tells split into mechanisms that are different scams underneath: a
+// voucher ask and a courier at the door are not the same warning. When a line
+// carries one, its explanation comes from the pool that speaks only about that
+// mechanism, and the base pool is the fallback when no such pool exists.
+async function explainTell(prefix, line) {
+  const base = prefix + line.tell;
+  if (typeof line.mechanism === 'string' && line.mechanism !== '') {
+    const keyed = await aiGenerate({
+      game: GAME,
+      event: base + '_' + line.mechanism,
+      context: round.context
+    });
+    if (keyed.meta.source !== 'fallback') {
+      return keyed;
+    }
+  }
+  return aiGenerate({ game: GAME, event: base, context: round.context });
 }
 
 /* ---- Recap --------------------------------------------------------------- */
@@ -311,11 +424,7 @@ async function renderRecap() {
     if (line.tell === null) {
       continue;
     }
-    const why = await aiGenerate({
-      game: GAME,
-      event: 'recap_' + line.tell,
-      context: round.context
-    });
+    const why = await explainTell('recap_', line);
     refs.recapList.appendChild(buildRecapItem({
       text: line.text,
       label: tellLabel(round.tellLabels, line.tell),
@@ -346,10 +455,13 @@ function boot() {
 
   refs.homeStreak = document.getElementById('home-streak');
   refs.answerCall = document.getElementById('answer-call');
+  refs.loadNote = document.getElementById('load-note');
   refs.ringName = document.getElementById('ring-name');
   refs.ringNumber = document.getElementById('ring-number');
   refs.answerBtn = document.getElementById('answer-btn');
+  refs.callHeader = document.getElementById('call-header');
   refs.callCaller = document.getElementById('call-caller');
+  refs.callHint = document.getElementById('call-hint');
   refs.transcript = document.getElementById('transcript');
   refs.dock = document.getElementById('call-dock');
   refs.dockInner = document.getElementById('call-dock-inner');

@@ -11,6 +11,10 @@ import path from 'node:path';
 
 const URL = 'http://localhost:4185/scam-dojo';
 const STORAGE_KEY = 'ctrlai:scam-dojo';
+// The game ignores a tap that lands within 350ms of a control appearing, which
+// is how a double tap on Listen stops falling through into the choice pair. A
+// script taps faster than any hand, so it waits the window out first.
+const GUARD_WAIT = 450;
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const CONTENT_DIR = path.join(HERE, '..', 'content');
 
@@ -136,6 +140,9 @@ async function playRound(page, options) {
 
   assert(taps > 0 && taps <= 25, label + ': listen taps out of range (' + taps + ')');
   assert(await page.locator('#hangup-btn').count() > 0, label + ': never reached the hang up choice');
+  // The choice pair has just replaced Listen under the same thumb, so let the
+  // guard window pass before either choice is tapped.
+  await page.waitForTimeout(GUARD_WAIT);
 
   const transcript = await transcriptOf(page);
   assert(transcript.length >= 6, label + ': only ' + transcript.length + ' bubbles revealed');
@@ -159,6 +166,9 @@ async function playRound(page, options) {
     while ((await page.locator('[data-screen="recap"]:not([hidden])').count()) === 0) {
       assert(continues < 30, label + ': the walkthrough never reached the recap');
       const before = await page.locator('.walkthrough-step').count();
+      // Same guard on the continue control: a card that just landed cannot be
+      // skipped by a second tap, so each tap waits the window out.
+      await page.waitForTimeout(GUARD_WAIT);
       await page.locator('#walkthrough-continue').click();
       continues += 1;
       // Every tap either lands another step or leaves for the recap, never stalls.
@@ -189,6 +199,7 @@ async function playRound(page, options) {
     // The walkthrough belongs to the comply path only, but step through it
     // rather than hanging the run if it ever turns up here.
     if (await page.locator('#walkthrough-continue').count() > 0) {
+      await page.waitForTimeout(GUARD_WAIT);
       await page.locator('#walkthrough-continue').click();
     }
   }

@@ -1,27 +1,27 @@
 {
   "grandchild1_1": [
-    "Ah Ma? Ah Ma, can you hear me?",
-    "Hello, hello. Is this Ah Ma speaking?",
-    "Ah Ma, it is me. Please do not put down the phone."
+    "Hello? Hello, can you hear me {relation}?",
+    "Hello, hello. Is that you {relation}?",
+    "It is me {relation}. Please do not put down the phone."
   ],
   "grandchild1_2": [
     "It is your grandson {grandname}. My voice sounds different because I have been crying.",
-    "Your grandson {grandname} here. Ah Ma, I am in very big trouble.",
-    "Ah Ma, your grandson {grandname} is speaking. Something bad happened this morning."
+    "Your grandson {grandname} here. I am in very big trouble {relation}.",
+    "Your grandson {grandname} is on the line {relation}. Something bad happened this morning."
   ],
   "grandchild1_3": [
-    "Ah Ma, I need the money within the hour or they will not let me go home.",
+    "I need the money within the hour {relation}, or they will not let me go home.",
     "They want the money today, {amount} in total, and I only have until noon.",
     "There is no time to sit and think about this. Please move now, every minute makes it worse for me."
   ],
   "grandchild1_4": [
-    "How is your knee, Ah Ma? Sorry I did not come by last Sunday.",
+    "How is your knee {relation}? Sorry I did not come by last Sunday.",
     "Did you go down to the kopitiam this morning? I keep thinking about your kaya toast.",
     "I know it is early. Uncle is still sleeping, right?"
   ],
   "grandchild1_5": [
     "Please do not tell Papa and Mama. I cannot face them if they find out.",
-    "Ah Ma, keep this between us only. If the family hears about it, I am finished.",
+    "Keep this between us only {relation}. If the family hears about it, I am finished.",
     "Do not say anything to anyone at home. Not Uncle, not my sister, nobody."
   ],
   "grandchild1_6": [
@@ -30,7 +30,7 @@
     "I will be here the whole morning. Nobody is letting me walk out yet."
   ],
   "grandchild1_7": [
-    "Do not call my handphone, Ah Ma. They took it from me, this is a borrowed line.",
+    "Do not call my handphone {relation}. They took it from me, this is a borrowed line.",
     "You cannot ring me back on this number. Just stay on the phone with me now.",
     "Please do not check with Papa first. By the time he picks up, it is already too late for me."
   ],
@@ -68,7 +68,7 @@
   "bank1_7": [
     "Move everything into the holding account I am about to read out. It is a safe account.",
     "Transfer the balance now, {amount} or whatever is inside, into our protection account.",
-    "Withdraw the cash and hand it to our courier at your door. That is the fastest way to keep it safe."
+    "The safest place for it tonight is our verification account. I will read the numbers out slowly."
   ],
 
   "parcel1_1": [
@@ -179,8 +179,8 @@
     "I will note this call under the {place} roadshow list."
   ],
   "luckydraw1_7": [
-    "There is a small processing fee, {fee} only. Buy shopping vouchers and read me the codes.",
-    "Before we release the money you settle the stamp fee, {fee} in gift cards, that is our system.",
+    "There is a small processing fee, {amount} only. Buy shopping vouchers and read me the codes.",
+    "Before we release the money you settle the stamp fee, {amount} in gift cards, that is our system.",
     "Do not transfer to a bank. Buy the cards from the shop downstairs and send me a photo of the back."
   ],
 
@@ -241,9 +241,9 @@
     "Do not worry, I am not asking you to come down anywhere."
   ],
   "charity1_5": [
-    "Just transfer the {amount} to my own account, the fund account is still being opened.",
-    "Buy shopping vouchers for {amount} and read me the codes, we use them to buy rice directly.",
-    "Cash is best. Our volunteer can come to your void deck tonight and collect it."
+    "Cash is easiest for us. Our volunteer can come to your void deck tonight and collect it.",
+    "Have the notes ready in an envelope, all {amount} of it, and our collector will come up to your flat.",
+    "No need to go anywhere. Our volunteer is on your street now and will take the cash at your door."
   ],
   "charity1_6": [
     "No need to check the charity register, we are a new group, you will not find us there yet.",
@@ -262,8 +262,8 @@
     "I am {advisor}, one of the advisers at Golden Ox Capital."
   ],
   "investment1_3": [
-    "Our {fund} portfolio pays a {rate} return every month, and the capital is guaranteed.",
-    "There is no risk in this one. Every client last year took their money back plus a {rate} share on top.",
+    "Our {fund} portfolio pays a return of {rate} every month, and the capital is guaranteed.",
+    "There is no risk in this one. Every client last year took their money back plus a share of {rate} on top.",
     "Put in {amount} today and by the next festive season it has grown by half. Guaranteed, in writing."
   ],
   "investment1_4": [
@@ -367,10 +367,22 @@
     "Secrecy is a tool, not shame. It leaves you alone with the person who is lying to you."
   ],
   "recap_unusual_payment": [
-    "Vouchers, gift cards and cash handed to a courier cannot be traced or reversed. That is exactly why they ask for them.",
+    "Watch how they want to be paid. An odd payment method is the clearest sign of all.",
+    "A real charge can be settled the ordinary way, at a counter, on a bill, with a receipt you keep.",
+    "If the way you are asked to pay is one you have never used before, that is the warning, not the amount.",
+    "They choose a payment nobody can reverse. That choice tells you more than anything else they said."
+  ],
+  "recap_unusual_payment_voucher": [
+    "Voucher codes cannot be traced or reversed. Once you read the numbers out, the money is already spent.",
     "No real office collects a fee in shopping codes. That request alone can end the call.",
-    "A safe account you never opened is not safe. Money that moves there does not come back.",
-    "Watch how they want to be paid. An odd payment method is the clearest sign of all."
+    "A card bought at the shop downstairs is as good as cash to a stranger, and nobody can call it back.",
+    "The scratch codes are the whole point. They travel down a phone line and leave nothing behind them."
+  ],
+  "recap_unusual_payment_courier": [
+    "Cash handed to somebody at your door leaves no receipt and no trail, so there is nothing for anyone to reverse.",
+    "No genuine fund or office sends a person to your flat to collect notes from you.",
+    "Once the envelope changes hands at the lift, the money is gone and so is the person who took it.",
+    "A collector at the door skips every check a real payment would pass through. That is exactly why they offered."
   ],
   "recap_no_callback": [
     "Blocking you from ringing back is the tell. A real office is happy for you to call the number you already have.",
@@ -433,11 +445,22 @@
     "The silence is the plan. Next would have come a reason why telling anyone makes it worse for you."
   ],
   "walkthrough_step_unusual_payment": [
+    "Going along with it, you would have made one small payment first, then a bigger one to release the first.",
+    "The odd payment is the part they cannot put through an ordinary counter, so the next step always leads away from one.",
+    "The next step would have been a payment you could not stop, made in a way you have never used before.",
+    "Had you paid the way they asked, there would have been no receipt to show anyone and no counter to walk back to."
+  ],
+  "walkthrough_step_unusual_payment_voucher": [
     "Next you would have been sent downstairs for vouchers, then asked to read the codes aloud. Once those numbers are spoken, they are spent.",
     "The next step would have been a shop downstairs, then codes read into the phone. The money, {amount} in this case, does not come back.",
-    "Cash handed to somebody at your door leaves no trail, so afterwards there is nothing for anyone to reverse.",
-    "Going along with it, you would have made one small payment first, then a bigger one to release the first.",
-    "The odd payment is the part they cannot fake through a normal bank, so the next step is always away from one."
+    "Going along with it, you would have bought one card, then been told a second one is needed to release the first.",
+    "The shop downstairs is the only place this works, so the next step is always the cards and never the counter."
+  ],
+  "walkthrough_step_unusual_payment_courier": [
+    "Next would have come a knock at the door, an envelope handed over, and somebody you cannot describe walking away with it.",
+    "The next step would have been notes counted out at your lift landing, {amount} in this case, with no receipt and nobody to ask afterwards.",
+    "Going along with it, you would have handed the cash over, and the same collector would have come back next week for more.",
+    "Cash at the door leaves no trail at all, so the next step is always somebody arriving rather than a payment you can check."
   ],
   "walkthrough_step_no_callback": [
     "Staying on the line was the goal. The next step would have been a long call with no gap for you to check anything.",

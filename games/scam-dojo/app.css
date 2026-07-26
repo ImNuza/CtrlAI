@@ -79,6 +79,22 @@
   width: 100%;
 }
 
+/* Spoken by role="status" the moment it is filled, and gone from the layout
+   again when it is cleared. Plain ink on a sunk card: nothing here is an alarm. */
+.load-note {
+  padding: var(--sp-4) var(--sp-5);
+  border: 3px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface-sunk);
+  color: var(--color-text);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+}
+
+.load-note:empty {
+  display: none;
+}
+
 /* ---- Ring --------------------------------------------------------------- */
 
 .screen-ring {
@@ -148,10 +164,12 @@
   padding-bottom: 15rem;
 }
 
-/* The dock is gone by the walkthrough, so the reserve would be dead space the
-   player has to scroll past to reach the continue button. */
+/* The dock is gone by the walkthrough, so the dock reserve would be dead space
+   the player has to scroll past to reach the continue button. The tail is the
+   room a tall step card needs to be able to reach the top of the screen, set in
+   pixels by app.js and zero whenever the page is already long enough. */
 .screen-call[data-phase="walkthrough"] {
-  padding-bottom: var(--sp-6);
+  padding-bottom: calc(var(--sp-6) + var(--walkthrough-tail, 0px));
 }
 
 .call-header {
@@ -209,6 +227,14 @@
   background-color: var(--color-surface-sunk);
 }
 
+/* After a choice the transcript is history. Inert in every sense: no pointer, no
+   press, no focus stop, so it can never answer a tap with feedback and nothing
+   else. Colour is untouched, the lines stay as readable as they were. */
+.bubble[disabled] {
+  cursor: default;
+  pointer-events: none;
+}
+
 .bubble.is-caught {
   border-color: var(--accent);
   background-color: var(--accent-tint);
@@ -230,8 +256,13 @@
   color: var(--color-text);
 }
 
+/* The same scroll margins .bubble carries: app.js scrolls the note into view the
+   moment it is inserted, and the bottom margin is what keeps it clear of the
+   fixed dock instead of landing behind it. */
 .tap-note {
   align-self: stretch;
+  scroll-margin-top: 7rem;
+  scroll-margin-bottom: 16rem;
   padding: var(--sp-4) var(--sp-5);
   border-left: 8px solid var(--color-border);
   border-radius: var(--radius-md);
@@ -262,10 +293,16 @@
   gap: var(--sp-5);
 }
 
+/* Anchored by its own top, under the sticky header, whose measured height app.js
+   writes into --sticky-offset. Landing a card by the page bottom instead would
+   push the step counter and the start of the quote off the screen. The gap on
+   top of the header covers the 10px the entrance animation is still holding the
+   card down by at the moment it is scrolled to. */
 .walkthrough-step {
   display: flex;
   flex-direction: column;
   gap: var(--sp-3);
+  scroll-margin-top: calc(var(--sticky-offset, 7rem) + var(--sp-5));
   padding: var(--sp-5);
   border: 3px solid var(--color-border);
   border-radius: var(--radius-lg);
@@ -279,7 +316,10 @@
 }
 
 /* Ink rather than accent: --accent on --accent-tint is only 6.56:1, and this
-   screen holds itself to 7:1. --color-text on the tint is 14.04:1. */
+   screen holds itself to 7:1. --color-text on the tint is 14.04:1. The same
+   swap is made for .recap-tell inside a caught card and for the ceremony streak
+   figure, the other two places text sits on the tint. Text moves off the accent;
+   the accent itself is untouched and keeps the borders and fills. */
 .walkthrough-title {
   font-size: var(--fs-lead);
   font-weight: var(--fw-bold);
@@ -391,6 +431,12 @@
   color: var(--accent);
 }
 
+/* Caught cards are tinted, so the label follows .walkthrough-title off the
+   accent: 6.56:1 on the tint becomes 14.04:1. */
+.recap-item[data-caught="true"] .recap-tell {
+  color: var(--color-text);
+}
+
 .recap-status {
   font-size: var(--fs-body);
   font-weight: var(--fw-bold);
@@ -448,6 +494,13 @@
    reads as a hollow outline. The accent stroke keeps the 3:1 boundary. */
 .ceremony .shield-body {
   fill: var(--color-surface);
+}
+
+/* Same tint, same swap as .recap-tell above: ink at 14.04:1 rather than accent
+   at 6.56:1. On the home screen the figure keeps the accent, where it sits on
+   the page background at 7.29:1. */
+.ceremony .streak-figure {
+  color: var(--color-text);
 }
 
 .ceremony-line {

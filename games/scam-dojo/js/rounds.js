@@ -25,19 +25,26 @@ export function loadContent() {
   return contentPromise;
 }
 
+// Any failure clears the cached promise, not just an HTTP one. A dropped
+// connection is the ordinary phone failure, and it must leave the next tap free
+// to fetch again rather than replaying the same rejection forever.
 async function fetchContent() {
-  const [structureResponse, bankResponse] = await Promise.all([
-    fetch(STRUCTURE_URL),
-    fetch(BANK_URL)
-  ]);
-  if (!structureResponse.ok || !bankResponse.ok) {
+  try {
+    const [structureResponse, bankResponse] = await Promise.all([
+      fetch(STRUCTURE_URL),
+      fetch(BANK_URL)
+    ]);
+    if (!structureResponse.ok || !bankResponse.ok) {
+      throw new Error('Scam Dojo content did not load');
+    }
+    const structure = await structureResponse.json();
+    const bank = await bankResponse.json();
+    registerBank(GAME, bank);
+    return structure;
+  } catch (error) {
     contentPromise = null;
-    throw new Error('Scam Dojo content did not load');
+    throw error;
   }
-  const structure = await structureResponse.json();
-  const bank = await bankResponse.json();
-  registerBank(GAME, bank);
-  return structure;
 }
 
 function pickIndex(rng, length) {
@@ -107,6 +114,9 @@ export async function buildRound(state) {
       index: i,
       text: generated.text,
       tell: tell,
+      // How this line asks to be paid. The recap and the walkthrough key off it
+      // so an explanation can never name a mechanism the line did not use.
+      mechanism: typeof spec.mechanism === 'string' && spec.mechanism !== '' ? spec.mechanism : null,
       benign: tell === null ? benignCategory(spec.benign) : null,
       tapped: false,
       caught: false

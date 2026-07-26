@@ -99,12 +99,16 @@ export function buildListenControl() {
 /**
  * Hang up is the filled primary and comply is the plain secondary. The safe
  * action carries the visual weight without the other one being hidden.
+ *
+ * Hang up goes last in the fragment on purpose: the dock is fixed to the bottom,
+ * so the last button lands on the pixels the Listen button just left. A stray
+ * second tap therefore hits the safe action rather than the one with no way back.
  * @returns {DocumentFragment}
  */
 export function buildChoiceControl() {
   const frag = document.createDocumentFragment();
-  frag.appendChild(button('hangup-btn', 'btn', 'Hang up'));
   frag.appendChild(button('comply-btn', 'btn btn-plain', 'Do what they say'));
+  frag.appendChild(button('hangup-btn', 'btn', 'Hang up'));
   return frag;
 }
 

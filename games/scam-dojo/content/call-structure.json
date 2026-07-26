@@ -25,9 +25,10 @@
         { "event": "grandchild1_7", "tell": "no_callback" }
       ],
       "slots": {
-        "grandname": ["Wei Jie", "Jun Kai", "Xin Yi"],
+        "grandname": ["Wei Jie", "Jun Kai", "Zhi Hao"],
         "amount": ["$800", "$1,500", "$2,300"],
-        "place": ["Bedok", "Toa Payoh", "Yishun"]
+        "place": ["Bedok", "Toa Payoh", "Yishun"],
+        "relation": ["Ah Ma", "Ah Gong", "Auntie"]
       }
     },
     {
@@ -42,7 +43,7 @@
         { "event": "bank1_4", "tell": null, "benign": "smalltalk" },
         { "event": "bank1_5", "tell": "detail_fishing" },
         { "event": "bank1_6", "tell": null, "benign": "logistics" },
-        { "event": "bank1_7", "tell": "unusual_payment" }
+        { "event": "bank1_7", "tell": "official_transfer" }
       ],
       "slots": {
         "officer": ["Kelvin Soh", "Rachel Tan", "Desmond Lim"],
@@ -62,7 +63,7 @@
         { "event": "parcel1_3", "tell": null, "benign": "logistics" },
         { "event": "parcel1_4", "tell": "detail_fishing" },
         { "event": "parcel1_5", "tell": null, "benign": "smalltalk" },
-        { "event": "parcel1_6", "tell": "unusual_payment" },
+        { "event": "parcel1_6", "tell": "unusual_payment", "mechanism": "voucher" },
         { "event": "parcel1_7", "tell": "no_callback" }
       ],
       "slots": {
@@ -106,12 +107,12 @@
         { "event": "luckydraw1_4", "tell": null, "benign": "smalltalk" },
         { "event": "luckydraw1_5", "tell": "detail_fishing" },
         { "event": "luckydraw1_6", "tell": null, "benign": "logistics" },
-        { "event": "luckydraw1_7", "tell": "unusual_payment" }
+        { "event": "luckydraw1_7", "tell": "unusual_payment", "mechanism": "voucher" }
       ],
       "slots": {
         "host": ["Jason Neo", "Melissa Koh", "Ryan Baskaran"],
         "prize": ["$4,800", "$3,600", "$2,900"],
-        "fee": ["$180", "$240", "$320"],
+        "amount": ["$180", "$240", "$320"],
         "place": ["Bugis", "Tampines", "Serangoon"]
       }
     },
@@ -127,7 +128,7 @@
         { "event": "techsupport1_4", "tell": null, "benign": "logistics" },
         { "event": "techsupport1_5", "tell": "detail_fishing" },
         { "event": "techsupport1_6", "tell": null, "benign": "smalltalk" },
-        { "event": "techsupport1_7", "tell": "unusual_payment" }
+        { "event": "techsupport1_7", "tell": "unusual_payment", "mechanism": "voucher" }
       ],
       "slots": {
         "tech": ["Ariff", "Winston", "Charmaine"],
@@ -146,7 +147,7 @@
         { "event": "charity1_2", "tell": null, "benign": "identity" },
         { "event": "charity1_3", "tell": "urgency" },
         { "event": "charity1_4", "tell": null, "benign": "smalltalk" },
-        { "event": "charity1_5", "tell": "unusual_payment" },
+        { "event": "charity1_5", "tell": "unusual_payment", "mechanism": "courier" },
         { "event": "charity1_6", "tell": "no_callback" }
       ],
       "slots": {
