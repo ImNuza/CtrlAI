@@ -454,7 +454,7 @@
     "A win you never entered and a return nobody else gets are the same promise, and both need your money first."
   ],
   "walkthrough_step_detail_fishing": [
-    "Once those details were read out, the caller would not have needed you again. The next call would have been to your bank, as you.",
+    "Once those details were read out, the caller would not have needed you again. The next call would have been to your bank, with somebody else answering every question as if they were you.",
     "The next step would have been one more harmless question, then another, until the form was complete.",
     "Your name, your card numbers and the code sent to your phone are the whole set. With them an account opens without you.",
     "Had you answered, the details would have been used quietly, and the first sign would have been a message you did not expect.",
@@ -471,7 +471,7 @@
     "The next step would have been an account number read out slowly, and a walk to the machine while still on the phone.",
     "Had the money moved into that safe account, it would have been out of reach within minutes.",
     "A holding account, a safety account, a verification account. Whatever the name, the next step is always your money leaving your side.",
-    "Going along with it, you would have transferred {amount} to strangers who opened that account this morning.",
+    "Going along with it, that transfer, {amount} in this case, would have landed with strangers who opened the account this morning.",
     "No office asks you to move savings by phone. The next step would have been a receipt that helps nobody."
   ]
 }

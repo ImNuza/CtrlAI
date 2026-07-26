@@ -51,11 +51,26 @@ the explanation routes through aiGenerate recap_(tell).
 ## Milestones
 
 - A, playable core: 3 scripts (grandchild, bank, parcel families), full loop home to recap,
-  smoke QA, inspector clean, commit. One Opus coder.
-- B1: content to 9 scripts across 8 families plus remaining recap banks (JSON only).
-- B2: comply walkthrough depth, ceremony feel, benign category coverage (js and css).
-  B1 and B2 run parallel, disjoint files. B3 after: full DoD QA suite plus fixes.
-  README.md written by the orchestrator from verified state. Commit at each step.
+  smoke QA, inspector clean, commit. One Opus coder. DONE, commit be90cca.
+- B1 (content only): 9 scripts across 8 families, remaining recap banks, walkthrough step
+  banks, complete tellLabels. Touches content/*.json only.
+- B2 (code only): walkthrough depth, ceremony feel, first line revealed on Answer
+  (approved, still tap driven). Touches index.html, app.css, js/, qa/smoke.mjs only.
+  B1 and B2 run parallel with disjoint files and pathspec scoped commits so neither
+  sweeps the other's in flight work. B3 after both: qa/dod.mjs full DoD suite plus
+  content integrity checks plus fixes. README.md by the orchestrator. Commit each step.
+
+## Milestone B contract (fixed, both coders code against this)
+
+Bank events B1 writes and B2 consumes, 4 or more variants each, second person, kind,
+one or two sentences, readable with every slot empty: walkthrough_step_urgency,
+walkthrough_step_secrecy, walkthrough_step_unusual_payment, walkthrough_step_no_callback,
+walkthrough_step_too_good, walkthrough_step_detail_fishing, walkthrough_step_penalty_threat,
+walkthrough_step_official_transfer. Each describes what would have happened next had the
+player gone along with that specific pressure. B2 passes the round's rolled slot context.
+Missing events degrade to the shared neutral fallback, never a crash, so parallel work
+cannot hard break the game; B3 asserts no fallback text renders in the finished build.
+tellLabels in call-structure.json must cover all 8 tells (B1).
 
 ## Verification (orchestrator repeats independently, never takes a coder's word)
 
