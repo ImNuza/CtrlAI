@@ -17,6 +17,7 @@ const BANK_URL = '/games/mahjong-kakis/content/kaki-banter.json';
 const CLEAR_MS = 240;
 const MISS_HOLD_MS = 600;
 const NUDGE_TAPS = 6;
+const RECENT_KEPT = 3;
 const FIRST_ROUND = { tileCount: 8, lookalike: 0.25 };
 const LATER_ROUND = { tileCount: 12, lookalike: 0.5 };
 const DEFAULT_NAME = 'Friend';
@@ -37,6 +38,9 @@ const el = {
 let banter = null;
 let state = blankState('');
 let round = null;
+// True until the first deal of a session that a returning player opened. That
+// one deal is greeted with the memory callback instead of a plain round start.
+let pendingReturn = false;
 
 boot();
 
@@ -54,6 +58,9 @@ async function boot() {
   if (saved && typeof saved.name === 'string' && saved.name.trim() !== '') {
     state = adopt(saved);
     state.visits += 1;
+    // A name on its own is not a shared history. Only somebody who finished a
+    // round has something for a kaki to remember.
+    pendingReturn = state.roundsPlayed >= 1;
     persist();
     startPlaying();
     return;
@@ -125,7 +132,62 @@ function deal() {
   renderTiles();
   updateBar();
   el.grid.focus({ preventScroll: true });
+
+  if (pendingReturn) {
+    pendingReturn = false;
+    banter.speak('return_visit', returnContext());
+    return;
+  }
   banter.speak('round_start', { name: state.name });
+}
+
+/* ---- what a kaki remembers ---------------------------------------------- */
+
+/*
+  History slots for return_visit. Both are optional: a missing one is left out
+  of the context entirely and shared/ai.js closes the gap, so every template
+  still reads as a sentence. The values are warm phrases, never statistics, and
+  never a count of what the player got wrong.
+*/
+function returnContext() {
+  const context = { name: state.name };
+  const rounds = roundsPhrase(state.roundsPlayed);
+  if (rounds) {
+    context.rounds = rounds;
+  }
+  const best = bestPhrase(state.bestClear);
+  if (best) {
+    context.best = best;
+  }
+  return context;
+}
+
+function roundsPhrase(played) {
+  if (played >= 4) {
+    return 'many rounds';
+  }
+  if (played >= 2) {
+    return 'a few rounds';
+  }
+  if (played === 1) {
+    return 'one round';
+  }
+  return null;
+}
+
+// bestClear is the fewest mismatches in any finished round. Every branch below
+// reads as praise for what happened, never as a count of what did not.
+function bestPhrase(bestClear) {
+  if (!Number.isFinite(bestClear)) {
+    return null;
+  }
+  if (bestClear === 0) {
+    return 'how you cleared it first try';
+  }
+  if (bestClear <= 2) {
+    return 'how fast you found every pair';
+  }
+  return 'how you stayed to the last pair';
 }
 
 function renderTiles() {
@@ -237,7 +299,9 @@ function maybeNudge() {
 function finishRound() {
   const pairs = round.tiles.length / 2;
   state.roundsPlayed += 1;
-  state.recent = state.recent.concat([{ matches: round.matches, misses: round.misses }]).slice(-3);
+  state.recent = state.recent
+    .concat([{ matches: round.matches, misses: round.misses }])
+    .slice(-RECENT_KEPT);
   if (state.bestClear === null || round.misses < state.bestClear) {
     state.bestClear = round.misses;
   }
@@ -311,17 +375,46 @@ function blankState(name) {
   };
 }
 
+/*
+  Merge a stored profile onto a fresh blank one. Every field is taken only when
+  it survives its own check, so a partial or older save loses the field it is
+  missing instead of poisoning the round with undefined.
+*/
 function adopt(saved) {
   const base = blankState(String(saved.name).trim().slice(0, 20) || DEFAULT_NAME);
-  base.visits = whole(saved.visits, 0);
-  base.roundsPlayed = whole(saved.roundsPlayed, 0);
-  base.totalMatches = whole(saved.totalMatches, 0);
-  base.bestClear = Number.isFinite(saved.bestClear) ? saved.bestClear : null;
-  base.recent = Array.isArray(saved.recent) ? saved.recent.slice(-3) : [];
-  if (saved.dial && Number.isFinite(saved.dial.tileCount)) {
-    base.dial = { tileCount: saved.dial.tileCount, lookalike: Number(saved.dial.lookalike) || 0 };
-  }
+  base.visits = whole(saved.visits, base.visits);
+  base.roundsPlayed = whole(saved.roundsPlayed, base.roundsPlayed);
+  base.totalMatches = whole(saved.totalMatches, base.totalMatches);
+  base.bestClear = Number.isFinite(saved.bestClear) && saved.bestClear >= 0
+    ? Math.floor(saved.bestClear)
+    : base.bestClear;
+  base.recent = adoptRecent(saved.recent, base.recent);
+  base.dial = adoptDial(saved.dial, base.dial);
   return base;
+}
+
+function adoptRecent(saved, fallback) {
+  if (!Array.isArray(saved)) {
+    return fallback;
+  }
+  const kept = [];
+  for (let i = 0; i < saved.length; i += 1) {
+    const entry = saved[i];
+    if (entry && typeof entry === 'object') {
+      kept.push({ matches: whole(entry.matches, 0), misses: whole(entry.misses, 0) });
+    }
+  }
+  return kept.slice(-RECENT_KEPT);
+}
+
+function adoptDial(saved, fallback) {
+  if (!saved || typeof saved !== 'object') {
+    return fallback;
+  }
+  return {
+    tileCount: Number.isFinite(saved.tileCount) ? saved.tileCount : fallback.tileCount,
+    lookalike: Number.isFinite(saved.lookalike) ? saved.lookalike : fallback.lookalike
+  };
 }
 
 function whole(value, fallback) {

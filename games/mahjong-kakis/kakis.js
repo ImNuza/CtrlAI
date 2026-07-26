@@ -18,7 +18,8 @@ const ARROW_X = ['16.6%', '50%', '83.4%'];
 const AFFINITY = {
   near_miss: 'lily',
   round_win: 'beng',
-  idle_nudge: 'rose'
+  idle_nudge: 'rose',
+  return_visit: 'lily'
 };
 
 export const KAKIS = [

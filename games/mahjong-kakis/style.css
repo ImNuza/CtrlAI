@@ -93,8 +93,6 @@ body {
   border-radius: 50%;
   background-color: var(--color-surface);
   box-shadow: var(--shadow-card);
-  transition: transform var(--dur-fast) var(--ease-out),
-              box-shadow var(--dur-fast) var(--ease-out);
 }
 
 .mk-portrait svg {
@@ -110,9 +108,14 @@ body {
   color: var(--color-text);
 }
 
+/* The ring is declared with its transition here and nowhere else, so it eases
+   in on the kaki who starts talking and disappears the same instant the class
+   leaves the one who stopped. Two portraits can never wear it at once. */
 .mk-kaki.is-speaking .mk-portrait {
   transform: translateY(-4px);
   box-shadow: 0 0 0 4px var(--accent), var(--shadow-raised);
+  transition: transform var(--dur-fast) var(--ease-out),
+              box-shadow var(--dur-fast) var(--ease-out);
 }
 
 .mk-kaki.is-speaking .mk-kaki-name {
