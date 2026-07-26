@@ -845,9 +845,19 @@ async function run(browser) {
       opacity: style.opacity,
       pointerEvents: style.pointerEvents,
       contrast: Math.round(ratio * 100) / 100,
-      colour: style.color + ' on ' + style.backgroundColor
+      colour: style.color + ' on ' + style.backgroundColor,
+      transition: style.transitionProperty
     };
   });
+  // Both resting states read fine, the crossfade between them does not: easing
+  // the fill while the label colour snaps puts white on pale sage for a few
+  // frames. Pinned here so a change to the shared button rule cannot bring the
+  // ambiguous frames back.
+  check('the primary button snaps between states instead of crossfading through an unreadable frame',
+    notYet.transition.indexOf('transform') !== -1 &&
+      notYet.transition.indexOf('background-color') === -1 &&
+      notYet.transition.indexOf('color') === -1,
+    'transition-property ' + notYet.transition);
   const beforeNudge = await returnPage.evaluate(function () {
     return {
       heading: document.getElementById('prompt-heading').textContent.trim(),

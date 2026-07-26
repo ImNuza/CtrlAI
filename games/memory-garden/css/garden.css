@@ -163,6 +163,14 @@
    on screen do nothing at all. Here it keeps a fully readable label, stays
    tappable, and answers the tap with a line rather than a scolding. */
 
+/* Both ends of the not yet flip are readable, the crossfade between them is
+   not: the shared rule eases background-color over 140ms while the label colour
+   snaps, so white text sits on a pale sage wash for those frames. Transform
+   only, so the press feedback stays and the state change lands in one frame. */
+#prompt-next {
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+
 #prompt-next[aria-disabled="true"] {
   opacity: 1;
   pointer-events: auto;
