@@ -54,3 +54,11 @@ Placeholder until final. If the run halted early, check git log and the Status l
 All three cores landed within about 40 minutes of each other and each was independently re-verified by the conductor (their QA scripts rerun from scratch, inspector rerun, screenshots viewed). Gate released to all three orchestrators at about 00:57 for Milestone B toward full definitions of done, target two hours, commit per sub-milestone.
 
 Incident, resolved: a Memory Garden coder ran git commit --amend over a conductor build-report commit. The orchestrator caught it, restored the commit byte for byte, recommitted its work cleanly, and the conductor verified history sanity (every game commit touches only its own directory, f58fe84 intact). Standing rule issued to all agents: never amend.
+
+## Adversarial QA sweep (phase 2)
+
+Nine independent Opus checkers ran in a workflow, three lenses per game: fresh-player drive (including markup injection into text inputs and double-tap attacks), senior floor deep audit of every reachable screen state, and content plus honesty audit. Result: 0 blockers, 20 serious, 21 minor, 18 nit findings, all with concrete evidence.
+
+The serious findings cluster into cross-game classes: stale-tap-through on view transitions (a second tap lands on the control that replaces the one just pressed: Memory Garden could skip the object picker or the whole grow ceremony, Scam Dojo could drop a double-tapper into the comply path), primary actions or feedback below the fold (Memory Garden question 3, Scam Dojo coaching notes and walkthrough steps, Mahjong Kakis progress bar at 16 tiles), template grammar at edges (welcome lines ungrammatical at one plant, name chips doubling what kakis already say, recap explaining a different payment method than its line), a silent brick when a content fetch fails, and a mid-aim 42px layout shift when a banter bubble auto-dismisses.
+
+Fix rounds dispatched to all three orchestrators at about 02:30 with per-game findings digests, triage rules (serious must fix, minor fix or document, nit judgment), the shared transition-guard guidance, and orders to extend their QA suites against regressions, rerun everything green, update READMEs, and report dispositions.
