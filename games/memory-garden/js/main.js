@@ -3,7 +3,7 @@
   plant. Tap only, no timers, nothing that can be failed.
 */
 
-import { registerBank, aiGenerate } from '../../../shared/ai.js';
+import { registerBank, aiGenerate, hashString } from '../../../shared/ai.js';
 import { loadState, saveState } from '../../../shared/storage.js';
 import { OBJECTS, PROMPTS } from './data.js';
 import { composePlant } from './composer.js';
@@ -14,6 +14,15 @@ const STATE_VERSION = 1;
 const BANK_URL = '/games/memory-garden/content/garden-lines.json';
 const MIN_PLOTS = 6;
 const FREE_TEXT_STEP = 'feeling';
+
+// A tap that lands inside a section which only just appeared is almost always the
+// second half of a double tap aimed at the screen before it. Swallowing those for
+// a third of a second is the difference between a shaky finger and a memory the
+// player never chose.
+const STALE_TAP_MS = 350;
+
+// Only ids this game could have written are allowed back out of storage.
+const PLANT_ID_PATTERN = /^[A-Za-z0-9_-]{1,64}$/;
 
 const SOIL_MOUND = '<svg viewBox="0 0 120 74" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">' +
   '<ellipse cx="60" cy="56" rx="44" ry="15" fill="#6f5a44"/>' +
@@ -35,7 +44,35 @@ let lastPlot = null;
 // The plant that was just grown, so the garden can point at it once and then
 // forget. Cleared by the render that used it, never by a timer.
 let freshPlantId = null;
+// One grow at a time. growPlant crosses an await, and without this a second
+// activation in that window would write a second plant.
+let growing = false;
+// Where the garden was standing when the story overlay opened, so closing it puts
+// the player back where they were instead of at some scroll position they never chose.
+let gardenScrollY = 0;
 const el = {};
+
+/* ---- per load freshness -------------------------------------------------
+   shared/ai.js rotates its picks off a module counter that resets with the page,
+   so without a salt the first line of every event is byte identical on every
+   fresh load. One salt per load, one counter per event, and the demo stops
+   greeting three reloads with the same sentence. Captions are deliberately left
+   out: a saved story has to read the same way every time it is opened. */
+
+const LOAD_SALT = String(Date.now()) + '.' + String(Math.random());
+const freshCalls = new Map();
+
+function freshSeed(event) {
+  const turn = (freshCalls.get(event) || 0) + 1;
+  freshCalls.set(event, turn);
+  return hashString(LOAD_SALT + ':' + event + ':' + turn);
+}
+
+function generateFresh(event, context) {
+  const merged = context === undefined || context === null ? {} : context;
+  merged.seed = freshSeed(event);
+  return aiGenerate({ game: GAME, event: event, context: merged });
+}
 
 /* ---- state -------------------------------------------------------------- */
 
@@ -46,6 +83,8 @@ function emptyGarden() {
 function isPlant(value) {
   return value !== null &&
     typeof value === 'object' &&
+    typeof value.id === 'string' &&
+    PLANT_ID_PATTERN.test(value.id) &&
     typeof value.objectId === 'string' &&
     value.answers !== null &&
     typeof value.answers === 'object';
@@ -113,12 +152,34 @@ function captionContext(plant) {
 
 /* ---- views -------------------------------------------------------------- */
 
+let currentView = '';
+let viewShownAt = 0;
+
+function markViewShown(name) {
+  if (name !== currentView) {
+    currentView = name;
+    viewShownAt = Date.now();
+  }
+}
+
+/* True when this tap arrived too soon after a whole section changed under the
+   finger. Stepping between questions is not a section change, so answering fast
+   is never punished. A keyboard activation reports detail 0 and always goes
+   through: a key press cannot be the tail of a double tap. */
+function staleTap(event) {
+  if (event && event.detail === 0) {
+    return false;
+  }
+  return Date.now() - viewShownAt < STALE_TAP_MS;
+}
+
 function showView(name, moveFocus) {
   const keys = Object.keys(VIEWS);
   for (let i = 0; i < keys.length; i += 1) {
     const view = VIEWS[keys[i]];
     document.getElementById(view.section).hidden = keys[i] !== name;
   }
+  markViewShown(name);
   if (moveFocus) {
     document.getElementById(VIEWS[name].heading).focus();
   }
@@ -126,36 +187,51 @@ function showView(name, moveFocus) {
 
 /* ---- garden ------------------------------------------------------------- */
 
+/* Built as elements rather than a string of HTML. Everything here comes back out
+   of localStorage, and a plant id built into markup by concatenation is a hole
+   the isPlant filter should not have to be the only guard on. */
+
+function plotButton(plant, fresh) {
+  const built = composePlant({ objectId: plant.objectId, answers: plant.answers });
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'plot plot-filled' + (fresh ? ' plot-new' : '');
+  button.dataset.plantId = plant.id;
+  button.setAttribute('aria-label', objectById(plant.objectId).name + ' memory' +
+    (fresh ? ', just planted' : '') + '. Tap to open the story.');
+  button.innerHTML = built.svg;
+  return button;
+}
+
+function emptyPlotButton() {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'plot';
+  button.dataset.empty = 'true';
+  button.setAttribute('aria-label', 'Empty plot. Tap to plant a memory here.');
+  button.innerHTML = SOIL_MOUND;
+  return button;
+}
+
 function renderPlots() {
   const plants = garden.plants;
   const total = Math.max(MIN_PLOTS, Math.ceil((plants.length + 1) / 3) * 3);
-  const parts = [];
+  const nodes = [];
 
   for (let i = 0; i < total; i += 1) {
     const plant = plants[i];
-    if (plant) {
-      const built = composePlant({ objectId: plant.objectId, answers: plant.answers });
-      const fresh = plant.id === freshPlantId;
-      parts.push('<button type="button" class="plot plot-filled' + (fresh ? ' plot-new' : '') +
-        '" data-plant-id="' + plant.id +
-        '" aria-label="' + objectById(plant.objectId).name + ' memory' +
-        (fresh ? ', just planted' : '') + '. Tap to open the story.">' +
-        built.svg + '</button>');
-    } else {
-      parts.push('<button type="button" class="plot" data-empty="true"' +
-        ' aria-label="Empty plot. Tap to plant a memory here.">' + SOIL_MOUND + '</button>');
-    }
+    nodes.push(plant ? plotButton(plant, plant.id === freshPlantId) : emptyPlotButton());
   }
-  el.plots.innerHTML = parts.join('');
+  el.plots.replaceChildren.apply(el.plots, nodes);
   freshPlantId = null;
 }
 
 async function renderWelcome() {
   const count = garden.plants.length;
-  const line = await aiGenerate({
-    game: GAME,
-    event: count === 0 ? 'welcome_first' : 'welcome_back',
-    context: { count: count }
+  // The count arrives already worded, so no template has to carry a plural noun
+  // that reads "1 memories" on the visit every player makes.
+  const line = await generateFresh(count === 0 ? 'welcome_first' : 'welcome_back', {
+    count: count === 1 ? 'one memory' : count + ' memories'
   });
   el.welcomeLine.textContent = line.text;
 }
@@ -168,19 +244,47 @@ function renderGarden() {
 /* ---- picker ------------------------------------------------------------- */
 
 function renderObjects() {
-  const parts = [];
+  const nodes = [];
   for (let i = 0; i < OBJECTS.length; i += 1) {
     const item = OBJECTS[i];
-    parts.push('<button type="button" class="object-card" data-object-id="' + item.id + '">' +
-      item.art + '<span>' + item.name + '</span></button>');
+    const card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'object-card';
+    card.dataset.objectId = item.id;
+    card.innerHTML = item.art;
+
+    /* The written blurb in data.js stays off the card on purpose. Measured at
+       360px it forces the 2 column grid past the viewport and drops the card to
+       two or three words a line, which is the opposite of calm. See the README
+       known issues note. */
+    const name = document.createElement('span');
+    name.textContent = item.name;
+    card.appendChild(name);
+
+    nodes.push(card);
   }
-  el.objects.innerHTML = parts.join('');
+  el.objects.replaceChildren.apply(el.objects, nodes);
 }
 
 /* ---- prompts ------------------------------------------------------------ */
 
 function setNextReady(ready) {
   el.promptNext.setAttribute('aria-disabled', ready ? 'false' : 'true');
+  if (ready) {
+    clearNudge();
+  }
+}
+
+function clearNudge() {
+  el.promptNudge.textContent = '';
+}
+
+// The not yet button still answers a tap, and it answers kindly. No shake, no
+// red, no telling anyone off for pressing the biggest thing on the screen.
+function showNudge() {
+  el.promptNudge.textContent = draft.step === PROMPTS.length - 1
+    ? 'Pick one of the answers first, then we grow it.'
+    : 'Pick one of the answers first, then we carry on.';
 }
 
 /* The question itself is generated, so the same three steps never read exactly
@@ -192,7 +296,7 @@ async function renderPromptHeading(prompt) {
   headingToken += 1;
   const token = headingToken;
   el.promptHeading.textContent = prompt.question;
-  const line = await aiGenerate({ game: GAME, event: 'prompt_' + prompt.id, context: {} });
+  const line = await generateFresh('prompt_' + prompt.id, {});
   if (token === headingToken && line.meta.source === 'bank' && line.text !== '') {
     el.promptHeading.textContent = line.text;
   }
@@ -205,16 +309,21 @@ function renderPrompt() {
   el.promptStep.textContent = 'Question ' + (draft.step + 1) + ' of ' + PROMPTS.length;
   renderPromptHeading(prompt);
   el.freeTextField.hidden = prompt.id !== FREE_TEXT_STEP;
+  clearNudge();
 
-  const parts = [];
+  const nodes = [];
   for (let i = 0; i < prompt.options.length; i += 1) {
     const option = prompt.options[i];
     const picked = option.id === chosen;
-    parts.push('<button type="button" class="chip' + (picked ? ' is-selected' : '') +
-      '" data-option-id="' + option.id + '" aria-pressed="' + (picked ? 'true' : 'false') + '">' +
-      option.label + '</button>');
+    const chip = document.createElement('button');
+    chip.type = 'button';
+    chip.className = 'chip' + (picked ? ' is-selected' : '');
+    chip.dataset.optionId = option.id;
+    chip.setAttribute('aria-pressed', picked ? 'true' : 'false');
+    chip.textContent = option.label;
+    nodes.push(chip);
   }
-  el.promptChips.innerHTML = parts.join('');
+  el.promptChips.replaceChildren.apply(el.promptChips, nodes);
 
   el.promptNext.textContent = draft.step === PROMPTS.length - 1 ? 'Grow this memory' : 'Next';
   setNextReady(Boolean(chosen));
@@ -223,37 +332,46 @@ function renderPrompt() {
 /* ---- growing ------------------------------------------------------------ */
 
 async function growPlant() {
-  const built = composePlant({ objectId: draft.objectId, answers: draft.answers });
-  const plant = {
-    id: 'mg-' + Date.now().toString(36) + '-' + built.seed.toString(36),
-    createdAt: new Date().toISOString(),
-    objectId: draft.objectId,
-    answers: {
-      who: draft.answers.who,
-      where: draft.answers.where,
-      feeling: draft.answers.feeling
-    },
-    freeText: el.freeText.value.trim(),
-    seed: built.seed,
-    caption: ''
-  };
+  if (growing) {
+    return;
+  }
+  growing = true;
+  let grownPhrase = '';
+  try {
+    const built = composePlant({ objectId: draft.objectId, answers: draft.answers });
+    const plant = {
+      // Time, memory and a throw of the dice. Two identical memories planted in
+      // the same millisecond still cannot collide on an id.
+      id: 'mg-' + Date.now().toString(36) + '-' + built.seed.toString(36) + '-' +
+        Math.floor(Math.random() * 1679616).toString(36),
+      createdAt: new Date().toISOString(),
+      objectId: draft.objectId,
+      answers: {
+        who: draft.answers.who,
+        where: draft.answers.where,
+        feeling: draft.answers.feeling
+      },
+      freeText: el.freeText.value.trim(),
+      seed: built.seed,
+      caption: ''
+    };
 
-  const caption = await aiGenerate({ game: GAME, event: 'caption', context: captionContext(plant) });
-  plant.caption = caption.text;
+    const caption = await aiGenerate({ game: GAME, event: 'caption', context: captionContext(plant) });
+    plant.caption = caption.text;
 
-  garden.plants.push(plant);
-  saveState(NS, garden);
-  freshPlantId = plant.id;
+    garden.plants.push(plant);
+    saveState(NS, garden);
+    freshPlantId = plant.id;
 
-  el.ceremonyStage.className = 'stage stage-grow';
-  el.ceremonyStage.innerHTML = built.svg;
-  showView('ceremony', true);
+    el.ceremonyStage.className = 'stage stage-grow';
+    el.ceremonyStage.innerHTML = built.svg;
+    grownPhrase = objectById(plant.objectId).phrase;
+    showView('ceremony', true);
+  } finally {
+    growing = false;
+  }
 
-  const line = await aiGenerate({
-    game: GAME,
-    event: 'ceremony_grow',
-    context: { object: objectById(plant.objectId).phrase }
-  });
+  const line = await generateFresh('ceremony_grow', { object: grownPhrase });
   el.ceremonyLine.textContent = line.text;
 }
 
@@ -268,12 +386,21 @@ function findPlant(id) {
   return null;
 }
 
+// The overlay is taller than a phone whenever the caption runs long, so it says
+// so out loud instead of leaving the ending under a band that looks like the end.
+function updateMoreCue() {
+  const overflows = el.replay.scrollHeight > el.replay.clientHeight + 1;
+  const atBottom = el.replay.scrollTop + el.replay.clientHeight >= el.replay.scrollHeight - 4;
+  el.replayMore.hidden = !overflows || atBottom;
+}
+
 async function openReplay(plantId, source) {
   const plant = findPlant(plantId);
   if (plant === null) {
     return;
   }
   lastPlot = source || null;
+  gardenScrollY = window.scrollY;
 
   const built = composePlant({ objectId: plant.objectId, answers: plant.answers });
   el.replayTitle.textContent = objectById(plant.objectId).name;
@@ -284,13 +411,16 @@ async function openReplay(plantId, source) {
     labelFor('where', plant.answers.where),
     labelFor('feeling', plant.answers.feeling)
   ];
-  const parts = [];
+  const nodes = [];
   for (let i = 0; i < chips.length; i += 1) {
     if (chips[i] !== '') {
-      parts.push('<span class="chip chip-static">' + chips[i] + '</span>');
+      const chip = document.createElement('span');
+      chip.className = 'chip chip-static';
+      chip.textContent = chips[i];
+      nodes.push(chip);
     }
   }
-  el.replayAnswers.innerHTML = parts.join('');
+  el.replayAnswers.replaceChildren.apply(el.replayAnswers, nodes);
   el.replayCaption.textContent = plant.caption;
 
   const told = typeof plant.freeText === 'string' ? plant.freeText.trim() : '';
@@ -299,14 +429,21 @@ async function openReplay(plantId, source) {
 
   el.replayLine.textContent = '';
   el.replay.hidden = false;
+  el.replay.scrollTop = 0;
+  markViewShown('replay');
   el.replayTitle.focus();
+  updateMoreCue();
 
-  const line = await aiGenerate({ game: GAME, event: 'replay_open', context: {} });
+  const line = await generateFresh('replay_open', {});
   el.replayLine.textContent = line.text;
+  updateMoreCue();
 }
 
 function closeReplay() {
   el.replay.hidden = true;
+  el.replayMore.hidden = true;
+  markViewShown('garden');
+  window.scrollTo(0, gardenScrollY);
   if (lastPlot && document.contains(lastPlot)) {
     lastPlot.focus();
   }
@@ -359,9 +496,17 @@ function backToGarden() {
 }
 
 function bind() {
-  el.startGrow.addEventListener('click', startFlow);
+  el.startGrow.addEventListener('click', function (event) {
+    if (staleTap(event)) {
+      return;
+    }
+    startFlow();
+  });
 
   el.plots.addEventListener('click', function (event) {
+    if (staleTap(event)) {
+      return;
+    }
     const plot = event.target.closest('.plot');
     if (plot === null) {
       return;
@@ -374,6 +519,9 @@ function bind() {
   });
 
   el.objects.addEventListener('click', function (event) {
+    if (staleTap(event)) {
+      return;
+    }
     const card = event.target.closest('.object-card');
     if (card === null) {
       return;
@@ -381,11 +529,16 @@ function bind() {
     draft.objectId = card.dataset.objectId;
     draft.answers = {};
     draft.step = 0;
+    // A note typed for one object must never follow the player to another.
+    el.freeText.value = '';
     renderPrompt();
     showView('prompt', true);
   });
 
   el.promptChips.addEventListener('click', function (event) {
+    if (staleTap(event)) {
+      return;
+    }
     const chip = event.target.closest('.chip');
     if (chip === null) {
       return;
@@ -401,8 +554,12 @@ function bind() {
     setNextReady(true);
   });
 
-  el.promptNext.addEventListener('click', function () {
+  el.promptNext.addEventListener('click', function (event) {
+    if (staleTap(event)) {
+      return;
+    }
     if (el.promptNext.getAttribute('aria-disabled') === 'true') {
+      showNudge();
       return;
     }
     if (draft.step < PROMPTS.length - 1) {
@@ -414,7 +571,10 @@ function bind() {
     growPlant();
   });
 
-  el.promptBack.addEventListener('click', function () {
+  el.promptBack.addEventListener('click', function (event) {
+    if (staleTap(event)) {
+      return;
+    }
     if (draft.step > 0) {
       draft.step -= 1;
       renderPrompt();
@@ -424,19 +584,39 @@ function bind() {
     showView('picker', true);
   });
 
-  el.ceremonyDone.addEventListener('click', backToGarden);
-  el.replayClose.addEventListener('click', closeReplay);
+  el.ceremonyDone.addEventListener('click', function (event) {
+    if (staleTap(event)) {
+      return;
+    }
+    backToGarden();
+  });
+
+  el.replayClose.addEventListener('click', function (event) {
+    if (staleTap(event)) {
+      return;
+    }
+    closeReplay();
+  });
 
   el.replay.addEventListener('click', function (event) {
+    if (staleTap(event)) {
+      return;
+    }
     if (event.target === el.replay) {
       closeReplay();
     }
   });
   el.replay.addEventListener('keydown', keepFocusInReplay);
+  el.replay.addEventListener('scroll', updateMoreCue);
 
   const backButtons = document.querySelectorAll('[data-back="garden"]');
   for (let i = 0; i < backButtons.length; i += 1) {
-    backButtons[i].addEventListener('click', backToGarden);
+    backButtons[i].addEventListener('click', function (event) {
+      if (staleTap(event)) {
+        return;
+      }
+      backToGarden();
+    });
   }
 }
 
@@ -451,6 +631,7 @@ function cacheElements() {
   el.promptHeading = document.getElementById('prompt-heading');
   el.promptChips = document.getElementById('prompt-chips');
   el.promptNext = document.getElementById('prompt-next');
+  el.promptNudge = document.getElementById('prompt-nudge');
   el.promptBack = document.getElementById('prompt-back');
   el.freeTextField = document.getElementById('freetext-field');
   el.freeText = document.getElementById('freetext');
@@ -465,6 +646,7 @@ function cacheElements() {
   el.replayTold = document.getElementById('replay-told');
   el.replayFreeText = document.getElementById('replay-freetext');
   el.replayLine = document.getElementById('replay-line');
+  el.replayMore = document.getElementById('replay-more');
   el.replayClose = document.getElementById('replay-close');
 }
 

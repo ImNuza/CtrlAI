@@ -8,30 +8,30 @@
     "You can start anywhere lah. Small things grow just as well as big ones."
   ],
   "welcome_back": [
-    "Welcome back. There are {count} memories growing here now.",
-    "Your garden has {count} plants in it. Tap any one to hear its story again.",
-    "Everything you planted is still here, all {count} of them. Take a look.",
-    "Good to see you again. The garden kept all {count} of your stories safe.",
-    "Nothing wilted while you were away, all {count} of them still standing.",
-    "Back again. The garden counted {count} stories and lost none of them."
+    "Welcome back. Everything you planted is still here, {count} growing quietly.",
+    "Good to see you again. Nothing wilted while you were away, {count} still standing.",
+    "Your garden is right where you left it, {count} kept safe.",
+    "Back again. The soil held on to every bit of it, {count} waiting for you.",
+    "Nothing goes missing here. Tap any plant to hear its story again, {count} sitting there for you.",
+    "Take your time lah. The garden was quiet without you, {count} still coming up green."
   ],
   "ceremony_grow": [
     "There. Look at it come up, slow at first and then all at once. This one remembers {object}.",
     "Steady now, no rush. Something green is pushing up out of the soil, and it already knows {object}.",
     "Wah. Leaf by leaf, the whole afternoon is coming back. The soil understands {object}.",
     "Give it a moment. Roots go down first, that is just how it works. After that, nothing in this garden forgets {object}.",
-    "Here it is. Still small, still stubborn. Down at the roots it already holds {object}.",
-    "There it is, green and quite pleased with itself. The whole garden knows {object} now."
+    "Here it is. Still small, still stubborn. The soil took it all in, {object} and the whole afternoon with it.",
+    "There it is, green and quite pleased with itself. The whole garden knows about it now, {object} and every bit of that day."
   ],
   "caption": [
     "One ordinary afternoon {where}, the light going soft, nobody in a hurry. Somebody talked through all of it, {who} mostly, and it still comes back {feeling} every time the garden remembers {object}.",
     "Nothing much happened {where}, only a long afternoon and the smell of rain coming. You would remember {who} too if you had been there, and you would see why this one has stayed {feeling} and why the garden still remembers {object}.",
     "Static on somebody's radio, an afternoon {where}, and company the whole way through, {who} usually. The garden remembers {object} now, and it has stayed {feeling} all this time.",
-    "You can still hear {who}. Not the heat, not the noise {where}, just that, and it comes back {feeling} every time the garden remembers {object}.",
+    "You can still hear it. Not the heat, not the noise {where}, just {who} talking, and it comes back {feeling} every time the garden remembers {object}.",
     "Some memories are loud, this one is not. An afternoon {where}, steam off somebody's cup, {who} talking through all of it, a garden that still remembers {object}, and a feeling that has not changed, {feeling} even now.",
-    "Small thing, long shadow. The garden took one afternoon {where} with company in it, {who} mostly, and grew {object} into something green that still comes back {feeling}.",
+    "Small thing, long shadow. The garden took one afternoon {where} with company in it, {who} mostly, and grew it into something green. It still comes back {feeling}, {object} and everything around it.",
     "Nobody thought to write it down, so the garden did it instead: one afternoon {where}, cool tiles underfoot, {who} somewhere close, {object} sitting there through all of it, and a feeling that has not gone anywhere, {feeling} as ever.",
-    "Two people, one afternoon {where}. That was all it took, and it still comes back {feeling}, the sound of {who} laughing, the garden quietly remembering {object}."
+    "Good company, one afternoon {where}. That was all it took, and it still comes back {feeling}, the sound of {who} laughing, the garden quietly remembering {object}."
   ],
   "replay_open": [
     "Take your time with this one. The story is not going anywhere.",

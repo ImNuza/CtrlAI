@@ -157,6 +157,31 @@
   cursor: default;
 }
 
+/* ---- The not yet button and its nudge -----------------------------------
+   The shared rule fades a disabled button to 55% and takes its pointer events
+   away, which puts the label at about 3:1 and makes a tap on the biggest thing
+   on screen do nothing at all. Here it keeps a fully readable label, stays
+   tappable, and answers the tap with a line rather than a scolding. */
+
+#prompt-next[aria-disabled="true"] {
+  opacity: 1;
+  pointer-events: auto;
+  border-color: var(--color-border);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  filter: none;
+}
+
+.nudge {
+  color: var(--color-text-muted);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+}
+
+.nudge:empty {
+  display: none;
+}
+
 /* ---- Grandchild note ----------------------------------------------------
    Optional on purpose. Nothing downstream ever requires it, so a player who
    only taps never learns it is there, and a grandchild who wants to write can. */
@@ -195,6 +220,15 @@
   border-left: 4px solid var(--accent);
 }
 
+/* A grandchild can type 120 characters with no space in them, a URL or an email
+   or one long run-on, and an unbroken run like that would otherwise push the
+   whole story panel off the side of the phone. Same treatment .object-card
+   already gets, applied where the free text actually lands. */
+.told-line,
+#replay-caption {
+  overflow-wrap: anywhere;
+}
+
 .told-line {
   font-style: italic;
 }
@@ -222,12 +256,14 @@
   height: auto;
 }
 
+/* Small on purpose. Every pixel the plant takes at the top of the story overlay
+   is a pixel the caption and the closing line lose off the bottom of the phone. */
 .stage-small {
-  min-height: 220px;
+  min-height: 0;
 }
 
 .stage-small svg {
-  width: 170px;
+  width: 120px;
 }
 
 /* The ceremony assembles the plant in layers: the pot settles, the stem rises
@@ -354,18 +390,20 @@
   align-items: flex-start;
   justify-content: center;
   padding:
-    calc(var(--safe-top) + var(--sp-5))
-    calc(var(--safe-right) + var(--sp-4))
+    calc(var(--safe-top) + var(--sp-3))
+    calc(var(--safe-right) + var(--sp-3))
     0
-    calc(var(--safe-left) + var(--sp-4));
+    calc(var(--safe-left) + var(--sp-3));
   background-color: var(--color-bg);
   overflow-y: auto;
+  /* Reaching the end of the story must not start scrolling the garden behind it. */
+  overscroll-behavior: contain;
 }
 
 .overlay-panel {
   display: flex;
   flex-direction: column;
-  gap: var(--sp-4);
+  gap: var(--sp-3);
   width: 100%;
   max-width: var(--page-max);
 }
@@ -373,13 +411,17 @@
 /* A long story can outrun the screen, so the way out stays pinned in view.
    The band carries the card colour, otherwise text slides through the button. */
 .overlay-panel {
-  padding-bottom: 0;
+  padding: var(--sp-4) var(--sp-4) 0;
 }
 
 .overlay-foot {
   position: sticky;
   bottom: 0;
-  padding: var(--sp-4) 0 calc(var(--safe-bottom) + var(--sp-5));
+  padding: var(--sp-3) 0 calc(var(--safe-bottom) + var(--sp-4));
+  /* A real edge. The gradient below fades text sliding under the band, but a
+     surface to transparent fade painted on surface shows nothing at rest, so the
+     band needs a line of its own to read as an edge and not as the end. */
+  border-top: 2px solid var(--color-border);
   background-color: var(--color-surface);
 }
 
@@ -393,4 +435,23 @@
   height: var(--sp-5);
   background: linear-gradient(to top, var(--color-surface), transparent);
   pointer-events: none;
+}
+
+/* Shown only while there is genuinely more story under the band, and gone the
+   moment the reader reaches the bottom. */
+.overlay-more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  padding-bottom: var(--sp-3);
+  color: var(--color-text-muted);
+  font-size: var(--fs-body);
+  line-height: var(--lh-tight);
+}
+
+.overlay-more .chev {
+  width: 28px;
+  height: 28px;
+  flex: none;
 }

@@ -15,6 +15,16 @@ import { hashString, makeRng } from '../../../shared/ai.js';
 const BASE_X = 60;
 const SOIL_Y = 128;
 
+/* The ornaments are drawn around a local origin and reach a long way left of it,
+   the seaside wave furthest at -19.5 before its tilt. Anchored at x 14 on the
+   succulent that lands outside a box starting at 0, and an outermost svg clips at
+   its own viewport, so the window frames and roof lines were being sliced flat.
+   The box starts left of every one of them instead, and gains the same on the
+   right so the plant stays centred on BASE_X. */
+const VIEW_MIN_X = -8;
+const VIEW_WIDTH = 136;
+const VIEW_HEIGHT = 160;
+
 const POT_BODY = '#8a5a3b';
 const POT_RIM = '#6f472c';
 const SOIL = '#4a3524';
@@ -749,7 +759,8 @@ export function composePlant(memory) {
   /* Every layer is an outer group carrying the placement transform and an inner
      group carrying nothing, so the ceremony can animate a transform on the inner
      one without wiping out the lean or the ornament's own position. */
-  const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 160" role="img"' +
+  const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="' + VIEW_MIN_X + ' 0 ' +
+    VIEW_WIDTH + ' ' + VIEW_HEIGHT + '" role="img"' +
     ' aria-label="' + label + '"' +
     ' data-species="' + species + '"' +
     ' data-palette="' + feeling + '"' +

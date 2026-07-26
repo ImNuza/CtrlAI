@@ -42,15 +42,18 @@
     <button type="button" class="btn btn-quiet btn-block" data-back="garden">Back to the garden</button>
   </section>
 
+  <!-- The primary button sits directly under the chips on every step, so the
+       optional note can never push the way forward past the bottom of a phone. -->
   <section id="view-prompt" class="view" hidden>
     <p class="muted" id="prompt-step">Question 1 of 3</p>
     <h2 id="prompt-heading" tabindex="-1">Who is in this memory with you?</h2>
     <div class="row" id="prompt-chips"></div>
+    <button type="button" class="btn btn-block" id="prompt-next" aria-disabled="true">Next</button>
+    <p class="nudge" id="prompt-nudge" role="status" aria-live="polite"></p>
     <div class="freetext" id="freetext-field" hidden>
       <label class="freetext-label" for="freetext">For the grandchild: add one line of the story (optional)</label>
       <textarea class="freetext-input" id="freetext" rows="2" maxlength="120"></textarea>
     </div>
-    <button type="button" class="btn btn-block" id="prompt-next" aria-disabled="true">Next</button>
     <button type="button" class="btn btn-quiet btn-block" id="prompt-back">Back</button>
   </section>
 
@@ -64,8 +67,12 @@
 </main>
 
 <div id="view-replay" class="overlay" role="dialog" aria-modal="true" aria-labelledby="replay-title" hidden>
+  <!-- The generated line reads as an opener, and three answer chips plus a full
+       caption are already taller than a phone, so it sits at the top where it is
+       actually read instead of under the sticky foot. -->
   <div class="overlay-panel card">
     <h2 id="replay-title" tabindex="-1">Your story</h2>
+    <p class="muted" id="replay-line" aria-live="polite"></p>
     <div class="stage stage-small" id="replay-plant"></div>
     <div class="row" id="replay-answers"></div>
     <p id="replay-caption"></p>
@@ -73,8 +80,10 @@
       <p class="muted told-lead">As told by the grandchild</p>
       <p class="told-line" id="replay-freetext"></p>
     </div>
-    <p class="muted" id="replay-line" aria-live="polite"></p>
     <div class="overlay-foot">
+      <p class="overlay-more" id="replay-more" hidden>More below
+        <svg class="chev" viewBox="0 0 24 24" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg"><path d="M5 9 L12 16.5 L19 9" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </p>
       <button type="button" class="btn btn-block" id="replay-close">Back to garden</button>
     </div>
   </div>
