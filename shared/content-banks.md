@@ -10,7 +10,7 @@ swapping in a real model later is an edit to one function body, not a rewrite of
 One JSON file per game, under its own directory:
 
 ```
-games/memory-garden/content/plants.json
+games/memory-garden/content/garden-lines.json
 games/mahjong-kakis/content/kaki-banter.json
 games/scam-dojo/content/scam-scripts.json
 ```

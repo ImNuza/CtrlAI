@@ -20,6 +20,14 @@
   meta.source is how the UI and the demo tell the two apart, so keep setting it
   ("bank", "fallback", and later "llm").
   ====================================================================
+
+  Determinism note for callers: template picks are seeded per (game, event)
+  call count, so the Nth call of an event in a page load lands on the same
+  template every session. For events that fire once per load (welcomes,
+  greetings), pass context.seed with per-visit entropy, for example a hash of
+  the player name and visit count, or a per-load salt. Memory Garden and
+  Mahjong Kakis both use this pattern; without it a once-per-load line feels
+  frozen across visits.
 */
 
 const banks = new Map();

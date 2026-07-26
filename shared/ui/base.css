@@ -181,6 +181,12 @@ a.chip {
   transform: scale(0.97);
 }
 
+/* Caution: opacity 0.55 drops label contrast below the senior floor and
+   pointer-events none swallows taps with no feedback. For controls a senior
+   is looking at, prefer Memory Garden's pattern (garden.css #prompt-next):
+   full opacity, taps still answered, styled as a quiet not-yet state with a
+   gentle nudge. As of tonight no shipped screen renders through this rule;
+   revisit it in the real build before anything does. */
 .btn[aria-disabled="true"] {
   opacity: 0.55;
   pointer-events: none;

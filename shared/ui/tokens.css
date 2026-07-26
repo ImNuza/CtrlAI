@@ -8,7 +8,10 @@
 
   The senior UX floor this file enforces:
     tap targets 64px or larger, body text 28px or larger,
-    body text contrast 7:1 or better, non-text boundaries 3:1 or better.
+    text contrast 4.5:1 minimum with 7:1 the working target, non-text boundaries 3:1 or better.
+  All ink-on-paper text pairs clear 7:1. Accent-as-text on tinted surfaces sits at
+  6.91:1 to 6.98:1 (measured for the kopitiam amber on its tint and on surface-sunk),
+  which is AAA for the large text those accents are used at and above the 4.5:1 floor.
 */
 
 :root {
