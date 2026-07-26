@@ -1,0 +1,137 @@
+/*
+  CtrlAI design tokens.
+  Custom properties only. No selectors that paint anything, no layout. base.css consumes these.
+
+  Every ratio below was computed with the WCAG 2.x relative luminance formula
+  (linearise each sRGB channel, L = 0.2126R + 0.7152G + 0.0722B,
+  ratio = (Llighter + 0.05) / (Ldarker + 0.05)) and is written next to the pairing it applies to.
+
+  The senior UX floor this file enforces:
+    tap targets 64px or larger, body text 28px or larger,
+    body text contrast 7:1 or better, non-text boundaries 3:1 or better.
+*/
+
+:root {
+  /* ---- Surfaces -------------------------------------------------------- */
+  /* Warm paper rather than pure white. Less glare, calmer under fluorescent light. */
+  --color-bg: #fbf6ee;
+  --color-surface: #fffcf7;
+  --color-surface-sunk: #f3ebde;
+
+  /* ---- Text ------------------------------------------------------------ */
+  /* --color-text on --color-bg        15.60:1  AAA */
+  /* --color-text on --color-surface   16.40:1  AAA */
+  --color-text: #241c14;
+  /* --color-text-muted on --color-bg       7.89:1  AAA */
+  /* --color-text-muted on --color-surface  8.29:1  AAA */
+  --color-text-muted: #5a4a3a;
+  /* --color-text-on-accent on every accent below is 7.76:1 or better, see accents */
+  --color-text-on-accent: #ffffff;
+
+  /* ---- Lines and focus ------------------------------------------------- */
+  /* --color-border on --color-bg       3.12:1  passes WCAG 1.4.11 non-text (3:1) */
+  /* --color-border on --color-surface  3.27:1  passes WCAG 1.4.11 non-text (3:1) */
+  --color-border: #9c8a6c;
+  /* --color-focus on --color-bg  7.69:1  AAA, far past the 3:1 focus indicator floor */
+  --color-focus: #8a3200;
+  /* --color-danger on --color-bg  7.36:1  AAA. Used for warnings, never for shaming a player. */
+  --color-danger: #9b2226;
+
+  /* ---- Per game accents ------------------------------------------------
+     Each accent is dark enough to be body text on --color-bg at 7:1 or better,
+     and light text on the accent as a fill is also 7:1 or better, so either
+     direction is safe. The matching tint is a background wash only; --color-text
+     on each tint stays above 14:1.
+  */
+
+  /* Memory Garden. --accent-garden on --color-bg 7.22:1 AAA. white on it 7.76:1 AAA. */
+  --accent-garden: #1b5e38;
+  --accent-garden-tint: #e7f0e6;
+
+  /* Mahjong Kakis. --accent-kopitiam on --color-bg 7.68:1 AAA. white on it 8.26:1 AAA. */
+  --accent-kopitiam: #7a3f06;
+  --accent-kopitiam-tint: #f7e9d4;
+
+  /* Scam Dojo. --accent-dojo on --color-bg 7.29:1 AAA. white on it 7.85:1 AAA. */
+  --accent-dojo: #14548c;
+  --accent-dojo-tint: #e2ecf6;
+
+  /* Games set --accent and --accent-tint on their own root to pick a side. */
+  --accent: var(--accent-garden);
+  --accent-tint: var(--accent-garden-tint);
+
+  /* ---- Type scale ------------------------------------------------------
+     Deliberately no step below 28px. If a size does not exist, nobody can
+     accidentally ship 14px caption text on a screen an 80 year old has to read.
+  */
+  --fs-body: 1.75rem;    /* 28px, the floor */
+  --fs-lead: 2rem;       /* 32px */
+  --fs-title: 2.5rem;    /* 40px */
+  --fs-display: 3rem;    /* 48px */
+
+  --lh-tight: 1.2;
+  --lh-body: 1.45;
+
+  --fw-regular: 400;
+  --fw-medium: 600;
+  --fw-bold: 700;
+
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+
+  /* ---- Spacing --------------------------------------------------------- */
+  --sp-1: 0.25rem;   /* 4px */
+  --sp-2: 0.5rem;    /* 8px */
+  --sp-3: 0.75rem;   /* 12px */
+  --sp-4: 1rem;      /* 16px */
+  --sp-5: 1.5rem;    /* 24px */
+  --sp-6: 2rem;      /* 32px */
+  --sp-7: 3rem;      /* 48px */
+
+  /* ---- Shape ----------------------------------------------------------- */
+  --radius-sm: 0.5rem;
+  --radius-md: 1rem;
+  --radius-lg: 1.5rem;
+  --radius-pill: 999px;
+
+  --shadow-card: 0 2px 6px rgba(36, 28, 20, 0.12);
+  --shadow-raised: 0 6px 16px rgba(36, 28, 20, 0.16);
+
+  /* ---- Touch ----------------------------------------------------------- */
+  /* 64px beats the 60px floor in CLAUDE.md and matches the usual 44pt guidance
+     with room for a shaky finger. Nothing tappable may go under this. */
+  --tap-min: 64px;
+  --tap-gap: 1rem;
+
+  /* ---- Focus ring ------------------------------------------------------ */
+  --focus-width: 4px;
+  --focus-offset: 3px;
+  --focus-ring: var(--focus-width) solid var(--color-focus);
+
+  /* ---- Motion ---------------------------------------------------------- */
+  --dur-instant: 90ms;
+  --dur-fast: 140ms;
+  --dur-base: 240ms;
+  --dur-slow: 420ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* ---- Safe area (notches, home indicators) ---------------------------- */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+
+  /* ---- Layout ---------------------------------------------------------- */
+  --page-max: 34rem;
+}
+
+/* Anyone who asked their OS for less motion gets none of it. Durations go to
+   zero rather than being merely shortened, so no transition can outlast a tap. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-instant: 0ms;
+    --dur-fast: 0ms;
+    --dur-base: 0ms;
+    --dur-slow: 0ms;
+  }
+}

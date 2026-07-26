@@ -1,0 +1,299 @@
+/*
+  CtrlAI base layer. Minimal reset plus the handful of classes every game shares.
+  Load tokens.css first. Nothing here hardcodes a colour or a size.
+
+  Rule for anything added later: no affordance may depend on hover. A finger
+  cannot hover. Hover styling lives behind @media (hover: hover) and is decoration only.
+*/
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body,
+h1,
+h2,
+h3,
+h4,
+p,
+figure,
+blockquote,
+dl,
+dd,
+ul,
+ol {
+  margin: 0;
+}
+
+ul,
+ol {
+  padding: 0;
+  list-style: none;
+}
+
+img,
+svg,
+video {
+  display: block;
+  max-width: 100%;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+body {
+  min-height: 100vh;
+  min-height: 100dvh;
+  margin: 0;
+  padding:
+    calc(var(--safe-top) + var(--sp-5))
+    calc(var(--safe-right) + var(--sp-5))
+    calc(var(--safe-bottom) + var(--sp-6))
+    calc(var(--safe-left) + var(--sp-5));
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-regular);
+  line-height: var(--lh-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  line-height: var(--lh-tight);
+  font-weight: var(--fw-bold);
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: var(--fs-display);
+}
+
+h2 {
+  font-size: var(--fs-title);
+}
+
+h3 {
+  font-size: var(--fs-lead);
+}
+
+p {
+  text-wrap: pretty;
+}
+
+/* ---- Page shell -------------------------------------------------------- */
+
+.page {
+  width: 100%;
+  max-width: var(--page-max);
+  margin: 0 auto;
+}
+
+/* ---- Layout utilities -------------------------------------------------- */
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+}
+
+.stack-tight {
+  gap: var(--sp-3);
+}
+
+.stack-loose {
+  gap: var(--sp-7);
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--tap-gap);
+}
+
+.row-between {
+  justify-content: space-between;
+}
+
+/* ---- Anything you can touch -------------------------------------------- */
+
+.btn,
+.chip,
+a.btn,
+a.chip {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-3);
+  min-height: var(--tap-min);
+  min-width: var(--tap-min);
+  padding: var(--sp-4) var(--sp-5);
+  border: 3px solid var(--accent);
+  border-radius: var(--radius-md);
+  background-color: var(--accent);
+  color: var(--color-text-on-accent);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-tight);
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease-out),
+              background-color var(--dur-fast) var(--ease-out);
+}
+
+.btn-quiet {
+  background-color: transparent;
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.btn-plain {
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  border-color: var(--color-border);
+}
+
+/* Pressed state carries the feedback, since hover cannot. */
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn[aria-disabled="true"] {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+/* ---- Chips (prompt answers, tags, tell zones) -------------------------- */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--tap-min);
+  min-width: var(--tap-min);
+  padding: var(--sp-3) var(--sp-5);
+  border: 3px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  font-size: var(--fs-body);
+  line-height: var(--lh-tight);
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease-out),
+              background-color var(--dur-fast) var(--ease-out),
+              border-color var(--dur-fast) var(--ease-out);
+}
+
+.chip:active {
+  transform: scale(0.97);
+}
+
+/* Selection is shown by fill, border weight and a mark, never by colour alone. */
+.chip[aria-pressed="true"],
+.chip.is-selected {
+  background-color: var(--accent-tint);
+  border-color: var(--accent);
+  font-weight: var(--fw-bold);
+}
+
+/* ---- Cards ------------------------------------------------------------- */
+
+.card {
+  padding: var(--sp-5);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.card-accent {
+  border-color: var(--accent);
+  background-color: var(--accent-tint);
+  box-shadow: none;
+}
+
+.card-title {
+  margin-bottom: var(--sp-2);
+  font-size: var(--fs-title);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-tight);
+}
+
+/* ---- Text helpers ------------------------------------------------------ */
+
+.muted {
+  color: var(--color-text-muted);
+}
+
+.lead {
+  font-size: var(--fs-lead);
+}
+
+.centered {
+  text-align: center;
+}
+
+/* Visible to a screen reader, invisible on screen. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---- Focus ------------------------------------------------------------- */
+
+:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+  border-radius: var(--radius-sm);
+}
+
+/* ---- Hover is decoration, never information ---------------------------- */
+
+@media (hover: hover) and (pointer: fine) {
+  .btn:hover {
+    background-color: var(--accent);
+    filter: brightness(1.12);
+  }
+
+  .btn-quiet:hover,
+  .btn-plain:hover {
+    filter: none;
+    background-color: var(--accent-tint);
+  }
+
+  .chip:hover {
+    background-color: var(--accent-tint);
+  }
+}

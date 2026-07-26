@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#fbf6ee">
+<meta name="description" content="Three prototype directions for the Tencent Age Well hackathon, playable locally.">
+<title>CtrlAI</title>
+<link rel="stylesheet" href="/shared/ui/tokens.css">
+<link rel="stylesheet" href="/shared/ui/base.css">
+<style>
+  .hub-header {
+    padding-bottom: var(--sp-2);
+  }
+
+  .hub-eyebrow {
+    font-size: var(--fs-body);
+    font-weight: var(--fw-bold);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  .game-link {
+    display: block;
+    min-height: var(--tap-min);
+    padding: var(--sp-5);
+    border: 3px solid var(--accent);
+    border-radius: var(--radius-lg);
+    background-color: var(--accent-tint);
+    color: var(--color-text);
+    text-align: left;
+    text-decoration: none;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform var(--dur-fast) var(--ease-out);
+  }
+
+  .game-link:active {
+    transform: scale(0.98);
+  }
+
+  .game-link-name {
+    display: block;
+    font-size: var(--fs-title);
+    font-weight: var(--fw-bold);
+    line-height: var(--lh-tight);
+    color: var(--accent);
+  }
+
+  .game-link-note {
+    display: block;
+    margin-top: var(--sp-3);
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
+    color: var(--color-text);
+  }
+
+  .link-garden {
+    --accent: var(--accent-garden);
+    --accent-tint: var(--accent-garden-tint);
+  }
+
+  .link-kakis {
+    --accent: var(--accent-kopitiam);
+    --accent-tint: var(--accent-kopitiam-tint);
+  }
+
+  .link-dojo {
+    --accent: var(--accent-dojo);
+    --accent-tint: var(--accent-dojo-tint);
+  }
+
+  .team-note {
+    padding-top: var(--sp-4);
+    border-top: 2px solid var(--color-border);
+    font-size: var(--fs-body);
+    color: var(--color-text-muted);
+  }
+</style>
+</head>
+<body>
+<main class="page stack">
+
+  <header class="hub-header stack-tight stack">
+    <p class="hub-eyebrow">Age Well bake-off</p>
+    <h1>CtrlAI</h1>
+    <p class="lead muted">Three directions. Play all three, then pick one.</p>
+  </header>
+
+  <nav class="stack" aria-label="Prototypes">
+    <a class="game-link link-garden" href="/memory-garden">
+      <span class="game-link-name">Memory Garden</span>
+      <span class="game-link-note">Answer a few gentle questions about an old object and watch a plant grow from the memory.</span>
+    </a>
+
+    <a class="game-link link-kakis" href="/mahjong-kakis">
+      <span class="game-link-name">Mahjong Kakis</span>
+      <span class="game-link-note">Tile matching at a kopitiam table with three AI kakis who banter and remember you.</span>
+    </a>
+
+    <a class="game-link link-dojo" href="/scam-dojo">
+      <span class="game-link-name">Scam Dojo</span>
+      <span class="game-link-note">A two minute daily drill. The phone rings, a scammer tries an angle, you tap the tells.</span>
+    </a>
+  </nav>
+
+  <p class="team-note">Team note: run this on a phone, or set your browser to a phone sized viewport before judging anything.</p>
+
+</main>
+</body>
+</html>
