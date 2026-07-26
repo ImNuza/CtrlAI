@@ -18,9 +18,13 @@ import {
   buildListenControl,
   buildChoiceControl,
   buildWalkthrough,
+  buildWalkthroughIntro,
+  buildWalkthroughStep,
   buildRecapItem,
   replayCeremony,
-  clear
+  clear,
+  WALKTHROUGH_NEXT,
+  WALKTHROUGH_END
 } from '/games/scam-dojo/js/ui.js';
 
 const GAME = 'scam-dojo';
@@ -35,6 +39,11 @@ const refs = {};
 let round = null;
 let revealed = 0;
 let choiceMade = false;
+
+let walkthroughSteps = [];
+let walkthroughIndex = 0;
+let walkthroughBusy = false;
+const walkthroughRefs = { steps: null, button: null };
 
 function normalizeState(raw) {
   const source = raw !== null && typeof raw === 'object' ? raw : {};
@@ -106,11 +115,22 @@ function onAnswer() {
 function startCall() {
   revealed = 0;
   choiceMade = false;
+  resetWalkthrough();
   screens.call.dataset.family = round.family;
   screens.call.dataset.script = round.id;
+  screens.call.dataset.phase = 'call';
   refs.callCaller.textContent = round.callerName;
   clear(refs.transcript);
   renderListenControl();
+
+  // Answering opens on the caller's first words, the way a real call does.
+  // Everything after it is still a tap the player chose to make.
+  revealNextLine();
+  if (revealed === 0) {
+    // A script with no lines at all still reaches the choice rather than
+    // stranding the player on a Listen button that can never fire.
+    renderChoiceControl();
+  }
 }
 
 function renderListenControl() {
@@ -183,14 +203,86 @@ async function onHangUp() {
   await finishRound();
 }
 
+/* ---- Walkthrough --------------------------------------------------------- */
+
+/*
+  Going along with the caller opens a story, not a verdict. One tap per pressure
+  the caller actually used, in the order they used it, each one saying what would
+  have happened next. The same shield is waiting at the end of it.
+*/
+
+function resetWalkthrough() {
+  walkthroughSteps = [];
+  walkthroughIndex = 0;
+  walkthroughBusy = false;
+  walkthroughRefs.steps = null;
+  walkthroughRefs.button = null;
+}
+
 async function onComply() {
   choiceMade = true;
   clear(refs.dockInner);
   refs.dock.setAttribute('hidden', '');
+  screens.call.dataset.phase = 'walkthrough';
+
+  walkthroughSteps = round.lines.filter(function (line) {
+    return line.tell !== null;
+  });
+  walkthroughIndex = 0;
+
+  const shell = buildWalkthrough();
+  refs.transcript.appendChild(shell);
+  walkthroughRefs.steps = shell.querySelector('#walkthrough-steps');
+  walkthroughRefs.button = shell.querySelector('#walkthrough-continue');
+  walkthroughRefs.button.addEventListener('click', onWalkthroughContinue);
+
   const intro = await aiGenerate({ game: GAME, event: 'walkthrough_intro', context: round.context });
-  const card = buildWalkthrough(intro.text);
-  refs.transcript.appendChild(card);
-  card.querySelector('#walkthrough-continue').addEventListener('click', finishRound);
+  walkthroughRefs.steps.appendChild(buildWalkthroughIntro(intro.text));
+  syncWalkthroughButton();
+  scrollToLatest();
+}
+
+function syncWalkthroughButton() {
+  const remaining = walkthroughIndex < walkthroughSteps.length;
+  walkthroughRefs.button.textContent = remaining ? WALKTHROUGH_NEXT : WALKTHROUGH_END;
+}
+
+// The continue control lives on through the whole walkthrough, so unlike the
+// dock buttons it is still there to be tapped twice. The flag is what stops a
+// double tap on the last step from banking the round twice.
+async function onWalkthroughContinue() {
+  if (walkthroughBusy) {
+    return;
+  }
+  walkthroughBusy = true;
+
+  if (walkthroughIndex >= walkthroughSteps.length) {
+    // Stays busy on purpose: the round is over and startCall resets it.
+    await finishRound();
+    return;
+  }
+
+  const line = walkthroughSteps[walkthroughIndex];
+  // The round's own rolled slots, so the consequence names the same grandchild,
+  // the same amount and the same place the caller just used.
+  const consequence = await aiGenerate({
+    game: GAME,
+    event: 'walkthrough_step_' + line.tell,
+    context: round.context
+  });
+
+  walkthroughIndex += 1;
+  walkthroughRefs.steps.appendChild(buildWalkthroughStep({
+    position: walkthroughIndex,
+    total: walkthroughSteps.length,
+    tell: line.tell,
+    quote: line.text,
+    label: tellLabel(round.tellLabels, line.tell),
+    consequence: consequence.text
+  }));
+
+  syncWalkthroughButton();
+  walkthroughBusy = false;
   scrollToLatest();
 }
 

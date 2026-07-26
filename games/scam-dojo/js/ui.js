@@ -108,15 +108,53 @@ export function buildChoiceControl() {
   return frag;
 }
 
+export const WALKTHROUGH_NEXT = 'Show me what happens next';
+export const WALKTHROUGH_END = 'See the recap';
+
 /**
- * The comply path interstitial. Kind, never a scolding.
- * @param {string} text
- * @returns {HTMLDivElement}
+ * The comply path shell. Steps land inside it one tap at a time and the single
+ * continue control stays put underneath them, so focus is never thrown away.
+ * @returns {HTMLElement}
  */
-export function buildWalkthrough(text) {
-  const card = el('div', 'walkthrough');
-  card.appendChild(para('walkthrough-line', text));
-  card.appendChild(button('walkthrough-continue', 'btn', 'Continue'));
+export function buildWalkthrough() {
+  const wrap = el('section', 'walkthrough');
+  wrap.id = 'walkthrough';
+  wrap.setAttribute('aria-label', 'What would have happened');
+
+  const steps = el('div', 'walkthrough-steps');
+  steps.id = 'walkthrough-steps';
+  steps.setAttribute('aria-live', 'polite');
+  wrap.appendChild(steps);
+
+  wrap.appendChild(button('walkthrough-continue', 'btn', WALKTHROUGH_NEXT));
+  return wrap;
+}
+
+/**
+ * Step 0. Sets the framing before a single consequence is named: this is a
+ * look at what the caller was steering towards, not a verdict on the player.
+ * @param {string} text
+ * @returns {HTMLElement}
+ */
+export function buildWalkthroughIntro(text) {
+  const card = el('article', 'walkthrough-step walkthrough-step-intro');
+  card.appendChild(para('walkthrough-title', 'Let us see what would have happened'));
+  card.appendChild(para('walkthrough-lead', text));
+  return card;
+}
+
+/**
+ * One step per pressure the caller used, in the order they used it.
+ * @param {{position: number, total: number, tell: string, quote: string, label: string, consequence: string}} step
+ * @returns {HTMLElement}
+ */
+export function buildWalkthroughStep(step) {
+  const card = el('article', 'walkthrough-step');
+  card.dataset.tell = step.tell;
+  card.appendChild(para('walkthrough-count', 'Step ' + step.position + ' of ' + step.total));
+  card.appendChild(para('walkthrough-quote', '"' + step.quote + '"'));
+  card.appendChild(para('walkthrough-tell', 'What they were doing: ' + step.label));
+  card.appendChild(para('walkthrough-line', step.consequence));
   return card;
 }
 
@@ -136,15 +174,42 @@ export function buildRecapItem(item) {
   return card;
 }
 
+let ceremonyWatcher = null;
+
 /**
  * Restart the shield entrance so the ceremony plays on every round, not only
- * the first time the element is created.
+ * the first time the element is created. It sits under the tell cards, so on a
+ * long recap it would otherwise play to an empty screen while the player is
+ * still reading. Hold it until it is actually in front of them.
+ *
+ * Without IntersectionObserver the class goes on straight away: the ceremony
+ * loses its timing, never its content.
  * @param {HTMLElement} ceremony
  */
 export function replayCeremony(ceremony) {
   ceremony.classList.remove('is-in');
   void ceremony.offsetWidth;
-  ceremony.classList.add('is-in');
+
+  if (ceremonyWatcher !== null) {
+    ceremonyWatcher.disconnect();
+    ceremonyWatcher = null;
+  }
+  if (typeof IntersectionObserver !== 'function') {
+    ceremony.classList.add('is-in');
+    return;
+  }
+
+  ceremonyWatcher = new IntersectionObserver(function (entries, observer) {
+    for (let i = 0; i < entries.length; i += 1) {
+      if (entries[i].isIntersecting) {
+        entries[i].target.classList.add('is-in');
+        observer.disconnect();
+        ceremonyWatcher = null;
+        return;
+      }
+    }
+  }, { threshold: 0.4 });
+  ceremonyWatcher.observe(ceremony);
 }
 
 /**

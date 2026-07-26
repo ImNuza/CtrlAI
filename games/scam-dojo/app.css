@@ -148,6 +148,12 @@
   padding-bottom: 15rem;
 }
 
+/* The dock is gone by the walkthrough, so the reserve would be dead space the
+   player has to scroll past to reach the continue button. */
+.screen-call[data-phase="walkthrough"] {
+  padding-bottom: var(--sp-6);
+}
+
 .call-header {
   position: sticky;
   top: 0;
@@ -241,20 +247,81 @@
   background-color: var(--accent-tint);
 }
 
+/* ---- Walkthrough (comply path) ------------------------------------------ */
+
 .walkthrough {
   align-self: stretch;
   display: flex;
   flex-direction: column;
   gap: var(--sp-5);
+}
+
+.walkthrough-steps {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+}
+
+.walkthrough-step {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
   padding: var(--sp-5);
-  border: 3px solid var(--accent);
+  border: 3px solid var(--color-border);
   border-radius: var(--radius-lg);
-  background-color: var(--accent-tint);
+  background-color: var(--color-surface);
   animation: line-in var(--dur-base) var(--ease-out) both;
 }
 
-.walkthrough-line {
+.walkthrough-step-intro {
+  border-color: var(--accent);
+  background-color: var(--accent-tint);
+}
+
+/* Ink rather than accent: --accent on --accent-tint is only 6.56:1, and this
+   screen holds itself to 7:1. --color-text on the tint is 14.04:1. */
+.walkthrough-title {
   font-size: var(--fs-lead);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-tight);
+  color: var(--color-text);
+}
+
+.walkthrough-lead {
+  font-size: var(--fs-lead);
+  line-height: var(--lh-body);
+}
+
+.walkthrough-count {
+  font-size: var(--fs-body);
+  font-weight: var(--fw-bold);
+  color: var(--color-text-muted);
+}
+
+/* The quoted line keeps a soft accent halo so the caller's own words are the
+   thing that lights up. It blooms in once and then rests; nothing loops. */
+.walkthrough-quote {
+  padding: var(--sp-4) var(--sp-5);
+  border-left: 8px solid var(--accent);
+  border-radius: var(--radius-md);
+  background-color: var(--accent-tint);
+  box-shadow: 0 0 20px 2px color-mix(in srgb, var(--accent) 26%, transparent);
+  font-size: var(--fs-body);
+  font-style: italic;
+  line-height: var(--lh-body);
+  animation: quote-glow var(--dur-base) var(--ease-out) both;
+}
+
+/* --accent on --color-surface is 7.67:1 (AAA), a touch above the 7.29:1 the
+   same pairing scores on --color-bg. */
+.walkthrough-tell {
+  font-size: var(--fs-body);
+  font-weight: var(--fw-bold);
+  color: var(--accent);
+}
+
+.walkthrough-line {
+  font-size: var(--fs-body);
   line-height: var(--lh-body);
 }
 
@@ -352,7 +419,29 @@
 }
 
 .ceremony-shield {
+  position: relative;
   width: 9rem;
+}
+
+.ceremony-art {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+}
+
+/* One ring, behind the shield, that expands and is gone. It rests invisible so
+   nothing lingers on screen between rounds. */
+.ceremony-ring {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 0;
+  width: 100%;
+  aspect-ratio: 1;
+  border: 4px solid var(--accent);
+  border-radius: 50%;
+  opacity: 0;
+  transform: translate(-50%, -50%);
 }
 
 /* The card is already accent tint, so the shield needs a lighter body or it
@@ -367,8 +456,19 @@
   line-height: var(--lh-body);
 }
 
-.ceremony.is-in .ceremony-shield {
+/* Three beats, all of them finished inside 300ms: the shield settles in, one
+   ring opens behind it, the count pops. Every duration and delay is a token, so
+   prefers-reduced-motion drops the whole ceremony to 0ms and it simply appears. */
+.ceremony.is-in .ceremony-art {
   animation: shield-in var(--dur-base) var(--ease-out) both;
+}
+
+.ceremony.is-in .ceremony-ring {
+  animation: ceremony-ring var(--dur-base) var(--ease-out) both;
+}
+
+.ceremony.is-in .streak-figure {
+  animation: count-pop var(--dur-fast) var(--ease-out) var(--dur-instant) both;
 }
 
 .screen-recap .btn {
@@ -399,6 +499,47 @@
   to {
     opacity: 1;
     transform: scale(1);
+  }
+}
+
+/* The shield is opaque, so the ring is worth nothing until it clears the edge.
+   It peaks at the moment it does, then opens out and is gone. */
+@keyframes ceremony-ring {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.7);
+  }
+  35% {
+    opacity: 0.55;
+    transform: translate(-50%, -50%) scale(1.02);
+  }
+  to {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.38);
+  }
+}
+
+@keyframes count-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.82);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes quote-glow {
+  from {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 0%, transparent);
+  }
+  to {
+    box-shadow: 0 0 20px 2px color-mix(in srgb, var(--accent) 26%, transparent);
   }
 }
 

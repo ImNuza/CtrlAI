@@ -1,14 +1,15 @@
 #!/usr/bin/env node
-// Scam Dojo milestone A smoke test. Drives the real UI at a phone viewport:
-// three rounds end to end, a mid-call catch and a mid-call benign tap, streak
-// persistence across a reload, and a content safety sweep of both JSON files.
-// Run from the repo root with the dev server up on PORT=4184.
+// Scam Dojo smoke test. Drives the real UI at a phone viewport: three rounds end
+// to end, the call opening on line one, a mid-call catch and a mid-call benign
+// tap, the comply walkthrough tapped through to the recap, streak persistence
+// across a reload, and a content safety sweep of both JSON files.
+// Run from the repo root with the dev server up on PORT=4185.
 import { chromium } from 'playwright';
 import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
-const URL = 'http://localhost:4184/scam-dojo';
+const URL = 'http://localhost:4185/scam-dojo';
 const STORAGE_KEY = 'ctrlai:scam-dojo';
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const CONTENT_DIR = path.join(HERE, '..', 'content');
@@ -75,6 +76,15 @@ async function playRound(page, options) {
   const script = await page.locator('[data-screen="call"]').getAttribute('data-script');
   assert(family !== null && family !== '', label + ': call screen has no data-family');
 
+  // Answering reveals line one and nothing more. Every later line is a tap.
+  const opening = await page.locator('.bubble:visible').count();
+  assert(opening === 1, label + ': call should open with exactly 1 bubble, found ' + opening);
+  assert(
+    (await page.locator('#listen-btn').count()) > 0,
+    label + ': Listen control missing after the opening line'
+  );
+  note(label + ': call opened with exactly 1 bubble before any Listen tap');
+
   let caughtTapped = false;
   let benignTapped = false;
   let taps = 0;
@@ -130,21 +140,61 @@ async function playRound(page, options) {
   const transcript = await transcriptOf(page);
   assert(transcript.length >= 6, label + ': only ' + transcript.length + ' bubbles revealed');
 
+  const tellCount = await page.locator('.bubble[data-tell]:not([data-tell=""])').count();
+  assert(tellCount > 0, label + ': the script carried no tells at all');
+
   if (options.midCallTaps) {
     assert(caughtTapped, label + ': no tell bubble was available to tap');
     assert(benignTapped, label + ': no benign bubble was available to tap');
   }
 
-  await page.locator('#hangup-btn').click();
+  let walkthroughSteps = 0;
 
-  // The comply interstitial should not appear on the hang up path, but continue
-  // through it if it ever does rather than hanging the run.
-  if (await page.locator('#walkthrough-continue').count() > 0) {
-    await page.locator('#walkthrough-continue').click();
+  if (options.comply) {
+    await page.locator('#comply-btn').click();
+    await page.waitForSelector('#walkthrough-continue', { timeout: 8000 });
+    await page.waitForSelector('.walkthrough-step-intro', { timeout: 8000 });
+
+    let continues = 0;
+    while ((await page.locator('[data-screen="recap"]:not([hidden])').count()) === 0) {
+      assert(continues < 30, label + ': the walkthrough never reached the recap');
+      const before = await page.locator('.walkthrough-step').count();
+      await page.locator('#walkthrough-continue').click();
+      continues += 1;
+      // Every tap either lands another step or leaves for the recap, never stalls.
+      await page.waitForFunction(
+        (count) =>
+          document.querySelectorAll('.walkthrough-step').length > count ||
+          document.querySelector('[data-screen="recap"]:not([hidden])') !== null,
+        before,
+        { timeout: 8000 }
+      );
+    }
+
+    // The call screen is only hidden, so the steps are still countable.
+    walkthroughSteps = await page.locator('.walkthrough-step').count();
+    assert(
+      walkthroughSteps >= 1 + tellCount,
+      label + ': walkthrough rendered ' + walkthroughSteps + ' steps, expected at least ' + (1 + tellCount)
+    );
+    const complyArtifact = await penaltyArtifact(page);
+    assert(complyArtifact === null, label + ': penalty artifact on the comply path: ' + complyArtifact);
+    note(
+      label + ': comply walkthrough rendered ' + walkthroughSteps + ' steps (intro plus ' +
+      tellCount + ' tells) over ' + continues + ' taps, then the recap'
+    );
+  } else {
+    await page.locator('#hangup-btn').click();
+
+    // The walkthrough belongs to the comply path only, but step through it
+    // rather than hanging the run if it ever turns up here.
+    if (await page.locator('#walkthrough-continue').count() > 0) {
+      await page.locator('#walkthrough-continue').click();
+    }
   }
 
   await page.waitForSelector('[data-screen="recap"]:not([hidden])', { timeout: 8000 });
-  return { family, script, transcript, taps };
+  return { family, script, transcript, taps, tellCount, walkthroughSteps };
 }
 
 async function checkContentSafety() {
@@ -219,11 +269,30 @@ async function main() {
     assert(homeStreak.trim() === '1', 'home should show streak 1, shows ' + homeStreak);
     note('home re-rendered with streak 1');
 
-    console.log('5. rounds 2 and 3');
+    console.log('5. rounds 2 and 3, round 3 on the comply path');
     const two = await playRound(page, { round: 2, midCallTaps: false });
     await page.locator('#back-home-btn').click();
     await page.waitForSelector('[data-screen="home"]:not([hidden])', { timeout: 8000 });
-    const three = await playRound(page, { round: 3, midCallTaps: false });
+    const three = await playRound(page, { round: 3, midCallTaps: false, comply: true });
+
+    // Going along with the caller earns the same shield and the same recap.
+    const complyRecapItems = await page.locator('.recap-item').count();
+    assert(
+      complyRecapItems === three.tellCount,
+      'comply recap lists ' + complyRecapItems + ' tells, the call had ' + three.tellCount
+    );
+    assert(await page.locator('#shield-ceremony').isVisible(), 'comply path recap has no shield ceremony');
+    // The ceremony waits until the player has scrolled to it, so scroll first.
+    await page.locator('#shield-ceremony').scrollIntoViewIfNeeded();
+    await page.waitForSelector('#shield-ceremony.is-in', { timeout: 8000 });
+    assert(
+      (await page.locator('#shield-ceremony .ceremony-ring').count()) === 1,
+      'the ceremony ring is missing from the recap'
+    );
+    const complyStreak = await page.locator('#streak-count').textContent();
+    assert(complyStreak.trim() === '3', 'comply path should still award a shield, streak shows ' + complyStreak);
+    note('comply recap: ' + complyRecapItems + ' tell cards, ceremony played with its ring, streak 3');
+
     await page.locator('#back-home-btn').click();
     await page.waitForSelector('[data-screen="home"]:not([hidden])', { timeout: 8000 });
     note('round 2 family "' + two.family + '", round 3 family "' + three.family + '"');
