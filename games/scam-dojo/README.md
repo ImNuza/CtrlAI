@@ -70,8 +70,9 @@ Start a server on the matching port, then run each with node.
 
 ## Known issues
 
-- Line events carry 3 variants each, so a very long session can start to feel the
-  pattern inside one family even though no two rounds are identical.
+- Line events carry 5 variants each and every support pool carries 6, so patterning
+  inside one family is much harder to feel than it was. Reduced, not gone: a long
+  enough session could still surface it, though no two rounds are identical.
 - The 8 line official script uses the logistics benign category twice; variant rotation
   keeps the two taps from reading the same.
 - The shield ceremony plays when it scrolls into view on the recap. A player who never
