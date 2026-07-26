@@ -254,9 +254,11 @@ function renderObjects() {
     card.innerHTML = item.art;
 
     /* The written blurb in data.js stays off the card on purpose. Measured at
-       360px it forces the 2 column grid past the viewport and drops the card to
-       two or three words a line, which is the opposite of calm. See the README
-       known issues note. */
+       360px it pushes the 2 column grid past the viewport, since a grid track
+       cannot shrink under its longest word, and it drops the card to two or
+       three words a line at the 28px floor. That is the opposite of calm on the
+       one screen a player uses most, so the copy waits for a layout with room
+       for it rather than getting squeezed into one that has none. */
     const name = document.createElement('span');
     name.textContent = item.name;
     card.appendChild(name);
