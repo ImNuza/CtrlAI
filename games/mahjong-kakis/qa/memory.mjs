@@ -26,6 +26,16 @@ const MINIMUMS = {
   return_visit: 5,
 };
 const HISTORY_SLOTS = ['rounds', 'best'];
+// The rule stated in a kaki's own words. A first hello has to carry one of
+// these, since nothing else in the game explains how to play.
+const TEACH_MARKERS = [
+  'two same tiles',
+  'tap both',
+  'that match',
+  'look alike',
+  'its twin',
+  'find two',
+];
 const ALLOWED_SLOTS = ['name', 'rounds', 'best'];
 const SLOT_PATTERN = /\{([a-zA-Z0-9_]+)\}/g;
 // U+2014 em dash and U+2013 en dash, written as code points so this file stays
@@ -35,7 +45,18 @@ const DASHES = /[\u2013\u2014]/;
 // The phrases game.js builds for the seeded profile below (roundsPlayed 3,
 // bestClear 0). One of the two has to survive into whichever line is picked.
 const EXPECTED_ROUNDS = 'a few rounds';
-const BEST_MARKERS = ['first try', 'found every pair', 'to the last pair'];
+/*
+  One marker per branch of bestPhrase in game.js, each a real substring of what
+  that branch returns. The visit count on each row is one whose seeded template
+  pick carries {best} for the profile name below, so the phrase actually reaches
+  the bubble instead of a {rounds} line quietly standing in for it.
+*/
+const BEST_BRANCHES = [
+  { bestClear: 0, visits: 1, marker: 'first try' },
+  { bestClear: 2, visits: 1, marker: 'found the pairs' },
+  { bestClear: 5, visits: 7, marker: 'stayed until the end' },
+];
+const BEST_MARKERS = BEST_BRANCHES.map((b) => b.marker);
 
 // A long name is the worst case for the bubble: it pushes the longest lines in
 // the bank onto a fourth line. The two phrases below are the longest game.js
@@ -130,6 +151,27 @@ async function lintBank() {
         `return_visit__${kaki} line carries no history: "${line}"`
       );
     }
+
+    // A hello to somebody nobody has met can only know their name. No shared
+    // past, real or implied, on the one screen where there is none.
+    for (const key of ['first_visit__' + kaki, 'round_start__' + kaki]) {
+      for (const line of bank[key]) {
+        const slots = [...line.matchAll(SLOT_PATTERN)].map((m) => m[1]);
+        for (const slot of slots) {
+          check(slot === 'name', `${key} uses {${slot}}, only {name} is allowed: "${line}"`);
+        }
+      }
+    }
+
+    // Half of every first hello has to teach the rule, because there is no
+    // instructions screen anywhere in this game.
+    const teaching = bank['first_visit__' + kaki].filter((line) =>
+      TEACH_MARKERS.some((marker) => line.toLowerCase().includes(marker))
+    );
+    check(
+      teaching.length * 2 >= bank['first_visit__' + kaki].length,
+      `first_visit__${kaki} teaches the rule in ${teaching.length} of ${bank['first_visit__' + kaki].length} lines`
+    );
   }
 
   return counts;
@@ -301,6 +343,36 @@ async function main() {
 
       summary.scenarios.namedButNew = { event: bubble.event, kaki: bubble.kaki, text: bubble.text };
       await context.close();
+    }
+
+    /*
+      (f) every branch of bestPhrase reaches the bubble intact. The visit counts
+      below are the ones whose seeded pick lands on a template that carries
+      {best} for this profile name, so each load renders the phrase rather than
+      a {rounds} line that would leave the branch untested.
+    */
+    {
+      const seen = [];
+      for (const branch of BEST_BRANCHES) {
+        const { context, page, errors } = await openSeeded(
+          browser,
+          profile({ visits: branch.visits, bestClear: branch.bestClear })
+        );
+        const bubble = await readBubble(page, 'return_visit');
+        check(
+          bubble.text.includes(branch.marker),
+          `bestClear ${branch.bestClear} should say "${branch.marker}", said: "${bubble.text}"`
+        );
+        check(!/\{|\}/.test(bubble.text), `bestClear ${branch.bestClear} left a slot: "${bubble.text}"`);
+        check(
+          !/\bmiss|wrong|mistake|error/i.test(bubble.text),
+          `bestClear ${branch.bestClear} names a failure: "${bubble.text}"`
+        );
+        check(errors.length === 0, `bestClear ${branch.bestClear}: page errors: ${errors.join(' | ')}`);
+        seen.push({ bestClear: branch.bestClear, kaki: bubble.kaki, text: bubble.text });
+        await context.close();
+      }
+      summary.scenarios.bestPhrases = seen;
     }
 
     // (c) a stranger still gets asked for a name.

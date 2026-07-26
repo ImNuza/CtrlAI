@@ -67,6 +67,8 @@ let round = null;
   null           an ordinary deal later in the same sitting.
 */
 let pendingGreeting = null;
+// True while the name screen is open on top of a profile that already exists.
+let renaming = false;
 // The tallest the bubble slot has been measured since the current wall was
 // dealt. The slot is allowed to grow when a taller line lands, never to shrink
 // under the player mid round.
@@ -121,11 +123,18 @@ async function loadBank() {
 
 /* ---- screens ------------------------------------------------------------ */
 
-function showNameScreen() {
+/*
+  The name screen is also the rename screen. Coming back to it from the
+  celebration card keeps every stat: only the name changes, so the kakis go on
+  remembering the rounds that were already played.
+*/
+function showNameScreen(current) {
   el.nameScreen.hidden = false;
   el.play.hidden = true;
   el.win.hidden = true;
   el.bubbleSlot.hidden = true;
+  banter.dismiss();
+  el.input.value = typeof current === 'string' ? current : '';
 }
 
 function startPlaying() {
@@ -136,8 +145,30 @@ function startPlaying() {
   deal();
 }
 
+/*
+  An empty box is not a name. Nothing is stored, nothing starts, and the caret
+  goes back where the player can type: no error text, nothing to feel caught out
+  by. The old silent fallback to a default name is gone, because a name chosen
+  by accident used to be permanent.
+*/
 function chooseName(raw) {
-  const name = String(raw || '').trim().slice(0, 20) || DEFAULT_NAME;
+  const name = String(raw === undefined || raw === null ? '' : raw).trim().slice(0, 20);
+  if (name === '') {
+    el.input.focus();
+    return;
+  }
+
+  // A rename touches the name and nothing else. Visits, rounds, best clear and
+  // the dial all belong to the same player, who has only changed what they are
+  // called.
+  if (renaming) {
+    renaming = false;
+    state.name = name;
+    persist();
+    startPlaying();
+    return;
+  }
+
   state = blankState(name);
   state.visits = 1;
   pendingGreeting = 'first_visit';
@@ -579,6 +610,11 @@ function wireControls() {
   document.querySelector('[data-action="again"]').addEventListener('click', function () {
     el.win.hidden = true;
     deal();
+  });
+
+  document.querySelector('[data-action="rename"]').addEventListener('click', function () {
+    renaming = true;
+    showNameScreen(state.name);
   });
 }
 

@@ -489,13 +489,15 @@ body {
   gap: var(--sp-1);
 }
 
+/* The empty ring is drawn in the muted text colour, 7.09:1 on the bar, rather
+   than the border colour, which measured 2.83:1 and read as texture. */
 .mk-dot {
   flex: none;
   width: 0.5rem;
   height: 0.5rem;
   border-radius: 50%;
   background-color: transparent;
-  box-shadow: inset 0 0 0 2px var(--color-border);
+  box-shadow: inset 0 0 0 2px var(--color-text-muted);
 }
 
 .mk-dot.is-found {
@@ -536,9 +538,14 @@ body {
   animation: mk-fade-in var(--dur-base) var(--ease-out) 1;
 }
 
+/* flex: none matters. As a shrinkable column item the card was quietly giving
+   up height when a long name pushed the title onto a third line, and its own
+   overflow: hidden then cut the bottom control off the card with no scrollbar
+   anywhere to say so. It keeps its content height now and the scrim scrolls. */
 .mk-win-card {
   position: relative;
   display: flex;
+  flex: none;
   flex-direction: column;
   gap: var(--sp-3);
   width: 100%;
@@ -613,9 +620,25 @@ body {
   color: var(--color-text-muted);
 }
 
-.mk-win-again,
-.mk-win-back {
+.mk-win-again {
   width: 100%;
+}
+
+/* Two quiet controls share a line so the card still ends above the fold on a
+   360px phone. Both halves clear the tap floor with room at every width the
+   game supports. */
+.mk-win-row {
+  display: flex;
+  flex-direction: row;
+  gap: var(--sp-3);
+}
+
+.mk-win-rename,
+.mk-win-back {
+  flex: 1 1 0;
+  min-width: 0;
+  padding-left: var(--sp-3);
+  padding-right: var(--sp-3);
 }
 
 @keyframes mk-fade-in {
