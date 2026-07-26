@@ -42,3 +42,7 @@ Cut order if squeezed: polish first, then dial range (keep 8/12/16 steps), never
 ## Status (final)
 
 All milestones reached, nothing cut. A core 92b686d, B1 memory beat 84f1fae, B2 hidden dial 64fdfc9, B3 polish 34404ee, README and this status in the final commit. Full verification evidence in BUILD-REPORT.md territory: three QA scripts green, inspector clean, screenshots reviewed by the orchestrator at 360/390/430.
+
+## Fix round (adversarial QA)
+
+All 6 SERIOUS fixed and verified: no-timer bubble with latched slot (zero layout drift measured), tile cap and compact height (16 tiles fit 360 to 430 at 844, row peek at 667), first_visit teaching event, seeded return-visit variety (4/3/4 templates per kaki over 12 visits), 11 doubled-name lines and 6 best-slot templates rewritten, player bar never ellipsises chip names. Commits b725be3, 852e2e2. Deferred: in-round resume (documented in README), tokens.css annotation (shared/ change request). New regression suite qa/stability.mjs, 8 classes.
