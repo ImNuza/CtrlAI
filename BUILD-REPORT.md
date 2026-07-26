@@ -33,9 +33,9 @@ node server.js then open http://localhost:4173 in a phone-sized viewport. Each g
 
 ## Per-game status
 
-- memory-garden: orchestrator running toward playable core
-- mahjong-kakis: CORE COMMITTED (92b686d) and conductor-verified: core QA passes under an independent run (four banter events through the AI seam, storage and hidden dial state correct), inspector clean, name screen eyeballed. Orchestrator paused before polish per the gate. One cosmetic speaker-ring issue queued for milestone B.
-- scam-dojo: CORE COMMITTED (be90cca) and conductor-verified: 11 smoke checks pass under an independent run, inspector clean, home screen eyeballed. Orchestrator paused before polish per the gate.
+- memory-garden: CORE COMMITTED (3bb08da, 45a1b05) and conductor-verified: 34 loop checks pass under an independent run (two answer sets give plants differing in 4 of 4 traits, persistence and corrupt-save fallback proven, 9-tap loop), inspector clean, ceremony screenshot eyeballed. Orchestrator paused, then released into milestone B.
+- mahjong-kakis: CORE COMMITTED (92b686d) and conductor-verified: core QA passes under an independent run (four banter events through the AI seam, storage and hidden dial state correct), inspector clean, name screen eyeballed. Released into milestone B, speaker-ring cosmetic fix queued.
+- scam-dojo: CORE COMMITTED (be90cca) and conductor-verified: 11 smoke checks pass under an independent run, inspector clean, home screen eyeballed. Released into milestone B.
 
 ## Verification results
 
@@ -48,3 +48,9 @@ None yet.
 ## What Dewa should check first
 
 Placeholder until final. If the run halted early, check git log and the Status line above.
+
+## Phase 1 gate log
+
+All three cores landed within about 40 minutes of each other and each was independently re-verified by the conductor (their QA scripts rerun from scratch, inspector rerun, screenshots viewed). Gate released to all three orchestrators at about 00:57 for Milestone B toward full definitions of done, target two hours, commit per sub-milestone.
+
+Incident, resolved: a Memory Garden coder ran git commit --amend over a conductor build-report commit. The orchestrator caught it, restored the commit byte for byte, recommitted its work cleanly, and the conductor verified history sanity (every game commit touches only its own directory, f58fe84 intact). Standing rule issued to all agents: never amend.
