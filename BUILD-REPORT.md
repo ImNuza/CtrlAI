@@ -34,7 +34,7 @@ node server.js then open http://localhost:4173 in a phone-sized viewport. Each g
 ## Per-game status
 
 - memory-garden: orchestrator running toward playable core
-- mahjong-kakis: orchestrator running toward playable core
+- mahjong-kakis: CORE COMMITTED (92b686d) and conductor-verified: core QA passes under an independent run (four banter events through the AI seam, storage and hidden dial state correct), inspector clean, name screen eyeballed. Orchestrator paused before polish per the gate. One cosmetic speaker-ring issue queued for milestone B.
 - scam-dojo: CORE COMMITTED (be90cca) and conductor-verified: 11 smoke checks pass under an independent run, inspector clean, home screen eyeballed. Orchestrator paused before polish per the gate.
 
 ## Verification results
