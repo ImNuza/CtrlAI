@@ -99,4 +99,4 @@ agent's word.
 ## House rules
 
 No `console.log` in shipped code, no emoji in code, no em dashes in writing. Commit at every
-working milestone. Nothing gets pushed anywhere.
+working milestone. Pushes to main happen only on Dewa's say-so.
