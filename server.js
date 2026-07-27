@@ -37,6 +37,24 @@ function contentTypeFor(filePath) {
   return CONTENT_TYPES[ext] || 'application/octet-stream';
 }
 
+/* A browser closing a tab, or a test runner closing a context, resets the socket
+   while a response is still going out. Node reports that on the request or the
+   response stream, and an 'error' event nobody listens for takes the process
+   down. A client walking away is never the server's problem. */
+const DROPPED_CLIENT = ['ECONNRESET', 'EPIPE', 'ECANCELED', 'ERR_STREAM_DESTROYED',
+  'ERR_STREAM_WRITE_AFTER_END'];
+
+function isDroppedClient(err) {
+  return Boolean(err) && DROPPED_CLIENT.indexOf(err.code) !== -1;
+}
+
+/* Anything fatal goes out with a synchronous write. A piped stderr is async, so
+   process.exit can cut the message off halfway, and the QA harness reading that
+   pipe is precisely who needs to read it. */
+function fatal(message) {
+  fs.writeSync(2, message + '\n');
+}
+
 // Resolve a URL path to an absolute file path that is provably inside ROOT.
 // Returns null for traversal attempts, dotfiles, and undecodable paths.
 function resolveInsideRoot(urlPath) {
@@ -75,6 +93,11 @@ function sendNotFound(res) {
 
 function sendFile(res, absolute, method) {
   fs.readFile(absolute, function (err, data) {
+    // The read takes a moment, and the client can be long gone by the time it
+    // lands. Writing to a dead response earns nothing but an error event.
+    if (res.writableEnded || res.destroyed) {
+      return;
+    }
     if (err) {
       sendNotFound(res);
       return;
@@ -93,6 +116,13 @@ function sendFile(res, absolute, method) {
 }
 
 const server = http.createServer(function (req, res) {
+  req.on('error', function () { /* the client left, nothing to answer */ });
+  res.on('error', function (err) {
+    if (!isDroppedClient(err)) {
+      fatal('CtrlAI dev server response error: ' + (err.stack || err));
+    }
+  });
+
   if (req.method !== 'GET' && req.method !== 'HEAD') {
     res.writeHead(405, { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store' });
     res.end('Method not allowed');
@@ -125,6 +155,46 @@ const server = http.createServer(function (req, res) {
     }
     sendFile(res, absolute, req.method);
   });
+});
+
+// Garbage on the wire, or a socket that dies before the request is whole. Answer
+// if the socket can still hear us, then close it either way.
+server.on('clientError', function (err, socket) {
+  if (!socket.destroyed && socket.writable && !isDroppedClient(err)) {
+    socket.end('HTTP/1.1 400 Bad Request\r\nConnection: close\r\n\r\n');
+  }
+  socket.destroy();
+});
+
+server.on('connection', function (socket) {
+  socket.on('error', function () { /* resets are routine, let the socket go */ });
+});
+
+/* Refusing to start has to be loud. This used to be an unhandled 'error' event,
+   and when a QA harness spawned the server with its output ignored, the harness
+   then talked to whatever was already on the port and reported nothing at all
+   until that stranger went away mid run. */
+server.on('error', function (err) {
+  if (err.code === 'EADDRINUSE') {
+    fatal('CtrlAI dev server cannot start: port ' + PORT + ' is already in use. ' +
+      'Find the holder with "lsof -nP -iTCP:' + PORT + ' -sTCP:LISTEN", stop it, ' +
+      'or start this server with a free PORT.');
+  } else {
+    fatal('CtrlAI dev server failed to start: ' + (err.stack || err));
+  }
+  process.exitCode = 1;
+  server.close();
+});
+
+/* Last line of defence, deliberately narrow. Swallowing everything would hide
+   the next real fault the same way the last one hid, so only a client that
+   vanished mid write is survivable and everything else still ends the process. */
+process.on('uncaughtException', function (err) {
+  if (isDroppedClient(err)) {
+    return;
+  }
+  fatal('CtrlAI dev server crashed: ' + (err.stack || err));
+  process.exit(1);
 });
 
 server.listen(PORT, function () {

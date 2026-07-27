@@ -13,12 +13,16 @@
 import { chromium } from 'playwright';
 import { spawn } from 'node:child_process';
 import { readFile } from 'node:fs/promises';
+import net from 'node:net';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(here, '../../..');
-const PORT = 4191;
+/* 4191 by default so a failure is easy to reproduce by hand. Override it when a
+   second copy of this suite could be running, from a worktree or another agent:
+   both would want the same port, and the loser cannot test anything useful. */
+const PORT = Number(process.env.MG_PORT) || 4191;
 const ORIGIN = 'http://localhost:' + PORT;
 const GAME_URL = ORIGIN + '/memory-garden';
 const STORAGE_KEY = 'ctrlai:memory-garden';
@@ -74,11 +78,45 @@ function sleep(ms) {
   return new Promise(function (resolve) { setTimeout(resolve, ms); });
 }
 
-async function waitForServer(timeoutMs) {
+/* The previous run's server is killed with a signal and not waited for, so for a
+   few milliseconds after a run ends the port is still held. Two runs back to
+   back used to land inside that window: the new server died of EADDRINUSE, this
+   suite unknowingly drove the old one, and when the old one finally went the
+   rest of the run was connection refused. Wait for the port instead. */
+function portIsFree() {
+  return new Promise(function (resolve) {
+    const probe = net.createServer();
+    probe.once('error', function () { resolve(false); });
+    probe.listen(PORT, function () {
+      probe.close(function () { resolve(true); });
+    });
+  });
+}
+
+async function waitForFreePort(timeoutMs) {
+  const deadline = Date.now() + timeoutMs;
+  for (;;) {
+    if (await portIsFree()) {
+      return true;
+    }
+    if (Date.now() >= deadline) {
+      return false;
+    }
+    await sleep(100);
+  }
+}
+
+// isMine tells us the spawned server is still alive. Without it a dead child
+// leaves this polling a stranger on the same port until the timeout.
+async function waitForServer(timeoutMs, isMine) {
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
+    if (typeof isMine === 'function' && !isMine()) {
+      return false;
+    }
     try {
       const response = await fetch(ORIGIN + '/');
+      await response.text();
       if (response.status === 200) {
         return true;
       }
@@ -1358,12 +1396,30 @@ async function run(browser) {
 async function main() {
   bank = JSON.parse(await readFile(BANK_PATH, 'utf8'));
 
+  // Never race a server that is still on its way out, and never quietly borrow
+  // somebody else's. This suite has to own the port it tests.
+  const portFree = await waitForFreePort(5000);
+  if (!portFree) {
+    process.stdout.write('Memory Garden loop QA cannot start: port ' + PORT +
+      ' is still held after 5s, so this run would be driving a server it does not ' +
+      'own and the results would be worthless. Find the holder with ' +
+      '"lsof -nP -iTCP:' + PORT + ' -sTCP:LISTEN" and stop it.\n');
+    process.exit(1);
+  }
+
+  /* The server's output used to go to /dev/null, so the one time it died mid run
+     the suite reported two baffling connection refused failures and threw the
+     reason away. Keep the pipes and read them, then a crash names itself. */
   const server = spawn(process.execPath, ['server.js'], {
     cwd: repoRoot,
     env: Object.assign({}, process.env, { PORT: String(PORT) }),
-    stdio: 'ignore'
+    stdio: ['ignore', 'pipe', 'pipe']
   });
+
   let stopped = false;
+  let exited = false;
+  let markGone = null;
+  const serverGone = new Promise(function (resolve) { markGone = resolve; });
   const stopServer = function () {
     if (!stopped) {
       stopped = true;
@@ -1376,12 +1432,37 @@ async function main() {
   };
   process.on('exit', stopServer);
 
+  const serverLog = [];
+  const keepOutput = function (stream) {
+    if (!stream) {
+      return;
+    }
+    stream.setEncoding('utf8');
+    stream.on('data', function (chunk) { serverLog.push(chunk); });
+  };
+  keepOutput(server.stdout);
+  keepOutput(server.stderr);
+  let serverDied = '';
+  server.on('error', function (error) {
+    serverDied = 'the dev server could not be spawned: ' + error.message;
+    exited = true;
+    markGone();
+  });
+  server.on('exit', function (code, signal) {
+    if (!stopped) {
+      serverDied = 'the dev server exited on its own, code ' + code + ', signal ' + signal;
+    }
+    exited = true;
+    markGone();
+  });
+
   let browser = null;
   let crash = null;
   try {
-    const up = await waitForServer(10000);
+    const up = await waitForServer(10000, function () { return !exited; });
     if (!up) {
-      throw new Error('dev server did not answer on ' + ORIGIN + ' within 10s');
+      throw new Error(serverDied ||
+        'dev server did not answer on ' + ORIGIN + ' within 10s');
     }
     browser = await chromium.launch();
     await run(browser);
@@ -1392,7 +1473,27 @@ async function main() {
       await browser.close();
     }
     stopServer();
+    // Wait for it to really go, so the next run back to back finds a free port.
+    await Promise.race([serverGone, sleep(3000)]);
+    if (!exited) {
+      try {
+        server.kill('SIGKILL');
+      } catch (err) {
+        // already gone
+      }
+      await Promise.race([serverGone, sleep(1000)]);
+    }
   }
+
+  // Let any last exit event and any final bytes off the pipes land before asking.
+  await sleep(150);
+
+  /* Ask this before the request and error counts, because a server that fell
+     over is the reason for every one of them and should read that way. */
+  const serverOutput = serverLog.join('').trim().split('\n').join(' / ');
+  check('the dev server stayed up for the whole run', serverDied === '',
+    serverDied === '' ? 'it said "' + serverOutput + '"'
+      : serverDied + ' :: ' + (serverOutput || 'it printed nothing at all'));
 
   // A tap the guard swallows is not a bug on its own, a suite full of them is.
   check('scripted taps land first time, the stale tap guard is not eating real ones',
