@@ -10,7 +10,7 @@ Updated as the run progresses, newest sections appended per phase.
 - Phase 0 (scaffold, schemas, seam, recon): in progress
 - Phase 1a (content banks): not started
 - Phase 1b (core slice U1 U2 U4 U8): not started
-- Phase 1c (style lock): not started
+- Phase 1c (style lock): done, candidate B locked (see decision 11)
 - Phase 2 (U5 U6 U7, bulk art): not started
 - Phase 3 (U3, share card, PWA, audio): not started
 - Phase 4 (adversaries, done-check, handoff): not started
@@ -54,6 +54,12 @@ run end):
 | # | What | Model | Credits | Kept |
 |---|---|---|---|---|
 | - | get_cost preflights x4 | - | 0 | - |
+| 1 | Style candidate A, storybook watercolor | nano_banana_pro 2k | 2 | yes, art/style/candidate-a.png |
+| 2 | Style candidate B, 1970s SG poster halftone | nano_banana_pro 2k | 2 | yes, art/style/candidate-b.png |
+| 3 | Style candidate C, soft gouache picture book | nano_banana_pro 2k | 2 | yes, art/style/candidate-c.png |
+| 4 | Style candidate D, peranakan decorative flat | nano_banana_pro 2k | 2 | yes, art/style/candidate-d.png |
+
+Running total: 8 of 300.
 
 ## Decision log
 
@@ -99,6 +105,22 @@ Every fork decided autonomously, with reasoning, for team review.
 10. **QA clock contract.** All date reads go through one overridable state
     function (localStorage `ctrlai:garden-of-life:qa-clock`) so Playwright QA
     can simulate day changes for streak verification, per GOAL done-check 4.
+11. **Art style locked: candidate B, 1970s Singapore poster.** Four candidates
+    generated (art/style/candidate-a.png through d), judged by a three-lens
+    Fable panel. Votes: senior legibility B 9/10 (bold outlines and wide value
+    jumps survive 80 to 160 px), product warmth B 9/10 (breeze blocks and
+    golden light are the exact 1970s a 70 year old was young in; nostalgic AND
+    alive, zero cuteness; also the most memorable in a deck), production
+    repeatability D 9/10 over B 6/10 (halftone drift, moire on downscale, aged
+    cast bleeding into cutouts). Locked B on the 2-of-3 vote and folded D's
+    production hygiene into the master scaffold as mitigation: flat fills,
+    crisp contours, halftone only in large background areas, plain cream
+    backgrounds on cutout assets, no aged cast on subjects. Scaffold and
+    character sheet notes in art/style/LOCKED.md. Candidate C rejected for
+    infantilizing register (the panel's words: draws the player as a storybook
+    grandma for grandchildren), A for elegiac fading and near-zero figure
+    ground separation at small sizes. Team can re-judge with all four PNGs in
+    the repo.
 
 ## What is real and what is canned (running list)
 
