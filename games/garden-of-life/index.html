@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#fbf6ee">
+<title>Garden of Life</title>
+<link rel="stylesheet" href="/shared/ui/tokens.css">
+<link rel="stylesheet" href="/shared/ui/base.css">
+<link rel="stylesheet" href="/games/garden-of-life/css/garden.css">
+<style>
+  :root {
+    --accent: var(--accent-garden);
+    --accent-tint: var(--accent-garden-tint);
+  }
+</style>
+</head>
+<body>
+<!--
+  The whole skeleton ships in one go, sections and ids included, so the waves
+  that follow only ever write js. Everything except the garden starts hidden and
+  main.js owns which section is on screen.
+-->
+<main class="page">
+
+  <section id="view-garden" class="view">
+    <header class="stack stack-tight">
+      <h1 class="game-title" id="garden-heading" tabindex="-1">Garden of Life</h1>
+      <p class="muted">Tell Auntie Bee one small thing, and it grows here.</p>
+    </header>
+
+    <!--
+      Gardener skeleton for M3. gardener.js fills the line, the reply chips and
+      the name form, then unhides this block. It stays out of the way until
+      there is something of hers to say, so M1 never shows an empty bubble.
+    -->
+    <div class="gardener" id="gardener" hidden>
+      <img class="gardener-art" id="gardener-art" alt="" hidden>
+      <div class="card card-accent gardener-bubble">
+        <p id="gardener-line" aria-live="polite"></p>
+        <div class="row" id="gardener-replies"></div>
+        <div class="name-form" id="gardener-name-form" hidden>
+          <p class="muted" id="gardener-name-label">What should I call you?</p>
+          <div class="row" id="honorific-chips"></div>
+          <input class="name-input" id="gardener-name-input" type="text" maxlength="24"
+                 autocomplete="off" aria-labelledby="gardener-name-label">
+          <button type="button" class="btn btn-block" id="gardener-name-save">Save this name</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="plots" id="plots"></div>
+
+    <button type="button" class="btn btn-block" id="tell-memory">Tell a memory</button>
+
+    <p class="centered"><a class="btn btn-plain btn-block" href="/">Back to hub</a></p>
+  </section>
+
+  <section id="view-picker" class="view" hidden>
+    <h2 id="picker-heading" tabindex="-1">Which one brings back a memory?</h2>
+    <p class="muted" id="picker-wait">Auntie Bee is still setting up her table. Come back in a moment.</p>
+    <div class="objects" id="objects"></div>
+    <button type="button" class="btn btn-quiet btn-block" data-back="garden">Back to the garden</button>
+  </section>
+
+  <!-- The primary button sits directly under the chips on every step, so the
+       optional note can never push the way forward past the bottom of a phone. -->
+  <section id="view-prompt" class="view" hidden>
+    <p class="muted" id="prompt-step">Question 1 of 3</p>
+    <h2 id="prompt-heading" tabindex="-1">Who was there with you?</h2>
+    <div class="row" id="prompt-chips"></div>
+    <button type="button" class="btn btn-block" id="prompt-next" aria-disabled="true">Next</button>
+    <p class="nudge" id="prompt-nudge" role="status" aria-live="polite"></p>
+    <div class="freetext" id="freetext-field" hidden>
+      <label class="freetext-label" for="freetext">For the grandchild: add one line of the story (optional)</label>
+      <textarea class="freetext-input" id="freetext" rows="2" maxlength="120"></textarea>
+    </div>
+    <button type="button" class="btn btn-quiet btn-block" id="prompt-back">Back</button>
+  </section>
+
+  <section id="view-ceremony" class="view" hidden>
+    <h2 id="ceremony-heading" tabindex="-1">Watch it grow</h2>
+    <p class="lead" id="ceremony-line" aria-live="polite"></p>
+    <div class="stage" id="ceremony-stage"></div>
+    <!-- Written copy, not a bank line, because the promise it makes has to hold
+         even when nothing has landed: the garden plants it young on purpose. -->
+    <p class="muted">In your garden it starts small, and every watering brings it closer to this.</p>
+    <button type="button" class="btn btn-block" id="ceremony-done">See the garden</button>
+  </section>
+
+</main>
+
+<!-- One panel for both jobs: the story replays here and the watering can lives
+     here, so a plant has exactly one thing you can do to it, and it is tapping it. -->
+<div id="view-plant" class="overlay" role="dialog" aria-modal="true" aria-labelledby="plant-title" hidden>
+  <div class="overlay-panel card">
+    <h2 id="plant-title" tabindex="-1">Your plant</h2>
+    <div class="stage stage-panel" id="plant-stage"></div>
+    <div class="row" id="plant-chips"></div>
+    <p id="plant-story" aria-live="polite"></p>
+    <div class="told" id="plant-told" hidden>
+      <p class="muted told-lead">As told by the grandchild</p>
+      <p class="told-line" id="plant-freetext"></p>
+    </div>
+    <div class="overlay-foot">
+      <p class="water-note" id="plant-water-note" role="status" aria-live="polite"></p>
+      <button type="button" class="btn btn-block" id="plant-water">Water this plant</button>
+      <button type="button" class="btn btn-quiet btn-block" id="plant-close">Back to garden</button>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="/games/garden-of-life/js/main.js"></script>
+</body>
+</html>

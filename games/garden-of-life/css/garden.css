@@ -1,0 +1,553 @@
+/*
+  Garden of Life styles. Sits on top of the shared tokens and base classes and
+  adds only what this game needs: the plot grid, the gardener bubble, the object
+  picker, the ceremony stage and the plant panel. Every size comes from a token
+  so the senior UX floor holds without anyone having to remember it.
+*/
+
+:root {
+  --accent: var(--accent-garden);
+  --accent-tint: var(--accent-garden-tint);
+}
+
+/* Views are flex columns, so the UA hidden rule needs to win outright. */
+[hidden] {
+  display: none !important;
+}
+
+/* ---- Page ground --------------------------------------------------------
+   The gradient is always painted, and the photograph is a layer on top of it.
+   Art lands late in this build, so a background that has not been drawn yet has
+   to change nothing: a 404 on the png simply leaves that layer unpainted. */
+
+body {
+  background-image:
+    url("/games/garden-of-life/art/backgrounds/day.png"),
+    linear-gradient(180deg, var(--color-bg) 0%, var(--accent-tint) 100%);
+  background-repeat: no-repeat, no-repeat;
+  background-position: center top, center top;
+  background-size: cover, cover;
+}
+
+.game-title {
+  color: var(--accent);
+}
+
+.view {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+}
+
+.btn-block {
+  width: 100%;
+}
+
+/* ---- Gardener -----------------------------------------------------------
+   Skeleton until M3 fills it. Her picture sits beside the bubble rather than
+   above it, so her first line lands in the same eyeline as the garden. */
+
+.gardener {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: var(--sp-3);
+}
+
+.gardener-art {
+  width: 88px;
+  height: 88px;
+  flex: none;
+  border-radius: var(--radius-md);
+}
+
+.gardener-bubble {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  flex: 1 1 auto;
+  /* A flex item refuses to shrink under its longest word without this, which is
+     how a long name pushes a whole phone screen sideways. */
+  min-width: 0;
+}
+
+#gardener-line {
+  overflow-wrap: anywhere;
+}
+
+.name-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+/* Typing is never required to get anywhere. The field exists for the grandchild
+   who wants to set a proper name, and it is sized like everything else. */
+.name-input {
+  width: 100%;
+  min-height: var(--tap-min);
+  padding: var(--sp-3) var(--sp-4);
+  border: 3px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+}
+
+/* ---- Garden plots -------------------------------------------------------
+   12 plots, 3 columns. At 390 wide the page has 342px of room, so a track is
+   106px across and a plot clears the 64px tap floor with most of it to spare.
+   The grid then grows a full row of 3 at a time so it never goes ragged. */
+
+.plots {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-3);
+}
+
+.plot {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  min-height: 100px;
+  min-width: var(--tap-min);
+  padding: var(--sp-2);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface-sunk);
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform var(--dur-fast) var(--ease-out),
+              border-color var(--dur-fast) var(--ease-out);
+}
+
+.plot:active {
+  transform: scale(0.97);
+}
+
+.plot-filled {
+  border-color: var(--accent);
+  background-color: var(--color-surface);
+}
+
+/* The plot that was just planted, for one render only. The ring is a resting
+   state on the class, so a reduced-motion request still gets the mark, it just
+   never sees it move or fade. */
+.plot-new {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-tint), 0 0 0 6px var(--accent);
+}
+
+/* Backwards, not both, on the entrance: once it has played the plot goes back to
+   its own styles, so the press feedback on :active is not left overridden. */
+@media (prefers-reduced-motion: no-preference) {
+  .plot-new {
+    animation: plot-arrive var(--dur-slow) var(--ease-out) backwards,
+               plot-ring calc(var(--dur-slow) * 2.4) var(--ease-out) forwards;
+  }
+}
+
+@keyframes plot-arrive {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes plot-ring {
+  0%,
+  60% {
+    box-shadow: 0 0 0 3px var(--accent-tint), 0 0 0 6px var(--accent);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 transparent, 0 0 0 0 transparent;
+  }
+}
+
+.plot svg {
+  width: 100%;
+  height: auto;
+}
+
+/* A thirsty plant drops back to the resting border instead of gaining a mark.
+   The composer draws the droop; nothing here may add anything that reads as a
+   warning, a fault, or a telling off. The plant is fine, it just wants water. */
+.plot.is-wilted {
+  border-color: var(--color-border);
+}
+
+/* Per stage hooks. The composer scales the drawing itself, so these are here for
+   presentation that belongs to the plot rather than to the plant, and they stay
+   empty until something actually needs them. */
+.plot[data-stage="0"] {
+  /* young */
+}
+
+.plot[data-stage="1"] {
+  /* growing */
+}
+
+.plot[data-stage="2"] {
+  /* full */
+}
+
+/* ---- Object picker ------------------------------------------------------ */
+
+.objects {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--sp-3);
+}
+
+.object-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--sp-2);
+  min-height: 200px;
+  padding: var(--sp-3);
+  border: 3px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  font-size: var(--fs-body);
+  line-height: var(--lh-tight);
+  text-align: center;
+  cursor: pointer;
+  overflow-wrap: break-word;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform var(--dur-fast) var(--ease-out),
+              border-color var(--dur-fast) var(--ease-out);
+}
+
+.object-card:active {
+  transform: scale(0.97);
+}
+
+/* The illustration is optional by design. When the png has not landed the card
+   is still a warm block with its name on it, which is all the tap needs. */
+.object-art {
+  width: 96px;
+  height: 96px;
+  flex: none;
+  object-fit: contain;
+}
+
+/* ---- Chips -------------------------------------------------------------- */
+
+.chip {
+  max-width: 100%;
+}
+
+.chip-static {
+  cursor: default;
+}
+
+/* ---- The not yet button and its nudge -----------------------------------
+   The shared rule fades a disabled button to 55% and takes its pointer events
+   away, which puts the label at about 3:1 and makes a tap on the biggest thing
+   on screen do nothing at all. Here it keeps a fully readable label, stays
+   tappable, and answers the tap with a line rather than a scolding. */
+
+/* Both ends of the not yet flip are readable, the crossfade between them is
+   not: the shared rule eases background-color over 140ms while the label colour
+   snaps, so white text sits on a pale sage wash for those frames. Transform
+   only, so the press feedback stays and the state change lands in one frame. */
+#prompt-next {
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+
+#prompt-next[aria-disabled="true"] {
+  opacity: 1;
+  pointer-events: auto;
+  border-color: var(--color-border);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  filter: none;
+}
+
+.nudge {
+  color: var(--color-text-muted);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+}
+
+.nudge:empty {
+  display: none;
+}
+
+/* ---- Grandchild note ----------------------------------------------------
+   Optional on purpose. Nothing downstream ever requires it, so a player who
+   only taps never learns it is there, and a grandchild who wants to write can. */
+
+.freetext {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.freetext-label {
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  color: var(--color-text-muted);
+}
+
+.freetext-input {
+  width: 100%;
+  min-height: var(--tap-min);
+  padding: var(--sp-3) var(--sp-4);
+  border: 3px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  resize: none;
+}
+
+.told {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  padding-left: var(--sp-4);
+  border-left: 4px solid var(--accent);
+}
+
+/* A grandchild can type 120 characters with no space in them, a URL or an email
+   or one long run-on, and an unbroken run like that would otherwise push the
+   whole panel off the side of the phone. */
+.told-line,
+#plant-story {
+  overflow-wrap: anywhere;
+}
+
+.told-line {
+  font-style: italic;
+}
+
+.told-line::before {
+  content: '"';
+}
+
+.told-line::after {
+  content: '"';
+}
+
+/* ---- Stage -------------------------------------------------------------- */
+
+.stage {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  min-height: 300px;
+}
+
+.stage svg {
+  width: 230px;
+  max-width: 100%;
+  height: auto;
+}
+
+/* Inside the panel the plant shares the screen with its story and the watering
+   can, so it is drawn big enough to recognise and no bigger. */
+.stage-panel {
+  min-height: 0;
+}
+
+.stage-panel svg {
+  width: 180px;
+}
+
+/* The ceremony assembles the plant in layers: the pot settles, the stem rises
+   into it, leaves fill in, blooms open with a small overshoot, the ornament
+   arrives last. Delays are multiples of a token, so a reduced-motion request
+   collapses the whole thing to instant. Animation rather than transition on
+   purpose: the fill mode carries the final state, so the plant is never left
+   invisible waiting on a frame that has not come. */
+
+.stage-grow .plant > g {
+  animation: layer-in var(--dur-base) var(--ease-out) both;
+}
+
+.stage-grow .plant > .layer-pot {
+  animation-name: pot-settle;
+}
+
+.stage-grow .plant > .layer-stem {
+  animation-delay: var(--dur-base);
+}
+
+.stage-grow .plant > .layer-leaves {
+  animation-delay: calc(var(--dur-base) * 2);
+}
+
+.stage-grow .plant > .layer-blooms {
+  animation-delay: calc(var(--dur-base) * 3);
+}
+
+.stage-grow .plant > .layer-ornament {
+  animation-delay: calc(var(--dur-base) * 4);
+}
+
+/* Movement rides on the inner group of each layer. The outer group carries the
+   lean and the ornament position as SVG transform attributes, and a CSS
+   transform on that element would throw both away. */
+
+.stage-grow .plant > .layer-stem > g {
+  animation: stem-rise var(--dur-base) var(--ease-out) both;
+  animation-delay: var(--dur-base);
+}
+
+.stage-grow .plant > .layer-blooms > g,
+.stage-grow .plant > .layer-ornament > g {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.stage-grow .plant > .layer-blooms > g {
+  animation: bloom-pop var(--dur-base) var(--ease-out) both;
+  animation-delay: calc(var(--dur-base) * 3);
+}
+
+.stage-grow .plant > .layer-ornament > g {
+  animation: ornament-pop var(--dur-base) var(--ease-out) both;
+  animation-delay: calc(var(--dur-base) * 4);
+}
+
+@keyframes layer-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pot-settle {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes stem-rise {
+  from {
+    transform: translateY(7px);
+  }
+
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes bloom-pop {
+  from {
+    transform: scale(0.72);
+  }
+
+  60% {
+    transform: scale(1.06);
+  }
+
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes ornament-pop {
+  from {
+    transform: scale(0.8);
+  }
+
+  to {
+    transform: scale(1);
+  }
+}
+
+/* ---- Plant panel -------------------------------------------------------- */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding:
+    calc(var(--safe-top) + var(--sp-3))
+    calc(var(--safe-right) + var(--sp-3))
+    0
+    calc(var(--safe-left) + var(--sp-3));
+  background-color: var(--color-bg);
+  overflow-y: auto;
+  /* Reaching the end of the story must not start scrolling the garden behind it. */
+  overscroll-behavior: contain;
+}
+
+/* A long story can outrun the screen, so the way out and the watering can both
+   stay pinned in view. The band carries the card colour, otherwise text slides
+   through the buttons. */
+.overlay-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  width: 100%;
+  max-width: var(--page-max);
+  padding: var(--sp-4) var(--sp-4) 0;
+}
+
+.overlay-foot {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: var(--sp-3) 0 calc(var(--safe-bottom) + var(--sp-4));
+  /* A real edge. The gradient below fades text sliding under the band, but a
+     surface to transparent fade painted on surface shows nothing at rest, so the
+     band needs a line of its own to read as an edge and not as the end. */
+  border-top: 2px solid var(--color-border);
+  background-color: var(--color-surface);
+}
+
+/* Story text fades out into the band instead of being sliced mid line. */
+.overlay-foot::before {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 100%;
+  left: 0;
+  height: var(--sp-5);
+  background: linear-gradient(to top, var(--color-surface), transparent);
+  pointer-events: none;
+}
+
+/* What the watering can answers with. Muted rather than loud, because every
+   answer it can give is good news, including watering twice in one day. */
+.water-note {
+  color: var(--color-text-muted);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+}
+
+.water-note:empty {
+  display: none;
+}
