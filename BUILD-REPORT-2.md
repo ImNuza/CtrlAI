@@ -59,7 +59,31 @@ run end):
 | 3 | Style candidate C, soft gouache picture book | nano_banana_pro 2k | 2 | yes, art/style/candidate-c.png |
 | 4 | Style candidate D, peranakan decorative flat | nano_banana_pro 2k | 2 | yes, art/style/candidate-d.png |
 
-Running total: 8 of 300.
+| 5 | Auntie Bee anchor portrait | nano_banana_pro 2k, ref B | 2 | kept |
+| 6-13 | Heritage objects x8 (kopitiam-cup, setron-tv, sewing-machine, kampung-house, rediffusion-set, provision-shop, dragon-playground, tingkat) | nano_banana_pro 2k, ref B | 16 | kept |
+| 14-15 | Backgrounds day + dusk | nano_banana_pro 2k 9:16, ref B | 4 | kept |
+| 16-22 | UI props x6 (coin, seed-packet, watering-can, speaker, shop, sprout) + app icon | recraft_v4_1 vector 1k | 8.75 | kept |
+| 23-26 | UI props x4 (basket, camera, trophy, share), retried after 429 | recraft_v4_1 vector 1k | 5 | kept |
+
+| 27-32 | Auntie Bee expressions x6 (welcome, happy, thinking, watering, concerned, celebrate) | nano_banana_pro 2k, ref anchor | 12 | kept |
+| 33 | rediffusion-set retry (v1 had photographic blur bleed in lower third) | nano_banana_pro 2k, ref B | 2 | kept |
+| 34 | dragon-playground retry (v1 drew a living creature, not the playground structure) | nano_banana_pro 2k, ref B | 2 | kept |
+
+| 35-40 | Meal illustrations x6 (sambal-kangkung, bayam-soup, chap-chye, nasi-lemak, mee-goreng, sambal-sweet-potato-leaves) | nano_banana_pro 2k, ref B | 12 | kept |
+
+Running total: 71.75 of 300. First 429 attempts were rejected before start and cost
+nothing. Review outcomes so far: anchor, 7 of 8 objects, both backgrounds, all 10
+prop SVGs and the icon SVG accepted on first take; tingkat kept with a minor soft
+base fade (not a clear failure, no retry spent); recraft vector output turned out
+to be real SVG files, so UI props ship as transparent SVGs (background rect
+stripped mechanically) instead of PNGs needing remove_background, which saves
+those credits entirely. Meal batch: all six kept on first take (minor edge
+smudges on sambal-kangkung and mee-goreng, invisible at card size). Dragon
+playground v2 kept with haze around the head; correct structure beat the crisp
+but wrong v1, and its retry budget is spent. The planned asset catalog is now
+fully generated: no further generation is planned; anything from here spends
+reserve only. Full-resolution originals live in the Higgsfield account under
+the job ids in this ledger; the repo carries game-sized downscales.
 
 ## Decision log
 
