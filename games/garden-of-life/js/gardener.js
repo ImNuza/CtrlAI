@@ -28,11 +28,12 @@ const ART_DIR = '/games/garden-of-life/art/gardener/';
 
 /* ---- expressions ---------------------------------------------------------
    The map the stretch plan fixes, written out so it can be read rather than
-   inferred. welcome greets, happy answers a name and admires a plant,
-   celebrate is for the moment a memory goes into the soil, watering is the
-   can, and concerned is care for a thirsty plant and never blame for it.
-   thinking is the quiet default, so an event nobody planned for still gets a
-   face rather than a blank square.
+   inferred. welcome greets, happy answers a name, admires a plant and takes in
+   a full basket, celebrate is for the moment a memory goes into the soil and
+   for the dish a harvest just opened, watering is the can, and concerned is
+   care for a thirsty plant and never blame for it. thinking is the quiet
+   default, so an event nobody planned for still gets a face rather than a
+   blank square.
 
    art/gardener/anchor.png is the character sheet the six faces were drawn
    from. It is not an expression and is deliberately not named here. */
@@ -43,7 +44,9 @@ const EXPRESSION = {
   return_after_absence: 'welcome',
   name_saved: 'happy',
   plant_comment: 'happy',
+  harvest: 'happy',
   planting: 'celebrate',
+  meal_unlock: 'celebrate',
   watering: 'watering',
   wilt_notice: 'concerned'
 };

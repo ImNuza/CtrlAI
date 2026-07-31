@@ -830,7 +830,11 @@ async function calmDegradeSession(browser) {
   });
   await auditScreen(page, 'picker with no prompt bank');
 
-  await press(page, '[data-back="garden"]', '#view-garden');
+  /* Scoped to the picker rather than page wide. The three stretch-two sections
+     bring their own way out and deliberately do not carry data-back, but a page
+     wide match would still be one selector hoping to stay unique forever, and
+     the button this check means is the picker's. */
+  await press(page, '#view-picker [data-back="garden"]', '#view-garden');
   const back = await page.locator('#view-garden').isVisible();
   const newErrors = pageErrors.length - pageErrorsBefore;
 

@@ -31,9 +31,9 @@ import { todayISO } from './state.js';
 
 /* ---- the shape of a round ----------------------------------------------- */
 
+// Eight pairs, so sixteen tiles, laid out four across by css/garden.css. PAIRS
+// is the only one of those three numbers this file needs to know.
 const PAIRS = 8;
-const TILE_COUNT = PAIRS * 2;
-const COLUMNS = 4;
 
 // Fixed by the stretch plan and paid by the glue, never by this file. It is
 // named here only so the finishing line can say out loud what was earned.
@@ -194,52 +194,18 @@ const MATCH_MARK = '<span class="puzzle-mark">' +
   '<path d="M6.5 12.5 L10.5 16.5 L17.5 8" fill="none" stroke="var(--color-text-on-accent)" ' +
   'stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
 
-/* ---- baseline styling ---------------------------------------------------
-   This module owns no stylesheet, and css/garden.css belongs to another seat,
-   so the floor the board needs travels with the board. The block goes in as the
-   first child of head, which puts it before garden.css in document order: any
-   rule the B seat writes for these classes wins on a tie without needing
-   !important, and this can be deleted outright once that css lands.
+/* ---- where the styling lives --------------------------------------------
+   css/garden.css owns .puzzle-board, .puzzle-tile, its data-state variants and
+   .puzzle-mark. This module carried a copy of those rules while the section html
+   was still on its way, and dropped it the moment the real css landed; the class
+   names and the data-state values below are the whole seam between the two
+   files, so renaming one here silently unstyles the board.
 
-   Track arithmetic, at the 390 wide phone this game is built for: the page has
-   342px of room, three 8px gaps leave 318, so a tile is about 79px square. That
-   clears the 64px tap floor with room to spare and lands where the plan asked.
-   The columns stay fractional rather than pinned to 64px, because a board that
-   forced its own width on a narrower phone would trade a comfortable tile for a
-   sideways scrollbar, and the scrollbar is the worse of the two. */
-
-const STYLE_ID = 'puzzle-baseline-style';
-
-const BASELINE_CSS = [
-  '.puzzle-board{display:grid;grid-template-columns:repeat(' + COLUMNS + ',1fr);gap:var(--sp-2);}',
-  '.puzzle-tile{position:relative;display:flex;align-items:center;justify-content:center;',
-  'aspect-ratio:1/1;min-height:var(--tap-min);padding:var(--sp-2);',
-  'border:3px solid var(--accent);border-radius:var(--radius-md);',
-  'background-color:var(--accent-tint);cursor:pointer;touch-action:manipulation;',
-  '-webkit-tap-highlight-color:transparent;user-select:none;',
-  'transition:transform var(--dur-fast) var(--ease-out),',
-  'background-color var(--dur-fast) var(--ease-out);}',
-  '.puzzle-tile:active{transform:scale(0.97);}',
-  '.puzzle-tile[data-state="up"]{background-color:var(--color-surface);border-color:var(--color-border);}',
-  '.puzzle-tile[data-state="matched"]{background-color:var(--color-surface);',
-  'border-color:var(--accent);border-width:5px;}',
-  '.puzzle-tile svg{width:100%;height:100%;}',
-  '.puzzle-mark{position:absolute;right:2px;bottom:2px;width:22px;height:22px;}'
-].join('');
-
-function ensureBaselineStyle() {
-  if (document.getElementById(STYLE_ID) !== null) {
-    return;
-  }
-  const head = document.head;
-  if (head === null || head === undefined) {
-    return;
-  }
-  const style = document.createElement('style');
-  style.id = STYLE_ID;
-  style.textContent = BASELINE_CSS;
-  head.insertBefore(style, head.firstChild);
-}
+   Two things that css is holding, worth knowing before anything moves them: the
+   grid is four fractional columns rather than four pinned 64px ones, so a narrow
+   phone loses a little tile rather than gaining a sideways scrollbar, and a
+   settled tile is told apart from a turned up one by fill, border weight and the
+   badge together, never by colour alone. */
 
 /* ---- the engine ---------------------------------------------------------
    Everything from here to the DOM layer is pure: it reads the round it is
@@ -264,7 +230,7 @@ export function roundSeed(day, counter) {
 /**
  * Deal sixteen face ids: every motif exactly twice, shuffled.
  * @param {number|string} seed Anything makeRng accepts, normally roundSeed().
- * @returns {Array<string>} TILE_COUNT face ids in board order.
+ * @returns {Array<string>} Sixteen face ids in board order.
  */
 export function buildDeck(seed) {
   const deck = [];
@@ -698,7 +664,6 @@ export function initPuzzle(options) {
     return 0;
   }
 
-  ensureBaselineStyle();
   ensureLive(el.progress);
   ensureLive(el.line);
   if (el.again !== null && el.again.textContent.trim() === '') {

@@ -35,9 +35,18 @@ Updated as the run progresses, newest sections appended per phase.
   Verified by my own fresh days.mjs run and a first-hand look at the live
   gardener greeting.
 - Phase 1c (style lock): done, candidate B locked (see decision 11)
-- Phase 2 (U5 U6 U7, bulk art): art half done ahead of schedule, every planned
-  asset generated, reviewed, committed (batches one and two); code half waits
-  on the M2 core
+- Phase 2 (U5 U6 U7, bulk art): done. Art half committed early (batches one
+  and two). Code half gate-green: coins with a fixed 6-coin puzzle payout,
+  seed shop at 4/8/12 with a daily free common and the rare shelf opening at
+  streak 3 (rungs 7 and 14 coded, one rare crop tonight, team tuning knob),
+  streaks pausing never resetting, guided placement, crop lifecycle to
+  harvest and basket, meal cards unlocking by consuming exact crop sets with
+  the celebrate face, lossless v1-to-v2 save migration. Suites: economy 33,
+  days 26, core 29, composer-check, all run by coders, the orchestrator, and
+  the conductor independently. Zero app defects in the stretch-two wave.
+  Notable engineering: the mahjong lift's 600ms miss timer was replaced by
+  player-paced next-tap flipping so the game contains no timers at all;
+  the shim-deletion was proven visually void with a zero-pixel diff.
 - Phase 3 (U3, share card, PWA, audio): not started
 - Phase 4 (adversaries, done-check, handoff): not started
 

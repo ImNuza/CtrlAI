@@ -53,7 +53,26 @@
 
     <div class="plots" id="plots"></div>
 
+    <!-- Under the plots on purpose. A banner above them would move the whole
+         grid the moment placement starts or is cancelled, and the tap it is
+         asking for is a tap on a plot. -->
+    <div class="banner" id="placement-banner" hidden>
+      <p id="placement-line"></p>
+      <button type="button" class="btn btn-quiet btn-block" id="placement-cancel">Not now</button>
+    </div>
+
     <button type="button" class="btn btn-block" id="tell-memory">Tell a memory</button>
+
+    <p class="coins-pill" id="garden-coins">0 coins</p>
+
+    <!-- Stacked rather than three across: at 390 a three column row leaves about
+         56px of room for a word like Puzzle at the 28px floor, and the label
+         would spill out of its own button. -->
+    <div class="entries">
+      <button type="button" class="btn btn-quiet btn-block" id="open-puzzle">Match the pairs</button>
+      <button type="button" class="btn btn-quiet btn-block" id="open-shop">Seed shop</button>
+      <button type="button" class="btn btn-quiet btn-block" id="open-meals">Meal cards</button>
+    </div>
 
     <p class="centered"><a class="btn btn-plain btn-block" href="/">Back to hub</a></p>
   </section>
@@ -90,6 +109,36 @@
     <button type="button" class="btn btn-block" id="ceremony-done">See the garden</button>
   </section>
 
+  <!-- puzzle.js renders the board and owns every word inside it, and binds this
+       back button itself, which it only does when the button is not marked
+       data-back. It is not marked, because qa/core.mjs taps the picker's way out
+       through a page wide [data-back="garden"] and a second marked button turns
+       that into an ambiguous match. One marked button on the page, and every
+       other way out is bound by id. -->
+  <section id="view-puzzle" class="view" hidden>
+    <h2 id="puzzle-heading" tabindex="-1">Match the pairs</h2>
+    <p class="coins-pill" id="puzzle-coins">0 coins</p>
+    <div class="puzzle-board" id="puzzle-board"></div>
+    <p class="muted" id="puzzle-progress"></p>
+    <p id="puzzle-line"></p>
+    <button type="button" class="btn btn-block" id="puzzle-again">Play another round</button>
+    <button type="button" class="btn btn-quiet btn-block" id="puzzle-back">Back to the garden</button>
+  </section>
+
+  <section id="view-shop" class="view" hidden>
+    <h2 id="shop-heading" tabindex="-1">Seed shop</h2>
+    <p class="coins-pill" id="shop-coins">0 coins</p>
+    <div id="shop-free"></div>
+    <div class="shop-grid" id="shop-grid"></div>
+    <button type="button" class="btn btn-quiet btn-block" id="shop-back">Back to the garden</button>
+  </section>
+
+  <section id="view-meals" class="view" hidden>
+    <h2 id="meals-heading" tabindex="-1">Meal cards</h2>
+    <div class="meals-grid" id="meals-grid"></div>
+    <button type="button" class="btn btn-quiet btn-block" id="meals-back">Back to the garden</button>
+  </section>
+
 </main>
 
 <!-- One panel for both jobs: the story replays here and the watering can lives
@@ -114,6 +163,8 @@
         <svg class="chev" viewBox="0 0 24 24" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg"><path d="M5 9 L12 16.5 L19 9" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </p>
       <p class="water-note" id="plant-water-note" role="status" aria-live="polite"></p>
+      <!-- Crops only, and only once they are ready. Memories are never picked. -->
+      <button type="button" class="btn btn-block" id="plant-harvest" hidden>Pick this one</button>
       <button type="button" class="btn btn-block" id="plant-water">Water this plant</button>
       <button type="button" class="btn btn-quiet btn-block" id="plant-close">Back to garden</button>
     </div>

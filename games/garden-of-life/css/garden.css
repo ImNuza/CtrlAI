@@ -599,6 +599,209 @@ body {
   flex: none;
 }
 
+/* ---- The economy: coins, entries, placement ------------------------------ */
+
+/* A readout, not a control, so it carries no tap affordance and no hover. It
+   still sits at the body size, because a number a player is counting on is not
+   a caption. */
+.coins-pill {
+  align-self: center;
+  padding: var(--sp-2) var(--sp-5);
+  border: 2px solid var(--accent);
+  border-radius: var(--radius-pill);
+  background-color: var(--accent-tint);
+  color: var(--color-text);
+  font-size: var(--fs-body);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-tight);
+  text-align: center;
+}
+
+/* Stacked, not three across. At 390 a three column row leaves each label about
+   56px of room at the 28px floor, which is less than the word Puzzle needs. */
+.entries {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+/* The one guided moment in the game. It sits under the plots so that appearing
+   and disappearing never moves the grid it is asking the player to tap. */
+.banner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+  border: 3px solid var(--accent);
+  border-radius: var(--radius-lg);
+  background-color: var(--accent-tint);
+}
+
+/* ---- Puzzle -------------------------------------------------------------
+   Same class names and the same geometry as the baseline block puzzle.js
+   carries, so that module can drop its own copy with nothing changing on
+   screen. At 390 the page has 342px, three 8px gaps leave 318, so a tile is
+   about 79px square and clears the tap floor with room to spare. The columns
+   stay fractional: a board that pinned its own width would trade a comfortable
+   tile for a sideways scrollbar on a narrower phone. */
+
+.puzzle-board {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--sp-2);
+}
+
+.puzzle-tile {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1 / 1;
+  min-height: var(--tap-min);
+  padding: var(--sp-2);
+  border: 3px solid var(--accent);
+  border-radius: var(--radius-md);
+  background-color: var(--accent-tint);
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  transition: transform var(--dur-fast) var(--ease-out),
+              background-color var(--dur-fast) var(--ease-out);
+}
+
+.puzzle-tile:active {
+  transform: scale(0.97);
+}
+
+/* Face up and settled are told apart by fill, border weight and the badge, so
+   the board never depends on colour alone to say what is going on. */
+.puzzle-tile[data-state="up"] {
+  background-color: var(--color-surface);
+  border-color: var(--color-border);
+}
+
+.puzzle-tile[data-state="matched"] {
+  background-color: var(--color-surface);
+  border-color: var(--accent);
+  border-width: 5px;
+}
+
+.puzzle-tile svg {
+  width: 100%;
+  height: 100%;
+}
+
+.puzzle-mark {
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  width: 22px;
+  height: 22px;
+}
+
+/* ---- Shop and meals -----------------------------------------------------
+   One column at 390. Two columns of 28px text on a phone gives about seven
+   characters a line, which is how a price ends up under its own name. */
+
+.shop-grid,
+.meals-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--sp-3);
+}
+
+.shop-card,
+.meal-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-4);
+  border: 3px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  font-size: var(--fs-body);
+  line-height: var(--lh-tight);
+  text-align: center;
+  overflow-wrap: break-word;
+}
+
+.shop-art,
+.meal-art {
+  width: 120px;
+  height: auto;
+}
+
+.meal-art {
+  width: 100%;
+  max-width: 240px;
+  border-radius: var(--radius-md);
+}
+
+.shop-name,
+.meal-name {
+  font-weight: var(--fw-bold);
+}
+
+.shop-price {
+  color: var(--color-text);
+  font-weight: var(--fw-bold);
+}
+
+.shop-lock,
+.meal-benefit {
+  color: var(--color-text-muted);
+  line-height: var(--lh-body);
+}
+
+/* The answer a card gives after a tap. It collapses when it has nothing to say,
+   so an empty line never holds space open, and the cards under it only move
+   when there is genuinely something new to read. Same rule as the water note. */
+.shop-note,
+.shop-free-note {
+  color: var(--color-text-muted);
+  line-height: var(--lh-body);
+}
+
+.shop-note:empty,
+.shop-free-note:empty {
+  display: none;
+}
+
+.shop-free-lead {
+  font-weight: var(--fw-bold);
+}
+
+/* The free packet picker. A row that wraps, so three or four crop names at the
+   28px floor stack instead of running off the side of the phone. */
+.shop-free-picks {
+  justify-content: center;
+}
+
+/* A dish already made keeps its card for good, so it reads as earned rather
+   than as merely available. */
+.meal-card.is-cooked {
+  border-color: var(--accent);
+}
+
+/* Locked is a preview, never a wall: the card still says what the dish is and
+   what it wants, so nothing a player grows is a dead end. */
+.shop-card.is-locked,
+.meal-card.is-locked {
+  border-style: dashed;
+  background-color: var(--color-surface-sunk);
+}
+
+/* When there is something to pick, picking is the action. The watering can stays
+   right there and stays the same size, it just stops competing for the eye. */
+#plant-harvest:not([hidden]) ~ #plant-water {
+  background-color: transparent;
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
 /* What the watering can answers with. Muted rather than loud, because every
    answer it can give is good news, including watering twice in one day. */
 .water-note {

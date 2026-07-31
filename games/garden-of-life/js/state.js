@@ -14,7 +14,7 @@
 import { loadState, saveState } from '../../../shared/storage.js';
 
 const NS = 'garden-of-life';
-const STATE_VERSION = 1;
+const STATE_VERSION = 2;
 
 // QA writes this key and reloads to simulate a day passing. Read directly rather
 // than through shared/storage.js, because it is QA apparatus and not game state.
@@ -32,8 +32,16 @@ const MS_PER_DAY = 86400000;
 const MAX_NAME = 40;
 const MAX_HONORIFIC = 24;
 const MAX_FREE_TEXT = 120;
+const MAX_CROP_ID = 40;
+const FREE_SEED_TIER = 'common';
 
 let state = emptyState();
+
+/* The crop and dish catalogues, injected once at boot from the files main.js
+   already fetches. Held rather than imported so this module keeps its promise of
+   working under plain node with no network and no content on disk: without them
+   the free seed and the meal check simply answer no, and nothing throws. */
+let catalogue = { crops: {}, dishes: [] };
 
 /* ---- the document ------------------------------------------------------- */
 
@@ -50,7 +58,15 @@ function emptyState() {
       memoryHint: ''
     },
     nextPlantId: 1,
-    plants: []
+    plants: [],
+    // ---- v2, the economy. Everything below defaults to empty, which is what a
+    // v1 save migrates into: nothing owned, nothing spent, nothing lost.
+    coins: 0,
+    streak: { days: 0, lastCountedDay: '' },
+    seeds: {},
+    basket: {},
+    meals: { unlocked: [] },
+    freeSeed: { lastClaimDay: '' }
   };
 }
 
@@ -93,6 +109,8 @@ function cleanPlant(raw) {
     kind: raw.kind === 'crop' ? 'crop' : 'memory',
     plantedDay: isoDay(raw.plantedDay),
     objectId: raw.objectId,
+    // Empty on a memory, and the reason a crop knows what it is.
+    cropId: text(raw.cropId, MAX_CROP_ID),
     answers: plainObject(raw.answers),
     phrases: plainObject(raw.phrases),
     tags: plainObject(raw.tags),
@@ -100,6 +118,39 @@ function cleanPlant(raw) {
     seed: Number.isFinite(raw.seed) ? raw.seed : 0,
     wateredDays: watered
   };
+}
+
+/* A map of crop id to how many, for the seed packet drawer and the basket. Only
+   whole positive counts survive: a zero or a negative is the same as not owning
+   the thing, and carrying it around would only complicate every reader. */
+function countMap(value) {
+  const source = plainObject(value);
+  const out = {};
+  const keys = Object.keys(source);
+  for (let i = 0; i < keys.length; i += 1) {
+    const id = text(keys[i], MAX_CROP_ID);
+    const count = source[keys[i]];
+    if (id !== '' && Number.isFinite(count) && count > 0) {
+      out[id] = Math.floor(count);
+    }
+  }
+  return out;
+}
+
+function idList(value) {
+  const source = Array.isArray(value) ? value : [];
+  const out = [];
+  for (let i = 0; i < source.length; i += 1) {
+    const id = text(source[i], MAX_CROP_ID);
+    if (id !== '' && out.indexOf(id) === -1) {
+      out.push(id);
+    }
+  }
+  return out;
+}
+
+function wholeCount(value) {
+  return Number.isFinite(value) && value > 0 ? Math.floor(value) : 0;
 }
 
 function cleanPlayer(raw) {
@@ -214,6 +265,13 @@ export function daysBetween(isoA, isoB) {
 /**
  * Read the saved garden, drop anything malformed, and hold it as the singleton.
  * Called once by main.js on boot.
+ *
+ * Migration from v1 is lossless by construction: every v1 field is read by the
+ * same code that read it before, and the v2 blocks are defaulted from the empty
+ * document rather than being required. A save written before the economy
+ * existed keeps every plant, every phrase and every watered day, and simply
+ * arrives with nothing in its pockets.
+ *
  * @returns {Object} The live state document.
  */
 export function initState() {
@@ -230,13 +288,50 @@ export function initState() {
       plants.push(cleanPlant(stored[i]));
     }
   }
+  const streak = plainObject(raw.streak);
+  const meals = plainObject(raw.meals);
+  const freeSeed = plainObject(raw.freeSeed);
   state = {
     version: STATE_VERSION,
     player: cleanPlayer(raw.player),
     nextPlantId: nextIdFor(raw.nextPlantId, plants),
-    plants: plants
+    plants: plants,
+    coins: wholeCount(raw.coins),
+    streak: {
+      days: wholeCount(streak.days),
+      lastCountedDay: isoDay(streak.lastCountedDay)
+    },
+    seeds: countMap(raw.seeds),
+    basket: countMap(raw.basket),
+    meals: { unlocked: idList(meals.unlocked) },
+    freeSeed: { lastClaimDay: isoDay(freeSeed.lastClaimDay) }
   };
   return state;
+}
+
+/**
+ * Hand state the catalogues it needs to judge an economy move: which crops exist
+ * and what tier they are, and which dishes want which crops. Injected rather
+ * than imported, so this module still runs with no content on disk.
+ * @param {{crops?: Object, dishes?: Array<Object>}} data crops is the crops map
+ *   from plant-traits.json, dishes is the dishes array from meal-cards.json.
+ * @returns {{crops: number, dishes: number}} How much of each was accepted.
+ */
+export function loadCatalogue(data) {
+  const source = plainObject(data);
+  const crops = plainObject(source.crops);
+  const dishes = [];
+  const rawDishes = Array.isArray(source.dishes) ? source.dishes : [];
+  for (let i = 0; i < rawDishes.length; i += 1) {
+    const dish = plainObject(rawDishes[i]);
+    const id = text(dish.id, MAX_CROP_ID);
+    const wants = idList(dish.crops);
+    if (id !== '' && wants.length > 0) {
+      dishes.push({ id: id, name: text(dish.name, MAX_NAME), crops: wants });
+    }
+  }
+  catalogue = { crops: crops, dishes: dishes };
+  return { crops: Object.keys(crops).length, dishes: dishes.length };
 }
 
 /**
@@ -278,9 +373,22 @@ export function recordVisit() {
   player.prevVisitDay = last;
   player.lastVisitDay = today;
   player.visitCount += 1;
+  recordPlayDay(today);
   saveNow();
 
   return { kind: kind, daysAway: daysAway };
+}
+
+/* The streak counts days the player showed up, and nothing else. A gap pauses
+   it and picks up where it left off, because a counter that punishes a week in
+   hospital by going back to zero is a counter that teaches people to stop
+   coming back. Folded into recordVisit so no caller can forget it. */
+function recordPlayDay(today) {
+  if (today === '' || state.streak.lastCountedDay === today) {
+    return;
+  }
+  state.streak.days += 1;
+  state.streak.lastCountedDay = today;
 }
 
 /* ---- plants ------------------------------------------------------------- */
@@ -462,4 +570,229 @@ export function setPlayerName(name, honorific) {
   state.player.honorific = text(honorific, MAX_HONORIFIC);
   saveNow();
   return state.player;
+}
+
+/* ---- coins --------------------------------------------------------------
+   One currency, earned at a fixed rate, spent at printed prices. There is no
+   second currency, no top up and no chance anywhere in here, which is the point:
+   a game aimed at seniors must never contain a mechanism a regulator would
+   recognise as a compulsion loop. */
+
+/**
+ * @returns {number} Coins in hand.
+ */
+export function getCoins() {
+  return state.coins;
+}
+
+/**
+ * Pay the player. The amount is the caller's fixed constant, never a roll.
+ * @param {number} amount Whole coins. Anything else is ignored.
+ * @returns {number} The new balance.
+ */
+export function addCoins(amount) {
+  const gain = wholeCount(amount);
+  if (gain === 0) {
+    return state.coins;
+  }
+  state.coins += gain;
+  saveNow();
+  return state.coins;
+}
+
+/**
+ * Take coins for a purchase. Refuses rather than going negative, and refuses an
+ * amount that is not a whole positive number, so a malformed price can never
+ * hand out something for nothing.
+ * @param {number} amount
+ * @returns {boolean} True only when the coins actually left the purse.
+ */
+export function spendCoins(amount) {
+  const cost = wholeCount(amount);
+  if (cost === 0 || state.coins < cost) {
+    return false;
+  }
+  state.coins -= cost;
+  saveNow();
+  return true;
+}
+
+/**
+ * @returns {{days: number, lastCountedDay: string}} Days shown up, never reset.
+ */
+export function getStreak() {
+  return state.streak;
+}
+
+/* ---- seeds and crops ---------------------------------------------------- */
+
+/**
+ * @returns {Object.<string, number>} Seed packets by crop id. Read only.
+ */
+export function getSeeds() {
+  return state.seeds;
+}
+
+/**
+ * Put a seed packet in the drawer, however it was come by.
+ * @param {string} cropId
+ * @returns {number} How many of that seed the player now holds.
+ */
+export function grantSeed(cropId) {
+  const id = text(cropId, MAX_CROP_ID);
+  if (id === '') {
+    return 0;
+  }
+  state.seeds[id] = (state.seeds[id] || 0) + 1;
+  saveNow();
+  return state.seeds[id];
+}
+
+/**
+ * Put a held seed in the ground. Refuses when the drawer is empty, so the only
+ * way to a crop plot is through a seed that was earned or bought.
+ * @param {string} cropId
+ * @returns {Object|null} The planted crop, or null when there was no seed.
+ */
+export function plantSeed(cropId) {
+  const id = text(cropId, MAX_CROP_ID);
+  if (id === '' || !(state.seeds[id] > 0)) {
+    return null;
+  }
+  state.seeds[id] -= 1;
+  if (state.seeds[id] === 0) {
+    delete state.seeds[id];
+  }
+  const plant = {
+    id: PLANT_ID_PREFIX + String(state.nextPlantId),
+    kind: 'crop',
+    plantedDay: todayISO(),
+    objectId: '',
+    cropId: id,
+    answers: {},
+    phrases: {},
+    tags: {},
+    freeText: '',
+    seed: 0,
+    wateredDays: []
+  };
+  state.nextPlantId += 1;
+  state.plants.push(plant);
+  saveNow();
+  return plant;
+}
+
+/**
+ * @returns {Object.<string, number>} Harvested crops by id. Read only.
+ */
+export function getBasket() {
+  return state.basket;
+}
+
+/**
+ * Pick a fully grown crop. The plot goes back to bare soil, ready for the next
+ * thing, and the crop goes in the basket.
+ * @param {string} plantId
+ * @returns {string|null} The crop id that was picked, or null when the plant is
+ *   not a crop, is not there, or is not ready yet.
+ */
+export function harvestCrop(plantId) {
+  const plant = findPlant(plantId);
+  if (plant === null || plant.kind !== 'crop' || plant.cropId === '') {
+    return null;
+  }
+  if (plantStage(plant) < MAX_STAGE) {
+    return null;
+  }
+  const cropId = plant.cropId;
+  state.basket[cropId] = (state.basket[cropId] || 0) + 1;
+  const index = state.plants.indexOf(plant);
+  if (index !== -1) {
+    state.plants.splice(index, 1);
+  }
+  saveNow();
+  return cropId;
+}
+
+/**
+ * Whether today's free seed is still there to take.
+ * @returns {boolean}
+ */
+export function canClaimFreeSeed() {
+  return state.freeSeed.lastClaimDay !== todayISO();
+}
+
+/**
+ * Take the one free seed of the day. Common tier only, so the free packet can
+ * never be the fast route to the rare shelf, and once a day, judged by the same
+ * clock as everything else.
+ * @param {string} cropId
+ * @returns {boolean} True when a seed was actually granted.
+ */
+export function claimFreeSeed(cropId) {
+  const id = text(cropId, MAX_CROP_ID);
+  const crop = plainObject(catalogue.crops)[id];
+  if (id === '' || crop === undefined || plainObject(crop).price_tier !== FREE_SEED_TIER) {
+    return false;
+  }
+  if (!canClaimFreeSeed()) {
+    return false;
+  }
+  state.freeSeed.lastClaimDay = todayISO();
+  grantSeed(id);
+  saveNow();
+  return true;
+}
+
+/* ---- meals -------------------------------------------------------------- */
+
+/**
+ * @returns {Array<string>} Dish ids already unlocked. Read only.
+ */
+export function getUnlockedMeals() {
+  return state.meals.unlocked;
+}
+
+/**
+ * Check the basket against every dish and unlock whatever it now completes.
+ *
+ * The crops are consumed, deliberately: a dish is an arc that the ingredients
+ * are spent on, and the card it leaves behind is permanent. Dishes are checked
+ * in file order, so a crop that two dishes want goes to the first one that is
+ * otherwise complete rather than to both.
+ *
+ * @returns {Array<{id: string, name: string}>} Dishes unlocked by this call,
+ *   empty when nothing completed. A dish already unlocked never appears again.
+ */
+export function mealUnlockCheck() {
+  const unlocked = [];
+  for (let i = 0; i < catalogue.dishes.length; i += 1) {
+    const dish = catalogue.dishes[i];
+    if (state.meals.unlocked.indexOf(dish.id) !== -1) {
+      continue;
+    }
+    let complete = true;
+    for (let j = 0; j < dish.crops.length; j += 1) {
+      if (!(state.basket[dish.crops[j]] > 0)) {
+        complete = false;
+        break;
+      }
+    }
+    if (!complete) {
+      continue;
+    }
+    for (let j = 0; j < dish.crops.length; j += 1) {
+      const cropId = dish.crops[j];
+      state.basket[cropId] -= 1;
+      if (state.basket[cropId] === 0) {
+        delete state.basket[cropId];
+      }
+    }
+    state.meals.unlocked.push(dish.id);
+    unlocked.push({ id: dish.id, name: dish.name });
+  }
+  if (unlocked.length > 0) {
+    saveNow();
+  }
+  return unlocked;
 }
