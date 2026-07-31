@@ -117,7 +117,31 @@ run end):
 
 | 35-40 | Meal illustrations x6 (sambal-kangkung, bayam-soup, chap-chye, nasi-lemak, mee-goreng, sambal-sweet-potato-leaves) | nano_banana_pro 2k, ref B | 12 | kept |
 
-Running total: 71.75 of 300. First 429 attempts were rejected before start and cost
+## Ledger close, checked against the account (RULES protocol)
+
+Balance at run start 1384.16, at ledger close 1229.46: account delta 154.70.
+Reconciliation against the transaction log:
+
+- This run's actual spend: 85.50 credits. 29 nano_banana_pro images at 2.00
+  exactly as preflighted (58.00), 11 recraft_v4_1 at 2.50 each (27.50). The
+  recraft get_cost preflight quoted 1.25 but every actual charge was 2.50;
+  the ledger lines above carry the preflight figure, this close carries the
+  truth. 85.50 of the 300 cap, 28 percent.
+- NOT this run: 69.20 credits of concurrent account activity between 01:55
+  and 02:28 SGT: 14 nano_banana_pro images of a pixel-art cloud mascot
+  ("[SUBJECT LOCK] A squat chunky pixel-art mascot: fluffy cloud-shaped
+  royal-blue head..."), 4 Kling 3.0 Turbo videos at 10.00 each, and 3
+  Bytedance video upscales at 0.40. Subject, style, and models are alien to
+  this project; no seat of this run had video authorization (images only);
+  the timestamps overlap this run but nothing in any seat brief or report
+  touches Higgsfield. This looks like another session or automation on the
+  same account. Dewa: check your other running sessions or scheduled tasks;
+  the generations are in your Higgsfield history around those timestamps.
+
+The arithmetic closes exactly: 85.50 + 69.20 = 154.70 = the account delta.
+
+Running total: 71.75 of 300 at preflight prices, 85.50 actual. First 429
+attempts were rejected before start and cost
 nothing. Review outcomes so far: anchor, 7 of 8 objects, both backgrounds, all 10
 prop SVGs and the icon SVG accepted on first take; tingkat kept with a minor soft
 base fade (not a clear failure, no retry spent); recraft vector output turned out

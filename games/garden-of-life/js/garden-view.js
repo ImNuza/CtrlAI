@@ -26,6 +26,10 @@ const GROWTH_WORDS = [JUST_PLANTED, 'growing well', 'in full bloom'];
 const CROP_WORDS = [JUST_PLANTED, 'growing well', 'ready to pick'];
 const THIRSTY_WORD = 'ready for a drink';
 const READY_LINE = 'This one is ready. Pick it whenever you like.';
+/* Said out loud on the panel, because the droop and the duller colours are the
+   only other way to know, and reduced contrast sensitivity takes both away.
+   Kind and actionable, never a rebuke, exactly like the four notes below. */
+const THIRSTY_LINE = 'This one is thirsty. A drink brings it right back.';
 
 /* The four answers the watering can gives, and every one of them is good news.
    A player who waters twice in a day has done nothing wrong, and a plant that
@@ -353,7 +357,11 @@ function openPanel(plantId) {
      growing, not a memory you are keeping, and the panel says only what is true
      of it: how it is doing, and what you can do about that. */
   el.panelStory.hidden = crop;
-  el.panelNote.textContent = ripe ? READY_LINE : '';
+  /* Thirst first, on a memory or a crop alike. A ripe crop already says so in
+     words on the pick button, so the note spends itself on the state that has
+     no words anywhere else. The next watering tap overwrites it from
+     WATER_NOTES, which is how it leaves. */
+  el.panelNote.textContent = built.traits.wilted ? THIRSTY_LINE : (ripe ? READY_LINE : '');
   el.panelHarvest.hidden = !ripe;
 
   const told = crop ? '' : (typeof plant.freeText === 'string' ? plant.freeText.trim() : '');
