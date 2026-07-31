@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "dishes": [
+    {
+      "id": "sambal-kangkung",
+      "name": "Sambal Kangkung",
+      "crops": ["kangkung", "chilli"],
+      "benefit": "Dark leafy greens full of iron, fried fast in hot sambal.",
+      "line": "Whole plate finished before the rice even reached the table."
+    },
+    {
+      "id": "bayam-soup",
+      "name": "Bayam Soup",
+      "crops": ["bayam", "ginger"],
+      "benefit": "Sweet soft leaves, one slice of ginger, clear and light.",
+      "line": "One pot on the stove, everybody drinks two bowls."
+    },
+    {
+      "id": "chap-chye",
+      "name": "Chap Chye",
+      "crops": ["chye-sim", "long-bean"],
+      "benefit": "Whatever greens are around, stewed soft with tanghoon, plenty of fibre.",
+      "line": "Cooked big, eaten for days, somehow better on day two."
+    },
+    {
+      "id": "nasi-lemak",
+      "name": "Nasi Lemak",
+      "crops": ["pandan", "chilli"],
+      "benefit": "Rice cooked with a knotted pandan leaf, sambal on the side.",
+      "line": "Pandan rice steaming at six in the morning, kitchen light on."
+    },
+    {
+      "id": "mee-goreng",
+      "name": "Mee Goreng",
+      "crops": ["chye-sim", "tomato", "calamansi"],
+      "benefit": "Noodles, greens and egg in one pan, calamansi squeezed over.",
+      "line": "Squeeze the calamansi first, then eat, always that order."
+    },
+    {
+      "id": "sambal-sweet-potato-leaves",
+      "name": "Sambal Sweet Potato Leaves",
+      "crops": ["sweet-potato-leaf", "chilli"],
+      "benefit": "Tender leaves with garlic and belacan, ready before the rice is.",
+      "line": "Grown along the fence, picked young, on the table by six."
+    }
+  ]
+}

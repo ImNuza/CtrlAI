@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CtrlAI: the 29 July meeting, and the 40 points nobody counted</title>
+<style>
+  :root {
+    --paper: #f7f3ec; --card: #fffdf8; --ink: #211a13; --muted: #6e6154;
+    --faint: #9a8d7c; --hairline: #e4dccd; --hairline-strong: #cfc4af;
+    --accent: #b4522a; --good: #3f7d3f; --warn: #a8730f; --tint: rgba(180,82,42,0.07);
+    --font-display: "Iowan Old Style", Palatino, "Book Antiqua", Georgia, serif;
+    --font-body: "Avenir Next", Avenir, Seravek, "Segoe UI", sans-serif;
+    --font-mono: "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #1a1712; --card: #211d17; --ink: #ece4d6; --muted: #a2967f;
+      --faint: #7c715e; --hairline: #332d24; --hairline-strong: #453d30;
+      --accent: #d0763f; --good: #5f9c58; --warn: #b3841a; --tint: rgba(208,118,63,0.09);
+    }
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+  .sheet { max-width: 900px; margin: 0 auto; padding: 48px 28px 80px; }
+
+  .kicker { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .rule-double { border-top: 3px solid var(--ink); border-bottom: 1px solid var(--ink); height: 6px; margin: 10px 0 26px; }
+  h1 { font-family: var(--font-display); font-weight: 600; font-size: clamp(36px, 6.4vw, 60px); line-height: 1.02; letter-spacing: -0.015em; }
+  h1 em { font-style: italic; color: var(--accent); }
+  h2 { font-family: var(--font-display); font-weight: 600; font-size: clamp(22px, 3.4vw, 30px); margin: 44px 0 8px; scroll-margin-top: 16px; }
+  h3 { font-family: var(--font-body); font-weight: 600; font-size: 16px; margin: 26px 0 4px; letter-spacing: 0.01em; }
+  .standfirst { margin: 18px 0 6px; max-width: 62ch; font-size: 18px; line-height: 1.5; }
+  p { margin: 12px 0; max-width: 68ch; }
+  ul, ol { margin: 12px 0 12px 22px; max-width: 68ch; }
+  li { margin: 6px 0; }
+  strong { font-weight: 600; }
+
+  nav { margin: 30px 0 0; padding: 12px 0; border-top: 1px solid var(--hairline-strong); border-bottom: 1px solid var(--hairline-strong); display: flex; flex-wrap: wrap; gap: 4px 20px; }
+  nav a { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: 0.1em; text-transform: uppercase; text-decoration: none; color: var(--muted); }
+  nav a:hover { color: var(--accent); }
+
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; margin: 22px 0; }
+  .tile { background: var(--card); border: 1px solid var(--hairline); border-radius: 8px; padding: 16px 18px; }
+  .tile-num { font-family: var(--font-display); font-size: 34px; font-variant-numeric: tabular-nums; line-height: 1; }
+  .tile-label { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-top: 8px; }
+
+  .table-wrap { overflow-x: auto; border: 1px solid var(--hairline); border-radius: 6px; background: var(--card); margin: 18px 0; }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; }
+  th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--hairline); white-space: nowrap; }
+  th { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+  td.wrap, th.wrap { white-space: normal; min-width: 200px; }
+
+  blockquote { margin: 16px 0; padding: 2px 0 2px 18px; border-left: 3px solid var(--hairline-strong); color: var(--muted); max-width: 66ch; font-size: 15px; }
+  blockquote cite { display: block; margin-top: 6px; font-style: normal; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--faint); }
+
+  .callout { background: var(--tint); border: 1px solid var(--hairline-strong); border-left: 3px solid var(--accent); border-radius: 4px; padding: 14px 18px; margin: 22px 0; }
+  .callout p { margin: 6px 0; }
+  .callout .callout-label { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
+
+  .caveat { display: inline-block; border: 1px solid var(--warn); color: var(--warn); font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; padding: 3px 9px; border-radius: 3px; margin-top: 14px; }
+  .verdict { font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.08em; text-transform: uppercase; padding: 2px 7px; border-radius: 3px; border: 1px solid currentColor; }
+  .v-keep { color: var(--good); }
+  .v-cut { color: var(--accent); }
+  .v-fix { color: var(--warn); }
+
+  sup.fnref { font-size: 11px; color: var(--accent); }
+  sup.fnref a { color: inherit; text-decoration: none; }
+  .footnotes { margin-top: 52px; padding-top: 16px; border-top: 1px solid var(--hairline-strong); font-size: 13px; color: var(--muted); }
+  .footnotes li { margin: 7px 0; max-width: 76ch; }
+  .footnotes code { font-family: var(--font-mono); font-size: 12px; }
+  .footnotes a { color: var(--muted); }
+</style>
+</head>
+<body>
+  <div class="sheet">
+    <div class="kicker"><span>CtrlAI &middot; Tencent Age Well &middot; Game Track</span><span>Meeting 29 Jul &middot; Written 31 Jul 2026</span></div>
+    <div class="rule-double"></div>
+    <h1>We agreed on a good game.<br>It is <em>not yet</em> a good entry.</h1>
+    <p class="standfirst">A hundred and ten minutes, three people, one decision. The garden is the right call. What went in the spec around it will cost us points, and the biggest gap is one nobody mentioned all night.</p>
+
+    <nav>
+      <a href="#what-happened">What happened</a>
+      <a href="#room">The room</a>
+      <a href="#agreed">The game as agreed</a>
+      <a href="#gap">The 40-point gap</a>
+      <a href="#good">What is strong</a>
+      <a href="#bad">What will cost us</a>
+      <a href="#revised">The revised spec</a>
+      <a href="#next">Best next move</a>
+      <a href="#actions">Team actions</a>
+      <a href="#footnotes">Sources</a>
+    </nav>
+
+    <section id="what-happened">
+      <h2>What happened</h2>
+
+      <div class="tiles">
+        <div class="tile"><div class="tile-num">110</div><div class="tile-label">Minutes on call</div></div>
+        <div class="tile"><div class="tile-num">40</div><div class="tile-label">Of 100 pts from AI use</div></div>
+        <div class="tile"><div class="tile-num">0</div><div class="tile-label">AI in the agreed spec</div></div>
+        <div class="tile"><div class="tile-num">9</div><div class="tile-label">Days to deadline</div></div>
+      </div>
+
+      <p>Zoe and Dewa started without Matthew, who joined fifty minutes late and got roasted for it. The call ran until Dewa was answering with his eyes shut and Zoe had to tell Matthew he had fallen asleep. Between those two points the team went through six distinct game ideas and landed on the seventh.</p>
+
+      <p>The path mattered more than the destination, so here it is in order.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Time</th><th class="wrap">Idea on the table</th><th class="wrap">Why it died, or survived</th></tr></thead>
+          <tbody>
+            <tr><td>00:00</td><td class="wrap">Hay Day hub. One farm, huts holding mini games</td><td class="wrap">Parked as too big, but the shape came back at the end</td></tr>
+            <tr><td>12:25</td><td class="wrap">Teach seniors to spot AI-generated media</td><td class="wrap">Zoe: you would be building AI with AI. Matthew conceded some seniors do not care either way</td></tr>
+            <tr><td>14:32</td><td class="wrap">Mahjong Kakis, from the repo</td><td class="wrap">Zoe: old people plus Chinese equals mahjong is the first thing every team will think of</td></tr>
+            <tr><td>22:21</td><td class="wrap">Scam Dojo, from the repo</td><td class="wrap">Function liked, packaging doubted. ScamShield already exists in Singapore</td></tr>
+            <tr><td>25:50</td><td class="wrap">Brilliant or Duolingo for seniors</td><td class="wrap">All three agreed no grandmother is opening Duolingo</td></tr>
+            <tr><td>33:58</td><td class="wrap">Spot the Sus. Where is Waldo for scams</td><td class="wrap">Matthew asked what it teaches beyond fun. No answer came</td></tr>
+            <tr><td>41:02</td><td class="wrap">Omegle for board games</td><td class="wrap">Killed by Zoe in one line: I just want to play chess</td></tr>
+            <tr><td>45:52</td><td class="wrap">Gardening game</td><td class="wrap">Survived. Matthew screen-shared Grow a Garden and played it live</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>Six decisions were actually locked, and they are all defensible:</p>
+
+      <ol>
+        <li><strong>One game, not three.</strong> Matthew argued it at 21:39 and he was right. Judges want to know what you are solving.</li>
+        <li><strong>Gardening as the frame.</strong> Agreed at 61:00 by all three.</li>
+        <li><strong>Plants wilt, they do not die.</strong> Zoe wanted death for engagement, Matthew pushed back, they landed on wilting. Correct answer.</li>
+        <li><strong>Mobile, not web-first.</strong> Zoe at 98:12.</li>
+        <li><strong>2D, not 3D.</strong> Matthew at 101:04. 3D adds complexity and new things to learn.</li>
+        <li><strong>Start building without waiting for the credits.</strong> Matthew at 105:46. Also correct.</li>
+      </ol>
+
+      <p>What did not get discussed once, in a hundred and ten minutes: the scoring rubric.</p>
+    </section>
+
+    <section id="room">
+      <h2>The room</h2>
+
+      <p>Worth recording, because the same instincts will show up next session.</p>
+
+      <p><strong>Matthew</strong> did 45 percent of the talking and generated most of the ideas, including the one that won. He is the team's throughput. He is also the one who reaches for the mechanic before the reason, which is how gacha got in. When Zoe read out a warning about randomized rewards being risky for older players, he answered with a joke about not monetizing anything and the idea sailed straight through into the PDF.</p>
+
+      <p><strong>Zoe</strong> ran Claude live during the call and is the reason the spec has a health-literacy layer at all. She is also the only one consistently asking whether a real senior would do the thing. Three of her objections killed three ideas, and all three were right. Her unresolved objection is the one to worry about:</p>
+
+      <blockquote>
+        The only problem is doing the quizzes might not be interesting. It feels like sitting an exam. And it is basically the starting point of the whole thing. We need to get these elderlies to actually do the quizzes to earn the money.
+        <cite>Zoe, 70:11</cite>
+      </blockquote>
+
+      <p>Matthew's answer was that cognitive games do not have to be quizzes, they could be puzzles or language. Nobody wrote down which. The entry point to the entire economy is still undefined.</p>
+
+      <p><strong>Dewa</strong> was the quietest at 17 percent, half asleep for the last forty minutes, and still landed the Pokemon Go hook at 55:11 that became the outdoor mechanic. The "I agree" at 89:08 was flagged as suspicious by Zoe at the time. So the honest framing is that the game was agreed by Matthew and Zoe, with Dewa nodding along from behind closed eyes.</p>
+    </section>
+
+    <section id="agreed">
+      <h2>The game as agreed</h2>
+
+      <p>Reconciled from Zoe's PDF plus the decisions made after she generated it. This is the current shared understanding, stated plainly so we can argue with it.</p>
+
+      <p><strong>Age Well: Garden of Life.</strong> A gentle wellness game for older adults built on a farming-sim loop, positioned in the PDF as inspired by Roblox's <em>Grow a Garden</em>.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>#</th><th class="wrap">Mechanic</th><th class="wrap">How it works</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td class="wrap">Quiz to earn</td><td class="wrap">Short health and trivia quizzes pay out coins. Doubles as cognitive stimulation</td></tr>
+            <tr><td>2</td><td class="wrap">Gacha seeds</td><td class="wrap">Coins spent on a randomized seed pull, rarity tiers uncommon to legendary</td></tr>
+            <tr><td>3</td><td class="wrap">Plant and grow</td><td class="wrap">Seeds planted, garden expands, visual record of consistency</td></tr>
+            <tr><td>4</td><td class="wrap">Daily quests</td><td class="wrap">Walk 1,000 steps for a seed. Photograph a real plant outdoors for a matching seed</td></tr>
+            <tr><td>5</td><td class="wrap">Water reminders</td><td class="wrap">Push notification to drink water and water the virtual plant. Neglected plants wilt</td></tr>
+            <tr><td>6</td><td class="wrap">Meal achievements</td><td class="wrap">Harvest a full ingredient set, a Meal Card unlocks with the real nutritional angle</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>Added verbally after the PDF was written: profile pages, a leaderboard scored on garden valuation, sharing your garden to Instagram or Facebook, and a possible tie-in with a Singapore healthy-food brand. Stack decided as React, mobile, 2D.</p>
+    </section>
+
+    <section id="gap">
+      <h2>The 40-point gap</h2>
+
+      <div class="callout">
+        <p class="callout-label">The finding</p>
+        <p><strong>Use of AI Tools is worth 40 of 100 points. The rubric names worldbuilding and intelligent NPCs as its Game Track examples. Garden of Life, as specified, contains no AI anywhere in the product.</strong><sup class="fnref"><a href="#fn1">1</a></sup></p>
+      </div>
+
+      <p>Read the six mechanics again. Quiz, gacha, plant, walk, water, meal card. Every one of them is a deterministic if-statement. The only AI in the plan is that we will use CodeBuddy to write the code and Miora to draw the vegetables, which is the same sentence every other team will write.</p>
+
+      <p>The sting is that we already had three AI stories and traded all of them away. Memory Garden composed a plant procedurally from what a senior told it. Mahjong Kakis had three characters who remembered your last visit. Scam Dojo generated fresh scam scripts every run. Zoe herself opened this meeting, at 01:16, pitching an AI NPC that asks about your day. That thread never came back.</p>
+
+      <p>This is not an argument for scrapping the garden. Team agreement with nine days left is worth more than a marginally better concept, and the garden is genuinely the strongest theme fit we have found. It is an argument that the garden is currently half a submission, and the missing half is the half worth 40 points.</p>
+    </section>
+
+    <section id="good">
+      <h2>What is strong</h2>
+
+      <h3>Gardening is the best-evidenced choice on the whole list</h3>
+      <p>This is worth knowing because it is a real asset we have not used. Horticultural therapy for older adults has multiple systematic reviews and meta-analyses behind it, showing benefits for depression, emotional wellbeing, social function and quality of life, and reduced agitation in people with dementia.<sup class="fnref"><a href="#fn2">2</a></sup> Compare that with brain training, covered below. We stumbled into the well-supported one.</p>
+
+      <h3>The Singapore hook is sitting right there, unused</h3>
+      <p>NParks' Community in Bloom has over 2,000 registered gardening groups and more than 48,000 gardeners, plus over 2,500 allotment plots that residents can lease.<sup class="fnref"><a href="#fn3">3</a></sup> Seniors are central to it. There are also NParks Therapeutic Gardens designed for older users. A digital garden in Singapore is not a random theme, it maps onto something a real ah ma in Tampines actually does on a Saturday morning. Nobody said this in the meeting and it should be on slide two.</p>
+
+      <h3>Meal achievements are the most original thing in the spec</h3>
+      <p>Rewarding crop variety rather than crop profit is quietly clever. It makes the optimal play also the healthy play with no lecturing. Keep it and make it the centrepiece.</p>
+
+      <h3>The team argued its way to the right cruelty setting</h3>
+      <p>Zoe wanted plants to die for engagement, Matthew said that defeats the point, they settled on wilting. That is exactly the call our own UX floor demands: no fail states that shame the player. Good instinct, arrived at without anyone quoting the rule.</p>
+
+      <h3>Focus, and no waiting</h3>
+      <p>One game beats three. Starting before the credits arrive beats blocking on someone else's Telegram reply. Both correct.</p>
+    </section>
+
+    <section id="bad">
+      <h2>What will cost us</h2>
+
+      <h3>1. Quiz-to-earn is the wrong front door <span class="verdict v-fix">fix</span></h3>
+      <p>Zoe's unresolved objection has research behind it. Surveys of older adults across the US, Canada, South Korea and Flanders find a strong preference for puzzle, card, tile and board games. Match-three titles like Bejeweled and Candy Crush are the genre seniors actually open.<sup class="fnref"><a href="#fn4">4</a></sup> Quizzes are the format they gravitate to least, and we put one in front of the entire economy. Zoe's exact instinct in the meeting, that elderly players reach for chess, Candy Crush and Zuma rather than Duolingo, is what the literature says.</p>
+
+      <h3>2. The cognitive-decline claim is a liability <span class="verdict v-cut">cut</span></h3>
+      <p>The PDF's impact table claims quizzes produce "lower population-level risk of cognitive decline". The evidence does not support that. Meta-analyses of commercial brain-training find modest gains that mostly vanish once you adjust for publication bias, with only processing speed surviving, and no significant improvement at all in older adults who already have cognitive impairment.<sup class="fnref"><a href="#fn5">5</a></sup> Lumosity paid the FTC two million dollars in 2016 for advertising almost exactly this claim, specifically for suggesting its games could stave off memory loss, dementia and Alzheimer's without the science to back it.<sup class="fnref"><a href="#fn6">6</a></sup></p>
+      <p>Any judge with a health background will spot it. Take the sentence out of the deck. We do not need it, because the gardening evidence is real.</p>
+
+      <h3>3. Gacha is the one thing that can sink us <span class="verdict v-cut">cut</span></h3>
+      <p>Zoe read the warning out loud in the meeting, at 51:15, from her own Claude session: remove randomized loot entirely, predatory monetization is especially risky for older or cognitively vulnerable players. Matthew joked past it and gacha stayed in the PDF as step two of the core loop.</p>
+      <p>The concern is real. Randomized-reward mechanics are designed around anticipation and reinforcement loops that disproportionately affect vulnerable players, and several jurisdictions now regulate them as gambling.<sup class="fnref"><a href="#fn7">7</a></sup> There is an extra wrinkle worth naming: China's own regulator does not approve games containing a compulsion loop, and we are pitching to Tencent. Putting a slot machine in a social-good game for cognitively vulnerable seniors is the single easiest thing for a judge to point at.</p>
+
+      <h3>4. Step quests cannot work from a browser link <span class="verdict v-cut">cut</span></h3>
+      <p>This one is a hard technical fact, not an opinion. Our deliverable is a game web link. Browsers cannot reach the hardware step counter. Native apps use CMPedometer on iOS and TYPE_STEP_COUNTER on Android, both running on a low-power coprocessor that keeps counting with the phone asleep. A web page has none of that. The best it can do is read the accelerometer through DeviceMotionEvent, which since iOS 13 requires a permission request triggered by a user gesture and stops the moment the tab is backgrounded.<sup class="fnref"><a href="#fn8">8</a></sup></p>
+      <p>"Walk 1,000 steps to unlock a seed" is a slide, not a feature. If it appears in the demo video and a judge opens the link, it will not work.</p>
+
+      <h3>5. Water reminders will not fire for a judge <span class="verdict v-fix">fix</span></h3>
+      <p>Web push on iOS only works if the user has added the site to their Home Screen first. An open Safari tab does not count.<sup class="fnref"><a href="#fn9">9</a></sup> A judge clicking our link gets no notifications at all. Worse, "add to home screen" is a real barrier for the actual target user. Keep the reminder as an in-game beat, show it in the video, and stop describing it as the differentiator.</p>
+
+      <h3>6. Healthy 365 already does most of this, in Singapore, for this exact age group <span class="verdict v-fix">fix</span></h3>
+      <p>This is the most dangerous overlap and nobody raised it. HPB's Healthy 365 app has run the National Steps Challenge since 2015: clock steps, earn Healthpoints, redeem vouchers. It now includes a dedicated programme for people aged 50 and over built around one simple task a day, customised workouts and rewarding quizzes.<sup class="fnref"><a href="#fn10">10</a></sup> A population-level evaluation covered nearly 700,000 adults.</p>
+      <p>Steps for points, plus quizzes for rewards, aimed at older Singaporeans, is the government app that already exists on their phone. Local judges will know it. We cannot win on that ground and should not try to fight there.</p>
+
+      <h3>7. We hand judges the "it is a clone" line ourselves <span class="verdict v-fix">fix</span></h3>
+      <p>The PDF's subtitle says inspired by Roblox's <em>Grow a Garden</em>. Project Quality scores creativity for 30 points. Do not put the comparison in our own document. Rename the game, and make the differences the first thing on the page.</p>
+
+      <h3>8. React Native does not produce a web link <span class="verdict v-fix">fix</span></h3>
+      <p>The call decided React for both iPhone and Android. But the submission deliverable is a game web link, an online demo playable in a browser, with EdgeOne as the suggested host. If that means React Native, we ship something the judges cannot open. Build a mobile web app, phone-sized, installable as a PWA if we want the home-screen path. React is fine. React Native is not.</p>
+    </section>
+
+    <section id="revised">
+      <h2>The revised spec</h2>
+
+      <p>Same game. The changes are aimed at one thing: put AI where it does double duty, making the product better and filling the 40-point hole at the same time. Three additions, four subtractions.</p>
+
+      <h3>Addition A. The garden grows from memories, not quiz scores</h3>
+      <p>Replace quiz-to-earn as the primary loop. Instead of answering trivia for coins, the player tells the garden one small thing about their life, and a plant is composed from what they said. Pick a heritage object, a kopitiam cup, a Setron TV, a sewing machine, answer two or three gentle prompts, and the species, colours and ornaments of the resulting plant come out of the answers. Tap any plant later and it replays the story.</p>
+      <p>Why this is the strongest single change:</p>
+      <ul>
+        <li>It is literally worldbuilding, the word the rubric uses.</li>
+        <li>The evidence is better than brain training. Reminiscence therapy has a Cochrane review covering 22 studies and 1,972 participants, with moderate-quality evidence of small benefits to quality of life, cognition and communication in dementia.<sup class="fnref"><a href="#fn11">11</a></sup> Small and honest beats large and unprovable.</li>
+        <li>It solves Zoe's exam problem. Nobody feels tested by being asked about their first kitchen.</li>
+        <li>It is culturally specific in a way a vegetable patch is not, which gives Miora far more interesting art prompts.</li>
+        <li>We already built it. Memory Garden's plant composer works today in the repo.</li>
+      </ul>
+      <p>Keep light puzzles as a secondary earner for players who want more to do. Make them tile and match-based, not quiz-based, because that is what the genre research says seniors actually play.</p>
+
+      <h3>Addition B. One NPC gardener who remembers you</h3>
+      <p>The rubric names intelligent NPCs. Give it exactly one: a gardener, an auntie or uncle character, who greets the player, comments on what they planted, notices when they have been away, and refers back to a story they told three sessions ago.</p>
+      <p>The critical design constraint, and this is where most teams will get it wrong: <strong>do not build a free-text chatbot.</strong> A randomised study of 130 players found LLM-driven NPCs significantly increased cognitive load, with no significant improvement in the gaming experience, and measurable harm to usability and trust. Open-ended modules were the worst offenders.<sup class="fnref"><a href="#fn12">12</a></sup> For a senior audience that is a disaster.</p>
+      <p>So: the NPC speaks in generated lines, the player answers by tapping one of two or three large chips. Generated output, bounded input. It stays tap-only, it respects our UX floor, and it still demos as obviously alive.</p>
+
+      <h3>Addition C. Keep the outdoor nudge, drop the pedometer</h3>
+      <p>Dewa's Pokemon Go instinct was right, the implementation was wrong. Replace "walk 1,000 steps" with "bring back one photo". The camera works from a browser. The player photographs a plant outside, a vision model identifies it, the NPC reacts to what they found, and it becomes a real seed in their garden.</p>
+      <p>This is better on every axis. It works from a web link. It is a second visible AI beat. It demos in ten seconds on video. And it connects the game to Community in Bloom and the real gardens seniors already visit, which is a much better story than step counting.</p>
+
+      <h3>Subtractions</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th class="wrap">Cut</th><th class="wrap">Replace with</th><th class="wrap">Because</th></tr></thead>
+          <tbody>
+            <tr><td class="wrap">Gacha seed pulls</td><td class="wrap">A seed shop with visible prices, one free daily seed, rare seeds earned by streak rather than chance</td><td class="wrap">Removes the gambling read entirely. Same anticipation, no randomised loot</td></tr>
+            <tr><td class="wrap">Step-count quests</td><td class="wrap">Photo quests</td><td class="wrap">Cannot be built on the web at all</td></tr>
+            <tr><td class="wrap">Cognitive-decline claims</td><td class="wrap">Honest framing: designed around horticultural therapy and reminiscence practice</td><td class="wrap">Defensible, and the evidence is genuinely on our side</td></tr>
+            <tr><td class="wrap">The Grow a Garden framing</td><td class="wrap">A Singapore name and a Singapore first slide</td><td class="wrap">Stop scoring our own creativity down</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Positioning against Healthy 365</h3>
+      <p>Do not compete on steps and points, we lose. Position on what Healthy 365 has nothing of: memory, story, and a character who knows you. Healthy 365 tracks a senior. This remembers one. If a judge raises the overlap, the answer should already be on a slide.</p>
+
+      <h3>Kept as-is</h3>
+      <p>Meal achievements, wilting instead of death, 2D, mobile-first, gentle pacing, no timers, the profile and garden sharing. Make the Meal Card itself generated, so what unlocks reflects what that specific player grew, and localise the recipes. An ah ma is more moved by a soup she recognises than by an Omega Bowl.</p>
+    </section>
+
+    <section id="next">
+      <h2>Best next move</h2>
+
+      <p>Not code. Two things first, and they take a day between them.</p>
+
+      <p><strong>One. Lock the spec on one page, then build a single vertical slice with CodeBuddy.</strong> Not the whole game. One screen, end to end: pick an object, answer two prompts, watch a plant appear, have the gardener say something about it. The reason to do this before anything else is that <em>nobody on the team has used CodeBuddy</em>, and it appeared in none of the training materials. It is the largest unknown in the entire plan and 40 points depend on it. Find out what it actually does on a small thing, today, rather than on day seven of a nine-day build.</p>
+
+      <p><strong>Two. Start the deck now, in parallel.</strong> The AI creation description is not a slide we write on 8 August. It is where 40 points get argued, and the material for it is being generated right now while we make these decisions. Every CodeBuddy prompt and Miora iteration worth showing should be screenshotted as it happens.</p>
+
+      <p>Chasing the credits stays on the list but it is blocked on someone else, so it runs in the background and does not gate anything.</p>
+
+      <div class="callout">
+        <p class="callout-label">The one-sentence version</p>
+        <p>Keep the garden, grow it from memories instead of quiz scores, give it one gardener who remembers you, and prove CodeBuddy works on a single screen before betting the week on it.</p>
+      </div>
+    </section>
+
+    <section id="actions">
+      <h2>Team actions</h2>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Who</th><th class="wrap">Action</th><th>When</th></tr></thead>
+          <tbody>
+            <tr><td>All three</td><td class="wrap">Register individually for CodeBuddy and Miora. Credits are per person, so three signups pool 6,000 CodeBuddy and 3,000 Miora</td><td>Today</td></tr>
+            <tr><td>All three</td><td class="wrap">Read this digest and say yes or no to the three additions before anyone writes code</td><td>Today</td></tr>
+            <tr><td>Dewa</td><td class="wrap">Rewrite the PDF into a one-page locked spec naming the three AI beats</td><td>Today</td></tr>
+            <tr><td>Dewa</td><td class="wrap">Port the Memory Garden plant composer into the new loop. It already works</td><td>Day 1 to 2</td></tr>
+            <tr><td>Dewa</td><td class="wrap">Keep the AI seam in shared/ai.js as the single swap point for real model calls</td><td>Ongoing</td></tr>
+            <tr><td>Matthew</td><td class="wrap">CodeBuddy spike: one screen, end to end, report what it is good and bad at</td><td>Today</td></tr>
+            <tr><td>Matthew</td><td class="wrap">Miora style test. Lock one art direction and check consistency across five assets</td><td>Day 1 to 2</td></tr>
+            <tr><td>Matthew</td><td class="wrap">Own the UI and aesthetic as claimed at 69:09. Vintage Singapore, paper texture</td><td>Ongoing</td></tr>
+            <tr><td>Zoe</td><td class="wrap">Rewrite the impact section without the cognitive-decline claim. Use horticultural therapy and reminiscence evidence instead</td><td>Day 1</td></tr>
+            <tr><td>Zoe</td><td class="wrap">Write the Healthy 365 positioning slide before a judge asks</td><td>Day 1 to 2</td></tr>
+            <tr><td>Zoe</td><td class="wrap">Own the deck, starting with the AI creation description</td><td>Ongoing</td></tr>
+            <tr><td>Whoever is free</td><td class="wrap">Chase the credits on Telegram. Blocked on them, not us</td><td>Today</td></tr>
+            <tr><td>All three</td><td class="wrap">Social post with the four hashtags for the free five points. Do not leave it to the last day</td><td>Before 9 Aug</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>Three things still have no owner and no answer. Name them now rather than discovering them on day six: what the secondary puzzle actually is, how the leaderboard is scored, and what the game is called.</p>
+
+      <span class="caveat">Transcript caveat: the recording is heavy Indonesian and English code-switching and the ASR scored 0.44 on language confidence. Timestamps and substance are reliable, exact wording is approximate. Two short turns were mis-attributed by the diarizer and corrected by hand.</span>
+    </section>
+
+    <ol class="footnotes" id="footnotes">
+      <li id="fn1">Scoring rubric, identical across all three hackathon source documents: Use of AI Tools 40, Impact and Relevance 30, Project Quality 30, plus 5 for a social post. Game Track examples named in the rubric are worldbuilding and intelligent NPCs. Local copy: <code>clawd/reports/tencent-age-well-hackathon-brief-2026-07-25.html</code>.</li>
+      <li id="fn2">Horticultural therapy for general health in older adults, systematic review and meta-analysis, PLOS One: <a href="https://journals.plos.org/plosone/article?id=10.1371%2Fjournal.pone.0263598">journals.plos.org</a>. Also effectiveness in older adults without dementia, JAMDA: <a href="https://www.jamda.com/article/S1525-8610(24)00718-7/abstract">jamda.com</a>. Confidence: high, multiple independent reviews agree.</li>
+      <li id="fn3">NParks Community in Bloom and the Allotment Gardening Scheme: <a href="https://gardeningsg.nparks.gov.sg/get-involved/community-gardens/">gardeningsg.nparks.gov.sg</a>. Over 2,000 groups, 48,000 gardeners, 2,500 plus allotment plots.</li>
+      <li id="fn4">Mobile Game Design Guide for the Middle-Aged and Older Adult Population, user-centred design study: <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8176340/">ncbi.nlm.nih.gov</a>. Genre preference surveys across US, Canada, South Korea and Flanders favour puzzle, card and board games.</li>
+      <li id="fn5">A Game a Day Keeps Cognitive Decline Away? Systematic review and meta-analysis of commercial brain-training, Neuropsychology Review: <a href="https://link.springer.com/article/10.1007/s11065-021-09515-2">link.springer.com</a>. And commercial computerised cognitive games meta-analysis, Scientific Reports: <a href="https://www.nature.com/articles/s41598-020-72281-3">nature.com</a>. Confidence: high on the direction, the field is genuinely contested but not in our favour.</li>
+      <li id="fn6">Lumosity to Pay 2 Million Dollars to Settle FTC Deceptive Advertising Charges, January 2016: <a href="https://www.ftc.gov/news-events/news/press-releases/2016/01/lumosity-pay-2-million-settle-ftc-deceptive-advertising-charges-its-brain-training-program">ftc.gov</a>. US jurisdiction, so not directly binding here, cited as a reputational precedent for this claim shape.</li>
+      <li id="fn7">Comparative analysis of loot box regulation, Journal of Digital Technologies and Law: <a href="https://www.lawjournal.digital/jour/article/view/428">lawjournal.digital</a>. Belgium treats loot boxes as illegal gambling, the Netherlands prohibits certain types, and China's regulator does not approve games containing a compulsion loop.</li>
+      <li id="fn8">Web step counting relies on DeviceMotionEvent or the Generic Sensor API. Since iOS 13, <code>DeviceMotionEvent.requestPermission()</code> must be called from a user gesture or Safari returns zeros, and neither can run in the background. Native CMPedometer and Android TYPE_STEP_COUNTER run on a coprocessor a web page cannot access. Confidence: high, this is a platform constraint not a workaround problem.</li>
+      <li id="fn9">iOS web push requires Add to Home Screen via Safari. An open tab does not qualify, on any browser. Available since iOS 16.4. <a href="https://www.magicbell.com/blog/pwa-ios-limitations-safari-support-complete-guide">magicbell.com</a>.</li>
+      <li id="fn10">Healthy 365 and the National Steps Challenge, HPB Singapore: <a href="https://www.healthhub.sg/programmes/healthyliving">healthhub.sg</a>. Population-wide evaluation covering 696,907 adults: <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC9238668/">pmc.ncbi.nlm.nih.gov</a>. The 50-and-over programme with daily tasks and rewarding quizzes is the direct overlap.</li>
+      <li id="fn11">Reminiscence therapy for dementia, Cochrane review, Woods et al. 2018. 22 studies, 1,972 participants, 16 studies in the meta-analysis: <a href="https://www.cochranelibrary.com/cdsr/doi/10.1002/14651858.CD001120.pub3/full">cochranelibrary.com</a>. Benefits are real but small, and evidence quality is moderate to low. Claim it honestly at that strength.</li>
+      <li id="fn12">The Double-Edged Sword of Open-Ended Interaction: How LLM-Driven NPCs Affect Players' Cognitive Load and Gaming Experience. Randomised between-subject study, N equals 130: <a href="https://arxiv.org/abs/2604.10107">arxiv.org</a>. Cognitive burden increased significantly, overall experience did not improve, usability and trust went down, and open-ended modules were worst.</li>
+      <li id="fn13">Source material for this digest: <code>meetings/29jul/meeting.json</code> (110 minute diarized transcript, 22,405 tokens), <code>age-well-garden-of-life-summary-2.pdf</code>, and the two submission-format screenshots in the same folder. Repo context from <code>GOAL.md</code> and <code>README.md</code>.</li>
+    </ol>
+  </div>
+</body>
+</html>

@@ -1,15 +1,17 @@
 # CtrlAI
 
-Prototype bake-off repo for the Tencent Cloud "Age Well" Social Good Challenge Singapore, Game Track. Team: Dewa, Matthew, Zoe. Submission deadline for the real game: Aug 9, 2026, 11:59 PM SGT.
+Repo for the Tencent Cloud "Age Well" Social Good Challenge Singapore, Game Track. Team: Dewa, Matthew, Zoe. Submission deadline: Aug 9, 2026, 11:59 PM SGT.
+
+Round one (done) was a three-prototype bake-off, still living under `games/`. The team picked the gardening direction on 29 Jul; the repo now carries the chosen game's spec, content, and reference slice.
 
 ## First actions for any new session
 
 1. If a `/goal` skill is available, invoke it now with the goal from `GOAL.md`. If it is not available, treat `GOAL.md` itself as the standing goal and proceed.
-2. Read `GOAL.md` fully before writing any code. It carries the mission, the three game specs, the constraints, and the freedom you have.
+2. Read `GOAL.md` fully before writing any code, then `SPEC.md` (the game), `RULES.md` (orchestration shape, UX floor, house rules), and `CONTEXT.md` (rubric, deadline, verified facts, settled decisions).
 
 ## Orchestration contract (Dewa's explicit request)
 
-This repo runs on heavy multi-agent orchestration: the main session conducts and integrates but writes no game code; three Fable orchestrator agents (one per game) plan, direct, and review; Opus coder subagents under them do all implementation. Dynamic workflows and large fan-outs are explicitly wanted. Full architecture in `GOAL.md`.
+This repo runs on heavy multi-agent orchestration: the main session conducts and integrates but writes no game code; Fable orchestrator agents plan, direct, and review; Opus coder subagents under them do all implementation. Dynamic workflows and large fan-outs are explicitly wanted. The current session's scope is in `GOAL.md`; the stable contract is in `RULES.md`.
 
 A 67-skill game-development pack is installed at `.claude/skills/`; its `router` skill is the entry point for every coder. `GOAL.md` lists the priority skills plus vetted third-party additions to install.
 
@@ -23,4 +25,4 @@ A 67-skill game-development pack is installed at `.claude/skills/`; its `router`
 
 ## What this repo is not
 
-Not the final submission. The real build happens with CodeBuddy (mandated by the hackathon) after the team picks a direction. These prototypes exist so the team can feel three directions and choose one.
+Not the final submission build. That happens with CodeBuddy and Miora (mandated, 40 of 100 points ride on documented AI-tool usage) once access lands. This repo is the source of truth that feeds it: locked spec, content banks, the reference slice, and the handoff doc. The three round-one prototypes stay as lift-from material.

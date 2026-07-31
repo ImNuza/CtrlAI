@@ -1,0 +1,230 @@
+{
+  "version": 1,
+  "batch": "a",
+  "objects": [
+    {
+      "id": "kopitiam-cup",
+      "label": "Kopitiam cup",
+      "phrase": "the kopitiam cup",
+      "blurb": "Thick white cup, kopi o kosong, marble table.",
+      "prompts": [
+        {
+          "axis": "who",
+          "q_candidates": [
+            "Who pulled up a stool beside you?",
+            "Whose kopi came with yours that morning?"
+          ],
+          "free_text": false,
+          "chips": [
+            { "id": "my-father", "label": "My father", "phrase": "with my father", "tags": ["bloom:one-big"] },
+            { "id": "my-mother", "label": "My mother", "phrase": "with my mother", "tags": ["bloom:one-big"] },
+            { "id": "just-us-two", "label": "Just us two", "phrase": "with just the two of us", "tags": ["bloom:pair"] },
+            { "id": "brother-and-sister", "label": "My brother and sister", "phrase": "with my brother and sister", "tags": ["bloom:trio"] },
+            { "id": "a-few-old-friends", "label": "A few old friends", "phrase": "with a few old friends", "tags": ["bloom:cluster"] },
+            { "id": "morning-regulars", "label": "The morning regulars", "phrase": "with the morning regulars", "tags": ["bloom:many"] }
+          ]
+        },
+        {
+          "axis": "where",
+          "q_candidates": [
+            "Where did you take your kopi most mornings?",
+            "Which table was yours in the mornings?"
+          ],
+          "free_text": true,
+          "chips": [
+            { "id": "corner-table", "label": "The corner table", "phrase": "at the corner table", "tags": ["ornament:kopitiam"] },
+            { "id": "coffeeshop-downstairs", "label": "Coffeeshop downstairs", "phrase": "at the coffeeshop downstairs", "tags": ["ornament:kopitiam"] },
+            { "id": "wet-market-stall", "label": "The wet market", "phrase": "at the coffee stall in the wet market", "tags": ["ornament:market"] },
+            { "id": "kampung-shop", "label": "The kampung shop", "phrase": "at the kampung shop", "tags": ["ornament:kampung"] },
+            { "id": "our-first-flat", "label": "Our first flat", "phrase": "at the table in our first flat", "tags": ["ornament:first-flat"] },
+            { "id": "seaside-stall", "label": "The seaside stall", "phrase": "at the seaside stall", "tags": ["ornament:seaside"] }
+          ]
+        },
+        {
+          "axis": "feeling",
+          "q_candidates": [
+            "That first sip in the morning, how was it?",
+            "What does the smell of kopi stir up?"
+          ],
+          "free_text": false,
+          "chips": [
+            { "id": "warm-and-cosy", "label": "Warm and cosy", "phrase": "warm and cosy", "tags": ["palette:warm"] },
+            { "id": "easy-and-happy", "label": "Easy and happy", "phrase": "easy and happy", "tags": ["palette:happy"] },
+            { "id": "quiet-and-calm", "label": "Quiet and calm", "phrase": "quiet and calm", "tags": ["palette:calm"] },
+            { "id": "a-little-wistful", "label": "A little wistful", "phrase": "a little wistful", "tags": ["palette:wistful"] },
+            { "id": "proud-of-those-days", "label": "Proud of those days", "phrase": "proud of those days", "tags": ["palette:proud"] },
+            { "id": "easy-in-the-chest", "label": "Easy in the chest", "phrase": "easy in the chest", "tags": ["palette:warm"] }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "setron-tv",
+      "label": "Setron TV",
+      "phrase": "the old Setron TV",
+      "blurb": "Rabbit ears, one good channel, everybody on the floor.",
+      "prompts": [
+        {
+          "axis": "who",
+          "q_candidates": [
+            "Who squeezed onto the floor with you?",
+            "Whose faces were lit up by that screen?"
+          ],
+          "free_text": true,
+          "chips": [
+            { "id": "my-grandmother", "label": "My grandmother", "phrase": "with my grandmother", "tags": ["bloom:one-big"] },
+            { "id": "my-father", "label": "My father", "phrase": "with my father", "tags": ["bloom:one-big"] },
+            { "id": "me-and-my-sister", "label": "Me and my sister", "phrase": "with my sister beside me", "tags": ["bloom:pair"] },
+            { "id": "the-three-of-us", "label": "The three of us", "phrase": "with the three of us", "tags": ["bloom:trio"] },
+            { "id": "the-whole-family", "label": "The whole family", "phrase": "with the whole family", "tags": ["bloom:cluster"] },
+            { "id": "neighbours-crowding-in", "label": "Neighbours crowding in", "phrase": "with the neighbours crowding in", "tags": ["bloom:many"] }
+          ]
+        },
+        {
+          "axis": "where",
+          "q_candidates": [
+            "Whose place did that television sit in?",
+            "Where did everybody gather round that screen?"
+          ],
+          "free_text": false,
+          "chips": [
+            { "id": "our-first-flat", "label": "Our first flat", "phrase": "in our first flat", "tags": ["ornament:first-flat"] },
+            { "id": "the-kampung-house", "label": "The kampung house", "phrase": "in the kampung house", "tags": ["ornament:kampung"] },
+            { "id": "neighbours-flat", "label": "The neighbour's flat", "phrase": "in the neighbour's flat", "tags": ["ornament:first-flat"] },
+            { "id": "coffeeshop-downstairs", "label": "Coffeeshop downstairs", "phrase": "at the coffeeshop downstairs", "tags": ["ornament:kopitiam"] },
+            { "id": "outside-the-shop", "label": "Outside the shop", "phrase": "outside the shop in the market", "tags": ["ornament:market"] },
+            { "id": "my-aunts-place", "label": "My aunt's place", "phrase": "at my aunt's place by the sea", "tags": ["ornament:seaside"] }
+          ]
+        },
+        {
+          "axis": "feeling",
+          "q_candidates": [
+            "Sitting close to that screen, what did you feel?",
+            "How were those nights, all of you together?"
+          ],
+          "free_text": false,
+          "chips": [
+            { "id": "full-and-warm", "label": "Full and warm", "phrase": "full and warm", "tags": ["palette:warm"] },
+            { "id": "noisy-and-happy", "label": "Noisy and happy", "phrase": "noisy and happy", "tags": ["palette:happy"] },
+            { "id": "quiet-and-settled", "label": "Quiet and settled", "phrase": "quiet and settled", "tags": ["palette:calm"] },
+            { "id": "miss-those-nights", "label": "I miss those nights", "phrase": "wistful about those nights", "tags": ["palette:wistful"] },
+            { "id": "proud-we-had-one", "label": "Proud we had one", "phrase": "proud, we had one of our own", "tags": ["palette:proud"] },
+            { "id": "snug-on-the-floor", "label": "Snug on the floor", "phrase": "snug on the floor", "tags": ["palette:warm"] }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sewing-machine",
+      "label": "Sewing machine",
+      "phrase": "the sewing machine",
+      "blurb": "Foot pedal humming late, school uniforms by morning.",
+      "prompts": [
+        {
+          "axis": "who",
+          "q_candidates": [
+            "Whose foot worked that pedal at night?",
+            "Who did all that mending for you?"
+          ],
+          "free_text": false,
+          "chips": [
+            { "id": "my-mother", "label": "My mother", "phrase": "with my mother", "tags": ["bloom:one-big"] },
+            { "id": "my-grandmother", "label": "My grandmother", "phrase": "with my grandmother", "tags": ["bloom:one-big"] },
+            { "id": "my-sister", "label": "My sister", "phrase": "with my sister next to me", "tags": ["bloom:pair"] },
+            { "id": "my-two-sisters", "label": "My two sisters", "phrase": "with my two sisters", "tags": ["bloom:trio"] },
+            { "id": "all-us-children", "label": "All of us children", "phrase": "with all of us children around", "tags": ["bloom:cluster"] },
+            { "id": "neighbours-bringing-clothes", "label": "Neighbours bringing clothes", "phrase": "with the neighbours bringing clothes over", "tags": ["bloom:many"] }
+          ]
+        },
+        {
+          "axis": "where",
+          "q_candidates": [
+            "Where did that machine sit all those years?",
+            "Which place did that humming belong to?"
+          ],
+          "free_text": false,
+          "chips": [
+            { "id": "corner-of-our-flat", "label": "Corner of our flat", "phrase": "in the corner of our first flat", "tags": ["ornament:first-flat"] },
+            { "id": "by-the-kitchen-door", "label": "By the kitchen door", "phrase": "by the kitchen door", "tags": ["ornament:first-flat"] },
+            { "id": "the-kampung-house", "label": "The kampung house", "phrase": "in the kampung house", "tags": ["ornament:kampung"] },
+            { "id": "the-tailor-shop", "label": "The tailor shop", "phrase": "at the tailor shop in the market", "tags": ["ornament:market"] },
+            { "id": "the-five-foot-way", "label": "The five foot way", "phrase": "along the five foot way", "tags": ["ornament:market"] },
+            { "id": "old-seaside-place", "label": "Our old seaside place", "phrase": "at the old place by the sea", "tags": ["ornament:seaside"] }
+          ]
+        },
+        {
+          "axis": "feeling",
+          "q_candidates": [
+            "What was it like, that humming at night?",
+            "Remembering that hum, what stays with you?"
+          ],
+          "free_text": true,
+          "chips": [
+            { "id": "looked-after", "label": "Looked after", "phrase": "looked after and warm", "tags": ["palette:warm"] },
+            { "id": "proud-of-the-work", "label": "Proud of the work", "phrase": "proud of the work", "tags": ["palette:proud"] },
+            { "id": "steady-and-calm", "label": "Steady and calm", "phrase": "steady and calm", "tags": ["palette:calm"] },
+            { "id": "a-little-tender", "label": "A little tender", "phrase": "a little tender", "tags": ["palette:wistful"] },
+            { "id": "happy-and-light", "label": "Happy and light", "phrase": "happy and light", "tags": ["palette:happy"] },
+            { "id": "safe-and-warm", "label": "Safe and warm", "phrase": "safe and warm", "tags": ["palette:warm"] }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tingkat",
+      "label": "Tingkat carrier",
+      "phrase": "the tingkat carrier",
+      "blurb": "Four tiers, still warm, somebody's cooking carried home.",
+      "prompts": [
+        {
+          "axis": "who",
+          "q_candidates": [
+            "Whose cooking was in those four tiers?",
+            "Who packed it and who carried it?"
+          ],
+          "free_text": true,
+          "chips": [
+            { "id": "my-mother", "label": "My mother", "phrase": "with my mother's cooking inside", "tags": ["bloom:one-big"] },
+            { "id": "my-grandmother", "label": "My grandmother", "phrase": "with my grandmother's cooking inside", "tags": ["bloom:one-big"] },
+            { "id": "mother-and-father", "label": "My mother and father", "phrase": "with my mother and father", "tags": ["bloom:pair"] },
+            { "id": "my-aunties", "label": "My aunties", "phrase": "with my aunties", "tags": ["bloom:trio"] },
+            { "id": "the-whole-family", "label": "The whole family", "phrase": "with the whole family", "tags": ["bloom:cluster"] },
+            { "id": "shared-with-neighbours", "label": "Shared with neighbours", "phrase": "with the neighbours sharing it too", "tags": ["bloom:many"] }
+          ]
+        },
+        {
+          "axis": "where",
+          "q_candidates": [
+            "Where did that tingkat get carried to?",
+            "Which kitchen did the food come from?"
+          ],
+          "free_text": false,
+          "chips": [
+            { "id": "the-kampung-kitchen", "label": "The kampung kitchen", "phrase": "in the kampung kitchen", "tags": ["ornament:kampung"] },
+            { "id": "our-first-flat", "label": "Our first flat", "phrase": "in our first flat", "tags": ["ornament:first-flat"] },
+            { "id": "the-wet-market", "label": "The wet market", "phrase": "at the wet market", "tags": ["ornament:market"] },
+            { "id": "coffeeshop-downstairs", "label": "Coffeeshop downstairs", "phrase": "at the coffeeshop downstairs", "tags": ["ornament:kopitiam"] },
+            { "id": "down-at-the-beach", "label": "Down at the beach", "phrase": "down at the beach", "tags": ["ornament:seaside"] },
+            { "id": "the-void-deck", "label": "The void deck", "phrase": "at the void deck downstairs", "tags": ["ornament:first-flat"] }
+          ]
+        },
+        {
+          "axis": "feeling",
+          "q_candidates": [
+            "That lid coming off, what came back?",
+            "What did that food mean to you?"
+          ],
+          "free_text": false,
+          "chips": [
+            { "id": "warm-and-full", "label": "Warm and full", "phrase": "warm and full", "tags": ["palette:warm"] },
+            { "id": "happy-and-hungry", "label": "Happy and hungry", "phrase": "happy and hungry", "tags": ["palette:happy"] },
+            { "id": "calm-and-easy", "label": "Calm and easy", "phrase": "calm and easy", "tags": ["palette:calm"] },
+            { "id": "miss-that-cooking", "label": "I miss that cooking", "phrase": "wistful for that cooking", "tags": ["palette:wistful"] },
+            { "id": "proud-of-that-cooking", "label": "Proud of that cooking", "phrase": "proud of that cooking", "tags": ["palette:proud"] },
+            { "id": "cared-for", "label": "Cared for", "phrase": "cared for and warm", "tags": ["palette:warm"] }
+          ]
+        }
+      ]
+    }
+  ]
+}
