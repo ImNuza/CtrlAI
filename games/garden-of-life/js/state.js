@@ -66,7 +66,13 @@ function emptyState() {
     seeds: {},
     basket: {},
     meals: { unlocked: [] },
-    freeSeed: { lastClaimDay: '' }
+    freeSeed: { lastClaimDay: '' },
+    /* ---- phase 3, and additive in the same way the economy was. A save written
+       before the camera walk and the sound switch existed reads back with an
+       unclaimed day and the sound on, which is what a new player gets anyway, so
+       there is nothing here to migrate and no reason to move the version. */
+    photo: { lastQuestDay: '' },
+    audio: { muted: false }
   };
 }
 
@@ -270,7 +276,9 @@ export function daysBetween(isoA, isoB) {
  * same code that read it before, and the v2 blocks are defaulted from the empty
  * document rather than being required. A save written before the economy
  * existed keeps every plant, every phrase and every watered day, and simply
- * arrives with nothing in its pockets.
+ * arrives with nothing in its pockets. The phase 3 blocks work the same way
+ * inside v2: no photo block means the camera walk is unclaimed, no audio block
+ * means the sound is on, so nothing needs rewriting and the version stays put.
  *
  * @returns {Object} The live state document.
  */
@@ -291,6 +299,8 @@ export function initState() {
   const streak = plainObject(raw.streak);
   const meals = plainObject(raw.meals);
   const freeSeed = plainObject(raw.freeSeed);
+  const photo = plainObject(raw.photo);
+  const audio = plainObject(raw.audio);
   state = {
     version: STATE_VERSION,
     player: cleanPlayer(raw.player),
@@ -304,7 +314,11 @@ export function initState() {
     seeds: countMap(raw.seeds),
     basket: countMap(raw.basket),
     meals: { unlocked: idList(meals.unlocked) },
-    freeSeed: { lastClaimDay: isoDay(freeSeed.lastClaimDay) }
+    freeSeed: { lastClaimDay: isoDay(freeSeed.lastClaimDay) },
+    photo: { lastQuestDay: isoDay(photo.lastQuestDay) },
+    // Silence is only ever something the player asked for, so anything that is
+    // not a stored true reads as sound on.
+    audio: { muted: audio.muted === true }
   };
   return state;
 }
@@ -795,4 +809,56 @@ export function mealUnlockCheck() {
     saveNow();
   }
   return unlocked;
+}
+
+/* ---- the camera walk ----------------------------------------------------
+   One walk a day, guarded exactly the way the free seed is guarded: the day it
+   was last claimed is the entire record. Nothing about the photograph is stored
+   here, and there is deliberately nowhere in this document to put it. */
+
+/**
+ * Whether today's camera walk is still there to be taken.
+ * @returns {boolean}
+ */
+export function photoQuestAvailable() {
+  return state.photo.lastQuestDay !== todayISO();
+}
+
+/**
+ * Spend today's camera walk. The reward is the caller's to hand over through
+ * addCoins and grantSeed, so all this does is judge the day, which keeps the
+ * fixed reward out of state and the calendar out of the glue.
+ * @returns {boolean} True when the day was unclaimed and has now been spent.
+ *   False means it was already claimed and nothing here changed.
+ */
+export function claimPhotoQuest() {
+  if (!photoQuestAvailable()) {
+    return false;
+  }
+  state.photo.lastQuestDay = todayISO();
+  saveNow();
+  return true;
+}
+
+/* ---- sound --------------------------------------------------------------
+   One switch, saved with everything else, so a player who wanted quiet never
+   has to ask for it twice. */
+
+/**
+ * @returns {boolean} True when the player has asked for silence.
+ */
+export function getAudioMuted() {
+  return state.audio.muted;
+}
+
+/**
+ * Remember which way the sound switch is pointing. Only a real true is silence,
+ * so a storage file edited by hand cannot leave the game in some third state.
+ * @param {boolean} muted
+ * @returns {boolean} What was stored.
+ */
+export function setAudioMuted(muted) {
+  state.audio.muted = muted === true;
+  saveNow();
+  return state.audio.muted;
 }

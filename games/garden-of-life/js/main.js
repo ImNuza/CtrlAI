@@ -10,7 +10,8 @@
 import { loadTraits } from './composer.js';
 import {
   initState, recordVisit, getPlants, getPlayer, findPlant, isWilted,
-  loadCatalogue, getCoins, addCoins, mealUnlockCheck
+  loadCatalogue, getCoins, addCoins, grantSeed, mealUnlockCheck,
+  photoQuestAvailable, claimPhotoQuest, getAudioMuted, setAudioMuted
 } from './state.js';
 import {
   initGardenView, renderGarden, markFreshPlant, speciesLabelFor,
@@ -21,6 +22,9 @@ import { initGardener, gardenerReact } from './gardener.js';
 import { initPuzzle, refreshPuzzleCoins } from './puzzle.js';
 import { initShop, refreshShopCoins } from './shop.js';
 import { initMeals, celebrateMeals } from './meals.js';
+import { initPhotoQuest } from './photo-quest.js';
+import { initShareCard } from './share-card.js';
+import { initAudio, setMuted as setAudioOutput, play } from './audio.js';
 
 const GAME = 'garden-of-life';
 
@@ -33,6 +37,18 @@ const CONTENT_URLS = {
 
 // Fixed, and the only number a round can pay. No variance, no bonus roll.
 const PUZZLE_PAYOUT = 6;
+
+/* The camera walk pays the same way: a flat 3 coins and one common seed the
+   player picks, once a day. Written here rather than in photo-quest.js for the
+   same reason the payout above is written here, which is that what a moment is
+   worth is the game's judgement and never the screen's. */
+const PHOTO_COINS = 3;
+const PHOTO_TIER = 'common';
+const PHOTO_DONE_TODAY = 'You have already been out with the camera today. There will be another one tomorrow.';
+
+const MUTE_ART = '/games/garden-of-life/art/ui/mute.svg';
+const SOUND_ON_LABEL = 'Sound on';
+const SOUND_OFF_LABEL = 'Sound off';
 
 // A tap that lands inside a section which only just appeared is almost always
 // the second half of a double tap aimed at the screen before it. Swallowing
@@ -47,7 +63,8 @@ const VIEWS = {
   ceremony: { section: 'view-ceremony', heading: 'ceremony-heading' },
   puzzle: { section: 'view-puzzle', heading: 'puzzle-heading' },
   shop: { section: 'view-shop', heading: 'shop-heading' },
-  meals: { section: 'view-meals', heading: 'meals-heading' }
+  meals: { section: 'view-meals', heading: 'meals-heading' },
+  photo: { section: 'view-photo', heading: 'photo-heading' }
 };
 
 const content = { prompts: null, gardenerLines: null, traits: null, meals: null };
@@ -149,6 +166,7 @@ let wiltNoticed = false;
 function onPlanted(plant) {
   markFreshPlant(plant.id);
   renderGarden();
+  playCue('planting');
   gardenerReact('planting', { plant: speciesLabelFor(plant) });
 }
 
@@ -189,6 +207,7 @@ function onHarvest(cropId) {
   const dishes = mealUnlockCheck();
   refreshCoins();
   if (dishes.length > 0) {
+    playCue('meal_unlock');
     gardenerReact('meal_unlock', { plant: dishes[0].name });
     // The card reveal is the meals screen's job, the line about it is ours.
     celebrateMeals(dishes);
@@ -197,11 +216,39 @@ function onHarvest(cropId) {
   gardenerReact('harvest', { plant: cropLabel(cropId) });
 }
 
-function cropLabel(cropId) {
+// The crops the game knows about, straight from the traits file main.js already
+// fetched. A file that never landed leaves an empty map, which every reader
+// below is written to survive.
+function cropsMap() {
   const traits = content.traits === null || typeof content.traits !== 'object' ? {} : content.traits;
-  const crops = traits.crops === null || typeof traits.crops !== 'object' ? {} : traits.crops;
-  const crop = crops[cropId];
+  return traits.crops === null || typeof traits.crops !== 'object' ? {} : traits.crops;
+}
+
+function cropLabel(cropId) {
+  const crop = cropsMap()[cropId];
   return crop !== null && crop !== undefined && typeof crop.label === 'string' ? crop.label : cropId;
+}
+
+/* What the camera walk is allowed to hand over: common tier only, in file order.
+   The same rule the free seed lives by, and for the same reason, which is that
+   no free packet may be the short way to the rare shelf. The tier travels with
+   each record because the screen filters again on its own side, and a list that
+   arrived without one would come out empty. */
+function commonCrops() {
+  const crops = cropsMap();
+  const keys = Object.keys(crops);
+  const out = [];
+  for (let i = 0; i < keys.length; i += 1) {
+    const crop = crops[keys[i]];
+    if (crop !== null && typeof crop === 'object' && crop.price_tier === PHOTO_TIER) {
+      out.push({
+        id: keys[i],
+        label: typeof crop.label === 'string' ? crop.label : keys[i],
+        price_tier: PHOTO_TIER
+      });
+    }
+  }
+  return out;
 }
 
 /* ---- coins on screen -----------------------------------------------------
@@ -222,6 +269,154 @@ function refreshCoins() {
 function onRoundComplete() {
   addCoins(PUZZLE_PAYOUT);
   refreshCoins();
+}
+
+/* ---- sound ---------------------------------------------------------------
+   Four cues, and every one of them rides on a visual change that has already
+   happened, so silence never costs the player information. Both calls go through
+   these two functions rather than being sprinkled through the glue, so the whole
+   game's relationship with the sound module is nine lines long. */
+
+/* Called from inside the tap that caused the thing being described, which is
+   what lets the module build its context at all: a browser refuses one asked for
+   anywhere else. Muted, it does nothing and builds nothing. */
+function playCue(name) {
+  play(name);
+}
+
+// The save is the record. This only tells the sound module which way the switch
+// is now pointing, so a cue already halfway through can fade out properly.
+function pushMuteToAudio(muted) {
+  setAudioOutput(muted);
+}
+
+function paintMute(button, label, muted) {
+  // Pressed means quiet. The label says the same thing in words, so the state
+  // never rides on the ring alone.
+  button.setAttribute('aria-pressed', muted ? 'true' : 'false');
+  if (label !== null) {
+    label.textContent = muted ? SOUND_OFF_LABEL : SOUND_ON_LABEL;
+  }
+}
+
+function bindMute() {
+  const button = document.getElementById('mute-toggle');
+  const label = document.getElementById('mute-label');
+  const art = document.getElementById('mute-art');
+  if (button === null) {
+    return;
+  }
+  if (art !== null) {
+    /* The listener goes on before the src, so a file that is not there is caught
+       rather than left as a broken picture. The label carries the button either
+       way, which is the fallback contract every art path in this game keeps. */
+    art.addEventListener('error', function () {
+      art.hidden = true;
+    });
+    art.src = MUTE_ART;
+    art.hidden = false;
+  }
+  paintMute(button, label, getAudioMuted());
+  button.addEventListener('click', function (event) {
+    if (staleTap(event)) {
+      return;
+    }
+    const muted = !getAudioMuted();
+    setAudioMuted(muted);
+    pushMuteToAudio(muted);
+    paintMute(button, label, muted);
+  });
+}
+
+/* The board settles a matched pair itself and tells nobody: the puzzle reports a
+   finished round and nothing smaller, which is the right seam for a payout and
+   the wrong one for a sound. So the cue is read off the board rather than
+   plumbed through the module, by counting what has settled after each tap.
+
+   Two things make that honest. This listener is added after initPuzzle, so it
+   runs after the module's own handler on the same node and sees the board the
+   tap left behind. And it compares a count rather than looking at the tile that
+   was tapped, so a tap on an already settled pair plays nothing, and a fresh
+   round, which empties the board, simply starts the count again. */
+let settledSeen = 0;
+
+function bindMatchCue() {
+  const board = document.getElementById('puzzle-board');
+  if (board === null) {
+    return;
+  }
+  board.addEventListener('click', function () {
+    const settled = board.querySelectorAll('[data-state="matched"]').length;
+    if (settled > settledSeen) {
+      playCue('match');
+    }
+    settledSeen = settled;
+  });
+}
+
+function onWatered() {
+  playCue('water');
+}
+
+/* ---- the camera walk -----------------------------------------------------
+   photo-quest.js runs the screen and works out what the photo shows. Every grant
+   happens here, through state, so the reward stays one fixed ruling in one file
+   and the module stays a screen. Nothing about the photograph reaches this
+   function, and there is nowhere in state to put it if it did. */
+
+function onQuestDone(result) {
+  const found = result === null || typeof result !== 'object' ? {} : result;
+  const label = typeof found.findLabel === 'string' ? found.findLabel : '';
+  const cropId = typeof found.seedCropId === 'string' ? found.seedCropId : '';
+
+  /* The day is spent first. A claim that comes back false means this walk was
+     already paid for, so the walk still ends in the garden and the coins are not
+     handed over twice. */
+  if (!claimPhotoQuest()) {
+    showView('garden', true);
+    return;
+  }
+
+  addCoins(PHOTO_COINS);
+  if (cropId !== '') {
+    grantSeed(cropId);
+    // Straight into the same guided moment a bought seed gets. One way to put
+    // something in the ground, however it was come by.
+    enterPlacement(cropId, cropLabel(cropId));
+  }
+  refreshCoins();
+  /* Shown from here rather than left to the module, so the walk ends in the
+     garden even if the screen forgets to leave. Calling it twice costs a repeat
+     of the same render, which is why it is safe to insist on it. */
+  showView('garden', true);
+  // Last, so her line lands on a garden the player is already looking at.
+  gardenerReact('photo_result', { plant: label });
+}
+
+function bindPhotoEntry() {
+  const button = document.getElementById('open-photo');
+  const note = document.getElementById('photo-note');
+  if (button === null) {
+    return;
+  }
+  button.addEventListener('click', function (event) {
+    if (staleTap(event)) {
+      return;
+    }
+    /* Never disabled into silence. A walk already taken today answers in a line
+       under the button that was just pressed, and the button keeps working, so
+       nothing on this screen ever reads as broken. */
+    if (!photoQuestAvailable()) {
+      if (note !== null) {
+        note.textContent = PHOTO_DONE_TODAY;
+      }
+      return;
+    }
+    if (note !== null) {
+      note.textContent = '';
+    }
+    showView('photo', true);
+  });
 }
 
 /* ---- boot --------------------------------------------------------------- */
@@ -283,6 +478,13 @@ async function start() {
   bindEntry('open-meals', 'meals');
   bindExit('shop-back');
   bindExit('meals-back');
+  /* photo-back is deliberately not bound here. photo-quest.js binds it, the same
+     way puzzle.js binds its own, because walking out of that screen also has to
+     reset the flow behind it, and binding it twice would send the player back
+     twice and move the focus twice. */
+  // The entry answers for itself, so it is not a plain bindEntry: today's walk
+  // may already be spent, and the answer to that is a line, not a screen.
+  bindPhotoEntry();
 
   const banks = await Promise.all([
     fetchJson(CONTENT_URLS.prompts),
@@ -331,15 +533,34 @@ async function start() {
     views: views,
     storyFor: storyFor,
     onPanelClosed: onPanelClosed,
-    onHarvest: onHarvest
+    onHarvest: onHarvest,
+    onWatered: onWatered
   });
 
   // The board deals itself a round on init and keeps it until the player
   // finishes it, so opening the puzzle later never costs a wait.
   initPuzzle({ views: views, onRoundComplete: onRoundComplete, coins: getCoins });
+  // After initPuzzle on purpose: same node, same phase, so this listener runs
+  // second and reads the board the module has already repainted.
+  bindMatchCue();
   // The shop hands a bought seed straight to the garden's guided placement.
   initShop({ views: views, onPlantNow: enterPlacement });
   initMeals({ views: views, dishes: content.meals });
+
+  /* Which seeds the walk may hand over is the game's ruling and not the screen's,
+     so the list goes over already filtered. It carries the tier as well as the
+     name, because the module filters again on its own side and a list with no
+     tier on it would come out empty. */
+  initPhotoQuest({ views: views, onQuestDone: onQuestDone, crops: commonCrops() });
+  // The share button belongs to that module, which binds it and narrates the
+  // result into #share-note itself.
+  initShareCard({ views: views });
+  /* Nothing is built here. The sound module creates its machinery inside the
+     first cue that runs after a real tap, which is the only place a browser
+     allows it, so this call only hands over the saved setting. */
+  initAudio({ muted: getAudioMuted() });
+
+  bindMute();
 
   renderGarden();
   refreshCoins();

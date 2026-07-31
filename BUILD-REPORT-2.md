@@ -47,7 +47,18 @@ Updated as the run progresses, newest sections appended per phase.
   Notable engineering: the mahjong lift's 600ms miss timer was replaced by
   player-paced next-tap flipping so the game contains no timers at all;
   the shim-deletion was proven visually void with a zero-pixel diff.
-- Phase 3 (U3, share card, PWA, audio): not started
+- Phase 3 (U3, share card, PWA, audio): done, gate-green. Photo quest with the
+  honest canned classifier ("I think it looks like a Bougainvillea. Am I
+  right?"), both correction paths, fixed 3-coin plus chosen-seed reward into
+  guided placement, one walk per day, and privacy hard-proven (nothing
+  image-derived ever touches state or DOM; grep and runtime both). Share card:
+  1080x1350 canvas photograph of the real garden, layout asserted for counts
+  1 through 12, dated download with share-sheet where platforms offer it. PWA
+  manifest valid with both icons; service worker deliberately skipped. Audio:
+  four sine cues, context built only on the first unmuted gesture (proven
+  causally), big persisted mute toggle. SPEC's 15-second photo done-when
+  measures under 2 seconds. Suite stack now 118 checks across four suites,
+  all green under coders, orchestrator, and conductor independently.
 - Phase 4 (adversaries, done-check, handoff): not started
 
 ## Higgsfield ledger

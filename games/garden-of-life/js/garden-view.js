@@ -48,6 +48,7 @@ let views = null;
 let storyFor = null;
 let onPanelClosed = null;
 let onHarvest = null;
+let onWatered = null;
 const el = {};
 
 /* The seed waiting for a plot. One guided moment, never a remembered mode: it
@@ -83,6 +84,8 @@ let storyToken = 0;
  *   onPanelClosed is handed the plant that was open and whether water actually
  *   went in, so main.js can decide what the gardener says about it. onHarvest is
  *   handed the crop id of something just picked, instead of onPanelClosed.
+ *   onWatered fires on the tap that actually put water in, before the panel
+ *   closes, so the glue can answer the moment rather than the leaving of it.
  * @returns {void}
  */
 export function initGardenView(options) {
@@ -91,6 +94,7 @@ export function initGardenView(options) {
   storyFor = typeof config.storyFor === 'function' ? config.storyFor : null;
   onPanelClosed = typeof config.onPanelClosed === 'function' ? config.onPanelClosed : null;
   onHarvest = typeof config.onHarvest === 'function' ? config.onHarvest : null;
+  onWatered = typeof config.onWatered === 'function' ? config.onWatered : null;
 
   el.plots = document.getElementById('plots');
   el.tellMemory = document.getElementById('tell-memory');
@@ -445,6 +449,13 @@ function waterOpenPlant() {
   // The note itself takes a line of the band, which is enough to put the last
   // chip under it.
   updateMoreCue();
+  /* Last, and only on a tap that genuinely watered something. The change is
+     already on screen by now, so a glue that throws while answering cannot
+     swallow the watering, and whatever it answers with lands on the moment
+     rather than on the panel closing a minute later. */
+  if (onWatered !== null) {
+    onWatered(plant, result);
+  }
 }
 
 /* Picking closes the panel, because the plot the panel was about is gone. The

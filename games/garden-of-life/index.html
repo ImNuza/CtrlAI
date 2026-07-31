@@ -5,6 +5,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#fbf6ee">
 <title>Garden of Life</title>
+<!-- Installable from the browser, so the garden lands on the home screen and
+     opens without a URL bar. No service worker on purpose: an install prompt is
+     the point, and a cache layer nobody has had time to test properly is a way
+     to serve yesterday's build to a judge. -->
+<link rel="manifest" href="/games/garden-of-life/manifest.webmanifest">
 <link rel="stylesheet" href="/shared/ui/tokens.css">
 <link rel="stylesheet" href="/shared/ui/base.css">
 <link rel="stylesheet" href="/games/garden-of-life/css/garden.css">
@@ -27,8 +32,19 @@
     <!-- No tagline under the title. Auntie Bee introduces the game herself now,
          in her own words, and the button says what to do; two lines of muted
          explanation on top of that only push the garden further down. -->
-    <header class="stack stack-tight">
+    <!-- The sound switch rides in the title row rather than under it. Anywhere
+         else it would be one more full width button between the player and the
+         plots, and it is a setting, not a thing to do. -->
+    <header class="garden-header">
       <h1 class="game-title" id="garden-heading" tabindex="-1">Garden of Life</h1>
+      <!-- The label says which way the switch is pointing, in words, so the
+           state never rides on a colour or on a picture. main.js gives the img
+           its src and keeps the label and aria-pressed in step; a file that
+           never loads takes itself out and leaves the words. -->
+      <button type="button" class="btn btn-plain icon-btn" id="mute-toggle" aria-pressed="false">
+        <img class="icon-btn-art" id="mute-art" alt="" hidden>
+        <span class="icon-btn-label" id="mute-label">Sound on</span>
+      </button>
     </header>
 
     <!--
@@ -70,8 +86,18 @@
          would spill out of its own button. -->
     <div class="entries">
       <button type="button" class="btn btn-quiet btn-block" id="open-puzzle">Match the pairs</button>
+      <!-- Next to the puzzle because it is the other way to earn, and the note
+           under it is how a walk already taken today answers a tap. The button
+           never goes quiet: a control a senior presses twice with nothing
+           happening is a control that reads as broken. -->
+      <button type="button" class="btn btn-quiet btn-block" id="open-photo">Take a photo</button>
+      <p class="entry-note" id="photo-note" role="status" aria-live="polite"></p>
       <button type="button" class="btn btn-quiet btn-block" id="open-shop">Seed shop</button>
       <button type="button" class="btn btn-quiet btn-block" id="open-meals">Meal cards</button>
+      <button type="button" class="btn btn-quiet btn-block" id="open-share">Share your garden</button>
+      <!-- share-card.js narrates which way the picture went, since a share sheet
+           and a download look nothing alike and only one of them is visible. -->
+      <p class="entry-note" id="share-note" role="status" aria-live="polite"></p>
     </div>
 
     <p class="centered"><a class="btn btn-plain btn-block" href="/">Back to hub</a></p>
@@ -137,6 +163,46 @@
     <h2 id="meals-heading" tabindex="-1">Meal cards</h2>
     <div class="meals-grid" id="meals-grid"></div>
     <button type="button" class="btn btn-quiet btn-block" id="meals-back">Back to the garden</button>
+  </section>
+
+  <!-- photo-quest.js owns the words inside the three regions below and shows one
+       of them at a time. Every label here reads on its own, so the screen is
+       still a screen before that module has said anything. -->
+  <section id="view-photo" class="view" hidden>
+    <h2 id="photo-heading" tabindex="-1">Take a photo of a plant</h2>
+    <!-- Written copy and always on screen, above the button rather than under
+         it. A promise about someone's photograph has to be readable before the
+         camera opens, not in a line they meet afterwards. -->
+    <p class="photo-privacy" id="photo-privacy">The photo stays on your phone.</p>
+    <button type="button" class="btn btn-block photo-open" id="photo-open">Take a photo</button>
+    <!-- One input, hidden from the eye and not from the finger: the big button
+         above opens it, so the phone goes straight to its own camera and the
+         desktop to its own file picker with no permission dance in between. -->
+    <input class="visually-hidden" id="photo-input" type="file" accept="image/*" capture="environment">
+
+    <div class="photo-guess" id="photo-guess" hidden>
+      <p class="lead" id="photo-guess-line" aria-live="polite"></p>
+      <!-- Stacked, not side by side. Two buttons across 390 leaves each about
+           seven characters at the 28px floor, which is how a yes ends up on
+           three lines. -->
+      <div class="photo-answers">
+        <button type="button" class="btn btn-block" id="photo-yes">Yes, that is it</button>
+        <button type="button" class="btn btn-quiet btn-block" id="photo-other">It is something else</button>
+      </div>
+    </div>
+
+    <div class="photo-picker" id="photo-picker" hidden>
+      <p class="muted">Tap what you found.</p>
+      <div class="photo-choices" id="photo-choices"></div>
+    </div>
+
+    <div class="photo-reward" id="photo-reward" hidden>
+      <p class="lead" id="photo-reward-line" aria-live="polite"></p>
+      <div class="row" id="photo-seed-chips"></div>
+      <button type="button" class="btn btn-block" id="photo-done">Plant this seed</button>
+    </div>
+
+    <button type="button" class="btn btn-quiet btn-block" id="photo-back">Back to the garden</button>
   </section>
 
 </main>
