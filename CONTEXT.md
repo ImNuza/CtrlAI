@@ -37,6 +37,7 @@ The submission form did not exist as of 29 Jul. Watch Discord.
 - CodeBuddy for code, Miora for art. The handbook says "highly recommends", the deck says "Development Tool Requirements". With 40 points on AI usage, treat both as mandatory for the submission build.
 - Credits are per person: 2,000 CodeBuddy/WorkBuddy each (distribution was pending as of 29 Jul, forms resubmitted), 1,000 Miora each (automatic on signup). Three signups pool 6,000 + 3,000.
 - The team has no CodeBuddy or Miora access yet. No work in this repo may depend on either until Dewa says access has landed.
+- Separate from the hackathon tools: Dewa's Higgsfield account is reachable through an MCP server in his sessions. It is not part of the mandated tool story. When a GOAL.md grants a budget, it covers interim art and style lock only, under the RULES.md paid-generation protocol; Miora stays the submission art story and can regenerate from tonight's references.
 
 ## Decisions already made (settled in the 29 Jul meeting, do not reopen)
 

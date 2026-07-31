@@ -1,10 +1,11 @@
-# SPEC: Garden of Life (working title) v0.2
+# SPEC: Garden of Life (working title) v0.3
 
-Status: proposed. Dewa has approved this revision; Matthew and Zoe have not yet signed off. The three additions and four cuts below are the changes to react to.
+Status: v0.2 design is Dewa-approved, Matthew and Zoe sign-off still pending. v0.3 changes build scope only, not game design: the overnight run builds most units itself instead of deferring them to the CodeBuddy phase, and adds an art direction section with a Higgsfield budget.
 
 Version history:
 - v0.1: Zoe's PDF from the 29 Jul meeting (`meetings/29jul/age-well-garden-of-life-summary-2.pdf`). Quiz-to-earn, gacha seeds, step quests, water reminders, meal achievements.
-- v0.2 (this file): applies the digest revisions. Adds memory-driven planting, one bounded NPC, photo quests. Cuts gacha, step quests, cognitive-decline claims, the Grow a Garden framing. Argument and sources: `meetings/29jul/digest-29jul-meeting.html`.
+- v0.2: applies the digest revisions. Adds memory-driven planting, one bounded NPC, photo quests. Cuts gacha, step quests, cognitive-decline claims, the Grow a Garden framing. Argument and sources: `meetings/29jul/digest-29jul-meeting.html`.
+- v0.3 (this file): widens the overnight build to near-finished product per GOAL.md. U3, U5, U6, U7 move from the CodeBuddy phase into this build. U6 defaults to the tile-matching recommendation, logged for team veto. Art direction added.
 
 ## Pitch
 
@@ -51,7 +52,7 @@ Each unit: what it is, v0 scope, out of scope, done-when (observable on a phone)
 ### U3: photo quest
 
 - What: the outdoor nudge. Photograph a real plant outside, it becomes a seed, the gardener reacts to what you found.
-- V0 (CodeBuddy phase): `<input type="file" accept="image/*" capture="environment">`, vision identification behind the seam, canned classifier fallback plus a manual "what did you find" chip picker if permission is denied or the model is unavailable.
+- V0 (this build): `<input type="file" accept="image/*" capture="environment">`, vision identification behind the seam, canned classifier fallback plus a manual "what did you find" chip picker if permission is denied or the model is unavailable. Tonight the canned and manual paths are the real paths; the live vision call stays a SWAP POINT for the CodeBuddy phase.
 - Out: GPS, AR, step counting of any kind (unbuildable in a browser, see CONTEXT.md).
 - Done when: on a phone, taking a photo produces a seed and a gardener comment inside 15 seconds.
 - Earns: Use of AI Tools est. 6 to 8; Impact (gets seniors outdoors, connects to Community in Bloom).
@@ -75,11 +76,11 @@ Each unit: what it is, v0 scope, out of scope, done-when (observable on a phone)
 - Earns: defends Impact and avoids the one attack that could sink the pitch.
 - AI seam: none.
 
-### U6: secondary puzzle (OPEN, needs a team decision)
+### U6: secondary puzzle (defaulted, team can veto)
 
 - What: the optional coin earner for players who want more to do.
-- Recommendation: tile pair-matching, lifted from `games/mahjong-kakis/` matching core, garden-skinned. Matches what seniors actually play (puzzle, card, tile genres lead every preference survey) and reuses working code. Not quizzes: Zoe's exam objection stands and the genre research backs her.
-- Decision needed by: before the CodeBuddy phase starts.
+- Decision: the overnight run builds the recommendation, tile pair-matching lifted from the `games/mahjong-kakis/` matching core, garden-skinned. Matches what seniors actually play (puzzle, card, tile genres lead every preference survey) and reuses working code. Not quizzes: Zoe's exam objection stands and the genre research backs her. Logged as an autonomous default; Matthew and Zoe can veto and the puzzle swaps behind the same coin interface.
+- Done when: a full round is playable by tap only, pays out coins, and needs no rules explanation to start.
 - Earns: Project Quality, session length.
 
 ### U7: meal cards
@@ -97,11 +98,31 @@ Each unit: what it is, v0 scope, out of scope, done-when (observable on a phone)
 - Done when: the slice runs from `node server.js` on a phone viewport with no build step.
 - AI seam: none.
 
-### Out of v0 entirely (slideware, not software)
+### In this build as polish (Phase 3, cut first if time runs short)
 
-- Leaderboard and public profiles: needs accounts and a backend that a 9-day web-link build does not have. Replace with a client-rendered shareable garden card image (canvas render, navigator.share plus download fallback). Feeds the +5 social bonus without a server. The verbal leaderboard agreement from the meeting needs this trade-off surfaced to the team.
+- Shareable garden card: client-rendered canvas image of the garden, navigator.share where available, download fallback everywhere. Feeds the +5 social bonus without a server.
+- PWA manifest and app icon so the game installs to the Home Screen and feels like an app. This is also the only road to real notifications on iOS later.
+- Gentle procedural audio (Web Audio, the pack's game-audio skill): soft confirmation and growth sounds, every sound with a visual equivalent for hard-of-hearing players, one big mute toggle. Quiet by default, never startling.
+
+### Out of this build entirely (slideware, not software)
+
+- Leaderboard and public profiles: needs accounts and a backend that a 9-day web-link build does not have. The shareable garden card is the replacement. The verbal leaderboard agreement from the meeting needs this trade-off surfaced to the team.
 - Real push notifications: iOS requires Home Screen install (CONTEXT.md). The watering reminder is an in-game beat shown in the demo video.
+- Live LLM and vision calls at runtime: the product must run locally with no keys tonight. Every such beat sits behind its SWAP POINT.
 - Brand partnerships (the super-greens idea): a deck mention only.
+
+## Art direction (this build)
+
+Style target, from Matthew's references in the meeting: vintage Singapore, paper texture, warm. Locked by generating 3 or 4 style candidates first, picking one, and holding every asset to it.
+
+Division of labor, and the reasoning matters:
+
+- Plants stay procedural SVG. Per-answer visible variation is the worldbuilding beat the rubric pays for; baked images would kill it. The composer's palettes get matched to the locked style.
+- Higgsfield generates everything else: the gardener (one character, 5 or 6 expressions and poses, built with the server's character-sheet workflow so the face stays consistent), the 8 heritage object illustrations, 2 or 3 garden backgrounds, 6 meal card illustrations, roughly 10 UI props and icons, and the app icon. Use remove_background for cutouts instead of regenerating.
+
+Budget protocol lives in RULES.md. Hard cap 300 credits. Planning split: roughly 15 percent style candidates, 65 percent bulk assets, 20 percent reserve for gaps. Images only, no video, no 3D, no upscales. Per-image costs are unknown until checked, so Phase 0 verifies balance and per-model costs and sizes the asset count to fit the cap with reserve intact.
+
+Miora remains the mandated art story for the submission. Tonight's art locks direction and fills the build; the CodeBuddy phase regenerates or replaces through Miora using tonight's assets as style reference, and the deck documents both honestly.
 
 ## Content banks (the Fable session's main cargo)
 
@@ -141,6 +162,7 @@ Screenshot every CodeBuddy prompt-to-result worth showing, every Miora style ite
 | Item | Owner | Deadline |
 |---|---|---|
 | Game name (candidates to react to: keep "Memory Garden", "Kebun Kita", "Garden of Life") | Team | Before deck draft |
-| Secondary puzzle choice (U6 recommendation above) | Team | Before CodeBuddy phase |
+| U6 puzzle veto window (tile-matching built by default) | Team | Before CodeBuddy phase |
 | Leaderboard trade-off sign-off (shareable card instead) | Team | Before CodeBuddy phase |
-| v0.2 sign-off | Matthew, Zoe | Next meeting |
+| Design sign-off (v0.2 changes, carried into v0.3) | Matthew, Zoe | Next meeting |
+| Art style acceptance (candidates in BUILD-REPORT-2.md after the run) | Team | Before Miora pass |

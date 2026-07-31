@@ -46,7 +46,19 @@
   - Senior UX adversary: drives every screen at 390x844 and fails anything below the floor above.
 - Adversary findings feed the fix loop before polish continues.
 
+## Paid generation (Higgsfield)
+
+Applies only when the current GOAL.md grants a budget. Without that grant, this section grants nothing.
+
+- The cap in GOAL.md is a hard ceiling, not a target. Reaching it stops all generation; placeholders fill remaining gaps and the gap list goes in the build report.
+- Before the first generation: check the account balance, check per-model image costs, and write the full asset plan sized against real numbers with the reserve intact. No generation before the plan exists.
+- Images only. No video, no 3D, no upscales. They cost multiples of an image and tonight needs none of them.
+- Lock style first: 3 or 4 candidates, pick one, then every asset uses the same prompt scaffold. Use the character-sheet workflow for any recurring character. Prefer remove_background on an existing asset over regenerating it.
+- No reroll churn. One retry per asset on a clear failure, then move on with the best take. A slightly off illustration beats an empty budget.
+- Every call gets a ledger line in the build report: what, which model, credits, kept or discarded. The ledger total is checked against the account balance delta at the end.
+- If the Higgsfield connection is absent or failing, degrade to procedural and CSS placeholders, log it, and never block the build on art.
+
 ## Blast radius
 
 - Touch nothing outside this repo, except reading the report files listed in CONTEXT.md.
-- No accounts, no external services, no network calls in the product, no pushes.
+- No accounts, no external services, no network calls in the product, no pushes. One exception: the Higgsfield MCP, only under the paid-generation rules above and only when GOAL.md grants a budget.
