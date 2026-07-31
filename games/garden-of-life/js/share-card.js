@@ -11,6 +11,12 @@
   composer's own svg at each plant's current stage and thirst, so the card is a
   photograph of the garden rather than a second version of it that could drift.
 
+  The caption counts memories and crops apart, because a card that calls a
+  bought bayam a memory is the game telling a small lie about somebody's life.
+  The grid is measured per garden for the same reason: whatever a player has,
+  one plot or twelve, the card should look composed around it rather than laid
+  out for a garden they do not have yet.
+
   Everything decorative is optional by contract. Auntie Bee's portrait is
   layered only if it loads, and her absence changes how the card looks and
   nothing about whether it works.
@@ -31,36 +37,69 @@ const CARD_W = 1080;
 const CARD_H = 1350;
 
 const MAX_PLANTS = 12;
-const COLUMNS = 3;
 
-/* The plot grid in card pixels. Three columns of 300 with 12 between them is
-   924 wide, and four rows of 216 is 900 tall, which is the tallest grid that
-   still leaves the caption and the footer room under it. Rows are centred
-   across the card and the last one is centred on its own, so a garden of four
-   is a row of three with the fourth under the middle of it rather than shoved
-   against the left edge. */
-const CELL_W = 300;
-const CELL_H = 216;
+/* The grid is measured rather than fixed. Three columns is as busy as this card
+   is ever allowed to get and 924 is as wide as the grid gets on a 1080 card,
+   but how many columns a garden actually uses, and how big a tile grows, are
+   worked out per garden in layoutFor. A card holding one memory should show it
+   large. A card holding twelve should show twelve. Nothing in between should
+   look like it was laid out for somebody else's garden. */
+const MAX_COLUMNS = 3;
+const GRID_W = 924;
 const CELL_GAP = 12;
 
-/* The space the grid and the caption share, between the rule under the title
-   and the inside of the bottom border. The whole block is centred in it, which
-   is what keeps a garden of two from sitting in a third of a card with the rest
-   empty underneath. */
-const BLOCK_TOP = 236;
-const BLOCK_BOTTOM = 1316;
+/* Where a tile stops growing. Past this one plot is bigger than the card can
+   carry gracefully and the plant inside starts reading as a poster rather than
+   as something growing in a garden. */
+const MAX_CELL_W = 620;
+const MAX_CELL_H = 640;
 
-// Grid bottom to caption baseline, then caption baseline to footer baseline,
-// then the footer's descenders.
-const CAPTION_GAP = 76;
+/* How far a tile is allowed to stray from the shape of a plot. The game's own
+   plot is 300 by 216, which is the widest shape here. The other way a tile is
+   let go a little taller than it is wide, which is what lets a garden of two
+   fill its half of the card instead of sitting in a wide letterbox, but not so
+   far that a row of three turns into three tall slots with a plant rattling
+   around in each. */
+const CELL_ASPECT_WIDE = 300 / 216;
+const CELL_ASPECT_TALL = 0.8;
+
+/* Room inside a tile, as a share of the tile, so a big plot is not just a big
+   empty frame. At 300 by 216 these come out as the 18 and 12 the card already
+   had. SIT_DOWN settles the plant towards the soil instead of floating it in
+   the middle, and it is always smaller than the padding, which is what stops
+   the nudge from ever pushing a plant out of its own tile. */
+const PAD_X = 0.06;
+const PAD_Y = 0.055;
+const SIT_DOWN = 0.028;
+
+/* The space the grid and the words share, between the rule under the title and
+   a comfortable margin above the drawn border. The whole block is centred in
+   it, which is what keeps a garden of two from sitting in a third of a card
+   with the rest empty around it. */
+const BLOCK_TOP = 236;
+const BLOCK_BOTTOM = 1292;
+
+// Grid bottom to the caption baseline, then down through the warm line to the
+// game's own name and its descenders. What is left over belongs to the grid.
+const CAPTION_GAP = 62;
 const CAPTION_CAP = 34;
 const FOOTER_GAP = 50;
-const FOOTER_TAIL = 10;
+const BRAND_GAP = 42;
+const BRAND_TAIL = 12;
+const WORDS_H = CAPTION_GAP + CAPTION_CAP + FOOTER_GAP + BRAND_GAP + BRAND_TAIL;
+const GRID_MAX_H = BLOCK_BOTTOM - BLOCK_TOP - WORDS_H;
 
-// The composer draws into a 136 by 160 viewBox. Kept exactly, because a plant
-// squashed to fit a square stops looking like the plant in the plot.
+/* The composer draws into a 136 by 160 viewBox. Kept exactly, because a plant
+   squashed to fit a square stops looking like the plant in the plot. The plant
+   is then fitted to whatever tile the layout settled on, by height and by
+   width, which is why it cannot outgrow the tile it sits in at any count. */
 const PLANT_RATIO = 160 / 136;
-const PLANT_W = 164;
+
+/* Caption sizes, largest first. A garden of memories and crops together has
+   more to say than a garden of one thing, so the line steps down a size until
+   it fits rather than walking off the edge of the paper. */
+const CAPTION_SIZES = [46, 42, 38, 34];
+const TEXT_W = CARD_W - 140;
 
 /* Top left, small, like a stamp on a postcard. She sits clear of the centred
    title and well above the first row of plots, so the card is composed the same
@@ -93,7 +132,19 @@ const FALLBACK = {
    granted about who is looking at it. */
 
 const TITLE = 'Garden of Life';
+
+/* The warm line under the caption. The game's own line is about memories, and
+   on a card that happens to hold none it would be the same small lie the
+   caption is careful not to tell, so a garden of crops gets the other one. */
 const FOOTER = 'Grown one memory at a time.';
+const FOOTER_CROPS = 'Grown one day at a time.';
+
+/* The game signs its own name at the bottom, quietly. A card gets forwarded and
+   cropped and screenshotted, and it should still say where it came from without
+   anybody having to read the caption. No hashtags are baked in: those belong to
+   whatever the player types when they post it, and an image cannot take them
+   back afterwards. */
+const BRAND = 'Garden of Life';
 
 const NOTE_WORKING = 'Getting your garden ready.';
 const NOTE_SHARED = 'Sent. Your garden is on its way.';
@@ -102,21 +153,96 @@ const NOTE_DOWNLOADED = 'Saved to your downloads. It is yours to send to anyone 
 const NOTE_TROUBLE = 'The picture did not come out this time. Nothing is lost, try again in a moment.';
 const NOTE_EMPTY = 'Plant one memory first, then there is a garden worth sending.';
 
+function wholeCount(value) {
+  return Number.isFinite(value) && value > 0 ? Math.floor(value) : 0;
+}
+
+/* Counted things read warmer as words than as digits, and a card never holds
+   more than twelve of anything, so the whole table fits here. */
+const NUMBER_WORDS = ['', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven',
+  'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve'];
+
+function countWord(n) {
+  return n > 0 && n < NUMBER_WORDS.length ? NUMBER_WORDS[n] : String(n);
+}
+
+function memoryPhrase(n) {
+  return countWord(n) + (n === 1 ? ' memory' : ' memories');
+}
+
+function cropPhrase(n) {
+  return countWord(n) + (n === 1 ? ' plant' : ' plants');
+}
+
+function lowerFirst(text) {
+  return text === '' ? '' : text.charAt(0).toLowerCase() + text.slice(1);
+}
+
 /**
- * The caption under the plants. Counts what is actually there and says it
- * plainly, because a garden with two plants in it is still worth showing.
- * @param {number} count How many plants are on the card.
- * @returns {string}
+ * The caption under the plants.
+ *
+ * Memories and crops are counted apart and named apart, because they are not
+ * the same thing and the card must not say otherwise. A garden holding one
+ * bought bayam has no memories in it at all, and calling it one memory would be
+ * the card telling a small lie about somebody's own life. Either kind alone
+ * gets its own sentence, and a garden holding both is told as both.
+ *
+ * @param {number} memories Plants grown from a told memory.
+ * @param {number} [crops=0] Plants grown from a seed out of the shop.
+ * @returns {string} One warm sentence, whatever the mix.
  */
-export function captionFor(count) {
-  const whole = Number.isFinite(count) && count > 0 ? Math.floor(count) : 0;
-  if (whole === 0) {
+export function captionFor(memories, crops) {
+  const told = wholeCount(memories);
+  const grown = wholeCount(crops);
+  if (told === 0 && grown === 0) {
     return 'The soil is ready and waiting.';
   }
-  if (whole === 1) {
-    return 'One memory, planted and growing.';
+  if (grown === 0) {
+    return memoryPhrase(told) + ', planted and growing.';
   }
-  return whole + ' memories, planted and growing.';
+  if (told === 0) {
+    return cropPhrase(grown) + ', coming along nicely.';
+  }
+  return memoryPhrase(told) + ' and ' + lowerFirst(cropPhrase(grown)) +
+    ', growing together.';
+}
+
+/**
+ * The quiet line under the caption, and the words that go with the picture when
+ * it leaves through a share sheet.
+ *
+ * @param {number} memories Plants grown from a told memory.
+ * @param {number} [crops=0] Plants grown from a seed out of the shop.
+ * @returns {string} The game's own line, unless the card holds no memories to
+ *   have grown that way.
+ */
+export function footerFor(memories, crops) {
+  return wholeCount(memories) === 0 && wholeCount(crops) > 0 ? FOOTER_CROPS : FOOTER;
+}
+
+/**
+ * Sort a garden into the two things it can hold.
+ *
+ * State normalises every plant to a kind of memory or crop, so anything that is
+ * not a crop is counted as a memory rather than being dropped: a card that
+ * quietly loses a plot is worse than one that calls it by the commoner name.
+ *
+ * @param {Array<Object>} plants The plants being drawn.
+ * @returns {{memories: number, crops: number, total: number}}
+ */
+export function tallyKinds(plants) {
+  const list = Array.isArray(plants) ? plants : [];
+  let crops = 0;
+  let memories = 0;
+  for (let i = 0; i < list.length; i += 1) {
+    const plant = list[i];
+    if (plant !== null && typeof plant === 'object' && plant.kind === 'crop') {
+      crops += 1;
+    } else if (plant !== null && typeof plant === 'object') {
+      memories += 1;
+    }
+  }
+  return { memories: memories, crops: crops, total: memories + crops };
 }
 
 /**
@@ -131,65 +257,139 @@ export function shareFilename(day) {
   return safe === '' ? FILE_STEM + '.' + 'png' : FILE_STEM + '-' + safe + '.png';
 }
 
-function wholeCount(value) {
-  return Number.isFinite(value) && value > 0 ? Math.floor(value) : 0;
+/* How big the plant inside a tile of this size is. Fitted by height and by
+   width both, so whichever room runs out first is the one that decides. This is
+   the whole of the no-overflow rule and every drawn plant comes through it. */
+function plantSize(cellW, cellH) {
+  const roomH = cellH - 2 * Math.round(cellH * PAD_Y);
+  const roomW = cellW - 2 * Math.round(cellW * PAD_X);
+  const height = Math.max(Math.floor(Math.min(roomH, roomW * PLANT_RATIO)), 1);
+  return { w: Math.max(Math.floor(height / PLANT_RATIO), 1), h: height };
 }
 
-/**
- * Where the grid and the words sit for a garden of this size.
- *
- * The grid, the caption and the footer are one block, and the block is centred
- * in the space under the title. A full garden fills it and a garden of two sits
- * in the middle of the card with even paper above and below, which is the
- * difference between a card that looks composed and a card that looks like it
- * was waiting for more plants.
- *
- * @param {number} count Plants being drawn, 1 to 12.
- * @returns {{rows: number, gridTop: number, gridBottom: number,
- *   captionY: number, footerY: number}} All in card pixels.
- */
-export function layoutFor(count) {
-  const total = Math.min(wholeCount(count), MAX_PLANTS);
-  const rows = total === 0 ? 1 : Math.ceil(total / COLUMNS);
-  const gridH = rows * CELL_H + (rows - 1) * CELL_GAP;
-  const blockH = gridH + CAPTION_GAP + CAPTION_CAP + FOOTER_GAP + FOOTER_TAIL;
-  const room = BLOCK_BOTTOM - BLOCK_TOP;
-  const slack = room - blockH;
-  const gridTop = BLOCK_TOP + (slack > 0 ? Math.round(slack / 2) : 0);
-  const gridBottom = gridTop + gridH;
-  const captionY = gridBottom + CAPTION_GAP + CAPTION_CAP;
+/* What a garden of this size comes to laid out in this many columns. Tiles take
+   what the grid and the band will give them, up to their own ceiling, and the
+   shape is clamped both ways so a tile stays a plot. */
+function fitColumns(count, columns) {
+  const rows = Math.ceil(count / columns);
+  let w = Math.min((GRID_W - (columns - 1) * CELL_GAP) / columns, MAX_CELL_W);
+  let h = Math.min((GRID_MAX_H - (rows - 1) * CELL_GAP) / rows, MAX_CELL_H);
+  if (w > h * CELL_ASPECT_WIDE) {
+    w = h * CELL_ASPECT_WIDE;
+  } else if (w < h * CELL_ASPECT_TALL) {
+    h = w / CELL_ASPECT_TALL;
+  }
+  const cellW = Math.max(Math.floor(w), 1);
+  const cellH = Math.max(Math.floor(h), 1);
+  const plant = plantSize(cellW, cellH);
   return {
+    columns: columns,
     rows: rows,
-    gridTop: gridTop,
-    gridBottom: gridBottom,
-    captionY: captionY,
-    footerY: captionY + FOOTER_GAP
+    cellW: cellW,
+    cellH: cellH,
+    plantW: plant.w,
+    plantH: plant.h,
+    /* How much plant the card ends up carrying. Keeping the arrangement that
+       covers the most is what gives one memory a big plot and twelve the full
+       grid, without either being written down here as a special case. */
+    covered: count * plant.w * plant.h
   };
 }
 
 /**
- * Where one plant sits, by its position in the garden.
+ * The whole card worked out for a garden of this size.
+ *
+ * Columns, tile size, where the grid starts and where every line of words sits
+ * are decided here and nowhere else. The arrangement is chosen by trying one,
+ * two and three columns and keeping whichever puts the most plant on the paper,
+ * so a garden of one is a single large plot instead of a small tile adrift in a
+ * card sized for twelve, and every count in between is composed for the same
+ * reason rather than by luck.
+ *
+ * The grid, the caption, the warm line and the game's name are one block, and
+ * the block is centred in the space under the title.
+ *
+ * @param {number} count Plants being drawn. Under 1 is treated as 1 and over 12
+ *   as 12, since twelve is all a card holds.
+ * @returns {{count: number, columns: number, rows: number, cellW: number,
+ *   cellH: number, plantW: number, plantH: number, gridW: number,
+ *   gridH: number, gridTop: number, gridBottom: number, captionY: number,
+ *   footerY: number, brandY: number}} All in card pixels.
+ */
+export function layoutFor(count) {
+  const total = Math.min(Math.max(wholeCount(count), 1), MAX_PLANTS);
+
+  // Widest first, so a tie between two arrangements keeps the one that spreads
+  // across the card rather than the one that stacks down it.
+  let best = null;
+  for (let columns = Math.min(MAX_COLUMNS, total); columns >= 1; columns -= 1) {
+    const fit = fitColumns(total, columns);
+    if (best === null || fit.covered > best.covered) {
+      best = fit;
+    }
+  }
+
+  const across = Math.min(best.columns, total);
+  const gridW = across * best.cellW + (across - 1) * CELL_GAP;
+  const gridH = best.rows * best.cellH + (best.rows - 1) * CELL_GAP;
+  const slack = (BLOCK_BOTTOM - BLOCK_TOP) - (gridH + WORDS_H);
+  const gridTop = BLOCK_TOP + (slack > 0 ? Math.round(slack / 2) : 0);
+  const gridBottom = gridTop + gridH;
+  const captionY = gridBottom + CAPTION_GAP + CAPTION_CAP;
+  const footerY = captionY + FOOTER_GAP;
+  return {
+    count: total,
+    columns: best.columns,
+    rows: best.rows,
+    cellW: best.cellW,
+    cellH: best.cellH,
+    plantW: best.plantW,
+    plantH: best.plantH,
+    gridW: gridW,
+    gridH: gridH,
+    gridTop: gridTop,
+    gridBottom: gridBottom,
+    captionY: captionY,
+    footerY: footerY,
+    brandY: footerY + BRAND_GAP
+  };
+}
+
+/**
+ * Where one plant sits, by its place in the garden.
  *
  * Rows are centred across the card, including a last row that did not fill up,
- * so the shape of a small garden is deliberate rather than ragged.
+ * so the shape of a small garden is deliberate rather than ragged. The plant's
+ * own box comes back alongside the tile, already fitted and already settled
+ * towards the soil, so nothing downstream has to work out whether it fits.
  *
  * @param {number} index 0 based.
  * @param {number} [count=12] How many plants are on the card, which is what
- *   decides where the row it lives in starts.
- * @returns {{x: number, y: number, w: number, h: number}} The cell box.
+ *   decides how big a tile is and where the row it lives in starts.
+ * @returns {{x: number, y: number, w: number, h: number, plantX: number,
+ *   plantY: number, plantW: number, plantH: number}} The tile and the plant
+ *   inside it, in card pixels.
  */
 export function cellBox(index, count) {
-  const total = Math.min(wholeCount(count) === 0 ? MAX_PLANTS : wholeCount(count), MAX_PLANTS);
-  const at = Math.min(wholeCount(index), total - 1);
-  const row = Math.floor(at / COLUMNS);
-  const column = at % COLUMNS;
-  const inThisRow = Math.min(total - row * COLUMNS, COLUMNS);
-  const rowW = inThisRow * CELL_W + (inThisRow - 1) * CELL_GAP;
+  const asked = wholeCount(count);
+  const plan = layoutFor(asked === 0 ? MAX_PLANTS : asked);
+  const at = Math.min(wholeCount(index), plan.count - 1);
+  const row = Math.floor(at / plan.columns);
+  const column = at % plan.columns;
+  const inThisRow = Math.min(plan.count - row * plan.columns, plan.columns);
+  const rowW = inThisRow * plan.cellW + (inThisRow - 1) * CELL_GAP;
+  const x = Math.round((CARD_W - rowW) / 2) + column * (plan.cellW + CELL_GAP);
+  const y = plan.gridTop + row * (plan.cellH + CELL_GAP);
   return {
-    x: Math.round((CARD_W - rowW) / 2) + column * (CELL_W + CELL_GAP),
-    y: layoutFor(total).gridTop + row * (CELL_H + CELL_GAP),
-    w: CELL_W,
-    h: CELL_H
+    x: x,
+    y: y,
+    w: plan.cellW,
+    h: plan.cellH,
+    plantX: x + Math.round((plan.cellW - plan.plantW) / 2),
+    plantY: y + Math.round((plan.cellH - plan.plantH) / 2) +
+      Math.round(plan.cellH * SIT_DOWN),
+    plantW: plan.plantW,
+    plantH: plan.plantH
   };
 }
 
@@ -433,24 +633,52 @@ function drawTitle(ctx, pal) {
   ctx.globalAlpha = 1;
 }
 
+/* The corner and the line grow with the tile. A 26 pixel corner is right on a
+   plot the size of a plot and looks like a scratch on one four times the size,
+   and at the base tile these come out at exactly the 26 and 3 the card had. */
 function drawPlot(ctx, pal, box) {
   ctx.fillStyle = pal.surface;
-  roundedRect(ctx, box.x, box.y, box.w, box.h, 26);
+  roundedRect(ctx, box.x, box.y, box.w, box.h, Math.round(box.h * 0.12));
   ctx.fill();
   ctx.strokeStyle = pal.border;
-  ctx.lineWidth = 3;
+  ctx.lineWidth = Math.max(3, Math.round(box.h * 0.014));
   ctx.stroke();
 }
 
-function drawCaption(ctx, pal, count, layout) {
+/* The biggest of the sizes that fits between the margins. A mixed garden of
+   twelve has a longer sentence than a garden of one, and a line that runs off
+   the paper is worse than a line one step smaller. */
+function fitSize(ctx, text, sizes, weight) {
+  for (let i = 0; i < sizes.length; i += 1) {
+    ctx.font = font(sizes[i], weight);
+    if (ctx.measureText(text).width <= TEXT_W) {
+      return sizes[i];
+    }
+  }
+  return sizes[sizes.length - 1];
+}
+
+function drawCaption(ctx, pal, tally, layout) {
   ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
+
+  const caption = captionFor(tally.memories, tally.crops);
   ctx.fillStyle = pal.text;
-  ctx.font = font(46, '600');
-  ctx.fillText(captionFor(count), CARD_W / 2, layout.captionY);
+  ctx.font = font(fitSize(ctx, caption, CAPTION_SIZES, '600'), '600');
+  ctx.fillText(caption, CARD_W / 2, layout.captionY);
 
   ctx.fillStyle = pal.muted;
   ctx.font = font(34, '400');
-  ctx.fillText(FOOTER, CARD_W / 2, layout.footerY);
+  ctx.fillText(footerFor(tally.memories, tally.crops), CARD_W / 2, layout.footerY);
+
+  /* The signature, and it stays quiet on purpose: it is there for the stranger
+     two forwards down the chat who wonders what this is, not for the player who
+     already knows. */
+  ctx.fillStyle = pal.accent;
+  ctx.globalAlpha = 0.7;
+  ctx.font = font(30, '600');
+  ctx.fillText(BRAND, CARD_W / 2, layout.brandY);
+  ctx.globalAlpha = 1;
 }
 
 /* Layered only if she arrived, into a corner that is hers alone: nothing else
@@ -491,7 +719,11 @@ async function paintCard(plants) {
   // the plants are being rasterized instead of after them.
   const gardener = loadImage(GARDENER_ART, false);
 
-  const height = PLANT_W * PLANT_RATIO;
+  /* One plan for the whole card, so the size a plant is rasterized at is the
+     same size it is drawn at. Rasterizing at the drawn size is also why a big
+     tile stays crisp instead of being a small drawing stretched. */
+  const layout = layoutFor(plants.length);
+
   /* Every plant is rasterized before anything is drawn, so one slow drawing
      cannot leave a half painted card, and the plots underneath are laid down
      first either way. */
@@ -499,22 +731,20 @@ async function paintCard(plants) {
   for (let i = 0; i < plants.length; i += 1) {
     const built = composeFor(plants[i]);
     const svg = built === null || typeof built !== 'object' ? '' : built.svg;
-    drawings.push(await svgImage(svg, PLANT_W, height));
+    drawings.push(await svgImage(svg, layout.plantW, layout.plantH));
   }
 
-  const layout = layoutFor(plants.length);
   for (let i = 0; i < plants.length; i += 1) {
     const box = cellBox(i, plants.length);
     drawPlot(ctx, pal, box);
     const img = drawings[i];
     if (img !== null) {
-      ctx.drawImage(img, box.x + (box.w - PLANT_W) / 2, box.y + (box.h - height) / 2 + 6,
-        PLANT_W, height);
+      ctx.drawImage(img, box.plantX, box.plantY, box.plantW, box.plantH);
     }
   }
 
   drawGardener(ctx, pal, await gardener);
-  drawCaption(ctx, pal, plants.length, layout);
+  drawCaption(ctx, pal, tallyKinds(plants), layout);
 
   return canvas;
 }
@@ -575,11 +805,11 @@ function fileFrom(blob, filename) {
   }
 }
 
-async function handOver(blob, filename) {
+async function handOver(blob, filename, words) {
   const file = fileFrom(blob, filename);
   if (file !== null && canShareFile(file)) {
     try {
-      await navigator.share({ files: [file], title: TITLE, text: FOOTER });
+      await navigator.share({ files: [file], title: TITLE, text: words });
       return 'shared';
     } catch (error) {
       /* Backing out of a share sheet is an answer, not a fault: the player
@@ -634,7 +864,9 @@ export async function shareGarden() {
       setNote(NOTE_TROUBLE);
       return 'trouble';
     }
-    const result = await handOver(blob, shareFilename(todayISO()));
+    const said = tallyKinds(plants);
+    const result = await handOver(blob, shareFilename(todayISO()),
+      footerFor(said.memories, said.crops));
     if (result === 'shared') {
       setNote(NOTE_SHARED);
     } else if (result === 'cancelled') {
