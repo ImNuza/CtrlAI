@@ -11,6 +11,7 @@ const PORT = Number(process.env.PORT) || 4173;
 
 const PAGE_ROUTES = {
   '/': 'index.html',
+  '/garden-of-life': 'games/garden-of-life/index.html',
   '/memory-garden': 'games/memory-garden/index.html',
   '/mahjong-kakis': 'games/mahjong-kakis/index.html',
   '/scam-dojo': 'games/scam-dojo/index.html'

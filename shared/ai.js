@@ -157,6 +157,88 @@ export function hashString(value) {
   return hash >>> 0;
 }
 
+/*
+  ============================ SWAP POINT ============================
+  aiClassifyPhoto is the vision seam. When a real vision model is wired
+  in (CodeBuddy phase), rewrite ONLY the body of aiClassifyPhoto to send
+  the photo and map the answer onto the same shape, keeping this
+  signature:
+
+      aiClassifyPhoto({ game, photo, context }) -> Promise<{ found, meta }>
+
+  found is { id, label, confidence } with id from photoFindChoices().
+  Tonight the body is a canned classifier: it ignores the photo bytes and
+  returns a plausible Singapore garden plant, seeded so QA is stable and
+  consecutive calls vary. meta.source is "canned" now, "vision" later, so
+  the UI and the demo can stay honest about which brain answered. The
+  canned path also remains the offline fallback after the swap: try the
+  model, catch, fall through to the canned pick.
+  ====================================================================
+*/
+
+const PHOTO_FINDS = [
+  { id: 'bougainvillea', label: 'Bougainvillea' },
+  { id: 'hibiscus', label: 'Hibiscus' },
+  { id: 'frangipani', label: 'Frangipani' },
+  { id: 'money-plant', label: 'Money plant' },
+  { id: 'orchid', label: 'Orchid' },
+  { id: 'fern', label: 'Fern' },
+  { id: 'heliconia', label: 'Heliconia' },
+  { id: 'rain-tree', label: 'Rain tree' }
+];
+
+let photoCallCount = 0;
+let lastPhotoIndex = -1;
+
+/**
+ * The closed set of plants the canned classifier can report. The manual
+ * "what did you find" picker shows exactly these, so the two paths always
+ * agree on vocabulary.
+ * @returns {Array<{id: string, label: string}>} A fresh copy.
+ */
+export function photoFindChoices() {
+  return PHOTO_FINDS.map(function (item) {
+    return { id: item.id, label: item.label };
+  });
+}
+
+/**
+ * Identify the plant in a photo. Canned tonight, vision later.
+ * Never throws and never inspects photo bytes in the canned path.
+ * @param {{game: string, photo?: *, context?: Object}} request
+ * @returns {Promise<{found: {id: string, label: string, confidence: number}, meta: Object}>}
+ */
+export async function aiClassifyPhoto(request) {
+  const input = request === null || typeof request !== 'object' ? {} : request;
+  const game = typeof input.game === 'string' ? input.game : '';
+  const context = input.context === null || typeof input.context !== 'object' ? {} : input.context;
+
+  photoCallCount += 1;
+  const seedSource = context.seed === undefined || context.seed === null
+    ? 'photo#' + photoCallCount
+    : String(context.seed);
+  const rng = makeRng(hashString(seedSource));
+
+  let index = Math.floor(rng() * PHOTO_FINDS.length);
+  if (index >= PHOTO_FINDS.length) {
+    index = PHOTO_FINDS.length - 1;
+  }
+  if (index === lastPhotoIndex) {
+    index = (index + 1) % PHOTO_FINDS.length;
+  }
+  lastPhotoIndex = index;
+
+  const found = PHOTO_FINDS[index];
+  return {
+    found: { id: found.id, label: found.label, confidence: 0.6 },
+    meta: {
+      source: 'canned',
+      game: game,
+      choices: PHOTO_FINDS.length
+    }
+  };
+}
+
 /* ---- internals ---------------------------------------------------------- */
 
 function pickIndex(key, length, seed) {
