@@ -48,6 +48,11 @@ const WILT_MIX = 0.45;
 const WILT_MIN_CONTRAST = 3.2;
 const WILT_LEAN = 10;
 const WILT_SQUASH = 0.9;
+/* Young growth sags harder. Ten degrees on a stage 0 sprout moves its tip about
+   five units inside a 136 unit box, which is nothing at plot size, so the sprout
+   gets its own droop and its own squash rather than the grown plant's. */
+const WILT_SPROUT_LEAN = 19;
+const WILT_SPROUT_SQUASH = 0.76;
 
 const NEUTRAL_PAL = {
   label: 'green',
@@ -1073,14 +1078,43 @@ function potSvg() {
 // seed leaves, drawn big enough that the stage scale still leaves it visible over
 // the pot rim. It carries the palette but none of the species shape, because a
 // memory that has just been planted has not decided what it is yet.
-function sproutParts(rng, pal) {
+//
+// The four wobbles are drawn before the branch, in the order the healthy form
+// used to draw them inline, so a thirsty sprout is the same sprout sagging and
+// not a different one. A shared palette and shared jitter, different posture.
+function sproutParts(rng, pal, wilted) {
   const top = 76 + jitter(rng, 5);
+  const leftTurn = jitter(rng, 8);
+  const leftLen = 25 + rng() * 4;
+  const rightTurn = jitter(rng, 8);
+  const rightLen = 23 + rng() * 4;
+
+  /* A sprout carries a tenth of a grown plant's mass, so the group lean and
+     squash that read clearly on a full silhouette vanish on this one at 106px.
+     The seed leaves are re-angled below the horizontal and the shoot bows over
+     its own tip, which is the part a player actually sees change. */
+  if (wilted) {
+    const tipX = BASE_X + 13;
+    const tipY = top + 16;
+    const droopStem = '<path d="M60 128 C57 116 65 108 ' + r2(tipX) + ' ' + r2(tipY) +
+      '" fill="none" stroke="' + pal.leafDark + '" stroke-width="5.5" stroke-linecap="round"/>';
+    const droopLeaves = [
+      '<path d="' + blade(BASE_X - 1, 100, 145 + leftTurn, leftLen, 7.4) +
+        '" fill="' + pal.leaf + '"/>',
+      '<path d="' + blade(BASE_X + 1, 94, 35 + rightTurn, rightLen, 7) +
+        '" fill="' + pal.leaf + '"/>',
+      '<ellipse cx="' + r2(tipX) + '" cy="' + r2(tipY) + '" rx="5" ry="4.2" fill="' +
+        pal.leaf + '"/>'
+    ].join('');
+    return { stem: droopStem, leaves: droopLeaves };
+  }
+
   const stem = '<path d="M60 128 C57 112 63 98 60 ' + r2(top) +
     '" fill="none" stroke="' + pal.leafDark + '" stroke-width="5.5" stroke-linecap="round"/>';
   const leaves = [
-    '<path d="' + blade(BASE_X, 98, -152 + jitter(rng, 8), 25 + rng() * 4, 8) +
+    '<path d="' + blade(BASE_X, 98, -152 + leftTurn, leftLen, 8) +
       '" fill="' + pal.leaf + '"/>',
-    '<path d="' + blade(BASE_X, 92, -28 + jitter(rng, 8), 23 + rng() * 4, 7.4) +
+    '<path d="' + blade(BASE_X, 92, -28 + rightTurn, rightLen, 7.4) +
       '" fill="' + pal.leaf + '"/>',
     '<ellipse cx="60" cy="' + r2(top) + '" rx="5.2" ry="4.4" fill="' + pal.leaf + '"/>'
   ].join('');
@@ -1264,12 +1298,15 @@ const CROP_BUILDERS = {
    group carrying nothing, so the ceremony can animate a transform on the inner
    one without wiping out the lean, the stage scale or the ornament's own spot. */
 
-function placementTransform(scale, lean, wilted) {
+function placementTransform(scale, lean, wilted, young) {
   // Wilt exaggerates the lean the plant already has and squashes it towards the
   // soil. Rotation is applied to the geometry first, the squash after, which
-  // gives the sag a slight shear instead of a rigid tip.
-  const turn = wilted ? (lean >= 0 ? lean + WILT_LEAN : lean - WILT_LEAN) : lean;
-  const scaleY = wilted ? scale * WILT_SQUASH : scale;
+  // gives the sag a slight shear instead of a rigid tip. Young growth gets the
+  // heavier pair of numbers, because a sprout is too small to show the light one.
+  const droop = young ? WILT_SPROUT_LEAN : WILT_LEAN;
+  const squash = young ? WILT_SPROUT_SQUASH : WILT_SQUASH;
+  const turn = wilted ? (lean >= 0 ? lean + droop : lean - droop) : lean;
+  const scaleY = wilted ? scale * squash : scale;
   return 'transform="translate(' + BASE_X + ' ' + SOIL_Y + ') scale(' + r2(scale) + ' ' +
     r2(scaleY) + ') translate(-' + BASE_X + ' -' + SOIL_Y + ') rotate(' + r2(turn) + ' ' +
     BASE_X + ' ' + SOIL_Y + ')"';
@@ -1300,8 +1337,8 @@ function neutralPlant(kind, stage, wilted, seedInput) {
   const seed = resolveSeed(seedInput, 'garden-of-life|sprout');
   const rng = makeRng(seed);
   const pal = wilted ? thirstyPalette(NEUTRAL_PAL) : NEUTRAL_PAL;
-  const built = sproutParts(rng, pal);
-  const place = placementTransform(0.62, 0, wilted);
+  const built = sproutParts(rng, pal, wilted);
+  const place = placementTransform(0.62, 0, wilted, true);
   const attrs = dataAttrs({
     'aria-label': growthLabel('sprout', NEUTRAL_PAL.label, GROWTH_WORDS, stage, wilted),
     'data-kind': kind,
@@ -1407,10 +1444,10 @@ export function composePlant(request) {
     const blooms = renderBlooms(spec, built.anchors, pal, rng,
       built.clusterScale ? built.clusterScale : 1);
     const tilt = jitter(rng, 10);
-    const young = sproutParts(rng, pal);
+    const young = sproutParts(rng, pal, wilted);
 
     const anchor = ORNAMENT_ANCHORS[species] ? ORNAMENT_ANCHORS[species] : [16, 136];
-    const place = placementTransform(stageData.scale, built.lean, wilted);
+    const place = placementTransform(stageData.scale, built.lean, wilted, stageData.sprout);
     const layers = [
       '<g class="layer-pot"><g>' + potSvg() + '</g></g>',
       '<g class="layer-stem" ' + place + '><g>' +
@@ -1504,9 +1541,9 @@ export function composeCrop(request) {
 
     const builder = CROP_BUILDERS[crop.archetype] ? CROP_BUILDERS[crop.archetype] : cropLeafy;
     const built = builder(rng, pal, crop.form);
-    const young = sproutParts(rng, pal);
+    const young = sproutParts(rng, pal, wilted);
 
-    const place = placementTransform(stageData.scale, 0, wilted);
+    const place = placementTransform(stageData.scale, 0, wilted, stageData.sprout);
     const layers = [
       '<g class="layer-pot"><g>' + potSvg() + '</g></g>',
       '<g class="layer-stem" ' + place + '><g>' +

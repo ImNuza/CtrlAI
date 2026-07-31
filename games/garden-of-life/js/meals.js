@@ -214,16 +214,29 @@ function para(className, text) {
    picture that cannot load takes itself out of the layout and leaves the card a
    warm block with its name and its line on it, which is the whole card anyway.
 
-   No sizing here. garden.css sizes .meal-card img, and the dish photographs are
-   800px square, so lazy is not a nicety: a screen of six locked cards should
-   not be pulling megabytes of food nobody has cooked yet. */
-function artNode(dish) {
+   Every dish shows its picture, cooked or not, because a dish nobody has made
+   yet is a plan and a plan is worth looking at. A dish still to cook wears the
+   picture washed back, which is a state anybody can see across the room and
+   nobody has to be told. The wash is on the picture only: every word on the
+   card stays at full strength, so nothing readable is dimmed towards the
+   contrast floor to carry a meaning that words are already carrying.
+
+   The filter is inline rather than a class because it is what the state looks
+   like and this file owns the state. Sizing stays in garden.css, which owns
+   .meal-card img. The photographs are 800px square, so lazy loading is not a
+   nicety here: six cards is six of them. */
+const LOCKED_WASH = 'saturate(0.4) sepia(0.16) opacity(0.62)';
+
+function artNode(dish, locked) {
   const art = document.createElement('img');
   art.className = 'meal-art';
   art.alt = '';
   art.src = MEAL_ART_DIR + dish.id + '.png';
   art.loading = 'lazy';
   art.decoding = 'async';
+  if (locked) {
+    art.style.filter = LOCKED_WASH;
+  }
   art.addEventListener('error', function () {
     art.hidden = true;
   });
@@ -239,7 +252,7 @@ function unlockedCard(dish, fresh) {
   card.setAttribute('aria-label', dish.name + ', cooked' +
     (dish.benefit === '' ? '' : '. ' + dish.benefit));
 
-  card.appendChild(artNode(dish));
+  card.appendChild(artNode(dish, false));
   card.appendChild(para('meal-name', dish.name));
   if (dish.benefit !== '') {
     card.appendChild(para('meal-benefit', dish.benefit));
@@ -259,13 +272,21 @@ function lockedCard(dish) {
   card.dataset.locked = 'true';
   card.setAttribute('role', 'group');
   card.setAttribute('aria-label', dish.name + ', ' + STILL_TO_COOK.toLowerCase() +
+    (dish.benefit === '' ? '' : '. ' + dish.benefit) +
     (grows === '' ? '' : '. ' + grows));
 
+  card.appendChild(artNode(dish, true));
   card.appendChild(para('meal-name', dish.name));
-  /* Said in words, not in colour or a padlock. The state has to survive being
-     read out loud, and it has to sit above the contrast floor, which a greyed
-     out card would not. */
+  /* Said in words, not in colour alone and not with a padlock. The state has to
+     survive being read out loud, and it has to sit above the contrast floor,
+     which is why the words are never the thing that gets dimmed. */
   card.appendChild(para('meal-state muted', STILL_TO_COOK));
+  /* The good news about the dish is on the card from the first session, before
+     anybody has grown a thing. It is also the copy that had to pass the no
+     claims rule, so it should be the copy a judge actually sees. */
+  if (dish.benefit !== '') {
+    card.appendChild(para('meal-benefit', dish.benefit));
+  }
   if (grows !== '') {
     card.appendChild(para('meal-grows', grows));
   }

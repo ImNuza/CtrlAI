@@ -55,18 +55,35 @@ const AGAIN_LABEL = 'One more round';
    Eight motifs from a Singapore garden, drawn here as inline svg so the board
    owes nothing to a file that may not have landed and nothing to composer.js.
 
+   Drawn to the locked style in art/style/LOCKED.md, small prop clause: flat
+   fills, extra bold dark outlines, simple friendly rounded shapes, no texture
+   and no halftone. The contour is the register's signature, so it is set once
+   on the svg root and inherited by every shape rather than repeated sixteen
+   times; a shape that wants a different weight says so itself, and the light
+   detail lines carry their own colour and are drawn on top of the fill.
+
    Every shape is built for a tile about 80px across: one dominant silhouette
    per motif, no detail under about 2.5 units in a 60 unit box, and no two
-   motifs sharing an outline. Colours are tokens only, and every fill sits at
-   7:1 or better against the surface a turned up tile is painted with, which is
-   well past the 3:1 the brief asks for. Light detail on top of a dark fill uses
-   --color-surface, the same pairing in reverse. */
+   motifs sharing an outline. Every fill that touches the tile clears 4.7:1
+   against the cream a turned up tile is painted with, against the 3:1 the
+   brief asks for, and the dark contour around it is 16:1. Light detail on top
+   of a dark fill uses --color-surface, the same pairing in reverse. */
+
+/* The warm poster palette has two fills the token set does not carry. Both are
+   lifted verbatim from the committed props in art/ui, so the register matches
+   by construction rather than by taste: olive is the leaf green in
+   watering-can.svg and sprout.svg, amber is the warm gold in both. Everything
+   else on these tiles is a token. There is no blue anywhere in the locked
+   palette, which is why the can and the butterfly left --accent-dojo behind. */
+const OLIVE = '#4a6b2f';
+const AMBER = '#a6600b';
 
 const FACE_BOX = '0 0 60 60';
 
 function face(inner) {
   return '<svg viewBox="' + FACE_BOX + '" aria-hidden="true" focusable="false" ' +
-    'xmlns="http://www.w3.org/2000/svg">' + inner + '</svg>';
+    'xmlns="http://www.w3.org/2000/svg" stroke="var(--color-text)" stroke-width="3" ' +
+    'stroke-linejoin="round" stroke-linecap="round">' + inner + '</svg>';
 }
 
 const FACES = [
@@ -74,10 +91,10 @@ const FACES = [
     id: 'leaf',
     label: 'leaf',
     svg: face(
-      '<path d="M30 5 C 47 15 50 38 30 55 C 10 38 13 15 30 5 Z" fill="var(--accent-garden)"/>' +
-      '<path d="M30 11 L30 51" stroke="var(--color-surface)" stroke-width="3" stroke-linecap="round"/>' +
-      '<path d="M30 23 L19 19 M30 31 L41 27 M30 39 L20 35" stroke="var(--color-surface)" ' +
-      'stroke-width="2.6" stroke-linecap="round"/>'
+      '<path d="M30 5 C 47 15 50 38 30 55 C 10 38 13 15 30 5 Z" fill="' + OLIVE + '"/>' +
+      '<path d="M30 11 L30 51" fill="none" stroke="var(--color-surface)" stroke-width="3"/>' +
+      '<path d="M30 23 L19 19 M30 31 L41 27 M30 39 L20 35" fill="none" ' +
+      'stroke="var(--color-surface)" stroke-width="2.6"/>'
     )
   },
   {
@@ -89,8 +106,7 @@ const FACES = [
       '<circle cx="37.6" cy="40.5" r="10" fill="var(--color-danger)"/>' +
       '<circle cx="22.4" cy="40.5" r="10" fill="var(--color-danger)"/>' +
       '<circle cx="17.6" cy="26" r="10" fill="var(--color-danger)"/>' +
-      '<circle cx="30" cy="30" r="9" fill="var(--color-surface)" ' +
-      'stroke="var(--accent-kopitiam)" stroke-width="3"/>'
+      '<circle cx="30" cy="30" r="9" fill="' + AMBER + '"/>'
     )
   },
   {
@@ -98,32 +114,39 @@ const FACES = [
     label: 'chilli',
     svg: face(
       '<path d="M33 17 C 45 24 46 40 30 54 C 21 44 20 29 26 21 Z" fill="var(--color-danger)"/>' +
-      '<circle cx="32" cy="17" r="5.5" fill="var(--accent-garden)"/>' +
-      '<path d="M32 16 C 27 10 22 8 17 9" stroke="var(--accent-garden)" stroke-width="5" ' +
-      'fill="none" stroke-linecap="round"/>'
+      // The stalk is a line, so it earns its contour by being drawn twice: the
+      // dark pass is the outline, the olive pass sits inside it.
+      '<path d="M32 16 C 27 10 22 8 17 9" fill="none" stroke="var(--color-text)" ' +
+      'stroke-width="9"/>' +
+      '<path d="M32 16 C 27 10 22 8 17 9" fill="none" stroke="' + OLIVE + '" stroke-width="4.5"/>' +
+      '<circle cx="32" cy="17" r="5.5" fill="' + OLIVE + '"/>'
     )
   },
   {
     id: 'calamansi',
     label: 'calamansi',
     svg: face(
-      '<circle cx="30" cy="31" r="20" fill="var(--accent-kopitiam)"/>' +
+      '<circle cx="30" cy="31" r="20" fill="' + AMBER + '"/>' +
       '<path d="M30 31 L30 11 M30 31 L47.3 21 M30 31 L47.3 41 M30 31 L30 51 ' +
-      'M30 31 L12.7 41 M30 31 L12.7 21" stroke="var(--color-surface)" stroke-width="2.8" ' +
-      'stroke-linecap="round"/>' +
-      '<circle cx="30" cy="31" r="4" fill="var(--color-surface)"/>'
+      'M30 31 L12.7 41 M30 31 L12.7 21" fill="none" stroke="var(--color-surface)" ' +
+      'stroke-width="2.8"/>' +
+      '<circle cx="30" cy="31" r="4" fill="var(--color-surface)" stroke-width="2"/>'
     )
   },
   {
     id: 'can',
     label: 'watering can',
     svg: face(
-      '<path d="M24 29 L9 20 L5 26 L24 38 Z" fill="var(--accent-dojo)"/>' +
-      '<path d="M28 25 C 30 14 47 14 48 25" stroke="var(--accent-dojo)" stroke-width="4.5" ' +
-      'fill="none" stroke-linecap="round"/>' +
-      '<rect x="24" y="25" width="27" height="26" rx="5" fill="var(--accent-dojo)"/>' +
-      '<circle cx="8" cy="34" r="2.6" fill="var(--accent-dojo)"/>' +
-      '<circle cx="14" cy="40" r="2.6" fill="var(--accent-dojo)"/>'
+      '<path d="M24 29 L9 20 L5 26 L24 38 Z" fill="var(--accent-kopitiam)"/>' +
+      '<rect x="24" y="25" width="27" height="26" rx="5" fill="var(--accent-kopitiam)"/>' +
+      '<path d="M28 25 C 30 14 47 14 48 25" fill="none" stroke="var(--color-text)" ' +
+      'stroke-width="9"/>' +
+      '<path d="M28 25 C 30 14 47 14 48 25" fill="none" stroke="var(--accent-kopitiam)" ' +
+      'stroke-width="4.5"/>' +
+      // Grown from 2.6 to make room for a contour and still leave an amber core
+      // that reads as water at 80px.
+      '<circle cx="8" cy="34" r="3.4" fill="' + AMBER + '" stroke-width="2"/>' +
+      '<circle cx="14" cy="40" r="3.4" fill="' + AMBER + '" stroke-width="2"/>'
     )
   },
   {
@@ -133,26 +156,32 @@ const FACES = [
       '<rect x="14" y="9" width="32" height="43" rx="3" fill="var(--accent-kopitiam)"/>' +
       // Inset, so the sealed flap reads as a fold without cutting the top off the
       // packet's silhouette against a tile painted the same colour as the band.
-      '<rect x="18" y="13" width="24" height="5" rx="2.5" fill="var(--color-surface)"/>' +
+      '<rect x="18" y="13" width="24" height="6" rx="3" fill="var(--color-surface)" ' +
+      'stroke-width="2"/>' +
       '<rect x="20" y="23" width="20" height="22" rx="2" fill="var(--color-surface)"/>' +
-      '<ellipse cx="26" cy="30" rx="4" ry="5" fill="var(--color-text)"/>' +
-      '<ellipse cx="34" cy="34" rx="4" ry="5" fill="var(--color-text)"/>' +
-      '<ellipse cx="27" cy="39" rx="4" ry="5" fill="var(--color-text)"/>'
+      /* Seeds pulled in from 4 by 5 to 3.2 by 4 on a 2 wide contour. At the old
+         size the new outlines closed the gaps between them and the three read as
+         one dark mass through the window. */
+      '<ellipse cx="25.5" cy="29.5" rx="3.2" ry="4" fill="var(--color-text)" stroke-width="2"/>' +
+      // One seed green, the way the committed seed-packet.svg puts a single
+      // growing thing on the label.
+      '<ellipse cx="34.5" cy="34" rx="3.2" ry="4" fill="' + OLIVE + '" stroke-width="2"/>' +
+      '<ellipse cx="25.5" cy="39.5" rx="3.2" ry="4" fill="var(--color-text)" stroke-width="2"/>'
     )
   },
   {
     id: 'butterfly',
     label: 'butterfly',
     svg: face(
-      '<path d="M28 24 C 18 9 6 12 6 22 C 6 30 16 33 28 33 Z" fill="var(--accent-dojo)"/>' +
-      '<path d="M32 24 C 42 9 54 12 54 22 C 54 30 44 33 32 33 Z" fill="var(--accent-dojo)"/>' +
-      '<path d="M28 35 C 18 37 10 41 12 48 C 15 53 25 50 28 42 Z" fill="var(--accent-dojo)"/>' +
-      '<path d="M32 35 C 42 37 50 41 48 48 C 45 53 35 50 32 42 Z" fill="var(--accent-dojo)"/>' +
-      '<circle cx="16" cy="22" r="3.6" fill="var(--color-surface)"/>' +
-      '<circle cx="44" cy="22" r="3.6" fill="var(--color-surface)"/>' +
+      '<path d="M28 24 C 18 9 6 12 6 22 C 6 30 16 33 28 33 Z" fill="' + AMBER + '"/>' +
+      '<path d="M32 24 C 42 9 54 12 54 22 C 54 30 44 33 32 33 Z" fill="' + AMBER + '"/>' +
+      '<path d="M28 35 C 18 37 10 41 12 48 C 15 53 25 50 28 42 Z" fill="var(--accent-kopitiam)"/>' +
+      '<path d="M32 35 C 42 37 50 41 48 48 C 45 53 35 50 32 42 Z" fill="var(--accent-kopitiam)"/>' +
+      '<circle cx="16" cy="22" r="4" fill="var(--color-surface)" stroke-width="2"/>' +
+      '<circle cx="44" cy="22" r="4" fill="var(--color-surface)" stroke-width="2"/>' +
       '<ellipse cx="30" cy="32" rx="3" ry="13" fill="var(--color-text)"/>' +
       '<path d="M30 20 C 27 13 24 11 21 10 M30 20 C 33 13 36 11 39 10" ' +
-      'stroke="var(--color-text)" stroke-width="2.4" fill="none" stroke-linecap="round"/>'
+      'fill="none" stroke="var(--color-text)" stroke-width="2.4"/>'
     )
   },
   {
@@ -162,14 +191,14 @@ const FACES = [
       '<path d="M8 49 C 8 42 13 39 20 39 H45 C 49 39 51 43 51 49 Z" fill="var(--color-text-muted)"/>' +
       '<path d="M12 45 C 9 34 11 26 18 24 C 23 23 25 27 23 31 C 20 35 19 40 20 45 Z" ' +
       'fill="var(--color-text-muted)"/>' +
-      '<path d="M18 24 L14 15 M23 25 L28 17" stroke="var(--color-text-muted)" ' +
-      'stroke-width="2.6" stroke-linecap="round"/>' +
-      '<circle cx="14" cy="14" r="2.4" fill="var(--color-text-muted)"/>' +
-      '<circle cx="28" cy="16" r="2.4" fill="var(--color-text-muted)"/>' +
-      '<circle cx="37" cy="29" r="15" fill="var(--accent-kopitiam)"/>' +
+      // Line art, so the dark is the drawing rather than an outline around it.
+      '<path d="M18 24 L14 15 M23 25 L28 17" fill="none" stroke="var(--color-text)" ' +
+      'stroke-width="2.6"/>' +
+      '<circle cx="14" cy="14" r="2.4" fill="var(--color-text)"/>' +
+      '<circle cx="28" cy="16" r="2.4" fill="var(--color-text)"/>' +
+      '<circle cx="37" cy="29" r="15" fill="' + AMBER + '"/>' +
       '<path d="M37 29 C 37 25 40 24 42.5 26 C 46 29 44 35 39 36 C 32 37 28 31 30 24 ' +
-      'C 32 18 39 16 45 19" fill="none" stroke="var(--color-surface)" stroke-width="2.8" ' +
-      'stroke-linecap="round"/>'
+      'C 32 18 39 16 45 19" fill="none" stroke="var(--color-surface)" stroke-width="2.8"/>'
     )
   }
 ];
@@ -187,10 +216,14 @@ const BACK_SVG = face(
 );
 
 /* The settled mark a matched pair keeps. Colour is never the only signal: the
-   badge, the heavier border and the aria label all say the same thing. */
+   badge, the heavier border and the aria label all say the same thing. It takes
+   the same dark contour as the motif it sits beside, or it would be the one flat
+   shape on the tile with no outline. The fill stays --accent, because that is
+   the whole game's colour and not this file's to re-pick. */
 const MATCH_MARK = '<span class="puzzle-mark">' +
   '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">' +
-  '<circle cx="12" cy="12" r="11" fill="var(--accent)"/>' +
+  '<circle cx="12" cy="12" r="10.6" fill="var(--accent)" stroke="var(--color-text)" ' +
+  'stroke-width="2"/>' +
   '<path d="M6.5 12.5 L10.5 16.5 L17.5 8" fill="none" stroke="var(--color-text-on-accent)" ' +
   'stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></span>';
 

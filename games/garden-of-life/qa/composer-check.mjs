@@ -368,6 +368,46 @@ async function runChecks() {
   check('every wilted plant colour stays at or above 3:1 on the plot surface',
     faint.length === 0, faint.join(', '));
 
+  /* Stage 0 is the smallest thing the garden ever draws, so it is where a wilt
+     is likeliest to go unnoticed. The sweep above only looks at stage 2, so the
+     sprout gets its own assertions: the droop has to move geometry, not only
+     colour, and it has to move it by an amount that survives 106px. */
+  let limpSprout = [];
+  for (let i = 0; i < OBJECT_IDS.length; i += 1) {
+    const fresh = composePlant({ objectId: OBJECT_IDS[i], tags: tagsFor(i), stage: 0 });
+    const dry = composePlant({
+      objectId: OBJECT_IDS[i], tags: tagsFor(i), stage: 0, wilted: true
+    });
+    const where = OBJECT_IDS[i];
+    if (fresh.svg === dry.svg) {
+      limpSprout.push(where + ' identical');
+      continue;
+    }
+    const placed = dry.svg.match(
+      /class="layer-stem" transform="translate\(60 128\) scale\((-?[\d.]+) (-?[\d.]+)\)[^"]*rotate\((-?[\d.]+) /);
+    if (placed === null) {
+      limpSprout.push(where + ' no placement transform');
+      continue;
+    }
+    const squash = Number(placed[2]) / Number(placed[1]);
+    const turn = Math.abs(Number(placed[3]));
+    if (squash > 0.8) {
+      limpSprout.push(where + ' squash ' + squash.toFixed(2));
+    }
+    if (turn < 15) {
+      limpSprout.push(where + ' droop ' + turn.toFixed(1) + ' degrees');
+    }
+    // The seed leaves themselves must re-angle. A group transform alone reads as
+    // the whole pot tipping over rather than as a plant going thirsty.
+    const freshLeaves = fresh.svg.match(/class="layer-leaves"[^>]*><g>(.*?)<\/g>/);
+    const dryLeaves = dry.svg.match(/class="layer-leaves"[^>]*><g>(.*?)<\/g>/);
+    if (freshLeaves === null || dryLeaves === null || freshLeaves[1] === dryLeaves[1]) {
+      limpSprout.push(where + ' leaves unchanged');
+    }
+  }
+  check('stage 0 sprout wilt droops geometry, not just colour, at 15 degrees or more',
+    limpSprout.length === 0, limpSprout.join(', '));
+
   // No shame iconography can be proved by machine, but the palette can: nothing
   // in a wilt render may turn grey or red, which is the whole vocabulary of
   // failure art. Muting runs towards olive, so hue stays green or warm.
@@ -424,6 +464,19 @@ function buildSheet() {
   parts.push(section('The same eight at plot size',
     'About 106px, the size a plot in the garden grid really gives a plant. This is the row that decides whether the silhouettes work.',
     plotCells, 'grid-plot'));
+
+  const sproutCells = [];
+  for (let i = 0; i < OBJECT_IDS.length; i += 1) {
+    const tags = tagsFor(i);
+    sproutCells.push(cell(composePlant({ objectId: OBJECT_IDS[i], tags: tags, stage: 0 }).svg,
+      OBJECT_IDS[i] + '<br>fresh', true));
+    sproutCells.push(cell(composePlant({
+      objectId: OBJECT_IDS[i], tags: tags, stage: 0, wilted: true
+    }).svg, OBJECT_IDS[i] + '<br>thirsty', true));
+  }
+  parts.push(section('Stage 0, fresh against thirsty, at plot size',
+    'Pairs, at the size a plot really gives them. A newly planted memory is the smallest thing on the screen, so its thirst has to carry on posture alone: seed leaves below the horizontal, the shoot bowed over its own tip.',
+    sproutCells, 'grid-plot'));
 
   const paletteCells = PALETTES.map(function (palette) {
     return cell(composePlant({

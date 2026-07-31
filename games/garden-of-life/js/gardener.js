@@ -67,6 +67,17 @@ const CONTINUE_REPLY = 'Okay lah';
 const SKIP_LABEL = 'Later lah';
 const SKIP_LINE = 'No hurry lah. Come, the plants are waiting for you.';
 
+/* The form's own two lines. The skeleton ships the first one as a second "what
+   should I call you", which lands right under a greeting that just asked, and
+   reads as her not having listened. She asks once, in the bubble, and the form
+   picks up from there. */
+const NAME_FORM_LEAD = 'Any one of these, or type your own.';
+
+/* The one thing worth saying outright, and it sits beside the field rather than
+   at the top of the form, because that is where the worry about having to type
+   actually lands. */
+const NAME_FORM_HINT = 'Tapping is enough. Typing is extra.';
+
 // Only reached if a generated line comes back empty, which the seam does not
 // do today. The bubble still has to read like her.
 const NEUTRAL_LINE = 'Take your time. The garden is not going anywhere.';
@@ -449,10 +460,37 @@ function buildHonorificChips() {
   el.honorifics.replaceChildren.apply(el.honorifics, nodes);
 }
 
+/* The form's copy, written from here because this module owns what the bubble
+   says. The lead replaces the skeleton's placeholder question, and the hint is
+   a new quiet line slipped in directly above the field.
+
+   The hint is wired as aria-describedby rather than as part of the label: it
+   describes the field, it does not name it, and the input keeps the accessible
+   name the skeleton gave it. Body size like everything else, since a hint a
+   senior cannot read is not a hint. It is a paragraph and not a .chip on
+   purpose, because the QA suites reach for the skip chip as the only .chip that
+   is a direct child of this form. */
+function dressNameForm() {
+  if (el.nameLabel !== null && el.nameLabel !== undefined) {
+    el.nameLabel.textContent = NAME_FORM_LEAD;
+  }
+  if (el.form === null || el.form === undefined ||
+    el.nameInput === null || el.nameInput === undefined) {
+    return;
+  }
+  const hint = document.createElement('p');
+  hint.className = 'muted';
+  hint.id = 'gardener-name-hint';
+  hint.textContent = NAME_FORM_HINT;
+  el.form.insertBefore(hint, el.nameInput);
+  el.nameInput.setAttribute('aria-describedby', hint.id);
+}
+
 /* The skeleton carries the form's four parts and no way back out of one, so the
    chip that closes it is built here, inside the form and under the save button,
-   which is where a way out belongs. It is the only node this module adds to the
-   skeleton, and it lives inside the form the skeleton already reserves room for. */
+   which is where a way out belongs. It lives inside the form the skeleton
+   already reserves room for, and it is the only .chip that is a direct child of
+   the form, which is how the QA suites find it. */
 function buildSkipChip() {
   if (el.form === null || el.form === undefined) {
     return;
@@ -525,6 +563,7 @@ function cacheElements() {
   el.replies = byId('gardener-replies');
   el.form = byId('gardener-name-form');
   el.honorifics = byId('honorific-chips');
+  el.nameLabel = byId('gardener-name-label');
   el.nameInput = byId('gardener-name-input');
   el.save = byId('gardener-name-save');
   el.skip = null;
@@ -603,6 +642,7 @@ function ensureReady() {
   try {
     cacheElements();
     buildHonorificChips();
+    dressNameForm();
     buildSkipChip();
     bind();
   } catch (error) {
