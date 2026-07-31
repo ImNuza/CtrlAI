@@ -58,7 +58,12 @@
         <p id="gardener-line" aria-live="polite"></p>
         <div class="row" id="gardener-replies"></div>
         <div class="name-form" id="gardener-name-form" hidden>
-          <p class="muted" id="gardener-name-label">What should I call you?</p>
+          <!-- Not a second "what should I call you". The bubble directly above
+               this has just asked, and gardener.js writes the same picking-up
+               line over this one anyway; leaving the question here twice meant
+               the skeleton would ask again the moment anything showed the form
+               before she dressed it. She asks once, and the form carries on. -->
+          <p class="muted" id="gardener-name-label">Any one of these, or type your own.</p>
           <div class="row" id="honorific-chips"></div>
           <input class="name-input" id="gardener-name-input" type="text" maxlength="24"
                  autocomplete="off" aria-labelledby="gardener-name-label">
@@ -100,7 +105,43 @@
       <p class="entry-note" id="share-note" role="status" aria-live="polite"></p>
     </div>
 
+    <!-- Quiet on purpose, and last. Nobody has to read it to play, so it is not
+         a block button in the stack with the things you actually do; it is a
+         small way in, sitting where a footnote would sit. -->
+    <p class="centered"><button type="button" class="btn btn-plain" id="open-why">Why this garden</button></p>
+
     <p class="centered"><a class="btn btn-plain btn-block" href="/">Back to hub</a></p>
+  </section>
+
+  <!-- One screen, and every word of it is written here rather than generated.
+       What this game claims about itself has to say the same thing every time it
+       is read, and it has to stay inside what the evidence actually supports. -->
+  <section id="view-why" class="view" hidden>
+    <h2 id="why-heading" tabindex="-1">Why this garden</h2>
+
+    <p>Singapore turns super-aged this year. By 2030 nearly one in four citizens
+      will be 65 or older.</p>
+
+    <p>Two old practices sit under this game. Reminiscence, which is drawing out
+      the stories a person already carries. And horticultural therapy, tending
+      something living because it does the tender good. Both have been studied in
+      older adults, and both are linked to better mood and steadier wellbeing.</p>
+
+    <!-- The honest strength, and it stays honest. Small is what the reviews
+         found, so small is what this page says, and the second sentence is the
+         line that keeps anyone from reading more into the first. -->
+    <p class="muted">The gains are real and they are small. Nothing here treats
+      anything, and nothing here prevents anything.</p>
+
+    <p class="lead why-standout">Healthy 365 tracks a senior. This game
+      remembers one.</p>
+
+    <p>Gardening is not a metaphor either. NParks runs Community in Bloom: more
+      than 2,000 gardening groups and over 48,000 gardeners across the island,
+      with seniors right in the middle of it. A plot on a phone sits beside
+      something plenty of people already do on a Saturday morning.</p>
+
+    <button type="button" class="btn btn-quiet btn-block" id="why-back">Back to the garden</button>
   </section>
 
   <section id="view-picker" class="view" hidden>

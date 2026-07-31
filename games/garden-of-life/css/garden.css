@@ -22,14 +22,43 @@
    leaves the middle layer unpainted with the other two unchanged.
 
    The scrim is what makes the art safe to put text on. Those two rgba values
-   are --color-bg and --accent-tint, which cannot be written as a token here
-   without an alpha channel to go with them. At 0.92 even a black pixel in the
-   illustration composites to a surface where body text sits above 13:1 and the
-   accent heading above 6:1, so every pair measured in tokens.css still holds. */
+   cannot be tokens, because a token has no alpha channel to go with it.
+
+   It used to be 0.92 to 0.94 over a sage bottom stop, which left the kampung
+   showing through at 8 percent: a grey wash with something behind it rather
+   than a warm room. It is now 0.80 to 0.84 and the bottom stop is the amber
+   cream from the locked poster palette, so the art carries up to 20 percent of
+   the page and the page ends warm instead of green.
+
+   Measured, not eyeballed, and measured on the render rather than on the css.
+   The garden was screenshotted at 390x844 with every bit of content set to
+   visibility hidden, so the shot is the composited ground and nothing else, and
+   all 786,630 pixels of it were then decoded and scanned for the darkest one.
+   That pixel is rgb(216, 202, 186). Scored against it, every colour this game
+   ever paints straight onto the ground:
+
+     ink #241c14 (headings, plain copy)    10.45:1
+     muted #5a4a3a (notes, nudges)          5.28:1
+     accent #1b5e38 (title, quiet buttons)  4.83:1
+
+   So 4.83:1 is the floor against a 4.5 requirement, and it belongs to accent
+   green, which is what the quiet entry buttons letter their labels in. The
+   picker was scanned the same way and came back the same, 4.83:1, which is the
+   answer that matters: the illustration is sized to cover, so a taller or
+   shorter page scales it differently and the number had to be checked on more
+   than one. Predicted beforehand at 4.84 by compositing the scrim over the
+   darkest pixel of day.png itself, rgb(67, 38, 22), so the two methods agree.
+
+   One thing this does NOT fix and is worth writing down: --color-border on this
+   ground is 2.13:1 at the same worst pixel, under the 3:1 boundary floor. It
+   was already under it at 0.92 (2.69:1), so thinning deepened an existing
+   problem rather than creating one. The plots below are fixed here because they
+   are the home screen; every other card edge that draws in --color-border is
+   left for a pass of its own. */
 
 body {
   background-image:
-    linear-gradient(180deg, rgba(251, 246, 238, 0.92) 0%, rgba(231, 240, 230, 0.94) 100%),
+    linear-gradient(180deg, rgba(251, 246, 238, 0.8) 0%, rgba(247, 233, 212, 0.84) 100%),
     url("/games/garden-of-life/art/backgrounds/day.png"),
     linear-gradient(180deg, var(--color-bg) 0%, var(--accent-tint) 100%);
   background-repeat: no-repeat, no-repeat, no-repeat;
@@ -195,6 +224,38 @@ body {
   line-height: var(--lh-body);
 }
 
+/* ---- The first session --------------------------------------------------
+   An empty garden has exactly one thing to do in it, and at 390x844 that one
+   thing was landing at y=1310, three screens down, under a dozen empty plots.
+   A first time player who does not know to scroll never found it.
+
+   So while the garden is empty the way in moves up under the title. Measured at
+   390x844 on a fresh save: the button's box is 163 to 235, comfortably inside
+   the first screen, and it goes back under the plots the moment the first
+   memory is planted.
+
+   Above her greeting and not under it, which is the part that is a judgement
+   call. Under it reads better as a conversation, and it measured at 786 to 858
+   on the first visit greeting: fourteen pixels past the fold, and only because
+   of how long that particular line happens to be. Her bubble is written by the
+   content bank and reserves 219px for a line that can grow, so a layout that
+   fits only while she keeps her greeting short is a layout that a future line
+   quietly breaks. Above the bubble the title is the only thing overhead, the
+   title never changes, and the guarantee holds whatever she says.
+
+   Done with order rather than by moving the node, because the plot grid keeps
+   exactly 12 children and reordering DOM would put the button inside the flow
+   that renders them. Explicit values on the two that move up; everything else
+   stays at the default 0 and keeps document order among themselves. */
+
+#view-garden.is-empty .garden-header {
+  order: -2;
+}
+
+#view-garden.is-empty #tell-memory {
+  order: -1;
+}
+
 /* ---- Garden plots -------------------------------------------------------
    12 plots, 3 columns. At 390 wide the page has 342px of room, so a track is
    106px across and a plot clears the 64px tap floor with most of it to spare.
@@ -210,6 +271,20 @@ body {
   gap: var(--sp-3);
 }
 
+/* Dressed to the locked poster style in art/style/LOCKED.md: flat warm fill,
+   one crisp closed contour, no gradient and no inner detail. The old plot was a
+   near white card behind a hairline of --color-border, which read as nothing at
+   all once the illustration came up behind it.
+
+   The contour is muted ink rather than --color-border for a reason with a number
+   on it: on the thinned ground --color-border measures 2.13:1 at the worst art
+   pixel and muted measures 5.38:1, so the bolder line is also the only one of
+   the two that clears the 3:1 boundary floor. Bold dark outlines are what the
+   poster wanted anyway.
+
+   The fill is the amber cream of that palette. It is the empty state, so no
+   plant is ever drawn on it and the wilt contrast floor, which is judged against
+   --color-surface-sunk, is not in this conversation. */
 .plot {
   display: flex;
   align-items: flex-end;
@@ -217,9 +292,10 @@ body {
   min-height: 116px;
   min-width: var(--tap-min);
   padding: var(--sp-2);
-  border: 2px solid var(--color-border);
+  border: 3px solid var(--color-text-muted);
   border-radius: var(--radius-md);
-  background-color: var(--color-surface-sunk);
+  background-color: var(--accent-kopitiam-tint);
+  box-shadow: var(--shadow-card);
   cursor: pointer;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
@@ -231,6 +307,12 @@ body {
   transform: scale(0.97);
 }
 
+/* A plant is drawn on this one, so the fill stays at --color-surface and gets no
+   warmer than that. qa/composer-check.mjs holds every wilted colour to 3:1
+   against --color-surface-sunk as the stand in for the plot behind it, and
+   surface is lighter than sunk, which keeps that check conservative. A warmer,
+   darker fill here would quietly make the real garden tighter than the number
+   the suite is proving. */
 .plot-filled {
   border-color: var(--accent);
   background-color: var(--color-surface);
@@ -284,11 +366,13 @@ body {
   height: 100%;
 }
 
-/* A thirsty plant drops back to the resting border instead of gaining a mark.
+/* A thirsty plant drops back to the resting contour instead of gaining a mark.
    The composer draws the droop; nothing here may add anything that reads as a
-   warning, a fault, or a telling off. The plant is fine, it just wants water. */
+   warning, a fault, or a telling off. The plant is fine, it just wants water.
+   The same muted ink the empty plots wear, so a thirsty plot reads as one that
+   is simply waiting rather than one that has been flagged. */
 .plot.is-wilted {
-  border-color: var(--color-border);
+  border-color: var(--color-text-muted);
 }
 
 /* Per stage hooks. The composer scales the drawing itself, so these are here for
@@ -356,8 +440,33 @@ body {
   max-width: 100%;
 }
 
+/* The three phrases on a plant are a record of what the player already said, not
+   three things to press. They were wearing the full chip treatment, a white fill
+   inside a 3px ring, which is exactly what a tappable answer looks like two
+   screens earlier, so the panel was offering choices that do not exist.
+
+   A wash instead of a ring. The border stays in the box at its own width and
+   goes transparent, so the tint paints straight through it and the pill keeps
+   the geometry and the 64px floor it already had, while the edge that said press
+   me is gone. The press scale and the hover both go with it, for the same
+   reason: nothing may answer a tap that does nothing.
+
+   --color-text on --accent-tint measures 14.39:1 off the rendered pill, so quiet
+   costs the reading nothing at all. */
 .chip-static {
+  border-color: transparent;
+  background-color: var(--accent-tint);
   cursor: default;
+}
+
+.chip-static:active {
+  transform: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .chip-static:hover {
+    background-color: var(--accent-tint);
+  }
 }
 
 /* ---- The not yet button and its nudge -----------------------------------
@@ -725,19 +834,50 @@ body {
 }
 
 /* ---- Puzzle -------------------------------------------------------------
-   Same class names and the same geometry as the baseline block puzzle.js
-   carries, so that module can drop its own copy with nothing changing on
-   screen. At 390 the page has 342px, three 8px gaps leave 318, so a tile is
-   about 79px square and clears the tap floor with room to spare. The columns
-   stay fractional: a board that pinned its own width would trade a comfortable
-   tile for a sideways scrollbar on a narrower phone. */
+   Same class names and the same data-state values puzzle.js paints, which are
+   the whole seam between that module and this file.
 
+   Dressed to the locked poster in art/style/LOCKED.md, and this is the css half
+   of that: flat fills, one crisp closed contour on every shape, warm paper,
+   colours from the token set and nowhere else. The tile FACES belong to
+   puzzle.js and are not touched here; the chrome is built to sit under them,
+   which is why a turned up tile keeps the near white paper the motifs were drawn
+   against and only the board and the backs go warm.
+
+   Geometry, and it is the tight thing on this screen. qa/economy.mjs holds every
+   tile to 80x80, well above the 64px tap floor, because a memory grid is tapped
+   over and over. At 390 the page has 342px and three 8px gaps leave 318, so a
+   tile is 79.5 and lands on 80 with nothing to spare. A first pass gave the
+   board 3px of border and 8px of padding and the tiles came out at 74, which
+   that suite caught. So the frame below costs no layout at all. The columns stay
+   fractional, so a narrower phone loses a little tile rather than gaining a
+   sideways scrollbar. */
+
+/* A board rather than sixteen loose squares: a warm surface the tiles are set
+   into, showing through as the grout between them, with one crisp line around
+   the whole thing and a shadow under it so it reads as an object on a table.
+
+   The line is a spread shadow rather than a border, and the padding is nothing
+   rather than a token, because both of those would come straight off the tile
+   size and the tiles have no room to give. A spread shadow paints outside the
+   border box, so the frame is drawn without a pixel of layout changing, and a
+   shadow can never push a page sideways. Same trick the welcome ring on a fresh
+   plot already uses. */
 .puzzle-board {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: var(--sp-2);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface-sunk);
+  box-shadow: 0 0 0 3px var(--color-text-muted), var(--shadow-card);
 }
 
+/* Face down: the warm amber cream of the poster palette, one flat fill, no
+   gradient and no inner detail. The contour is muted ink so the tiles separate
+   from a board of nearly the same value the way a poster separates its shapes,
+   by line rather than by a step in brightness. puzzle.js draws the back ring in
+   that same muted ink, which measures 7.10:1 on this fill, so the one mark on a
+   face down tile is nowhere near the 3:1 floor. */
 .puzzle-tile {
   position: relative;
   display: flex;
@@ -746,9 +886,9 @@ body {
   aspect-ratio: 1 / 1;
   min-height: var(--tap-min);
   padding: var(--sp-2);
-  border: 3px solid var(--accent);
+  border: 3px solid var(--color-text-muted);
   border-radius: var(--radius-md);
-  background-color: var(--accent-tint);
+  background-color: var(--accent-kopitiam-tint);
   cursor: pointer;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
@@ -761,11 +901,16 @@ body {
   transform: scale(0.97);
 }
 
-/* Face up and settled are told apart by fill, border weight and the badge, so
-   the board never depends on colour alone to say what is going on. */
+/* Turned up. Near white paper on purpose and not warmed with the rest: the
+   motifs in puzzle.js are drawn to sit on --color-surface, some of them with
+   highlights stroked in it, and warming the paper under them would quietly take
+   contrast off another seat's drawing.
+
+   Down, up and settled are told apart by fill, by border weight, by the badge
+   and by the drawing itself, so nothing on this board rides on colour alone. */
 .puzzle-tile[data-state="up"] {
   background-color: var(--color-surface);
-  border-color: var(--color-border);
+  border-color: var(--color-text-muted);
 }
 
 .puzzle-tile[data-state="matched"] {
@@ -881,6 +1026,17 @@ body {
   background-color: var(--color-surface-sunk);
 }
 
+/* Same hazard as the not yet button above, and the same fix. The shared rule
+   eases background-color over 140ms while the label colour snaps, so the moment
+   the harvest button appears the watering can fades from filled accent toward
+   its own surface with the label already switched to accent green: green ink on
+   a green wash, unreadable for those frames. Transform only, so the press
+   feedback stays and the colour change lands in one frame. Declared before the
+   sibling rule below, which is the one that flips it. */
+#plant-water {
+  transition: transform var(--dur-fast) var(--ease-out);
+}
+
 /* When there is something to pick, picking is the action. The watering can stays
    right there and stays the same size, it just stops competing for the eye. */
 #plant-harvest:not([hidden]) ~ #plant-water {
@@ -952,6 +1108,23 @@ body {
 #photo-guess-line,
 #photo-reward-line {
   overflow-wrap: anywhere;
+}
+
+/* ---- Why this garden ----------------------------------------------------
+   An aside, and it reads like one. No cards, no pull quotes, no wall of
+   references: paragraphs at the body floor with room to breathe between them,
+   and one line lifted out because it is the one worth taking away.
+
+   The section is a .view, so it already stacks with sp-5 between children, and
+   at 28px that is the right gap for reading rather than for scanning. Nothing
+   here needed a size that was not already a token. */
+
+/* The same left rule the grandchild's line and the privacy note wear, in accent
+   rather than in border ink. Quiet emphasis that the page already speaks. */
+.why-standout {
+  padding-left: var(--sp-4);
+  border-left: 4px solid var(--accent);
+  line-height: var(--lh-body);
 }
 
 /* What the watering can answers with. Muted rather than loud, because every

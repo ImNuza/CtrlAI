@@ -64,7 +64,10 @@ const VIEWS = {
   puzzle: { section: 'view-puzzle', heading: 'puzzle-heading' },
   shop: { section: 'view-shop', heading: 'shop-heading' },
   meals: { section: 'view-meals', heading: 'meals-heading' },
-  photo: { section: 'view-photo', heading: 'photo-heading' }
+  photo: { section: 'view-photo', heading: 'photo-heading' },
+  // Nothing is played here and nothing is earned. It answers the one question a
+  // garden cannot answer for itself, which is why it exists at all.
+  why: { section: 'view-why', heading: 'why-heading' }
 };
 
 const content = { prompts: null, gardenerLines: null, traits: null, meals: null };
@@ -126,6 +129,13 @@ function showView(name, moveFocus) {
      after the focus above, which scrolls to the heading on its own and would
      otherwise undo it. */
   if (name === 'garden') {
+    /* The purse is spent on other screens and the garden shows it, so the pill
+       is redrawn on the way back in rather than at each of the six exits that
+       lead here. The shop is the one that actually took coins, but a refresh
+       hung off the shop's own back button is a refresh the next screen with a
+       price on it has to remember to copy. Coming home is the one event they
+       all share, so it is the one place this belongs. */
+    refreshCoins();
     revealPlacement();
   }
 }
@@ -476,8 +486,10 @@ async function start() {
   bindEntry('open-puzzle', 'puzzle');
   bindEntry('open-shop', 'shop');
   bindEntry('open-meals', 'meals');
+  bindEntry('open-why', 'why');
   bindExit('shop-back');
   bindExit('meals-back');
+  bindExit('why-back');
   /* photo-back is deliberately not bound here. photo-quest.js binds it, the same
      way puzzle.js binds its own, because walking out of that screen also has to
      reset the flow behind it, and binding it twice would send the player back

@@ -97,6 +97,7 @@ export function initGardenView(options) {
   onWatered = typeof config.onWatered === 'function' ? config.onWatered : null;
 
   el.plots = document.getElementById('plots');
+  el.gardenView = document.getElementById('view-garden');
   el.tellMemory = document.getElementById('tell-memory');
   el.panel = document.getElementById('view-plant');
   el.panelTitle = document.getElementById('plant-title');
@@ -225,6 +226,15 @@ export function renderGarden() {
   }
   el.plots.replaceChildren.apply(el.plots, nodes);
   freshPlantId = null;
+
+  /* A garden with nothing in it needs the way in above the fold, and css moves
+     the button there off this one class. It is set from the render rather than
+     once at boot because the state it describes changes: the first memory takes
+     it off, and picking the last crop puts it back. The plot count is untouched
+     either way, so nothing about the grid depends on this. */
+  if (el.gardenView !== null && el.gardenView !== undefined) {
+    el.gardenView.classList.toggle('is-empty', plants.length === 0);
+  }
 }
 
 function emptyPlot() {
