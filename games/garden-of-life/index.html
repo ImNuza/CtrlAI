@@ -93,16 +93,24 @@
 <!-- One panel for both jobs: the story replays here and the watering can lives
      here, so a plant has exactly one thing you can do to it, and it is tapping it. -->
 <div id="view-plant" class="overlay" role="dialog" aria-modal="true" aria-labelledby="plant-title" hidden>
+  <!-- The story sits above the plant, not under the chips. Three phrases at the
+       28px floor plus a plant is already taller than a phone, and the story is
+       the reason anyone tapped, so it goes where it is read without scrolling. -->
   <div class="overlay-panel card">
     <h2 id="plant-title" tabindex="-1">Your plant</h2>
+    <p id="plant-story" aria-live="polite"></p>
     <div class="stage stage-panel" id="plant-stage"></div>
     <div class="row" id="plant-chips"></div>
-    <p id="plant-story" aria-live="polite"></p>
     <div class="told" id="plant-told" hidden>
       <p class="muted told-lead">As told by the grandchild</p>
       <p class="told-line" id="plant-freetext"></p>
     </div>
     <div class="overlay-foot">
+      <!-- Shown only while there is genuinely more under the band. A senior who
+           does not know to scroll must never lose a chip behind the buttons. -->
+      <p class="overlay-more" id="plant-more" hidden>More below
+        <svg class="chev" viewBox="0 0 24 24" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg"><path d="M5 9 L12 16.5 L19 9" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </p>
       <p class="water-note" id="plant-water-note" role="status" aria-live="polite"></p>
       <button type="button" class="btn btn-block" id="plant-water">Water this plant</button>
       <button type="button" class="btn btn-quiet btn-block" id="plant-close">Back to garden</button>

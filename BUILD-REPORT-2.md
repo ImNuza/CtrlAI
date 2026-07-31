@@ -7,11 +7,27 @@ Updated as the run progresses, newest sections appended per phase.
 
 ## Run status
 
-- Phase 0 (scaffold, schemas, seam, recon): in progress
-- Phase 1a (content banks): not started
-- Phase 1b (core slice U1 U2 U4 U8): not started
+- Phase 0 (scaffold, schemas, seam, recon): done, committed 1d4138b
+- Phase 1a (content banks): done, committed 1229bf7. Three banks written by a
+  5-writer 3-reviewer workflow, bottom third cut (23 of 88 gardener lines died,
+  48 of 144 chips died, 3 of 9 dishes died), lint-clean including slot-degrade
+  simulation against the real shared/ai.js tidy logic. The linter itself was
+  adversarially verified against 44 mutated-bank cases before its pass was
+  believed. plant-traits.json landed from the composer coder and passes too.
+- Phase 1b (core slice U1 U2 U4 U8): M2 gate green. U8 shell and U1
+  memory-to-plant complete end to end, U4 mechanics in (full day-cycle UI
+  verification deferred to M4 as planned), U2 gardener is M3. Verified three
+  ways: coder suites (36 + 57 + 54 + 24 + 29 checks, all green), the
+  orchestrator's own fresh runs, and the conductor driving the loop by hand in
+  a real browser at 390x844 (garden, picker with final art, three prompts,
+  ceremony with composed story line, sprout planted with welcome ring). One
+  defect found by the orchestrator's eyeball pass (panel occlusion under the
+  sticky foot) and fixed in one iteration with a More-below cue. Composer
+  determinism proven across cold processes; wilt contrast enforced in code.
 - Phase 1c (style lock): done, candidate B locked (see decision 11)
-- Phase 2 (U5 U6 U7, bulk art): not started
+- Phase 2 (U5 U6 U7, bulk art): art half done ahead of schedule, every planned
+  asset generated, reviewed, committed (batches one and two); code half waits
+  on the M2 core
 - Phase 3 (U3, share card, PWA, audio): not started
 - Phase 4 (adversaries, done-check, handoff): not started
 
