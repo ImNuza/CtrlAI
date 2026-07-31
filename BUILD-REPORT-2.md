@@ -24,6 +24,16 @@ Updated as the run progresses, newest sections appended per phase.
   defect found by the orchestrator's eyeball pass (panel occlusion under the
   sticky foot) and fixed in one iteration with a More-below cue. Composer
   determinism proven across cold processes; wilt contrast enforced in code.
+  M3 and M4 followed and are gate-green: Auntie Bee live with six verified
+  event reactions, expression art per event, honorific name capture with a
+  no-penalty skip, and qa/days.mjs proving the full day cycle through the QA
+  clock (growth per distinct watered day, wilt at two dry days, total
+  recovery, absence classification, month-boundary arithmetic). One real
+  defect caught by the day suite (screen-reader stammer on fresh plots),
+  fixed as a shared constant. The puzzle engine (js/puzzle.js) is written and
+  node-proven with 97 assertions, deliberately unwired until stretch two.
+  Verified by my own fresh days.mjs run and a first-hand look at the live
+  gardener greeting.
 - Phase 1c (style lock): done, candidate B locked (see decision 11)
 - Phase 2 (U5 U6 U7, bulk art): art half done ahead of schedule, every planned
   asset generated, reviewed, committed (batches one and two); code half waits

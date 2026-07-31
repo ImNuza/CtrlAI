@@ -52,34 +52,52 @@ body {
 }
 
 /* ---- Gardener -----------------------------------------------------------
-   Skeleton until M3 fills it. Her picture sits beside the bubble rather than
-   above it, so her first line lands in the same eyeline as the garden. */
+   Her picture sits beside the bubble rather than above it, so her line lands in
+   the same eyeline as the garden. */
 
+/* She sits above her own words rather than beside them. Measured at 390 with
+   the real bank: a portrait in the row costs the text a third of its width and
+   drops it to about 14 characters a line, which is a bad read at the 28px floor
+   and makes her longest line 373px tall. Stacked, the same line is 251px and
+   the measure is 22 characters. */
 .gardener {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   align-items: flex-start;
   gap: var(--sp-3);
 }
 
+/* Not a control, so the tap floor does not apply. Big enough to read a face at
+   arm's length, small enough to leave the bubble a readable measure. */
 .gardener-art {
-  width: 88px;
-  height: 88px;
+  width: 96px;
+  height: 96px;
   flex: none;
   border-radius: var(--radius-md);
+  object-fit: cover;
 }
 
 .gardener-bubble {
   display: flex;
   flex-direction: column;
   gap: var(--sp-3);
-  flex: 1 1 auto;
+  align-self: stretch;
   /* A flex item refuses to shrink under its longest word without this, which is
      how a long name pushes a whole phone screen sideways. */
   min-width: 0;
+  padding: var(--sp-4);
 }
 
+/* The reserve belongs to the line, not to the bubble, because the line is what
+   changes on every reaction. Sized to her longest line, measured across all 65
+   in the bank at 390 with the longest name and memory hint a player could
+   produce. Without it, a reaction that runs shorter than the last one drags the
+   whole garden up the screen under the player's finger. Short lines sit centred
+   in the reserved box rather than leaving a hole underneath. */
 #gardener-line {
+  display: flex;
+  align-items: center;
+  min-height: 219px;
   overflow-wrap: anywhere;
 }
 

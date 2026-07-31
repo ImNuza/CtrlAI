@@ -7,11 +7,11 @@
   that has not landed leaves a calm screen, never a broken one.
 */
 
-import { registerBank } from '../../../shared/ai.js';
 import { loadTraits } from './composer.js';
-import { initState, recordVisit } from './state.js';
-import { initGardenView, renderGarden, markFreshPlant } from './garden-view.js';
+import { initState, recordVisit, getPlants, getPlayer, findPlant, isWilted } from './state.js';
+import { initGardenView, renderGarden, markFreshPlant, speciesLabelFor } from './garden-view.js';
 import { initMemoryFlow, storyFor } from './memory-flow.js';
+import { initGardener, gardenerReact } from './gardener.js';
 
 const GAME = 'garden-of-life';
 
@@ -109,49 +109,53 @@ async function fetchJson(url) {
   }
 }
 
-/* File order is load bearing. aiGenerate hands back meta.template_index against
-   the array registered here, and gardener.js looks the matching reply chips up
-   by that index, so nothing may sort or filter these lines on the way in.
+/* ---- what the gardener answers to ---------------------------------------
+   Registration of her lines moved into gardener.js with M3, per the
+   consumption contract in content/SCHEMAS.md: whoever reads meta.template_index
+   back has to be the one who registered the array it indexes into. */
 
-   This sits in boot only until gardener.js exists in M3, which then owns it per
-   the consumption contract in content/SCHEMAS.md. */
-function registerGardenerLines(data) {
-  if (data === null || typeof data !== 'object') {
-    return;
-  }
-  const events = data.events;
-  if (events === null || typeof events !== 'object') {
-    return;
-  }
-  const bank = {};
-  const keys = Object.keys(events);
-  for (let i = 0; i < keys.length; i += 1) {
-    const lines = events[keys[i]];
-    if (!Array.isArray(lines)) {
-      continue;
-    }
-    const texts = [];
-    for (let j = 0; j < lines.length; j += 1) {
-      const line = lines[j];
-      if (line !== null && typeof line === 'object' && typeof line.text === 'string') {
-        texts.push(line.text);
-      }
-    }
-    if (texts.length > 0) {
-      bank[keys[i]] = texts;
-    }
-  }
-  registerBank(GAME, bank);
-}
-
-/* ---- boot --------------------------------------------------------------- */
+// She may notice a thirsty plant once in a sitting. Twice is nagging.
+let wiltNoticed = false;
 
 /* The garden points at the new plant once, then goes back to being a garden.
    memory-flow.js has already stored it by the time this runs. */
 function onPlanted(plant) {
   markFreshPlant(plant.id);
   renderGarden();
+  gardenerReact('planting', { plant: speciesLabelFor(plant) });
 }
+
+/* Priority when several moments land on the same panel close, from the stretch
+   plan: watering beats the wilt notice beats a passing comment. Watering wins
+   because the player just did the thing, and being told about a dry plant in
+   the same breath would read as never quite enough. */
+function onPanelClosed(plant, didWater) {
+  if (didWater) {
+    gardenerReact('watering', { plant: speciesLabelFor(plant) });
+    return;
+  }
+  if (!wiltNoticed) {
+    const thirsty = firstWiltedPlant();
+    if (thirsty !== null) {
+      wiltNoticed = true;
+      gardenerReact('wilt_notice', { plant: speciesLabelFor(thirsty) });
+      return;
+    }
+  }
+  gardenerReact('plant_comment', { plant: speciesLabelFor(plant) });
+}
+
+function firstWiltedPlant() {
+  const plants = getPlants();
+  for (let i = 0; i < plants.length; i += 1) {
+    if (isWilted(plants[i])) {
+      return plants[i];
+    }
+  }
+  return null;
+}
+
+/* ---- boot --------------------------------------------------------------- */
 
 function bindBackButtons() {
   const buttons = document.querySelectorAll('[data-back="garden"]');
@@ -178,7 +182,6 @@ async function start() {
   content.gardenerLines = banks[1];
   content.traits = banks[2];
 
-  registerGardenerLines(content.gardenerLines);
   // Before anything composes a plant. Without it the composer answers every
   // request with a neutral sprout rather than refusing.
   loadTraits(content.traits);
@@ -186,12 +189,24 @@ async function start() {
   initState();
   visit = recordVisit();
 
+  /* She greets on init, so she needs to know how this arrival was classified
+     and what the player last planted, which is the callback that makes a second
+     visit feel like a second visit. An empty label is a real answer: her lines
+     read fine without it. */
+  const last = findPlant(getPlayer().lastPlantId);
+  initGardener({
+    lines: content.gardenerLines,
+    views: views,
+    visit: visit,
+    plant: last === null ? '' : speciesLabelFor(last)
+  });
+
   /* The picker's waiting line stays whatever happens here: memory-flow.js hides
      it by rendering object cards, and leaves it standing when it has no bank to
      render from. One owner for that region, and a screen that always reads. */
   initMemoryFlow({ prompts: content.prompts, views: views, onPlanted: onPlanted });
 
-  initGardenView({ views: views, storyFor: storyFor });
+  initGardenView({ views: views, storyFor: storyFor, onPanelClosed: onPanelClosed });
   renderGarden();
   showView('garden', false);
 }

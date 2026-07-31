@@ -16,7 +16,10 @@ import { getPlants, findPlant, plantStage, isWilted, waterPlant } from './state.
 const MIN_PLOTS = 12;
 const COLUMNS = 3;
 
-const GROWTH_WORDS = ['just planted', 'growing well', 'in full bloom'];
+// One string, used both as the stage 0 growth word and as the just planted
+// note, so a label can never end up saying it twice.
+const JUST_PLANTED = 'just planted';
+const GROWTH_WORDS = [JUST_PLANTED, 'growing well', 'in full bloom'];
 const THIRSTY_WORD = 'ready for a drink';
 
 /* The four answers the watering can gives, and every one of them is good news.
@@ -38,7 +41,12 @@ const SOIL_MOUND = '<svg viewBox="0 0 120 74" aria-hidden="true" focusable="fals
 
 let views = null;
 let storyFor = null;
+let onPanelClosed = null;
 const el = {};
+
+// Whether water actually went in during this opening of the panel. Read once by
+// the close handler, so the gardener can answer the moment rather than the tap.
+let wateredThisOpen = false;
 
 // The plant that was just grown, so the garden can point at it once and then
 // forget. Cleared by the render that used it, never by a timer.
@@ -56,15 +64,19 @@ let storyToken = 0;
  * never leaves a dead plot behind, and every one of them is guarded against the
  * tail of a double tap.
  * @param {{views: {show: Function, markShown: Function, staleTap: Function},
- *   storyFor?: function(Object): Promise<*>}} options storyFor comes from
- *   memory-flow.js. Without it the panel tells the story from the plant's own
- *   saved phrases, so the panel never depends on a module or a bank.
+ *   storyFor?: function(Object): Promise<*>,
+ *   onPanelClosed?: function(Object, boolean): void}} options storyFor comes
+ *   from memory-flow.js. Without it the panel tells the story from the plant's
+ *   own saved phrases, so the panel never depends on a module or a bank.
+ *   onPanelClosed is handed the plant that was open and whether water actually
+ *   went in, so main.js can decide what the gardener says about it.
  * @returns {void}
  */
 export function initGardenView(options) {
   const config = options === null || typeof options !== 'object' ? {} : options;
   views = config.views;
   storyFor = typeof config.storyFor === 'function' ? config.storyFor : null;
+  onPanelClosed = typeof config.onPanelClosed === 'function' ? config.onPanelClosed : null;
 
   el.plots = document.getElementById('plots');
   el.tellMemory = document.getElementById('tell-memory');
@@ -197,8 +209,9 @@ function filledPlot(plant, fresh) {
   button.dataset.plantId = plant.id;
   button.dataset.stage = String(built.traits.stage);
   button.dataset.wilted = built.traits.wilted ? 'true' : 'false';
-  button.setAttribute('aria-label', plantName(plant, built) + ', ' + growthWord(built) +
-    (fresh ? ', just planted' : '') + '. Tap to hear its story.');
+  const growth = growthWord(built);
+  button.setAttribute('aria-label', plantName(plant, built) + ', ' + growth +
+    (fresh && growth !== JUST_PLANTED ? ', ' + JUST_PLANTED : '') + '. Tap to hear its story.');
   button.innerHTML = built.svg;
   return button;
 }
@@ -214,6 +227,19 @@ function composeFor(plant) {
     // without one still regrows the same way every time.
     seed: Number.isFinite(plant.seed) && plant.seed > 0 ? plant.seed : undefined
   });
+}
+
+/**
+ * What the gardener calls this plant. It comes from the composer, so the name
+ * she says out loud is the same name the drawing answers to.
+ * @param {Object} plant
+ * @returns {string} Empty when there is no plant to name.
+ */
+export function speciesLabelFor(plant) {
+  if (plant === null || typeof plant !== 'object') {
+    return '';
+  }
+  return composeFor(plant).traits.speciesLabel;
 }
 
 function growthWord(built) {
@@ -249,6 +275,7 @@ function openPanel(plantId) {
   }
   openPlantId = plant.id;
   gardenScrollY = window.scrollY;
+  wateredThisOpen = false;
 
   const built = renderPanelPlant(plant);
   el.panelTitle.textContent = plantName(plant, built);
@@ -343,6 +370,9 @@ function waterOpenPlant() {
     updateMoreCue();
     return;
   }
+  // Only a tap that actually put water in counts. A second tap on the same day
+  // is answered kindly here and is not a watering for the gardener to remark on.
+  wateredThisOpen = true;
   el.panelNote.textContent = result.recovered
     ? WATER_NOTES.recovered
     : (result.advanced ? WATER_NOTES.advanced : WATER_NOTES.watered);
@@ -355,8 +385,13 @@ function waterOpenPlant() {
 
 function closePanel() {
   const returnTo = openPlantId;
+  // Read before the close clears it, and handed over after the garden is back
+  // on screen, so her line lands on a garden the player is already looking at.
+  const closed = findPlant(returnTo);
+  const didWater = wateredThisOpen;
   el.panel.hidden = true;
   el.panelMore.hidden = true;
+  wateredThisOpen = false;
   openPlantId = '';
   views.markShown('garden');
   // Watering can have moved a stage while the panel was open, so the garden is
@@ -366,6 +401,9 @@ function closePanel() {
   const plot = plotNodeFor(returnTo);
   if (plot !== null) {
     plot.focus();
+  }
+  if (onPanelClosed !== null && closed !== null) {
+    onPanelClosed(closed, didWater);
   }
 }
 
