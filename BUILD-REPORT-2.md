@@ -3,7 +3,41 @@
 Session start: 2026-07-31, late night. Dewa asleep, unattended per GOAL.md.
 This file is the truth about what happened: every autonomous decision, what is
 real versus canned, verification evidence, and the full Higgsfield ledger.
-Updated as the run progresses, newest sections appended per phase.
+
+## MORNING SUMMARY (read this first)
+
+The run completed GOAL.md's done-check and stopped there. Garden of Life is
+playable end to end at http://localhost:4173/garden-of-life (node server.js)
+at 390x844: memory to plant, Auntie Bee with real session memory, tending
+with kind wilt, zero-randomness economy, tile puzzle, meal cards, photo
+quest, share card, PWA manifest, gentle audio. All eight done-check points
+verified. Five QA suites (147 checks total) plus a content linter are green;
+two independent adversaries ran, their fifteen findings were fixed and
+re-verified by an independent delta pass. A usage halt hit at roughly 4am
+and killed four coder seats mid-wave; per-item commits and seat respawns
+from the committed repo absorbed it with zero lost work.
+
+WHAT TO TEST BY HAND FIRST:
+1. The first five minutes on your phone viewport: greeting, honorific, one
+   memory (try the kampung house), the ceremony line naming your feeling,
+   water the sprout.
+2. Set localStorage key ctrlai:garden-of-life:qa-clock to a date 3 days on
+   and reload: the absence greeting, the thirsty plant, and recovery.
+3. A puzzle round, then the shop: buy with the 6 coins, plant via the
+   banner, then the photo quest (file picker on desktop) and the share
+   download.
+4. The share card PNG in your downloads and HANDOFF.md for the CodeBuddy
+   port plan.
+
+SPEND: 85.50 Higgsfield credits of the 300 cap (ledger close below,
+reconciled to the cent against the account). NOTE: 69.20 further credits of
+concurrent account activity between 01:55 and 02:28 SGT were NOT this run
+(pixel-art mascot images and Kling videos; details in the ledger close);
+check your other sessions.
+
+TEAM DECISIONS LEFT OPEN, logged throughout: game name, U6 veto window,
+leaderboard trade-off, rare rungs 7 and 14 content, the shared border token,
+the social post (needs the four hashtags, card is ready).
 
 ## Run status
 
@@ -59,7 +93,16 @@ Updated as the run progresses, newest sections appended per phase.
   causally), big persisted mute toggle. SPEC's 15-second photo done-when
   measures under 2 seconds. Suite stack now 118 checks across four suites,
   all green under coders, orchestrator, and conductor independently.
-- Phase 4 (adversaries, done-check, handoff): not started
+- Phase 4 (adversaries, done-check, handoff): done. Rubric adversary scored
+  the build 57/100 as judged from the link alone (its biggest docks, live
+  model calls and CodeBuddy/Miora evidence, are the next phase's job by
+  design); senior UX adversary measured 54 screen-states and found zero
+  hard-floor violations with five warnings. All fifteen tonight-addressable
+  findings were fixed across seven seats, committed per item through a
+  session-limit halt, and re-verified 12/12 by an independent delta pass
+  (which also caught one item lost in the halt's bookkeeping, fixed and
+  proven). HANDOFF.md written for the CodeBuddy phase; README rewritten
+  honest; conductor done-check against GOAL's eight points passed.
 
 ## Higgsfield ledger
 
