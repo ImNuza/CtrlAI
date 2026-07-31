@@ -245,7 +245,7 @@
         "replies": ["Short walk only", "Got lucky lah", "Easy to find"]
       },
       {
-        "text": "Into the garden it goes. Your {plant} row starts today.",
+        "text": "Good {plant} find. That one deserves a corner in this garden.",
         "replies": ["Plant it now", "From my walk", "Good start"]
       },
       {
@@ -259,15 +259,15 @@
     ],
     "story_retell": [
       {
-        "text": "I still remember {object_phrase}. Whole afternoons of it {where_phrase}.",
+        "text": "I still remember {object_phrase}. Whole hours of it {where_phrase}.",
         "replies": ["Yes, that is it", "Tell me again", "Wah, you remember"]
       },
       {
-        "text": "You planted an afternoon {where_phrase} and it still sits {feeling_phrase}.",
+        "text": "You planted a moment {where_phrase} and it still sits {feeling_phrase}.",
         "replies": ["Still feels the same", "Long time ago already", "Play it again"]
       },
       {
-        "text": "One afternoon {where_phrase}, good company {who_phrase}, and I grew from it.",
+        "text": "One day {where_phrase}, good company {who_phrase}, and I grew from it.",
         "replies": ["That is the one", "Good company indeed", "Tell it again"]
       },
       {
@@ -275,7 +275,7 @@
         "replies": ["It does ah", "Still so clear", "Once more please"]
       },
       {
-        "text": "Every leaf here grew out of that afternoon {where_phrase}.",
+        "text": "Every leaf here grew out of that day {where_phrase}.",
         "replies": ["Imagine that", "That is right", "Again please"]
       },
       {

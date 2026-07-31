@@ -428,6 +428,56 @@ function draftPlant() {
 
 /* ---- ceremony ----------------------------------------------------------- */
 
+/* One sentence under the story saying where the colour came from. It is written
+   here rather than taken from a bank on purpose: it names the machinery, and the
+   machinery is the answer that was tapped plus the palette the composer took out
+   of it. Nobody has to be told the garden listened once they can read their own
+   words in the reason.
+
+   Pure string work off the plant being planted, so the same memory reads the same
+   sentence every time, and it keeps to the twelve word line every written line in
+   this game keeps to. */
+const MAX_ATTRIBUTION_WORDS = 12;
+
+function countWords(value) {
+  return value === '' ? 0 : value.split(/\s+/).length;
+}
+
+// A chip label is bank text and could have been hand edited into anything. The
+// one shape that would show is trailing punctuation, since the sentence brings
+// its own comma.
+function asAnswer(value) {
+  const clean = trimmed(value).replace(/[.,;:!?]+$/, '').trim();
+  return clean === '' ? '' : clean.charAt(0).toUpperCase() + clean.slice(1);
+}
+
+/* The feeling that actually set the palette. Read from the back because a bank
+   asking for a feeling twice lets the later answer win, and the later answer is
+   the one draftPlant writes onto the plant. */
+function feelingAnswer() {
+  for (let i = draft.picks.length - 1; i >= 0; i -= 1) {
+    const pick = draft.picks[i];
+    if (pick !== undefined && pick !== null && pick.axis === 'feeling') {
+      return asAnswer(pick.label);
+    }
+  }
+  return '';
+}
+
+function attributionFor(builtTraits) {
+  const built = builtTraits === null || typeof builtTraits !== 'object' ? {} : builtTraits;
+  const answer = feelingAnswer();
+  const colour = trimmed(built.paletteLabel);
+  /* A palette of none is the composer saying it never got a traits file, so no
+     colour was chosen out of anything and the neutral sprout has no blooms to
+     point at. No feeling tapped, same thing: nothing honest to say. */
+  if (answer === '' || colour === '' || built.palette === 'none') {
+    return '';
+  }
+  const sentence = answer + ', you said, so the blooms turned ' + colour + '.';
+  return countWords(sentence) > MAX_ATTRIBUTION_WORDS ? '' : sentence;
+}
+
 async function runCeremony() {
   if (growing || draft.object === null) {
     return;
@@ -436,6 +486,7 @@ async function runCeremony() {
   storyToken += 1;
   const token = storyToken;
   let plant = null;
+  let attribution = '';
 
   try {
     plant = draftPlant();
@@ -449,6 +500,7 @@ async function runCeremony() {
     // picture regrow in the plot and in the panel forever.
     plant.seed = built.seed;
     pending = plant;
+    attribution = attributionFor(built.traits);
 
     el.ceremonyStage.className = 'stage stage-grow';
     el.ceremonyStage.innerHTML = built.svg;
@@ -460,7 +512,9 @@ async function runCeremony() {
 
   const line = await storyFor(plant);
   if (token === storyToken) {
-    el.ceremonyLine.textContent = line;
+    // The ceremony line only. storyFor keeps saying exactly what it said before,
+    // so the panel replays the story on its own words.
+    el.ceremonyLine.textContent = attribution === '' ? line : line + ' ' + attribution;
   }
 }
 
@@ -684,11 +738,14 @@ function bind() {
     }
 
     // Traits are pulled from the chip here, at answer time, so the draft never
-    // carries a chip id anywhere near the composer.
+    // carries a chip id anywhere near the composer. The label rides along for the
+    // ceremony's attribution sentence: it is the words the player just read on
+    // the button, which is what makes the sentence theirs.
     draft.picks[draft.step] = {
       axis: prompt.axis,
       chipId: chip.id,
       phrase: chip.phrase,
+      label: chip.label,
       tagValue: tagValue(chip, prompt.axis)
     };
 
