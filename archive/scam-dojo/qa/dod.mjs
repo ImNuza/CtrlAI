@@ -23,7 +23,7 @@ import path from 'node:path';
 const runCommand = promisify(execFile);
 
 const PORT = 4186;
-const TARGET = 'http://localhost:' + PORT + '/scam-dojo';
+const TARGET = 'http://localhost:' + PORT + '/archive/scam-dojo';
 const STORAGE_KEY = 'ctrlai:scam-dojo';
 
 // shared/ai.js returns this whenever an event is missing from the bank. A
@@ -33,7 +33,7 @@ const NEUTRAL_FALLBACK = 'Take your time. There is no wrong answer here.';
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const CONTENT_DIR = path.join(HERE, '..', 'content');
 const REPO_ROOT = path.join(HERE, '..', '..', '..');
-const GAME_DIR = 'games/scam-dojo';
+const GAME_DIR = 'games/archive/scam-dojo';
 
 const TELLS = [
   'urgency',
@@ -94,7 +94,7 @@ const NARROW_WIDTH = 360;
 const VIEWPORT_HEIGHT = 844;
 const BODY_FLOOR_PX = 28;
 
-const CONTENT_GLOB = '**/games/scam-dojo/content/*.json';
+const CONTENT_GLOB = '**/archive/scam-dojo/content/*.json';
 const MECHANISM_TELL = 'unusual_payment';
 
 // What names a payment mechanism out loud. Used both ways: to read the mechanism

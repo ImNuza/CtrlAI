@@ -12,9 +12,9 @@ const PORT = Number(process.env.PORT) || 4173;
 const PAGE_ROUTES = {
   '/': 'index.html',
   '/garden-of-life': 'games/garden-of-life/index.html',
-  '/memory-garden': 'games/memory-garden/index.html',
-  '/mahjong-kakis': 'games/mahjong-kakis/index.html',
-  '/scam-dojo': 'games/scam-dojo/index.html'
+  '/archive/memory-garden': 'archive/memory-garden/index.html',
+  '/archive/mahjong-kakis': 'archive/mahjong-kakis/index.html',
+  '/archive/scam-dojo': 'archive/scam-dojo/index.html'
 };
 
 const CONTENT_TYPES = {

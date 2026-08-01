@@ -8,7 +8,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
 
-const URL = process.env.MK_URL || 'http://localhost:4182/mahjong-kakis';
+const URL = process.env.MK_URL || 'http://localhost:4182/archive/mahjong-kakis';
 const BUBBLE_TIMEOUT = 3000;
 const KEY = 'ctrlai:mahjong-kakis';
 

@@ -24,7 +24,7 @@ const repoRoot = path.resolve(here, '../../..');
    both would want the same port, and the loser cannot test anything useful. */
 const PORT = Number(process.env.MG_PORT) || 4191;
 const ORIGIN = 'http://localhost:' + PORT;
-const GAME_URL = ORIGIN + '/memory-garden';
+const GAME_URL = ORIGIN + '/archive/memory-garden';
 const STORAGE_KEY = 'ctrlai:memory-garden';
 const BANK_PATH = path.join(here, '..', 'content', 'garden-lines.json');
 const VIEWPORT = { width: 390, height: 844 };
@@ -595,7 +595,7 @@ async function run(browser) {
 
   /* ---- Determinism ------------------------------------------------------ */
   const determinism = await page.evaluate(async function () {
-    const module = await import('/games/memory-garden/js/composer.js');
+    const module = await import('/archive/memory-garden/js/composer.js');
     const memory = { objectId: 'tingkat', answers: { who: 'my-grandmother', where: 'market', feeling: 'calm' } };
     const first = module.composePlant(memory);
     const second = module.composePlant(memory);
@@ -623,7 +623,7 @@ async function run(browser) {
      way left of their anchor, so 31 of these 40 used to be sliced flat down one
      side. Mounted for real and measured against the declared viewBox. */
   const ornaments = await page.evaluate(async function () {
-    const module = await import('/games/memory-garden/js/composer.js');
+    const module = await import('/archive/memory-garden/js/composer.js');
     const objects = ['kopitiam-cup', 'sewing-machine', 'rotary-phone', 'tingkat', 'cassette',
       'five-stones', 'setron-tv', 'rattan-chair'];
     const places = ['kampung', 'first-flat', 'kopitiam', 'market', 'seaside'];
@@ -688,7 +688,7 @@ async function run(browser) {
 
   /* ---- The bellflower actually hangs bells ------------------------------ */
   const bells = await page.evaluate(async function () {
-    const module = await import('/games/memory-garden/js/composer.js');
+    const module = await import('/archive/memory-garden/js/composer.js');
     const read = function (who) {
       const built = module.composePlant({
         objectId: 'rotary-phone',

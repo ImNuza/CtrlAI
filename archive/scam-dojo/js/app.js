@@ -8,7 +8,7 @@
 
 import { loadState, saveState } from '/shared/storage.js';
 import { aiGenerate } from '/shared/ai.js';
-import { buildRound, loadContent, tellLabel } from '/games/scam-dojo/js/rounds.js';
+import { buildRound, loadContent, tellLabel } from '/archive/scam-dojo/js/rounds.js';
 import {
   renderStreak,
   renderRing,
@@ -25,7 +25,7 @@ import {
   clear,
   WALKTHROUGH_NEXT,
   WALKTHROUGH_END
-} from '/games/scam-dojo/js/ui.js';
+} from '/archive/scam-dojo/js/ui.js';
 
 const GAME = 'scam-dojo';
 const NS = 'scam-dojo';

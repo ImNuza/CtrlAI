@@ -17,7 +17,7 @@ Garden view (plot grid, big "Grow a new memory" button) > object picker (6 SVG c
 - `qa/loop.mjs` Playwright definition-of-done script, spawns its own server on 4191
 - `qa/contact-sheet.mjs` node script, composes a matrix of plants, writes HTML sheet to tools/qa/output/
 
-All asset URLs absolute (`/games/memory-garden/...`, `/shared/...`) because the route `/memory-garden` has no trailing slash.
+All asset URLs absolute (`/archive/memory-garden/...`, `/shared/...`) because the route `/memory-garden` has no trailing slash.
 
 ## State (localStorage ns `memory-garden` via shared/storage.js)
 

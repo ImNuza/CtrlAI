@@ -2,7 +2,7 @@
 
 Repo for the Tencent Cloud "Age Well" Social Good Challenge Singapore, Game Track. Team: Dewa, Matthew, Zoe. Submission deadline: Aug 9, 2026, 11:59 PM SGT.
 
-Round one (done) was a three-prototype bake-off, still living under `games/`. The team picked the gardening direction on 29 Jul; the repo now carries the chosen game's spec, content, and reference slice.
+Round one (done) was a three-prototype bake-off; the prototypes now live under `archive/` as lift-from material. The team picked the gardening direction on 29 Jul; the repo carries the chosen game's spec, content, and reference build at `games/garden-of-life/`.
 
 ## First actions for any new session
 

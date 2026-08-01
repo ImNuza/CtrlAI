@@ -9,7 +9,7 @@
 
 import { chromium } from 'playwright';
 
-const URL = process.env.MK_URL || 'http://localhost:4182/mahjong-kakis';
+const URL = process.env.MK_URL || 'http://localhost:4182/archive/mahjong-kakis';
 const BUBBLE_TIMEOUT = 3000;
 
 function check(condition, message) {

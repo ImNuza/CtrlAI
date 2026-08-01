@@ -8,11 +8,11 @@
 
 import { registerBank, hashString } from '/shared/ai.js';
 import { loadState, saveState } from '/shared/storage.js';
-import { buildWall } from '/games/mahjong-kakis/tiles.js';
-import { renderPortraits, createBanter } from '/games/mahjong-kakis/kakis.js';
+import { buildWall } from '/archive/mahjong-kakis/tiles.js';
+import { renderPortraits, createBanter } from '/archive/mahjong-kakis/kakis.js';
 
 const NS = 'mahjong-kakis';
-const BANK_URL = '/games/mahjong-kakis/content/kaki-banter.json';
+const BANK_URL = '/archive/mahjong-kakis/content/kaki-banter.json';
 
 const CLEAR_MS = 240;
 const MISS_HOLD_MS = 600;

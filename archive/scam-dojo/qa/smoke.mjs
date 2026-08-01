@@ -9,7 +9,7 @@ import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
-const URL = 'http://localhost:4185/scam-dojo';
+const URL = 'http://localhost:4185/archive/scam-dojo';
 const STORAGE_KEY = 'ctrlai:scam-dojo';
 // The game ignores a tap that lands within 350ms of a control appearing, which
 // is how a double tap on Listen stops falling through into the choice pair. A

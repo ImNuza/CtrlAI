@@ -7,8 +7,8 @@
 import { registerBank, aiGenerate, makeRng, hashString } from '/shared/ai.js';
 
 const GAME = 'scam-dojo';
-const STRUCTURE_URL = '/games/scam-dojo/content/call-structure.json';
-const BANK_URL = '/games/scam-dojo/content/scam-scripts.json';
+const STRUCTURE_URL = '/archive/scam-dojo/content/call-structure.json';
+const BANK_URL = '/archive/scam-dojo/content/scam-scripts.json';
 const BENIGN_FALLBACK = 'greeting';
 
 let contentPromise = null;

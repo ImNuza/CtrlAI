@@ -6,7 +6,7 @@ All code and content by Opus coder subagents. Directory owned: games/scam-dojo/ 
 ## Architecture
 
 Single page app served at /scam-dojo. The page URL has no trailing slash, so every asset
-and fetch URL must be absolute: /games/scam-dojo/... Relative paths would resolve to the
+and fetch URL must be absolute: /archive/scam-dojo/... Relative paths would resolve to the
 repo root and 404.
 
 Files:

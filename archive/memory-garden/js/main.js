@@ -11,7 +11,7 @@ import { composePlant } from './composer.js';
 const GAME = 'memory-garden';
 const NS = 'memory-garden';
 const STATE_VERSION = 1;
-const BANK_URL = '/games/memory-garden/content/garden-lines.json';
+const BANK_URL = '/archive/memory-garden/content/garden-lines.json';
 const MIN_PLOTS = 6;
 const FREE_TEXT_STEP = 'feeling';
 
