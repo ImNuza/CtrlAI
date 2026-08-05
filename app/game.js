@@ -859,13 +859,28 @@ function renderGarden() {
     document.getElementById('btn-hint-exercise').addEventListener('click', () => showScreen('exercises'));
   }
 
+  /* The walkable floor. Everything above stays a direct child of the scene:
+     the window, the daily card and the first-visit hint are scenery, not
+     places the gardener can stand. */
+  const floor = document.createElement('div');
+  floor.className = 'garden-floor';
+  floor.id = 'garden-floor';
+
   // Shelves
   for (let s = 0; s < state.shelves; s++) {
-    scene.appendChild(buildShelf(s));
+    floor.appendChild(buildShelf(s));
   }
 
   // Locked next shelf — always visible so there's always a goal
-  scene.appendChild(buildLockedShelf());
+  floor.appendChild(buildLockedShelf());
+
+  floor.appendChild(buildAvatar());
+  scene.appendChild(floor);
+  attachFloorPointerHandlers(floor);
+  /* Re-apply the remembered position straight away. renderGarden() runs on
+     every water, harvest and shelf purchase, so without this the gardener
+     would snap back to the top of the garden several times a session. */
+  applyAvatarTransform();
 
   const waterBtn = document.getElementById('btn-water-all');
   const hasThirsty = state.plants.some(p => p.state === 'wilt');
@@ -895,18 +910,24 @@ function buildShelf(shelfIdx) {
       ? `${SEEDS.find(sd => sd.id === plant.seedId)?.name || 'Plant'} — ${plant.state}`
       : 'Empty pot — visit shop to plant');
 
+    /* Pointer taps are handled by the floor, which walks the gardener over
+       first, so the dataset carries everything firePlotInteraction() needs.
+       Keyboard keeps its own direct listener below: asking a switch or
+       keyboard user to steer an avatar across the shelf before they may open
+       a pot would be a step backwards, so Enter and Space still act at once. */
+    plot.dataset.plantIdx = String(plantIdx);
+    plot.dataset.filled = plant ? '1' : '0';
+
     if (plant) {
       const isThirsty = plant.state === 'wilt';
       plot.classList.add('has-plant');
       if (isThirsty) plot.classList.add('thirsty');
       plot.innerHTML = `<div class="plot-plant" aria-hidden="true">${plantSVG(plant)}</div><div class="plot-pot" aria-hidden="true"></div>`;
-      plot.addEventListener('click', () => openPlantDetail(plantIdx));
       plot.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openPlantDetail(plantIdx); }
       });
     } else {
       plot.innerHTML = `<div class="plot-pot empty" aria-hidden="true"></div>`;
-      plot.addEventListener('click', () => showScreen('shop'));
       plot.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showScreen('shop'); }
       });
@@ -958,6 +979,388 @@ function buildLockedShelf() {
 
   unit.appendChild(btn);
   return unit;
+}
+
+/* ════════════════════════════════════════════════════════════
+   THE GARDENER: walk-up tending
+   ════════════════════════════════════════════════════════════
+
+   Touching anywhere on the shelves walks a little gardener to that spot;
+   holding and dragging steers continuously. Standing beside a pot raises a
+   hint and a big button, and a tap straight on a pot walks over and opens it
+   on arrival. The shelf economy underneath is untouched: the same plant
+   detail panel and the same shop trip, just reached on foot.
+
+   Position lives here rather than in state on purpose. It is a view detail,
+   not progress, so it is never written to localStorage. renderGarden()
+   rebuilds the whole floor on every water, harvest and purchase, and these
+   variables are what survive that. */
+
+const AVATAR_SIZE = 52;           // matches .garden-avatar in styles.css
+const AVATAR_SPEED = 300;         // px per second, walk and steer alike
+const INTERACT_RADIUS = 88;       // px from pot centre; pots sit ~106px apart
+const TAP_SLOP = 10;              // px of travel still counted as a tap
+const PLOT_STAND_OFFSET = 48;     // stand this far below a pot centre, at the plank
+const EDGE_SCROLL_MARGIN = 68;    // px from the visible top or bottom edge
+const EDGE_SCROLL_SPEED = 620;    // px per second at the very edge
+
+let avatarX = 0;
+let avatarY = 0;
+let avatarPlaced = false;
+let avatarWalking = false;
+let avatarFacingLeft = false;
+let moveTarget = null;
+let pendingInteractEl = null;
+const walkKeys = { up: false, down: false, left: false, right: false };
+let dragActive = false;
+let dragMoved = false;
+let dragPointerId = null;
+let dragStartClientX = 0;
+let dragStartClientY = 0;
+let dragClientX = 0;
+let dragClientY = 0;
+let edgeScrollVel = 0;
+let lastFrameStamp = 0;
+let hintText = '';
+let hintPlotEl = null;
+
+function buildAvatar() {
+  const av = document.createElement('div');
+  av.className = 'garden-avatar';
+  av.id = 'garden-avatar';
+  av.setAttribute('aria-hidden', 'true');
+  av.innerHTML = `<span class="avatar-sprout"></span><span class="avatar-head"></span><span class="avatar-body"></span>`;
+  return av;
+}
+
+function applyAvatarTransform() {
+  const av = document.getElementById('garden-avatar');
+  if (!av) return;
+  av.style.transform = `translate3d(${avatarX - AVATAR_SIZE / 2}px, ${avatarY - AVATAR_SIZE / 2}px, 0)`;
+  av.classList.toggle('walking', avatarWalking);
+  av.classList.toggle('facing-left', avatarFacingLeft);
+}
+
+/* Both rects are read in the same frame and both are viewport-relative, so
+   subtracting them gives floor content coordinates whatever the scroll. */
+function plotCentre(floor, plot) {
+  const fr = floor.getBoundingClientRect();
+  const pr = plot.getBoundingClientRect();
+  return { x: pr.left - fr.left + pr.width / 2, y: pr.top - fr.top + pr.height / 2 };
+}
+
+function clientToFloor(floor, clientX, clientY) {
+  const fr = floor.getBoundingClientRect();
+  return { x: clientX - fr.left, y: clientY - fr.top };
+}
+
+function nearestPlotInRange(floor) {
+  const plots = floor.querySelectorAll('.shelf-plot');
+  if (!plots.length) return null;
+  const fr = floor.getBoundingClientRect();
+  let best = null;
+  let bestDist = Infinity;
+  plots.forEach(plot => {
+    const pr = plot.getBoundingClientRect();
+    const cx = pr.left - fr.left + pr.width / 2;
+    const cy = pr.top - fr.top + pr.height / 2;
+    const d = Math.hypot(cx - avatarX, cy - avatarY);
+    if (d < bestDist) { bestDist = d; best = plot; }
+  });
+  return bestDist <= INTERACT_RADIUS ? best : null;
+}
+
+/* The hint and its button name a specific pot, so they stay quiet while that
+   pot is scrolled out of sight. Arrival interactions are not gated on this. */
+function isPlotVisible(plot) {
+  if (!plot) return false;
+  const screenEl = document.getElementById('screen-garden');
+  if (!screenEl) return false;
+  const sr = screenEl.getBoundingClientRect();
+  const pr = plot.getBoundingClientRect();
+  return pr.bottom > sr.top + 24 && pr.top < sr.bottom - 24;
+}
+
+function isModalOpen() {
+  const plantModal = document.getElementById('plant-detail-modal');
+  const shareModal = document.getElementById('share-modal');
+  return (plantModal && !plantModal.hidden) || (shareModal && !shareModal.hidden);
+}
+
+/* The one place a pot interaction is decided, shared by the walk-up arrival,
+   the E key and the floating button. Same outcomes the old direct tap had. */
+function firePlotInteraction(plot) {
+  if (!plot) return;
+  const idx = Number(plot.dataset.plantIdx);
+  if (plot.dataset.filled === '1' && state.plants[idx]) {
+    openPlantDetail(idx);
+  } else {
+    showScreen('shop');
+  }
+}
+
+function plotHintText(plot) {
+  if (!plot) return '';
+  const idx = Number(plot.dataset.plantIdx);
+  const plant = state.plants[idx];
+  if (plot.dataset.filled === '1' && plant) {
+    const seed = SEEDS.find(s => s.id === plant.seedId);
+    return `You are beside the ${seed ? seed.name : 'plant'}`;
+  }
+  return 'You are beside an empty pot';
+}
+
+function setGardenHint(plot) {
+  const bar = document.getElementById('garden-hint-bar');
+  const btn = document.getElementById('garden-interact-btn');
+  if (!bar || !btn) return;
+  hintPlotEl = plot;
+  const text = plotHintText(plot);
+  if (text === hintText) return;
+  hintText = text;
+  if (!plot) {
+    bar.hidden = true;
+    btn.hidden = true;
+    bar.textContent = '';
+    return;
+  }
+  bar.textContent = text;
+  btn.textContent = plot.dataset.filled === '1' ? 'Tend this plant' : 'Plant a seed';
+  bar.hidden = false;
+  btn.hidden = false;
+}
+
+function placeAvatarAtStart(floor) {
+  const firstPlot = floor.querySelector('.shelf-plot');
+  if (firstPlot) {
+    const c = plotCentre(floor, firstPlot);
+    avatarX = c.x;
+    avatarY = c.y + PLOT_STAND_OFFSET;
+  } else {
+    avatarX = floor.clientWidth / 2;
+    avatarY = Math.min(120, floor.scrollHeight / 2);
+  }
+  avatarPlaced = true;
+}
+
+function gardenFrame(now) {
+  requestAnimationFrame(gardenFrame);
+  const previous = lastFrameStamp || now;
+  lastFrameStamp = now;
+
+  if (currentScreenName !== 'garden') { setGardenHint(null); return; }
+  const floor = document.getElementById('garden-floor');
+  // Width is zero while the screen is still mid-transition and unpainted.
+  if (!floor || !floor.clientWidth) return;
+
+  if (!avatarPlaced) { placeAvatarAtStart(floor); applyAvatarTransform(); }
+
+  // Clamped so a backgrounded tab does not teleport the gardener on return.
+  const dt = Math.min((now - previous) / 1000, 0.05);
+  const step = AVATAR_SPEED * dt;
+  const startX = avatarX;
+  const startY = avatarY;
+
+  if (dragActive) {
+    // Recomputed every frame so edge scrolling keeps steering under a still finger.
+    moveTarget = clientToFloor(floor, dragClientX, dragClientY);
+  }
+
+  const dirX = (walkKeys.right ? 1 : 0) - (walkKeys.left ? 1 : 0);
+  const dirY = (walkKeys.down ? 1 : 0) - (walkKeys.up ? 1 : 0);
+
+  if (dirX || dirY) {
+    // Keys take over from a walk in progress, the same way a new touch does.
+    moveTarget = null;
+    pendingInteractEl = null;
+    const len = Math.hypot(dirX, dirY) || 1;
+    avatarX += (dirX / len) * step;
+    avatarY += (dirY / len) * step;
+  } else if (moveTarget) {
+    const dx = moveTarget.x - avatarX;
+    const dy = moveTarget.y - avatarY;
+    const dist = Math.hypot(dx, dy);
+    if (dist <= step) {
+      avatarX = moveTarget.x;
+      avatarY = moveTarget.y;
+      if (!dragActive) moveTarget = null;
+    } else {
+      avatarX += (dx / dist) * step;
+      avatarY += (dy / dist) * step;
+    }
+  }
+
+  const half = AVATAR_SIZE / 2;
+  avatarX = Math.min(Math.max(avatarX, half), Math.max(half, floor.clientWidth - half));
+  avatarY = Math.min(Math.max(avatarY, half), Math.max(half, floor.scrollHeight - half));
+
+  if (edgeScrollVel !== 0) {
+    const screenEl = document.getElementById('screen-garden');
+    if (screenEl) screenEl.scrollTop += edgeScrollVel * dt;
+  }
+
+  const movedX = avatarX - startX;
+  const movedY = avatarY - startY;
+  avatarWalking = Math.abs(movedX) > 0.15 || Math.abs(movedY) > 0.15;
+  if (movedX < -0.4) avatarFacingLeft = true;
+  else if (movedX > 0.4) avatarFacingLeft = false;
+  applyAvatarTransform();
+
+  const near = nearestPlotInRange(floor);
+  setGardenHint(isModalOpen() || !isPlotVisible(near) ? null : near);
+
+  if (pendingInteractEl) {
+    if (!floor.contains(pendingInteractEl)) {
+      pendingInteractEl = null;
+    } else {
+      const c = plotCentre(floor, pendingInteractEl);
+      if (Math.hypot(c.x - avatarX, c.y - avatarY) <= INTERACT_RADIUS) {
+        const target = pendingInteractEl;
+        pendingInteractEl = null;
+        moveTarget = null;
+        firePlotInteraction(target);
+      }
+    }
+  }
+}
+
+/* ── FLOOR POINTER HANDLING ─────────────────────────────────── */
+
+/* Attached by renderGarden() to each freshly built floor. The old floor is
+   discarded with its listeners, so nothing accumulates across rebuilds. */
+function attachFloorPointerHandlers(floor) {
+  floor.addEventListener('pointerdown', onFloorPointerDown);
+  floor.addEventListener('pointermove', onFloorPointerMove);
+  floor.addEventListener('pointerup', onFloorPointerUp);
+  floor.addEventListener('pointercancel', onFloorPointerCancel);
+  floor.addEventListener('touchmove', onFloorTouchMove, { passive: false });
+}
+
+function onFloorPointerDown(e) {
+  // The buy-a-shelf plank is a purchase, not a place to walk. Leave it alone.
+  if (e.target.closest('.shelf-locked-plank')) return;
+  const floor = e.currentTarget;
+  pendingInteractEl = null;
+  dragActive = true;
+  dragMoved = false;
+  dragPointerId = e.pointerId;
+  dragStartClientX = e.clientX;
+  dragStartClientY = e.clientY;
+  dragClientX = e.clientX;
+  dragClientY = e.clientY;
+  moveTarget = clientToFloor(floor, e.clientX, e.clientY);
+  if (floor.setPointerCapture) {
+    try { floor.setPointerCapture(e.pointerId); } catch (err) { /* capture optional */ }
+  }
+}
+
+function onFloorPointerMove(e) {
+  if (!dragActive || e.pointerId !== dragPointerId) return;
+  dragClientX = e.clientX;
+  dragClientY = e.clientY;
+  if (Math.hypot(e.clientX - dragStartClientX, e.clientY - dragStartClientY) > TAP_SLOP) dragMoved = true;
+  updateEdgeScroll(e.clientY);
+}
+
+function onFloorTouchMove(e) {
+  // Native scrolling is suppressed only while a drag on the floor is running.
+  if (dragActive) e.preventDefault();
+}
+
+function onFloorPointerUp(e) {
+  if (!dragActive || e.pointerId !== dragPointerId) return;
+  const floor = e.currentTarget;
+  endDrag(floor, e.pointerId);
+  if (dragMoved) return;
+
+  /* A tap, not a drag. Read the release point rather than the event target,
+     because pointer capture retargets the event to the floor itself. */
+  const under = document.elementFromPoint(e.clientX, e.clientY);
+  const plot = under && under.closest ? under.closest('.shelf-plot') : null;
+  if (!plot || !floor.contains(plot)) return;
+  const c = plotCentre(floor, plot);
+  moveTarget = { x: c.x, y: c.y + PLOT_STAND_OFFSET };
+  pendingInteractEl = plot;
+}
+
+function onFloorPointerCancel(e) {
+  if (!dragActive || e.pointerId !== dragPointerId) return;
+  endDrag(e.currentTarget, e.pointerId);
+}
+
+function endDrag(floor, pointerId) {
+  dragActive = false;
+  dragPointerId = null;
+  edgeScrollVel = 0;
+  if (floor && floor.releasePointerCapture && pointerId !== null && pointerId !== undefined) {
+    try { floor.releasePointerCapture(pointerId); } catch (err) { /* already released */ }
+  }
+}
+
+/* Dragging towards the top or bottom of the visible garden pulls the screen
+   along, which is how lower shelves are reached while native scroll is off. */
+function updateEdgeScroll(clientY) {
+  const screenEl = document.getElementById('screen-garden');
+  if (!screenEl) { edgeScrollVel = 0; return; }
+  const r = screenEl.getBoundingClientRect();
+  const fromTop = clientY - r.top;
+  const fromBottom = r.bottom - clientY;
+  if (fromTop < EDGE_SCROLL_MARGIN) {
+    const depth = Math.min(1, Math.max(0, (EDGE_SCROLL_MARGIN - fromTop) / EDGE_SCROLL_MARGIN));
+    edgeScrollVel = -EDGE_SCROLL_SPEED * depth;
+  } else if (fromBottom < EDGE_SCROLL_MARGIN) {
+    const depth = Math.min(1, Math.max(0, (EDGE_SCROLL_MARGIN - fromBottom) / EDGE_SCROLL_MARGIN));
+    edgeScrollVel = EDGE_SCROLL_SPEED * depth;
+  } else {
+    edgeScrollVel = 0;
+  }
+}
+
+/* ── FLOOR KEYBOARD ─────────────────────────────────────────── */
+
+const WALK_KEY_MAP = {
+  arrowup: 'up', arrowdown: 'down', arrowleft: 'left', arrowright: 'right',
+  w: 'up', s: 'down', a: 'left', d: 'right',
+};
+
+/* Arrow presses are deliberately not consumed: the garden screen is the
+   scroll container and arrow scrolling has to keep working for anyone who
+   never touches the gardener. */
+function onWalkKeyDown(e) {
+  if (currentScreenName !== 'garden' || isModalOpen()) return;
+  const key = e.key.toLowerCase();
+  const dir = WALK_KEY_MAP[key];
+  if (dir) { walkKeys[dir] = true; return; }
+  if (key === 'e') {
+    const floor = document.getElementById('garden-floor');
+    if (!floor) return;
+    const plot = nearestPlotInRange(floor);
+    if (plot) { e.preventDefault(); firePlotInteraction(plot); }
+  }
+}
+
+function onWalkKeyUp(e) {
+  const dir = WALK_KEY_MAP[e.key.toLowerCase()];
+  if (dir) walkKeys[dir] = false;
+}
+
+function clearWalkKeys() {
+  walkKeys.up = false; walkKeys.down = false; walkKeys.left = false; walkKeys.right = false;
+}
+
+function initGardenAvatar() {
+  document.addEventListener('keydown', onWalkKeyDown);
+  document.addEventListener('keyup', onWalkKeyUp);
+  window.addEventListener('blur', clearWalkKeys);
+  const btn = document.getElementById('garden-interact-btn');
+  if (btn) {
+    btn.addEventListener('click', () => {
+      const floor = document.getElementById('garden-floor');
+      const plot = floor ? nearestPlotInRange(floor) : null;
+      if (plot) { playSelect(); firePlotInteraction(plot); }
+    });
+  }
+  requestAnimationFrame(gardenFrame);
 }
 
 /* ── PLANT DETAIL PANEL ─────────────────────────────────────── */
@@ -3954,6 +4357,7 @@ function init() {
   rollDailyTasks();
   updateCoinDisplay();
   renderGarden();
+  initGardenAvatar();
 
   // init() renders the garden directly rather than routing through
   // showScreen(), so credit the visit here or g_visit can never complete.
