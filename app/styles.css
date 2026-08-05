@@ -619,12 +619,21 @@ body{
   .garden-avatar.walking .avatar-sprout{animation:none}
 }
 
-/* Walk-up hint and its big companion button. Both sit above the bottom nav
-   and only appear when the gardener is standing beside a pot. */
+/* Walk-up hint and its big companion button. Both appear only when the
+   gardener is standing beside a pot.
+
+   The dock is driven from script rather than pinned to the nav. The garden
+   screen scrolls, and the water and shop buttons and the buy-a-shelf plank
+   all pass through the bottom of the viewport, where a fixed overlay would
+   cover them and swallow their taps. updateGardenDock() lifts the pair to
+   sit above whichever of those is in the way, and the value below is the
+   resting dock used whenever nothing competes. */
+:root{--garden-dock:calc(var(--nav-height) + 14px)}
+
 .garden-hint-bar{
   position:fixed;
   left:50%;
-  bottom:calc(var(--nav-height) + 88px);
+  bottom:calc(var(--garden-dock) + 74px);
   transform:translateX(-50%);
   max-width:calc(var(--game-max-width) - 2.5rem);
   padding:0.5rem 1.1rem;
@@ -649,7 +658,7 @@ body{
 .garden-interact-btn{
   position:fixed;
   left:50%;
-  bottom:calc(var(--nav-height) + 14px);
+  bottom:var(--garden-dock);
   transform:translateX(-50%);
   min-width:220px;
   white-space:nowrap;

@@ -1199,6 +1199,55 @@ function setGardenHint(plot) {
   btn.hidden = false;
 }
 
+/* The garden screen scrolls, and the water and shop buttons and the buy-a-
+   shelf plank all travel through the bottom of the viewport where the hint
+   and its button are docked. A fixed overlay parked there covers them and
+   eats their taps, which is exactly what a player met on arrival. So the
+   dock is measured instead of assumed: whenever one of those controls is in
+   the band, the pair sits just above it, and it drops back to the resting
+   dock as soon as the band is clear. */
+
+const DOCK_GAP = 12;
+
+let gardenDockPx = -1;
+
+function elementHeight(el, fallback) {
+  return el && el.offsetHeight ? el.offsetHeight : fallback;
+}
+
+function updateGardenDock() {
+  const bar = document.getElementById('garden-hint-bar');
+  const btn = document.getElementById('garden-interact-btn');
+  if (!bar || !btn) return;
+  const vh = window.innerHeight;
+  const base = elementHeight(document.querySelector('.bottom-nav'), 80) + 14;
+  const stack = elementHeight(btn, 64) + 10 + elementHeight(bar, 41);
+
+  /* Lowest control first, so each lift is in effect before the next one up is
+     tested. Clearing the water and shop buttons can put the pair straight onto
+     the buy-a-shelf plank, which a single pass would miss. */
+  const rects = [];
+  document.querySelectorAll('#screen-garden .garden-actions, #garden-floor .shelf-locked-plank').forEach(el => {
+    const r = el.getBoundingClientRect();
+    if (r.height && r.top < vh && r.bottom > 0) rects.push(r);
+  });
+  rects.sort((a, b) => b.top - a.top);
+
+  let dock = base;
+  rects.forEach(r => {
+    if (r.bottom <= vh - dock - stack) return;
+    dock = Math.max(dock, vh - r.top + DOCK_GAP);
+  });
+
+  // Never climb into the top bar, however tall the competing stack gets.
+  const ceiling = vh - elementHeight(document.querySelector('.topbar'), 64) - stack - 8;
+  dock = Math.min(dock, Math.max(base, ceiling));
+
+  if (Math.abs(dock - gardenDockPx) < 0.5) return;
+  gardenDockPx = dock;
+  document.documentElement.style.setProperty('--garden-dock', `${Math.round(dock)}px`);
+}
+
 function placeAvatarAtStart(floor) {
   const firstPlot = floor.querySelector('.shelf-plot');
   if (firstPlot) {
@@ -1277,6 +1326,7 @@ function gardenFrame(now) {
 
   const near = nearestPlotInRange(floor);
   setGardenHint(isModalOpen() || !isPlotVisible(near) ? null : near);
+  if (hintText) updateGardenDock();
 
   if (pendingInteractEl) {
     if (!floor.contains(pendingInteractEl)) {
