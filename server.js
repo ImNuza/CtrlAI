@@ -9,9 +9,13 @@ const path = require('node:path');
 const ROOT = __dirname;
 const PORT = Number(process.env.PORT) || 4173;
 
+/* The shipping app lives in app/, which is also the deploy root on EdgeOne
+   Pages. /garden-of-life is kept pointing at it so older links and QA scripts
+   written against the previous layout still land somewhere real. */
 const PAGE_ROUTES = {
   '/': 'index.html',
-  '/garden-of-life': 'games/garden-of-life/index.html',
+  '/app': 'app/index.html',
+  '/garden-of-life': 'app/index.html',
   '/archive/memory-garden': 'archive/memory-garden/index.html',
   '/archive/mahjong-kakis': 'archive/mahjong-kakis/index.html',
   '/archive/scam-dojo': 'archive/scam-dojo/index.html'

@@ -3,108 +3,127 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#fbf6ee">
-<meta name="description" content="Three prototype directions for the Tencent Age Well hackathon, playable locally.">
+<meta name="theme-color" content="#EEE9D9">
+<meta name="description" content="CtrlAI, Age Well hackathon. The shipping build lives in app/.">
 <title>CtrlAI</title>
-<link rel="stylesheet" href="/shared/ui/tokens.css">
-<link rel="stylesheet" href="/shared/ui/base.css">
+<link rel="stylesheet" href="/design-system/design-tokens.css">
 <style>
-  .hub-header {
-    padding-bottom: var(--sp-2);
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0 }
+
+  body {
+    background: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    font-family: var(--font-body);
+    line-height: var(--leading-normal);
+    padding: var(--space-8) var(--safe-x) var(--space-16);
   }
 
-  .hub-eyebrow {
-    font-size: var(--fs-body);
-    font-weight: var(--fw-bold);
-    letter-spacing: 0.08em;
+  main {
+    max-width: 34rem;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  .eyebrow {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-semibold);
+    letter-spacing: var(--tracking-caps);
     text-transform: uppercase;
-    color: var(--color-text-muted);
+    color: var(--color-text-secondary);
   }
 
-  .game-link {
+  h1 {
+    font-family: var(--font-display);
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-semibold);
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-display);
+  }
+
+  .lead {
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+  }
+
+  .app-link {
     display: block;
-    min-height: var(--tap-min);
-    padding: var(--sp-5);
-    border: 3px solid var(--accent);
+    min-height: var(--min-tap-target);
+    padding: var(--space-6);
+    border: 2px solid var(--color-foliage-mid);
     border-radius: var(--radius-lg);
-    background-color: var(--accent-tint);
-    color: var(--color-text);
-    text-align: left;
+    background: var(--color-bg-surface);
+    box-shadow: var(--shadow-paper);
+    color: inherit;
     text-decoration: none;
-    touch-action: manipulation;
-    -webkit-tap-highlight-color: transparent;
-    transition: transform var(--dur-fast) var(--ease-out);
   }
 
-  .game-link:active {
-    transform: scale(0.98);
-  }
+  .app-link:active { transform: scale(0.99) }
 
-  .game-link-name {
+  .app-link-name {
     display: block;
-    font-size: var(--fs-title);
-    font-weight: var(--fw-bold);
-    line-height: var(--lh-tight);
-    color: var(--accent);
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-weight: var(--weight-semibold);
+    color: var(--color-foliage-shadow);
   }
 
-  .game-link-note {
+  .app-link-note {
     display: block;
-    margin-top: var(--sp-3);
-    font-size: var(--fs-body);
-    line-height: var(--lh-body);
-    color: var(--color-text);
+    margin-top: var(--space-3);
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
   }
 
-  .link-garden {
-    --accent: var(--accent-garden);
-    --accent-tint: var(--accent-garden-tint);
+  .note {
+    padding-top: var(--space-5);
+    border-top: 1.5px solid var(--color-border-mid);
+    font-size: var(--text-sm);
+    color: var(--color-text-secondary);
   }
 
-  .link-kakis {
-    --accent: var(--accent-kopitiam);
-    --accent-tint: var(--accent-kopitiam-tint);
-  }
+  .note a { color: var(--color-foliage-shadow) }
 
-  .link-dojo {
-    --accent: var(--accent-dojo);
-    --accent-tint: var(--accent-dojo-tint);
-  }
-
-  .team-note {
-    padding-top: var(--sp-4);
-    border-top: 2px solid var(--color-border);
-    font-size: var(--fs-body);
-    color: var(--color-text-muted);
-  }
-
-  .team-note a {
-    color: var(--accent-garden);
+  code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.9em;
+    padding: 0.1em 0.35em;
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-inset);
   }
 </style>
 </head>
 <body>
-<main class="page stack">
+<main>
 
-  <header class="hub-header stack-tight stack">
-    <p class="hub-eyebrow">Age Well, round two</p>
+  <header>
+    <p class="eyebrow">Age Well, round two</p>
     <h1>CtrlAI</h1>
-    <p class="lead muted">The team picked the garden. This build is the one going forward.</p>
   </header>
 
-  <nav class="stack" aria-label="The game">
-    <a class="game-link link-garden" href="/garden-of-life">
-      <span class="game-link-name">Garden of Life</span>
-      <span class="game-link-note">A garden that grows from your memories. Tell Auntie Bee one small thing, and a plant joins your garden.</span>
-    </a>
-  </nav>
+  <p class="lead">This page is a local signpost, not part of the build. The shipping
+    app is <code>app/</code>, which is also the deploy root on EdgeOne Pages.</p>
 
-  <p class="team-note">Round one prototypes are archived, kept as lift-from material:
+  <a class="app-link" href="/app/">
+    <span class="app-link-name">Garden of Life</span>
+    <span class="app-link-note">Cognitive exercises and a garden that grows from them.
+      Five courses, including the kopitiam table where three kakis play mahjong
+      with you and remember your name.</span>
+  </a>
+
+  <p class="note">Open it on a phone, or set your browser to a phone sized viewport
+    before judging anything. The design target is 390&times;844, portrait.</p>
+
+  <p class="note">Round one prototypes are archived, kept as lift-from material:
     <a href="/archive/memory-garden">Memory Garden</a>,
     <a href="/archive/mahjong-kakis">Mahjong Kakis</a>,
-    <a href="/archive/scam-dojo">Scam Dojo</a>.</p>
+    <a href="/archive/scam-dojo">Scam Dojo</a>.
+    Mahjong Kakis is the one that got ported into <code>app/</code>; the archived
+    copy is left intact as the reference the port was read from.</p>
 
-  <p class="team-note">Team note: run this on a phone, or set your browser to a phone sized viewport before judging anything.</p>
+  <p class="note">The design system lives at
+    <a href="/design-system/design-system.html">design-system/</a>.</p>
 
 </main>
 </body>
