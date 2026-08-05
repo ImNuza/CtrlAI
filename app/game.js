@@ -531,7 +531,10 @@ function progressTask(...ids) {
     }
   });
   if (changed) { saveState(); updateCoinDisplay(); }
-  if (currentScreenName === 'garden') renderDailyCard();
+  /* The card is a static host in the menu now, so it can be kept current from
+     any screen rather than only while the garden is on show. */
+  renderDailyCard();
+  updateMenuBadge();
 }
 
 function checkWeekReward() {
@@ -816,11 +819,76 @@ function renderDailyCard() {
   host.querySelectorAll('.daily-task:not(.done)').forEach(btn => {
     btn.addEventListener('click', () => {
       const route = btn.dataset.route;
+      closeMenu();
       if (route === 'almanac') showScreen('almanac', 'forward');
       else showScreen(route, 'forward');
     });
   });
 }
+
+/* ── MENU ───────────────────────────────────────────────────── */
+
+/* One button in the top bar instead of two, holding today's tasks, the sound
+   toggle and sharing. The badge is the only thing that leaks out, so a day's
+   tasks are still noticeable without the card taking over the garden. */
+
+function updateMenuBadge() {
+  const badge = document.getElementById('menu-badge');
+  if (!badge) return;
+  const tasks = state.daily.tasks || [];
+  badge.hidden = !tasks.some(t => !t.done);
+}
+
+function openMenu() {
+  const modal = document.getElementById('menu-modal');
+  if (!modal) return;
+  renderDailyCard();
+  updateMenuBadge();
+  syncSoundControl();
+  modal.hidden = false;
+  const menuBtn = document.getElementById('menu-btn');
+  if (menuBtn) menuBtn.setAttribute('aria-expanded', 'true');
+  const close = document.getElementById('btn-close-menu');
+  if (close) close.focus();
+}
+
+function closeMenu() {
+  const modal = document.getElementById('menu-modal');
+  if (!modal || modal.hidden) return;
+  modal.hidden = true;
+  const menuBtn = document.getElementById('menu-btn');
+  if (menuBtn) {
+    menuBtn.setAttribute('aria-expanded', 'false');
+    menuBtn.focus();
+  }
+  updateMenuBadge();
+}
+
+function syncSoundControl() {
+  const btn = document.getElementById('mute-btn');
+  const icon = document.getElementById('mute-icon');
+  const label = document.getElementById('mute-label');
+  if (!btn || !icon) return;
+  icon.innerHTML = `<use href="#${state.sound ? 'icon-sound' : 'icon-mute'}"/>`;
+  if (label) label.textContent = state.sound ? 'Sound is on' : 'Sound is off';
+  btn.setAttribute('aria-pressed', String(!state.sound));
+  btn.setAttribute('aria-label', state.sound ? 'Turn sound off' : 'Turn sound on');
+}
+
+document.getElementById('menu-btn').addEventListener('click', () => {
+  const modal = document.getElementById('menu-modal');
+  if (modal.hidden) { playSelect(); openMenu(); } else { closeMenu(); }
+});
+
+document.getElementById('btn-close-menu').addEventListener('click', closeMenu);
+
+document.getElementById('menu-modal').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) closeMenu();
+});
+
+document.getElementById('menu-modal').addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') closeMenu();
+});
 
 function renderGarden() {
   updatePlantStates();
@@ -834,11 +902,11 @@ function renderGarden() {
   // Window at top
   scene.insertAdjacentHTML('beforeend', renderWindow());
 
-  // Daily tasks card
-  const dailyHost = document.createElement('div');
-  dailyHost.id = 'daily-card';
-  scene.appendChild(dailyHost);
+  /* Today's tasks used to sit here. They live in the menu now, so the garden
+     itself is just the garden. The badge on the menu button is what says
+     there is something waiting. */
   renderDailyCard();
+  updateMenuBadge();
 
   // First-visit hint
   if (state.plants.length === 0) {
@@ -1082,9 +1150,10 @@ function isPlotVisible(plot) {
 }
 
 function isModalOpen() {
-  const plantModal = document.getElementById('plant-detail-modal');
-  const shareModal = document.getElementById('share-modal');
-  return (plantModal && !plantModal.hidden) || (shareModal && !shareModal.hidden);
+  return ['plant-detail-modal', 'share-modal', 'menu-modal'].some(id => {
+    const el = document.getElementById(id);
+    return el && !el.hidden;
+  });
 }
 
 /* The one place a pot interaction is decided, shared by the walk-up arrival,
@@ -2305,6 +2374,7 @@ function renderProfile() {
 /* ── SHARE MODAL ────────────────────────────────────────────── */
 
 document.getElementById('share-btn').addEventListener('click', () => {
+  closeMenu();
   const modal = document.getElementById('share-modal');
   const preview = document.getElementById('share-preview');
   const stats = document.getElementById('share-stats');
@@ -2357,11 +2427,7 @@ function copyShareText(text) {
 
 document.getElementById('mute-btn').addEventListener('click', () => {
   state.sound = !state.sound;
-  const btn = document.getElementById('mute-btn');
-  const icon = document.getElementById('mute-icon');
-  icon.innerHTML = `<use href="#${state.sound ? 'icon-sound' : 'icon-mute'}"/>`;
-  btn.setAttribute('aria-pressed', String(!state.sound));
-  btn.setAttribute('aria-label', state.sound ? 'Mute sound' : 'Unmute sound');
+  syncSoundControl();
   saveState();
 });
 
@@ -4387,10 +4453,7 @@ function init() {
   setTimeout(() => drainAwards(), 1600);
 
   // Set initial mute state
-  const muteIcon = document.getElementById('mute-icon');
-  muteIcon.innerHTML = `<use href="#${state.sound ? 'icon-sound' : 'icon-mute'}"/>`;
-  document.getElementById('mute-btn').setAttribute('aria-pressed', String(!state.sound));
-  document.getElementById('mute-btn').setAttribute('aria-label', state.sound ? 'Mute sound' : 'Unmute sound');
+  syncSoundControl();
 
   // First-visit welcome
   if (!state.lastVisit) {

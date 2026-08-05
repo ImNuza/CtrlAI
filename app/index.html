@@ -206,6 +206,11 @@
       <path d="M1 20v-6h6"/>
       <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
     </symbol>
+    <symbol id="icon-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 7h16"/>
+      <path d="M4 12h16"/>
+      <path d="M4 17h16"/>
+    </symbol>
   </defs>
 </svg>
 
@@ -225,11 +230,9 @@
       </span>
     </div>
     <div class="topbar-right">
-      <button class="icon-btn" id="mute-btn" aria-label="Toggle sound" aria-pressed="false">
-        <svg class="icon" id="mute-icon"><use href="#icon-sound"/></svg>
-      </button>
-      <button class="icon-btn" id="share-btn" aria-label="Share garden">
-        <svg class="icon"><use href="#icon-share"/></svg>
+      <button class="icon-btn" id="menu-btn" aria-label="Open menu" aria-haspopup="dialog" aria-expanded="false">
+        <svg class="icon"><use href="#icon-menu"/></svg>
+        <span class="menu-badge" id="menu-badge" hidden></span>
       </button>
     </div>
   </header>
@@ -376,6 +379,31 @@
 
   <!-- ══ PLANT DETAIL MODAL ══ -->
   <div class="modal-overlay" id="plant-detail-modal" role="dialog" aria-modal="true" aria-label="Plant details" hidden></div>
+
+  <!-- ══ MENU ══
+       Today's tasks, sound and sharing, all behind one button so the top bar
+       stays quiet. The daily card host lives here now, not in the garden. -->
+  <div class="modal-overlay" id="menu-modal" role="dialog" aria-modal="true" aria-labelledby="menu-title" hidden>
+    <div class="modal-sheet" role="document">
+      <div class="modal-header">
+        <h2 class="modal-title" id="menu-title">Menu</h2>
+        <button class="icon-btn" id="btn-close-menu" aria-label="Close menu">
+          <svg class="icon"><use href="#icon-close"/></svg>
+        </button>
+      </div>
+      <div id="daily-card"></div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary menu-row" id="mute-btn" aria-pressed="false">
+          <svg class="icon" id="mute-icon"><use href="#icon-sound"/></svg>
+          <span id="mute-label">Sound is on</span>
+        </button>
+        <button class="btn btn-secondary menu-row" id="share-btn">
+          <svg class="icon"><use href="#icon-share"/></svg>
+          Share your garden
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- ══ WATER ANIMATION OVERLAY ══ -->
   <div id="water-overlay" aria-hidden="true"></div>

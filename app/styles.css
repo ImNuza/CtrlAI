@@ -136,6 +136,28 @@ body{
   transition:all var(--duration-fast) var(--ease-gentle);
   flex-shrink:0;
 }
+/* Menu button and its badge: the one mark that says today has tasks left,
+   now that the daily card lives inside the menu rather than in the garden. */
+#menu-btn{position:relative}
+.menu-badge{
+  position:absolute;
+  top:9px;
+  right:9px;
+  width:14px;
+  height:14px;
+  border-radius:50%;
+  background:var(--accent-red);
+  border:2px solid var(--bg-surface);
+}
+.menu-badge[hidden]{display:none}
+
+/* Full width rows inside the menu sheet */
+.menu-row{
+  width:100%;
+  justify-content:flex-start;
+  padding:0 1.25rem;
+}
+
 .icon-btn:hover{border-color:var(--border-strong);color:var(--text-primary)}
 .icon-btn:active{transform:scale(0.96)}
 .icon-btn:focus-visible{outline:3px solid var(--foliage-mid);outline-offset:2px}
@@ -804,6 +826,14 @@ body{
   padding:1.25rem 1.25rem 1rem;
   box-shadow:var(--shadow-paper);
 }
+/* Inside the menu the sheet already provides the card, so the card drops its
+   own frame and reads as the first section of the panel. */
+#menu-modal .daily-card{
+  background:transparent;
+  border:none;
+  box-shadow:none;
+  padding:0;
+}
 .daily-card-title{
   display:flex;
   align-items:center;
@@ -905,7 +935,18 @@ body{
   color:var(--text-muted);
   white-space:nowrap;
 }
-.daily-week-dots{margin:0;flex:1}
+/* Label and count on one line, the ten dots on their own line beneath. All
+   three side by side ran past the right edge at phone width. */
+.daily-week{flex-wrap:wrap}
+.daily-week-label{order:1}
+.daily-week-hint,.daily-week-done{order:2;margin-left:auto}
+.daily-week-dots{
+  order:3;
+  flex-basis:100%;
+  margin:0.5rem 0 0;
+  justify-content:flex-start;
+  flex-wrap:wrap;
+}
 .daily-week-hint{font-size:0.85rem;color:var(--text-muted);white-space:nowrap}
 .daily-week-done{
   display:inline-flex;
