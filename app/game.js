@@ -724,7 +724,7 @@ function buyShelf() {
   saveState();
   updateCoinDisplay();
   playCoin();
-  showNotif('success', 'new-shelf', `New shelf installed!`, `You now have room for ${gardenCapacity()} plants.`, 'icon-garden');
+  showNotif('success', 'new-shelf', `New land cleared!`, `You now have room for ${gardenCapacity()} plants.`, 'icon-garden');
   renderGarden();
   // One-shot install animation on the newest shelf
   const units = document.querySelectorAll('#garden-scene .shelf-unit:not(.shelf-locked-unit)');
@@ -736,35 +736,7 @@ function buyShelf() {
   }
 }
 
-/* ── TIME OF DAY ────────────────────────────────────────────── */
-
-function getTimeOfDay() {
-  const h = new Date().getHours();
-  if (h >= 5 && h < 11) return 'morning';
-  if (h >= 11 && h < 17) return 'midday';
-  if (h >= 17 && h < 20) return 'evening';
-  return 'night';
-}
-
-function renderWindow() {
-  const period = getTimeOfDay();
-  const celestial = period === 'night'
-    ? `<svg class="sky-moon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`
-    : `<svg class="sky-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4" fill="currentColor" stroke="none"/><path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>`;
-
-  return `
-    <div class="garden-window sky-${period}" role="img" aria-label="Window showing ${period} sky">
-      ${celestial}
-      <div class="window-hills"></div>
-      <div class="window-frame-bars" aria-hidden="true"></div>
-      <div class="window-curtain curtain-left" aria-hidden="true"></div>
-      <div class="window-curtain curtain-right" aria-hidden="true"></div>
-      <div class="window-sill" aria-hidden="true"></div>
-    </div>
-  `;
-}
-
-/* ── GARDEN RENDERER — retro shelf system ───────────────────── */
+/* ── GARDEN RENDERER: open field of soil patches ────────────── */
 
 function renderDailyCard() {
   const host = document.getElementById('daily-card');
@@ -899,9 +871,6 @@ function renderGarden() {
   const today = new Date();
   dateEl.textContent = today.toLocaleDateString('en-SG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
-  // Window at top
-  scene.insertAdjacentHTML('beforeend', renderWindow());
-
   /* Today's tasks used to sit here. They live in the menu now, so the garden
      itself is just the garden. The badge on the menu button is what says
      there is something waiting. */
@@ -927,28 +896,13 @@ function renderGarden() {
     document.getElementById('btn-hint-exercise').addEventListener('click', () => showScreen('exercises'));
   }
 
-  /* The walkable floor. Everything above stays a direct child of the scene:
-     the window, the daily card and the first-visit hint are scenery, not
-     places the gardener can stand. */
-  const floor = document.createElement('div');
-  floor.className = 'garden-floor';
-  floor.id = 'garden-floor';
-
-  // Shelves
+  // Rows of land
   for (let s = 0; s < state.shelves; s++) {
-    floor.appendChild(buildShelf(s));
+    scene.appendChild(buildShelf(s));
   }
 
-  // Locked next shelf — always visible so there's always a goal
-  floor.appendChild(buildLockedShelf());
-
-  floor.appendChild(buildAvatar());
-  scene.appendChild(floor);
-  attachFloorPointerHandlers(floor);
-  /* Re-apply the remembered position straight away. renderGarden() runs on
-     every water, harvest and shelf purchase, so without this the gardener
-     would snap back to the top of the garden several times a session. */
-  applyAvatarTransform();
+  // The untilled row at the end, always visible so there is always a goal
+  scene.appendChild(buildLockedShelf());
 
   const waterBtn = document.getElementById('btn-water-all');
   const hasThirsty = state.plants.some(p => p.state === 'wilt');
@@ -960,11 +914,16 @@ function renderGarden() {
   updateCoinDisplay();
 }
 
+/* The function and data names below still say shelf, because state.shelves,
+   SHELF_SLOTS and gardenCapacity() are the saved model and renaming them
+   would break every existing save. What the player sees and hears is a row
+   of soil patches in an open field. */
+
 function buildShelf(shelfIdx) {
   const unit = document.createElement('div');
   unit.className = 'shelf-unit';
   unit.setAttribute('role', 'group');
-  unit.setAttribute('aria-label', `Shelf ${shelfIdx + 1}`);
+  unit.setAttribute('aria-label', `Garden row ${shelfIdx + 1}`);
 
   const pots = document.createElement('div');
   pots.className = 'shelf-pots';
@@ -975,14 +934,9 @@ function buildShelf(shelfIdx) {
     const plot = document.createElement('button');
     plot.className = 'shelf-plot';
     plot.setAttribute('aria-label', plant
-      ? `${SEEDS.find(sd => sd.id === plant.seedId)?.name || 'Plant'} — ${plant.state}`
-      : 'Empty pot — visit shop to plant');
+      ? `${SEEDS.find(sd => sd.id === plant.seedId)?.name || 'Plant'}, ${plant.state}`
+      : 'Bare patch of soil, visit the shop to plant');
 
-    /* Pointer taps are handled by the floor, which walks the gardener over
-       first, so the dataset carries everything firePlotInteraction() needs.
-       Keyboard keeps its own direct listener below: asking a switch or
-       keyboard user to steer an avatar across the shelf before they may open
-       a pot would be a step backwards, so Enter and Space still act at once. */
     plot.dataset.plantIdx = String(plantIdx);
     plot.dataset.filled = plant ? '1' : '0';
 
@@ -991,11 +945,13 @@ function buildShelf(shelfIdx) {
       plot.classList.add('has-plant');
       if (isThirsty) plot.classList.add('thirsty');
       plot.innerHTML = `<div class="plot-plant" aria-hidden="true">${plantSVG(plant)}</div><div class="plot-pot" aria-hidden="true"></div>`;
+      plot.addEventListener('click', () => openPlantDetail(plantIdx));
       plot.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openPlantDetail(plantIdx); }
       });
     } else {
       plot.innerHTML = `<div class="plot-pot empty" aria-hidden="true"></div>`;
+      plot.addEventListener('click', () => showScreen('shop'));
       plot.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showScreen('shop'); }
       });
@@ -1004,8 +960,6 @@ function buildShelf(shelfIdx) {
   }
 
   unit.appendChild(pots);
-  unit.insertAdjacentHTML('beforeend',
-    `<div class="shelf-plank" aria-hidden="true"><div class="shelf-bracket left"></div><div class="shelf-bracket right"></div></div>`);
   return unit;
 }
 
@@ -1016,17 +970,24 @@ function buildLockedShelf() {
   const unit = document.createElement('div');
   unit.className = 'shelf-unit shelf-locked-unit';
 
+  /* Untilled ground at the end of the field. This one stays tappable from
+     anywhere, unlike the planting patches, so the class name the dock
+     measurement and the floor exemption both key off must not change. */
   const btn = document.createElement('button');
   btn.className = 'shelf-locked-plank';
   btn.disabled = !canAfford;
   btn.setAttribute('aria-label', canAfford
-    ? `Buy new shelf for ${cost} coins`
-    : `New shelf costs ${cost} coins — you have ${state.coins}`);
+    ? `Clear a new row of land for ${cost} coins`
+    : `A new row of land costs ${cost} coins, you have ${state.coins}`);
   btn.innerHTML = `
-    <div class="shelf-plank locked" aria-hidden="true"><div class="shelf-bracket left"></div><div class="shelf-bracket right"></div></div>
+    <div class="patch-locked-row" aria-hidden="true">
+      <span class="patch-locked-slot"></span>
+      <span class="patch-locked-slot"></span>
+      <span class="patch-locked-slot"></span>
+    </div>
     <div class="shelf-tag${canAfford ? ' affordable' : ''}">
       <svg class="icon" aria-hidden="true"><use href="#icon-garden"/></svg>
-      <span class="shelf-tag-text">New shelf</span>
+      <span class="shelf-tag-text">Clear new land</span>
       <span class="shelf-tag-price">
         <svg class="icon icon-sm" aria-hidden="true"><use href="#icon-coin"/></svg>
         ${cost}
@@ -1047,439 +1008,6 @@ function buildLockedShelf() {
 
   unit.appendChild(btn);
   return unit;
-}
-
-/* ════════════════════════════════════════════════════════════
-   THE GARDENER: walk-up tending
-   ════════════════════════════════════════════════════════════
-
-   Touching anywhere on the shelves walks a little gardener to that spot;
-   holding and dragging steers continuously. Standing beside a pot raises a
-   hint and a big button, and a tap straight on a pot walks over and opens it
-   on arrival. The shelf economy underneath is untouched: the same plant
-   detail panel and the same shop trip, just reached on foot.
-
-   Position lives here rather than in state on purpose. It is a view detail,
-   not progress, so it is never written to localStorage. renderGarden()
-   rebuilds the whole floor on every water, harvest and purchase, and these
-   variables are what survive that. */
-
-const AVATAR_SIZE = 52;           // matches .garden-avatar in styles.css
-const AVATAR_SPEED = 300;         // px per second, walk and steer alike
-const INTERACT_RADIUS = 88;       // px from pot centre; pots sit ~106px apart
-const TAP_SLOP = 10;              // px of travel still counted as a tap
-const PLOT_STAND_OFFSET = 48;     // stand this far below a pot centre, at the plank
-const EDGE_SCROLL_MARGIN = 68;    // px from the visible top or bottom edge
-const EDGE_SCROLL_SPEED = 620;    // px per second at the very edge
-
-let avatarX = 0;
-let avatarY = 0;
-let avatarPlaced = false;
-let avatarWalking = false;
-let avatarFacingLeft = false;
-let moveTarget = null;
-let pendingInteractEl = null;
-const walkKeys = { up: false, down: false, left: false, right: false };
-let dragActive = false;
-let dragMoved = false;
-let dragPointerId = null;
-let dragStartClientX = 0;
-let dragStartClientY = 0;
-let dragClientX = 0;
-let dragClientY = 0;
-let edgeScrollVel = 0;
-let lastFrameStamp = 0;
-let hintText = '';
-let hintPlotEl = null;
-
-function buildAvatar() {
-  const av = document.createElement('div');
-  av.className = 'garden-avatar';
-  av.id = 'garden-avatar';
-  av.setAttribute('aria-hidden', 'true');
-  av.innerHTML = `<span class="avatar-sprout"></span><span class="avatar-head"></span><span class="avatar-body"></span>`;
-  return av;
-}
-
-function applyAvatarTransform() {
-  const av = document.getElementById('garden-avatar');
-  if (!av) return;
-  av.style.transform = `translate3d(${avatarX - AVATAR_SIZE / 2}px, ${avatarY - AVATAR_SIZE / 2}px, 0)`;
-  av.classList.toggle('walking', avatarWalking);
-  av.classList.toggle('facing-left', avatarFacingLeft);
-}
-
-/* Both rects are read in the same frame and both are viewport-relative, so
-   subtracting them gives floor content coordinates whatever the scroll. */
-function plotCentre(floor, plot) {
-  const fr = floor.getBoundingClientRect();
-  const pr = plot.getBoundingClientRect();
-  return { x: pr.left - fr.left + pr.width / 2, y: pr.top - fr.top + pr.height / 2 };
-}
-
-function clientToFloor(floor, clientX, clientY) {
-  const fr = floor.getBoundingClientRect();
-  return { x: clientX - fr.left, y: clientY - fr.top };
-}
-
-function nearestPlotInRange(floor) {
-  const plots = floor.querySelectorAll('.shelf-plot');
-  if (!plots.length) return null;
-  const fr = floor.getBoundingClientRect();
-  let best = null;
-  let bestDist = Infinity;
-  plots.forEach(plot => {
-    const pr = plot.getBoundingClientRect();
-    const cx = pr.left - fr.left + pr.width / 2;
-    const cy = pr.top - fr.top + pr.height / 2;
-    const d = Math.hypot(cx - avatarX, cy - avatarY);
-    if (d < bestDist) { bestDist = d; best = plot; }
-  });
-  return bestDist <= INTERACT_RADIUS ? best : null;
-}
-
-/* The hint and its button name a specific pot, so they stay quiet while that
-   pot is scrolled out of sight. Arrival interactions are not gated on this. */
-function isPlotVisible(plot) {
-  if (!plot) return false;
-  const screenEl = document.getElementById('screen-garden');
-  if (!screenEl) return false;
-  const sr = screenEl.getBoundingClientRect();
-  const pr = plot.getBoundingClientRect();
-  return pr.bottom > sr.top + 24 && pr.top < sr.bottom - 24;
-}
-
-function isModalOpen() {
-  return ['plant-detail-modal', 'share-modal', 'menu-modal'].some(id => {
-    const el = document.getElementById(id);
-    return el && !el.hidden;
-  });
-}
-
-/* The one place a pot interaction is decided, shared by the walk-up arrival,
-   the E key and the floating button. Same outcomes the old direct tap had. */
-function firePlotInteraction(plot) {
-  if (!plot) return;
-  const idx = Number(plot.dataset.plantIdx);
-  if (plot.dataset.filled === '1' && state.plants[idx]) {
-    openPlantDetail(idx);
-  } else {
-    showScreen('shop');
-  }
-}
-
-function plotHintText(plot) {
-  if (!plot) return '';
-  const idx = Number(plot.dataset.plantIdx);
-  const plant = state.plants[idx];
-  if (plot.dataset.filled === '1' && plant) {
-    const seed = SEEDS.find(s => s.id === plant.seedId);
-    return `You are beside the ${seed ? seed.name : 'plant'}`;
-  }
-  return 'You are beside an empty pot';
-}
-
-function setGardenHint(plot) {
-  const bar = document.getElementById('garden-hint-bar');
-  const btn = document.getElementById('garden-interact-btn');
-  if (!bar || !btn) return;
-  hintPlotEl = plot;
-  const text = plotHintText(plot);
-  if (text === hintText) return;
-  hintText = text;
-  if (!plot) {
-    bar.hidden = true;
-    btn.hidden = true;
-    bar.textContent = '';
-    return;
-  }
-  bar.textContent = text;
-  btn.textContent = plot.dataset.filled === '1' ? 'Tend this plant' : 'Plant a seed';
-  bar.hidden = false;
-  btn.hidden = false;
-}
-
-/* The garden screen scrolls, and the water and shop buttons and the buy-a-
-   shelf plank all travel through the bottom of the viewport where the hint
-   and its button are docked. A fixed overlay parked there covers them and
-   eats their taps, which is exactly what a player met on arrival. So the
-   dock is measured instead of assumed: whenever one of those controls is in
-   the band, the pair sits just above it, and it drops back to the resting
-   dock as soon as the band is clear. */
-
-const DOCK_GAP = 12;
-
-let gardenDockPx = -1;
-
-function elementHeight(el, fallback) {
-  return el && el.offsetHeight ? el.offsetHeight : fallback;
-}
-
-function updateGardenDock() {
-  const bar = document.getElementById('garden-hint-bar');
-  const btn = document.getElementById('garden-interact-btn');
-  if (!bar || !btn) return;
-  const vh = window.innerHeight;
-  const base = elementHeight(document.querySelector('.bottom-nav'), 80) + 14;
-  const stack = elementHeight(btn, 64) + 10 + elementHeight(bar, 41);
-
-  /* Lowest control first, so each lift is in effect before the next one up is
-     tested. Clearing the water and shop buttons can put the pair straight onto
-     the buy-a-shelf plank, which a single pass would miss. */
-  const rects = [];
-  document.querySelectorAll('#screen-garden .garden-actions, #garden-floor .shelf-locked-plank').forEach(el => {
-    const r = el.getBoundingClientRect();
-    if (r.height && r.top < vh && r.bottom > 0) rects.push(r);
-  });
-  rects.sort((a, b) => b.top - a.top);
-
-  let dock = base;
-  rects.forEach(r => {
-    if (r.bottom <= vh - dock - stack) return;
-    dock = Math.max(dock, vh - r.top + DOCK_GAP);
-  });
-
-  // Never climb into the top bar, however tall the competing stack gets.
-  const ceiling = vh - elementHeight(document.querySelector('.topbar'), 64) - stack - 8;
-  dock = Math.min(dock, Math.max(base, ceiling));
-
-  if (Math.abs(dock - gardenDockPx) < 0.5) return;
-  gardenDockPx = dock;
-  document.documentElement.style.setProperty('--garden-dock', `${Math.round(dock)}px`);
-}
-
-function placeAvatarAtStart(floor) {
-  const firstPlot = floor.querySelector('.shelf-plot');
-  if (firstPlot) {
-    const c = plotCentre(floor, firstPlot);
-    avatarX = c.x;
-    avatarY = c.y + PLOT_STAND_OFFSET;
-  } else {
-    avatarX = floor.clientWidth / 2;
-    avatarY = Math.min(120, floor.scrollHeight / 2);
-  }
-  avatarPlaced = true;
-}
-
-function gardenFrame(now) {
-  requestAnimationFrame(gardenFrame);
-  const previous = lastFrameStamp || now;
-  lastFrameStamp = now;
-
-  if (currentScreenName !== 'garden') { setGardenHint(null); return; }
-  const floor = document.getElementById('garden-floor');
-  // Width is zero while the screen is still mid-transition and unpainted.
-  if (!floor || !floor.clientWidth) return;
-
-  if (!avatarPlaced) { placeAvatarAtStart(floor); applyAvatarTransform(); }
-
-  // Clamped so a backgrounded tab does not teleport the gardener on return.
-  const dt = Math.min((now - previous) / 1000, 0.05);
-  const step = AVATAR_SPEED * dt;
-  const startX = avatarX;
-  const startY = avatarY;
-
-  if (dragActive) {
-    // Recomputed every frame so edge scrolling keeps steering under a still finger.
-    moveTarget = clientToFloor(floor, dragClientX, dragClientY);
-  }
-
-  const dirX = (walkKeys.right ? 1 : 0) - (walkKeys.left ? 1 : 0);
-  const dirY = (walkKeys.down ? 1 : 0) - (walkKeys.up ? 1 : 0);
-
-  if (dirX || dirY) {
-    // Keys take over from a walk in progress, the same way a new touch does.
-    moveTarget = null;
-    pendingInteractEl = null;
-    const len = Math.hypot(dirX, dirY) || 1;
-    avatarX += (dirX / len) * step;
-    avatarY += (dirY / len) * step;
-  } else if (moveTarget) {
-    const dx = moveTarget.x - avatarX;
-    const dy = moveTarget.y - avatarY;
-    const dist = Math.hypot(dx, dy);
-    if (dist <= step) {
-      avatarX = moveTarget.x;
-      avatarY = moveTarget.y;
-      if (!dragActive) moveTarget = null;
-    } else {
-      avatarX += (dx / dist) * step;
-      avatarY += (dy / dist) * step;
-    }
-  }
-
-  const half = AVATAR_SIZE / 2;
-  avatarX = Math.min(Math.max(avatarX, half), Math.max(half, floor.clientWidth - half));
-  avatarY = Math.min(Math.max(avatarY, half), Math.max(half, floor.scrollHeight - half));
-
-  if (edgeScrollVel !== 0) {
-    const screenEl = document.getElementById('screen-garden');
-    if (screenEl) screenEl.scrollTop += edgeScrollVel * dt;
-  }
-
-  const movedX = avatarX - startX;
-  const movedY = avatarY - startY;
-  avatarWalking = Math.abs(movedX) > 0.15 || Math.abs(movedY) > 0.15;
-  if (movedX < -0.4) avatarFacingLeft = true;
-  else if (movedX > 0.4) avatarFacingLeft = false;
-  applyAvatarTransform();
-
-  const near = nearestPlotInRange(floor);
-  setGardenHint(isModalOpen() || !isPlotVisible(near) ? null : near);
-  if (hintText) updateGardenDock();
-
-  if (pendingInteractEl) {
-    if (!floor.contains(pendingInteractEl)) {
-      pendingInteractEl = null;
-    } else {
-      const c = plotCentre(floor, pendingInteractEl);
-      if (Math.hypot(c.x - avatarX, c.y - avatarY) <= INTERACT_RADIUS) {
-        const target = pendingInteractEl;
-        pendingInteractEl = null;
-        moveTarget = null;
-        firePlotInteraction(target);
-      }
-    }
-  }
-}
-
-/* ── FLOOR POINTER HANDLING ─────────────────────────────────── */
-
-/* Attached by renderGarden() to each freshly built floor. The old floor is
-   discarded with its listeners, so nothing accumulates across rebuilds. */
-function attachFloorPointerHandlers(floor) {
-  floor.addEventListener('pointerdown', onFloorPointerDown);
-  floor.addEventListener('pointermove', onFloorPointerMove);
-  floor.addEventListener('pointerup', onFloorPointerUp);
-  floor.addEventListener('pointercancel', onFloorPointerCancel);
-  floor.addEventListener('touchmove', onFloorTouchMove, { passive: false });
-}
-
-function onFloorPointerDown(e) {
-  // The buy-a-shelf plank is a purchase, not a place to walk. Leave it alone.
-  if (e.target.closest('.shelf-locked-plank')) return;
-  const floor = e.currentTarget;
-  pendingInteractEl = null;
-  dragActive = true;
-  dragMoved = false;
-  dragPointerId = e.pointerId;
-  dragStartClientX = e.clientX;
-  dragStartClientY = e.clientY;
-  dragClientX = e.clientX;
-  dragClientY = e.clientY;
-  moveTarget = clientToFloor(floor, e.clientX, e.clientY);
-  if (floor.setPointerCapture) {
-    try { floor.setPointerCapture(e.pointerId); } catch (err) { /* capture optional */ }
-  }
-}
-
-function onFloorPointerMove(e) {
-  if (!dragActive || e.pointerId !== dragPointerId) return;
-  dragClientX = e.clientX;
-  dragClientY = e.clientY;
-  if (Math.hypot(e.clientX - dragStartClientX, e.clientY - dragStartClientY) > TAP_SLOP) dragMoved = true;
-  updateEdgeScroll(e.clientY);
-}
-
-function onFloorTouchMove(e) {
-  // Native scrolling is suppressed only while a drag on the floor is running.
-  if (dragActive) e.preventDefault();
-}
-
-function onFloorPointerUp(e) {
-  if (!dragActive || e.pointerId !== dragPointerId) return;
-  const floor = e.currentTarget;
-  endDrag(floor, e.pointerId);
-  if (dragMoved) return;
-
-  /* A tap, not a drag. Read the release point rather than the event target,
-     because pointer capture retargets the event to the floor itself. */
-  const under = document.elementFromPoint(e.clientX, e.clientY);
-  const plot = under && under.closest ? under.closest('.shelf-plot') : null;
-  if (!plot || !floor.contains(plot)) return;
-  const c = plotCentre(floor, plot);
-  moveTarget = { x: c.x, y: c.y + PLOT_STAND_OFFSET };
-  pendingInteractEl = plot;
-}
-
-function onFloorPointerCancel(e) {
-  if (!dragActive || e.pointerId !== dragPointerId) return;
-  endDrag(e.currentTarget, e.pointerId);
-}
-
-function endDrag(floor, pointerId) {
-  dragActive = false;
-  dragPointerId = null;
-  edgeScrollVel = 0;
-  if (floor && floor.releasePointerCapture && pointerId !== null && pointerId !== undefined) {
-    try { floor.releasePointerCapture(pointerId); } catch (err) { /* already released */ }
-  }
-}
-
-/* Dragging towards the top or bottom of the visible garden pulls the screen
-   along, which is how lower shelves are reached while native scroll is off. */
-function updateEdgeScroll(clientY) {
-  const screenEl = document.getElementById('screen-garden');
-  if (!screenEl) { edgeScrollVel = 0; return; }
-  const r = screenEl.getBoundingClientRect();
-  const fromTop = clientY - r.top;
-  const fromBottom = r.bottom - clientY;
-  if (fromTop < EDGE_SCROLL_MARGIN) {
-    const depth = Math.min(1, Math.max(0, (EDGE_SCROLL_MARGIN - fromTop) / EDGE_SCROLL_MARGIN));
-    edgeScrollVel = -EDGE_SCROLL_SPEED * depth;
-  } else if (fromBottom < EDGE_SCROLL_MARGIN) {
-    const depth = Math.min(1, Math.max(0, (EDGE_SCROLL_MARGIN - fromBottom) / EDGE_SCROLL_MARGIN));
-    edgeScrollVel = EDGE_SCROLL_SPEED * depth;
-  } else {
-    edgeScrollVel = 0;
-  }
-}
-
-/* ── FLOOR KEYBOARD ─────────────────────────────────────────── */
-
-const WALK_KEY_MAP = {
-  arrowup: 'up', arrowdown: 'down', arrowleft: 'left', arrowright: 'right',
-  w: 'up', s: 'down', a: 'left', d: 'right',
-};
-
-/* Arrow presses are deliberately not consumed: the garden screen is the
-   scroll container and arrow scrolling has to keep working for anyone who
-   never touches the gardener. */
-function onWalkKeyDown(e) {
-  if (currentScreenName !== 'garden' || isModalOpen()) return;
-  const key = e.key.toLowerCase();
-  const dir = WALK_KEY_MAP[key];
-  if (dir) { walkKeys[dir] = true; return; }
-  if (key === 'e') {
-    const floor = document.getElementById('garden-floor');
-    if (!floor) return;
-    const plot = nearestPlotInRange(floor);
-    if (plot) { e.preventDefault(); firePlotInteraction(plot); }
-  }
-}
-
-function onWalkKeyUp(e) {
-  const dir = WALK_KEY_MAP[e.key.toLowerCase()];
-  if (dir) walkKeys[dir] = false;
-}
-
-function clearWalkKeys() {
-  walkKeys.up = false; walkKeys.down = false; walkKeys.left = false; walkKeys.right = false;
-}
-
-function initGardenAvatar() {
-  document.addEventListener('keydown', onWalkKeyDown);
-  document.addEventListener('keyup', onWalkKeyUp);
-  window.addEventListener('blur', clearWalkKeys);
-  const btn = document.getElementById('garden-interact-btn');
-  if (btn) {
-    btn.addEventListener('click', () => {
-      const floor = document.getElementById('garden-floor');
-      const plot = floor ? nearestPlotInRange(floor) : null;
-      if (plot) { playSelect(); firePlotInteraction(plot); }
-    });
-  }
-  requestAnimationFrame(gardenFrame);
 }
 
 /* ── PLANT DETAIL PANEL ─────────────────────────────────────── */
@@ -1561,7 +1089,7 @@ function openPlantDetail(index) {
         </button>
         <div class="harvest-confirm" id="harvest-confirm" hidden>
           <p class="harvest-confirm-text">
-            Harvesting takes ${seed.name} off the shelf and frees its pot.
+            Harvesting lifts ${seed.name} out of the ground and frees its patch.
             You keep any meal cards it unlocked.
           </p>
           <div class="harvest-confirm-actions">
@@ -1651,7 +1179,7 @@ function harvestPlant(index) {
   updateCoinDisplay();
   playCoin();
   showNotif('success', `harvest-${Date.now()}`, `${seed.name} harvested`,
-    `+${value} coins, and a pot is free again. Its meal card stays in your collection.`, 'icon-meal');
+    `+${value} coins, and a patch is free again. Its meal card stays in your collection.`, 'icon-meal');
   renderGarden();
 }
 
@@ -2189,7 +1717,7 @@ function renderShop() {
 function buySeed(seed) {
   if (state.coins < seed.cost) return;
   if (state.plants.length >= gardenCapacity()) {
-    showNotif('warn', 'garden-full', 'Your garden is full', 'Buy a new shelf to make room for more plants.', 'icon-garden');
+    showNotif('warn', 'garden-full', 'Your garden is full', 'Clear a new row of land to make room for more plants.', 'icon-garden');
     return;
   }
   state.coins -= seed.cost;
@@ -2225,7 +1753,7 @@ function plantSeed(seedId) {
 document.getElementById('btn-free-seed').addEventListener('click', () => {
   if (!isNewDay(state.freeSeedDate)) return;
   if (state.plants.length >= gardenCapacity()) {
-    showNotif('warn', 'garden-full', 'Your garden is full', 'Buy a new shelf to make room for more plants.', 'icon-garden');
+    showNotif('warn', 'garden-full', 'Your garden is full', 'Clear a new row of land to make room for more plants.', 'icon-garden');
     return;
   }
   state.freeSeedDate = todayStr();
@@ -4473,7 +4001,6 @@ function init() {
   rollDailyTasks();
   updateCoinDisplay();
   renderGarden();
-  initGardenAvatar();
 
   // init() renders the garden directly rather than routing through
   // showScreen(), so credit the visit here or g_visit can never complete.
