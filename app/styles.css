@@ -536,15 +536,6 @@ body{
   padding:0.5rem 0 1.5rem;
 }
 
-/* Static decorative gardener, procedural shapes only. Never interactive,
-   never animated, just a friendly presence anchored near the bottom of the
-   screen. */
-.garden2-gardener{
-  display:flex;
-  justify-content:center;
-  margin:1rem 0 0.5rem;
-}
-
 /* ════════════════════════════════════════════════════════════
    PLANT DETAIL PANEL
    ════════════════════════════════════════════════════════════ */
