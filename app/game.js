@@ -1244,12 +1244,11 @@ function buildShelf(shelfIdx, opts = {}) {
 }
 
 /* ── PATCHES VIEW (second tab) ──────────────────────────────────
-   Same state.plants, the same buildShelf()/buildLockedShelf() and its own
-   createFieldPan() camera (patchesFieldPan) as the primary garden, just a
-   single column instead of two so the current row centers in the window.
-   Only the per-plot tap behaviour differs: tapping a bare patch opens the
-   in-place seed menu instead of navigating to the Shop tab, and a bloom is
-   harvested on the spot instead of opening the detail panel. */
+   Same state.plants, the same buildShelf()/buildLockedShelf(), and the same
+   two-column grid and createFieldPan() camera (patchesFieldPan) as the
+   primary garden. Only the per-plot tap behaviour differs: tapping a bare
+   patch opens the in-place seed menu instead of navigating to the Shop tab,
+   and a bloom is harvested on the spot instead of opening the detail panel. */
 function renderGarden2() {
   updatePlantStates();
   const scene = document.getElementById('garden2-scene');

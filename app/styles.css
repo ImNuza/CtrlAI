@@ -518,11 +518,10 @@ body{
    PATCHES SCREEN (second tab): same soil patches, its own pan camera
    Same bounded-viewport idea as the primary garden: the field is dragged
    under a fixed window instead of the page scrolling, so the header never
-   moves. Patches is a single column (one row of patches per shelf) rather
-   than the primary garden's two, so the column is centered in the window
-   instead of pinned to the left edge. The background is a flatter, lighter
-   variant of the primary garden's grass so the two feel related but not
-   identical.
+   moves. Two columns of patches side by side, same as the primary garden,
+   so the field runs past the phone edge and needs a left-right pan. The
+   background is a flatter, lighter variant of the primary garden's grass
+   so the two feel related but not identical.
    ════════════════════════════════════════════════════════════ */
 #screen-garden2{
   overflow:hidden;
@@ -544,21 +543,21 @@ body{
 }
 .garden2-viewport.panning{cursor:grabbing}
 
-/* width:max-content plus min-width:100% is what lets align-items:center pull
-   the single 300px column to the middle of a wider window, while still
-   giving measureGardenPan() a true content width to clamp against once a
-   phone is narrow enough that the column itself needs panning to reach. */
+/* width:max-content makes offsetWidth the true content width, which is what
+   the pan bounds are measured from. Two plots of land side by side is what
+   makes the field wider than the phone. */
 .garden2-field{
   --field-col:300px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
+  display:grid;
+  grid-template-columns:repeat(2,var(--field-col));
+  align-content:start;
+  justify-content:start;
+  gap:0.25rem 0.75rem;
   width:max-content;
   min-width:100%;
   padding:0.5rem 1rem 1.5rem;
   will-change:transform;
 }
-.garden2-field .shelf-unit{width:var(--field-col)}
 .garden2-field.pan-glide{transition:transform 420ms var(--ease-gentle)}
 
 @media (max-height:640px){
