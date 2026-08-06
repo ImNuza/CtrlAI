@@ -269,6 +269,23 @@
       </div>
     </section>
 
+    <!-- ── GARDEN GRID SCREEN: same plants, a plain static grid ── -->
+    <section class="screen" id="screen-garden2" role="tabpanel" aria-labelledby="nav-garden2">
+      <div class="screen-header">
+        <h1 class="screen-title">Your Patches</h1>
+        <p class="screen-subtitle">The same garden, laid out all at once.</p>
+      </div>
+      <div class="garden2-grid" id="garden2-grid"></div>
+      <div class="garden2-gardener" aria-hidden="true">
+        <svg viewBox="0 0 80 90" width="80" height="90">
+          <ellipse cx="40" cy="84" rx="22" ry="5" fill="rgba(43,33,24,0.14)"/>
+          <circle cx="40" cy="56" r="22" fill="#4C7EA8"/>
+          <path d="M18 32a22 22 0 0 1 44 0z" fill="#C9A876"/>
+          <ellipse cx="40" cy="32" rx="24" ry="6" fill="#C9A876"/>
+        </svg>
+      </div>
+    </section>
+
     <!-- ── EXERCISES SCREEN — LEVEL PATH ── -->
     <section class="screen" id="screen-exercises" role="tabpanel" aria-labelledby="nav-exercises">
       <div class="screen-header">
@@ -353,6 +370,10 @@
     <button class="nav-item" id="nav-profile" data-screen="profile" role="tab" aria-selected="false" aria-controls="screen-profile" aria-label="Profile">
       <svg class="icon" aria-hidden="true"><use href="#icon-profile"/></svg>
       <span>Profile</span>
+    </button>
+    <button class="nav-item" id="nav-garden2" data-screen="garden2" role="tab" aria-selected="false" aria-controls="screen-garden2" aria-label="Garden patches grid view">
+      <svg class="icon" aria-hidden="true"><use href="#icon-leaf"/></svg>
+      <span>Patches</span>
     </button>
   </nav>
 

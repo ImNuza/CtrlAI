@@ -512,6 +512,40 @@ body{
 }
 
 /* ════════════════════════════════════════════════════════════
+   GARDEN GRID SCREEN (second tab): same soil patches, plain grid
+   No pan camera here: the page scrolls like every other tab, so the
+   background just needs to read as the same field, a flatter, lighter
+   variant of the primary garden's grass so the two feel related but not
+   identical.
+   ════════════════════════════════════════════════════════════ */
+#screen-garden2{
+  background:linear-gradient(180deg,#DCE4CC 0%,#CBD6B4 100%);
+}
+
+/* Four across, wrapping to further rows as gardenCapacity() grows. Capped
+   width keeps the grid centered and the patches a comfortable size rather
+   than stretching edge to edge on wider phones. .shelf-plot's own
+   min-width:var(--tap-min) floor still applies inside each column. */
+.garden2-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:1rem 0.6rem;
+  width:100%;
+  max-width:360px;
+  margin:0 auto;
+  padding:0.5rem 0 1.5rem;
+}
+
+/* Static decorative gardener, procedural shapes only. Never interactive,
+   never animated, just a friendly presence anchored near the bottom of the
+   screen. */
+.garden2-gardener{
+  display:flex;
+  justify-content:center;
+  margin:1rem 0 0.5rem;
+}
+
+/* ════════════════════════════════════════════════════════════
    PLANT DETAIL PANEL
    ════════════════════════════════════════════════════════════ */
 

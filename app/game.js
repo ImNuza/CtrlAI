@@ -691,6 +691,7 @@ function showScreen(name, direction) {
 
   currentScreenName = name;
   if (name === 'garden') { renderGarden(); progressTask('g_visit'); }
+  if (name === 'garden2') renderGarden2();
   if (name === 'exercises') renderExercises();
   if (name === 'shop') { renderShop(); progressTask('g_shop'); }
   if (name === 'profile') renderProfile();
@@ -1106,6 +1107,40 @@ function renderGarden() {
    would break every existing save. What the player sees and hears is a row
    of soil patches in an open field. */
 
+/* One soil patch, filled or bare. Shared by the primary garden's rows
+   (buildShelf) and the grid view (renderGarden2) so both read the same
+   state.plants array through the same click behaviour instead of two
+   diverging implementations. */
+function buildPlot(plantIdx) {
+  const plant = state.plants[plantIdx];
+  const plot = document.createElement('button');
+  plot.className = 'shelf-plot';
+  plot.setAttribute('aria-label', plant
+    ? `${SEEDS.find(sd => sd.id === plant.seedId)?.name || 'Plant'}, ${plant.state}`
+    : 'Bare patch of soil, visit the shop to plant');
+
+  plot.dataset.plantIdx = String(plantIdx);
+  plot.dataset.filled = plant ? '1' : '0';
+
+  if (plant) {
+    const isThirsty = plant.state === 'wilt';
+    plot.classList.add('has-plant');
+    if (isThirsty) plot.classList.add('thirsty');
+    plot.innerHTML = `<div class="plot-plant" aria-hidden="true">${plantSVG(plant)}</div><div class="plot-pot" aria-hidden="true"></div>`;
+    plot.addEventListener('click', () => openPlantDetail(plantIdx));
+    plot.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openPlantDetail(plantIdx); }
+    });
+  } else {
+    plot.innerHTML = `<div class="plot-pot empty" aria-hidden="true"></div>`;
+    plot.addEventListener('click', () => showScreen('shop'));
+    plot.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showScreen('shop'); }
+    });
+  }
+  return plot;
+}
+
 function buildShelf(shelfIdx) {
   const unit = document.createElement('div');
   unit.className = 'shelf-unit';
@@ -1117,37 +1152,27 @@ function buildShelf(shelfIdx) {
 
   for (let slot = 0; slot < SHELF_SLOTS; slot++) {
     const plantIdx = shelfIdx * SHELF_SLOTS + slot;
-    const plant = state.plants[plantIdx];
-    const plot = document.createElement('button');
-    plot.className = 'shelf-plot';
-    plot.setAttribute('aria-label', plant
-      ? `${SEEDS.find(sd => sd.id === plant.seedId)?.name || 'Plant'}, ${plant.state}`
-      : 'Bare patch of soil, visit the shop to plant');
-
-    plot.dataset.plantIdx = String(plantIdx);
-    plot.dataset.filled = plant ? '1' : '0';
-
-    if (plant) {
-      const isThirsty = plant.state === 'wilt';
-      plot.classList.add('has-plant');
-      if (isThirsty) plot.classList.add('thirsty');
-      plot.innerHTML = `<div class="plot-plant" aria-hidden="true">${plantSVG(plant)}</div><div class="plot-pot" aria-hidden="true"></div>`;
-      plot.addEventListener('click', () => openPlantDetail(plantIdx));
-      plot.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openPlantDetail(plantIdx); }
-      });
-    } else {
-      plot.innerHTML = `<div class="plot-pot empty" aria-hidden="true"></div>`;
-      plot.addEventListener('click', () => showScreen('shop'));
-      plot.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showScreen('shop'); }
-      });
-    }
-    pots.appendChild(plot);
+    pots.appendChild(buildPlot(plantIdx));
   }
 
   unit.appendChild(pots);
   return unit;
+}
+
+/* ── GARDEN GRID VIEW (second tab) ──────────────────────────────
+   Same state.plants and the same buildPlot() as the primary garden, laid out
+   as a plain static grid instead of a pannable field. Read/tend only: no
+   land-buying tile here, that stays the primary garden's job. */
+function renderGarden2() {
+  updatePlantStates();
+  const grid = document.getElementById('garden2-grid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  const capacity = gardenCapacity();
+  for (let i = 0; i < capacity; i++) {
+    grid.appendChild(buildPlot(i));
+  }
+  updateCoinDisplay();
 }
 
 function buildLockedShelf() {
