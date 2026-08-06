@@ -2039,6 +2039,7 @@ body{
   letter-spacing:0.02em;
   padding:0.5rem;
 }
+.nav-item[hidden]{display:none}
 .nav-item:active{transform:scale(0.95)}
 .nav-item.active{color:var(--foliage-shadow)}
 .nav-item.active .icon{color:var(--foliage-mid)}

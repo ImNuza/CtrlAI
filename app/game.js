@@ -695,7 +695,7 @@ function triggerCelebration() {
 
 /* ── NAVIGATION ─────────────────────────────────────────────── */
 
-let currentScreenName = 'garden';
+let currentScreenName = 'garden2';
 
 function showScreen(name, direction) {
   const dir = direction || 'forward';
@@ -4406,6 +4406,7 @@ function init() {
   rollDailyTasks();
   updateCoinDisplay();
   renderGarden();
+  renderGarden2();
 
   // init() renders the garden directly rather than routing through
   // showScreen(), so credit the visit here or g_visit can never complete.
