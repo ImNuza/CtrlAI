@@ -275,7 +275,13 @@
         <h1 class="screen-title">Your Patches</h1>
         <p class="screen-subtitle">The same garden, laid out all at once.</p>
       </div>
-      <div class="garden2-grid" id="garden2-grid"></div>
+      <!-- Bounded pan window, same idea as the primary garden's field: the
+           current row of patches sits at the top, a locked row waits below
+           it, and the player drags to look around instead of the page
+           scrolling. -->
+      <div class="garden2-viewport" id="garden2-viewport">
+        <div class="garden2-field" id="garden2-scene"></div>
+      </div>
     </section>
 
     <!-- ── EXERCISES SCREEN — LEVEL PATH ── -->

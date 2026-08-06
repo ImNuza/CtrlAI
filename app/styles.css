@@ -431,10 +431,13 @@ body{
    Ground waiting to be cleared rather than a locked object. It sits in the
    grid in reading order like any other plot, so the player pans to it the
    same way they pan to their planted land. */
-.shelf-locked-unit{padding:0.75rem 0.5rem 1rem}
+/* Spans both field columns so it always starts a fresh row below every
+   opened patch, regardless of whether the shelf count is odd or even. */
+.shelf-locked-unit{padding:0.75rem 0.5rem 1rem;grid-column:1 / -1}
 .shelf-locked-plank{
   position:relative;
-  width:100%;
+  width:var(--field-col);
+  max-width:100%;
   background:transparent;
   border:none;
   padding:0.5rem 0 0.5rem;
@@ -512,28 +515,55 @@ body{
 }
 
 /* ════════════════════════════════════════════════════════════
-   GARDEN GRID SCREEN (second tab): same soil patches, plain grid
-   No pan camera here: the page scrolls like every other tab, so the
-   background just needs to read as the same field, a flatter, lighter
+   PATCHES SCREEN (second tab): same soil patches, its own pan camera
+   Same bounded-viewport idea as the primary garden: the field is dragged
+   under a fixed window instead of the page scrolling, so the header never
+   moves. Patches is a single column (one row of patches per shelf) rather
+   than the primary garden's two, so the column is centered in the window
+   instead of pinned to the left edge. The background is a flatter, lighter
    variant of the primary garden's grass so the two feel related but not
    identical.
    ════════════════════════════════════════════════════════════ */
 #screen-garden2{
+  overflow:hidden;
+  padding:1rem 1.25rem calc(var(--nav-height) + 0.75rem);
   background:linear-gradient(180deg,#DCE4CC 0%,#CBD6B4 100%);
 }
 
-/* Four across, wrapping to further rows as gardenCapacity() grows. Capped
-   width keeps the grid centered and the patches a comfortable size rather
-   than stretching edge to edge on wider phones. .shelf-plot's own
-   min-width:var(--tap-min) floor still applies inside each column. */
-.garden2-grid{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:1rem 0.6rem;
-  width:100%;
-  max-width:360px;
-  margin:0 auto;
-  padding:0.5rem 0 1.5rem;
+.garden2-viewport{
+  position:relative;
+  flex:1;
+  min-height:0;
+  margin:0 -1.25rem;
+  overflow:hidden;
+  touch-action:none;
+  user-select:none;
+  -webkit-user-select:none;
+  -webkit-tap-highlight-color:transparent;
+  cursor:grab;
+}
+.garden2-viewport.panning{cursor:grabbing}
+
+/* width:max-content plus min-width:100% is what lets align-items:center pull
+   the single 300px column to the middle of a wider window, while still
+   giving measureGardenPan() a true content width to clamp against once a
+   phone is narrow enough that the column itself needs panning to reach. */
+.garden2-field{
+  --field-col:300px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  width:max-content;
+  min-width:100%;
+  padding:0.5rem 1rem 1.5rem;
+  will-change:transform;
+}
+.garden2-field .shelf-unit{width:var(--field-col)}
+.garden2-field.pan-glide{transition:transform 420ms var(--ease-gentle)}
+
+@media (max-height:640px){
+  #screen-garden2{overflow-y:auto;overflow-x:hidden}
+  .garden2-viewport{flex:none;height:230px}
 }
 
 /* ════════════════════════════════════════════════════════════

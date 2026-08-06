@@ -760,6 +760,9 @@ function nextShelfCost() {
   return 300 + (idx - SHELF_BASE_COSTS.length + 1) * 150;
 }
 
+/* Both tabs show a locked-shelf tile, and either can be the one tapped, so
+   the render + pan-into-view afterward targets whichever tab is on screen
+   rather than always the primary garden. */
 function buyShelf() {
   const cost = nextShelfCost();
   if (state.coins < cost) return;
@@ -769,15 +772,19 @@ function buyShelf() {
   updateCoinDisplay();
   playCoin();
   showNotif('success', 'new-shelf', `New land cleared!`, `You now have room for ${gardenCapacity()} plants.`, 'icon-garden');
-  renderGarden();
+
+  const onPatches = currentScreenName === 'garden2';
+  const sceneId = onPatches ? 'garden2-scene' : 'garden-scene';
+  const fieldPan = onPatches ? patchesFieldPan : gardenFieldPan;
+  if (onPatches) renderGarden2(); else renderGarden();
   // One-shot install animation on the newest shelf
-  const units = document.querySelectorAll('#garden-scene .shelf-unit:not(.shelf-locked-unit)');
+  const units = document.querySelectorAll(`#${sceneId} .shelf-unit:not(.shelf-locked-unit)`);
   const newest = units[units.length - 1];
   if (newest) {
     newest.classList.add('installed');
     newest.addEventListener('animationend', () => newest.classList.remove('installed'), { once: true });
     // The field no longer scrolls, so bring the new plot into view by panning.
-    panGardenIntoView(newest);
+    fieldPan.panIntoView(newest);
   }
 }
 
@@ -907,182 +914,195 @@ document.getElementById('menu-modal').addEventListener('keydown', (e) => {
   if (e.key === 'Escape') closeMenu();
 });
 
-/* ── GARDEN PAN CAMERA ───────────────────────────────────────
-   The field is wider and taller than the phone, so the player drags it under
-   a fixed window rather than scrolling the page. The header and the action
-   buttons stay put. This moves the camera only: nothing in the garden is
-   dragged, and every patch is still opened by an ordinary tap. */
+/* ── FIELD PAN CAMERA ────────────────────────────────────────
+   Both the Garden tab and the Patches tab show the same soil-patch field
+   inside a window smaller than the field, so the player drags it under a
+   fixed window rather than scrolling the page. createFieldPan() builds one
+   independent camera per tab, so createFieldPan() is called once per screen
+   below and each keeps its own offset: panning one tab never moves the
+   other. This moves the camera only: nothing in the field is dragged, and
+   every patch is still opened by an ordinary tap. */
 
 /* Travel from pointerdown that turns a tap into a drag. Small enough that a
    deliberate drag starts immediately, large enough that a shaky finger
    pressing a patch still counts as a tap. */
 const PAN_DRAG_THRESHOLD = 9;
 
-const gardenPan = { x: 0, y: 0, minX: 0, minY: 0 };
-let gardenPanBound = false;
-let gardenPanHintDone = false;
-let gardenPanMeasureTimer = 0;
-
 function clampPan(value, min, max) {
   return value < min ? min : (value > max ? max : value);
 }
 
-function applyGardenPan() {
-  const field = document.getElementById('garden-scene');
-  if (!field) return;
-  field.style.transform = `translate3d(${gardenPan.x}px, ${gardenPan.y}px, 0)`;
-}
+/* screenName gates the retry-until-measurable loop and the resize listener
+   to when that tab is the one on screen. hintId is optional: the Patches
+   tab has no discoverability pill of its own, since the Garden tab already
+   teaches the drag-to-look gesture first. */
+function createFieldPan(screenName, viewportId, fieldId, hintId) {
+  const pan = { x: 0, y: 0, minX: 0, minY: 0 };
+  let bound = false;
+  let hintDone = false;
+  let measureTimer = 0;
 
-/* Recomputed after every render, because the field grows as land is cleared.
-   The current offset is re-clamped rather than reset, so watering a plant
-   does not throw the view back to the corner. */
-function measureGardenPan() {
-  const viewport = document.getElementById('garden-viewport');
-  const field = document.getElementById('garden-scene');
-  if (!viewport || !field) return;
-  window.clearTimeout(gardenPanMeasureTimer);
-  /* renderGarden() runs while the screen transition still has the tab hidden,
-     and a hidden element measures zero. Clamping against that phantom size
-     would snap the view to the corner, so wait for the transition instead. */
-  if (viewport.clientWidth === 0 || field.offsetWidth === 0) {
-    if (currentScreenName === 'garden') gardenPanMeasureTimer = window.setTimeout(measureGardenPan, 280);
-    return;
+  function apply() {
+    const field = document.getElementById(fieldId);
+    if (field) field.style.transform = `translate3d(${pan.x}px, ${pan.y}px, 0)`;
   }
-  const slackX = field.offsetWidth - viewport.clientWidth;
-  const slackY = field.offsetHeight - viewport.clientHeight;
-  gardenPan.minX = slackX > 0 ? -slackX : 0;
-  gardenPan.minY = slackY > 0 ? -slackY : 0;
-  gardenPan.x = clampPan(gardenPan.x, gardenPan.minX, 0);
-  gardenPan.y = clampPan(gardenPan.y, gardenPan.minY, 0);
-  applyGardenPan();
-  maybeShowGardenPanHint();
-}
 
-function gardenPanHasSlack() {
-  return gardenPan.minX < 0 || gardenPan.minY < 0;
-}
+  function hasSlack() {
+    return pan.minX < 0 || pan.minY < 0;
+  }
 
-function hideGardenPanHint() {
-  const hint = document.getElementById('garden-pan-hint');
-  if (!hint || hint.hidden) return;
-  gardenPanHintDone = true;
-  hint.classList.add('fading');
-  window.setTimeout(() => { hint.hidden = true; hint.classList.remove('fading'); }, 400);
-}
+  function hideHint() {
+    const hint = hintId && document.getElementById(hintId);
+    if (!hint || hint.hidden) return;
+    hintDone = true;
+    hint.classList.add('fading');
+    window.setTimeout(() => { hint.hidden = true; hint.classList.remove('fading'); }, 400);
+  }
 
-function maybeShowGardenPanHint() {
-  const hint = document.getElementById('garden-pan-hint');
-  if (!hint || gardenPanHintDone || !gardenPanHasSlack()) return;
-  gardenPanHintDone = true;
-  hint.hidden = false;
-  window.setTimeout(hideGardenPanHint, 5000);
-}
+  function maybeShowHint() {
+    const hint = hintId && document.getElementById(hintId);
+    if (!hint || hintDone || !hasSlack()) return;
+    hintDone = true;
+    hint.hidden = false;
+    window.setTimeout(hideHint, 5000);
+  }
 
-/* Used after clearing new land, in place of the scroll the field no longer
-   does. Rects are measured after the transform, so the move is expressed as a
-   delta from where the element currently sits. */
-function panGardenIntoView(el) {
-  const viewport = document.getElementById('garden-viewport');
-  const field = document.getElementById('garden-scene');
-  if (!viewport || !field || !el) return;
-  measureGardenPan();
-  const vp = viewport.getBoundingClientRect();
-  const box = el.getBoundingClientRect();
-  const wantX = gardenPan.x + (vp.left + vp.width / 2) - (box.left + box.width / 2);
-  const wantY = gardenPan.y + (vp.top + vp.height / 2) - (box.top + box.height / 2);
-  gardenPan.x = clampPan(wantX, gardenPan.minX, 0);
-  gardenPan.y = clampPan(wantY, gardenPan.minY, 0);
-  field.classList.add('pan-glide');
-  applyGardenPan();
-  window.setTimeout(() => field.classList.remove('pan-glide'), 500);
-}
+  /* Recomputed after every render, because the field grows as land is
+     cleared. The current offset is re-clamped rather than reset, so tending
+     a plant does not throw the view back to the corner. */
+  function measure() {
+    const viewport = document.getElementById(viewportId);
+    const field = document.getElementById(fieldId);
+    if (!viewport || !field) return;
+    window.clearTimeout(measureTimer);
+    /* render*() runs while the screen transition still has the tab hidden,
+       and a hidden element measures zero. Clamping against that phantom size
+       would snap the view to the corner, so wait for the transition instead. */
+    if (viewport.clientWidth === 0 || field.offsetWidth === 0) {
+      if (currentScreenName === screenName) measureTimer = window.setTimeout(measure, 280);
+      return;
+    }
+    const slackX = field.offsetWidth - viewport.clientWidth;
+    const slackY = field.offsetHeight - viewport.clientHeight;
+    pan.minX = slackX > 0 ? -slackX : 0;
+    pan.minY = slackY > 0 ? -slackY : 0;
+    pan.x = clampPan(pan.x, pan.minX, 0);
+    pan.y = clampPan(pan.y, pan.minY, 0);
+    apply();
+    maybeShowHint();
+  }
 
-function bindGardenPan() {
-  const viewport = document.getElementById('garden-viewport');
-  if (!viewport || gardenPanBound) return;
-  gardenPanBound = true;
+  /* Used after clearing new land, in place of the scroll the field no longer
+     does. Rects are measured after the transform, so the move is expressed as
+     a delta from where the element currently sits. */
+  function panIntoView(el) {
+    const viewport = document.getElementById(viewportId);
+    const field = document.getElementById(fieldId);
+    if (!viewport || !field || !el) return;
+    measure();
+    const vp = viewport.getBoundingClientRect();
+    const box = el.getBoundingClientRect();
+    const wantX = pan.x + (vp.left + vp.width / 2) - (box.left + box.width / 2);
+    const wantY = pan.y + (vp.top + vp.height / 2) - (box.top + box.height / 2);
+    pan.x = clampPan(wantX, pan.minX, 0);
+    pan.y = clampPan(wantY, pan.minY, 0);
+    field.classList.add('pan-glide');
+    apply();
+    window.setTimeout(() => field.classList.remove('pan-glide'), 500);
+  }
 
-  let activeId = null;
-  let startX = 0, startY = 0, originX = 0, originY = 0;
-  let dragged = false;
+  function bind() {
+    const viewport = document.getElementById(viewportId);
+    if (!viewport || bound) return;
+    bound = true;
 
-  /* A drag ends with the browser firing a click on whatever button was under
-     the finger. One capture-phase listener on the window swallows exactly that
-     click, wherever it lands. The timeout is the safety net for the touch case
-     where no click follows at all, so a stale eater can never take the next
-     real tap. */
-  function swallowNextClick() {
-    let timer = 0;
-    const clear = () => {
-      window.removeEventListener('click', eat, true);
-      window.clearTimeout(timer);
-    };
-    function eat(e) {
-      e.stopPropagation();
+    let activeId = null;
+    let startX = 0, startY = 0, originX = 0, originY = 0;
+    let dragged = false;
+
+    /* A drag ends with the browser firing a click on whatever button was under
+       the finger. One capture-phase listener on the window swallows exactly that
+       click, wherever it lands. The timeout is the safety net for the touch case
+       where no click follows at all, so a stale eater can never take the next
+       real tap. */
+    function swallowNextClick() {
+      let timer = 0;
+      const clear = () => {
+        window.removeEventListener('click', eat, true);
+        window.clearTimeout(timer);
+      };
+      function eat(e) {
+        e.stopPropagation();
+        e.preventDefault();
+        clear();
+      }
+      window.addEventListener('click', eat, true);
+      timer = window.setTimeout(clear, 400);
+    }
+
+    viewport.addEventListener('pointerdown', (e) => {
+      if (activeId !== null) return;
+      if (e.pointerType === 'mouse' && e.button !== 0) return;
+      activeId = e.pointerId;
+      startX = e.clientX;
+      startY = e.clientY;
+      originX = pan.x;
+      originY = pan.y;
+      dragged = false;
+      /* Capture is taken later, not here. While a pointer is captured the click
+         that follows pointerup is delivered to the capturing element instead of
+         the button under the finger, which would swallow every ordinary tap. */
+    });
+
+    viewport.addEventListener('pointermove', (e) => {
+      if (e.pointerId !== activeId) return;
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      if (!dragged) {
+        if (Math.sqrt(dx * dx + dy * dy) < PAN_DRAG_THRESHOLD) return;
+        dragged = true;
+        viewport.classList.add('panning');
+        hideHint();
+        /* Now that it is a drag and not a tap, capture keeps the moves coming
+           even if the finger leaves the window. The click it retargets is the
+           one swallowNextClick() is about to eat anyway. */
+        try { viewport.setPointerCapture(activeId); } catch (err) { /* drag still tracked without it */ }
+      }
       e.preventDefault();
-      clear();
+      pan.x = clampPan(originX + dx, pan.minX, 0);
+      pan.y = clampPan(originY + dy, pan.minY, 0);
+      apply();
+    });
+
+    function endPan(e) {
+      if (e.pointerId !== activeId) return;
+      try {
+        if (viewport.hasPointerCapture(activeId)) viewport.releasePointerCapture(activeId);
+      } catch (err) { /* nothing to release */ }
+      activeId = null;
+      viewport.classList.remove('panning');
+      if (dragged) swallowNextClick();
+      dragged = false;
     }
-    window.addEventListener('click', eat, true);
-    timer = window.setTimeout(clear, 400);
+
+    viewport.addEventListener('pointerup', endPan);
+    viewport.addEventListener('pointercancel', endPan);
+    /* Fallback for the case where the pointer is released off the viewport
+       before the drag threshold was crossed, so nothing was captured yet.
+       Without it the gesture would stay open and block the next drag. */
+    window.addEventListener('pointerup', endPan);
+    window.addEventListener('pointercancel', endPan);
+
+    window.addEventListener('resize', () => {
+      if (currentScreenName === screenName) measure();
+    });
   }
 
-  viewport.addEventListener('pointerdown', (e) => {
-    if (activeId !== null) return;
-    if (e.pointerType === 'mouse' && e.button !== 0) return;
-    activeId = e.pointerId;
-    startX = e.clientX;
-    startY = e.clientY;
-    originX = gardenPan.x;
-    originY = gardenPan.y;
-    dragged = false;
-    /* Capture is taken later, not here. While a pointer is captured the click
-       that follows pointerup is delivered to the capturing element instead of
-       the button under the finger, which would swallow every ordinary tap. */
-  });
-
-  viewport.addEventListener('pointermove', (e) => {
-    if (e.pointerId !== activeId) return;
-    const dx = e.clientX - startX;
-    const dy = e.clientY - startY;
-    if (!dragged) {
-      if (Math.sqrt(dx * dx + dy * dy) < PAN_DRAG_THRESHOLD) return;
-      dragged = true;
-      viewport.classList.add('panning');
-      hideGardenPanHint();
-      /* Now that it is a drag and not a tap, capture keeps the moves coming
-         even if the finger leaves the window. The click it retargets is the
-         one swallowNextClick() is about to eat anyway. */
-      try { viewport.setPointerCapture(activeId); } catch (err) { /* drag still tracked without it */ }
-    }
-    e.preventDefault();
-    gardenPan.x = clampPan(originX + dx, gardenPan.minX, 0);
-    gardenPan.y = clampPan(originY + dy, gardenPan.minY, 0);
-    applyGardenPan();
-  });
-
-  function endPan(e) {
-    if (e.pointerId !== activeId) return;
-    try {
-      if (viewport.hasPointerCapture(activeId)) viewport.releasePointerCapture(activeId);
-    } catch (err) { /* nothing to release */ }
-    activeId = null;
-    viewport.classList.remove('panning');
-    if (dragged) swallowNextClick();
-    dragged = false;
-  }
-
-  viewport.addEventListener('pointerup', endPan);
-  viewport.addEventListener('pointercancel', endPan);
-  /* Fallback for the case where the pointer is released off the viewport
-     before the drag threshold was crossed, so nothing was captured yet.
-     Without it the gesture would stay open and block the next drag. */
-  window.addEventListener('pointerup', endPan);
-  window.addEventListener('pointercancel', endPan);
-
-  window.addEventListener('resize', () => {
-    if (document.getElementById('screen-garden').classList.contains('active')) measureGardenPan();
-  });
+  return { pan, bind, measure, panIntoView, hasSlack };
 }
+
+const gardenFieldPan = createFieldPan('garden', 'garden-viewport', 'garden-scene', 'garden-pan-hint');
+const patchesFieldPan = createFieldPan('garden2', 'garden2-viewport', 'garden2-scene', null);
 
 function renderGarden() {
   updatePlantStates();
@@ -1132,8 +1152,8 @@ function renderGarden() {
   // The untilled plot at the end, always there so there is always a goal
   scene.appendChild(buildLockedShelf());
 
-  bindGardenPan();
-  measureGardenPan();
+  gardenFieldPan.bind();
+  gardenFieldPan.measure();
 
   const waterBtn = document.getElementById('btn-water-all');
   const hasThirsty = state.plants.some(p => p.state === 'wilt');
@@ -1150,14 +1170,14 @@ function renderGarden() {
    would break every existing save. What the player sees and hears is a row
    of soil patches in an open field. */
 
-/* One soil patch, filled or bare. Shared by the primary garden's rows
-   (buildShelf) and the grid view (renderGarden2) so both read the same
+/* One soil patch, filled or bare. Shared by both tabs' rows via buildShelf,
+   which forwards its own opts straight through, so both read the same
    state.plants array through the same click behaviour instead of two
    diverging implementations.
 
-   opts lets a caller (currently only renderGarden2) swap in Patches-tab-only
-   tap behaviour without changing what buildShelf gets when it calls this
-   with no second argument at all:
+   opts lets renderGarden2 swap in Patches-tab-only tap behaviour on every
+   plot in its rows, while renderGarden's rows keep the default behaviour by
+   calling buildShelf with no opts at all:
      - onEmptyTap(plantIdx): replaces the default "go to Shop" tap on a bare patch.
      - onBloomTap(plantIdx): replaces openPlantDetail for a patch whose plant
        has reached full bloom (other filled states still open the detail modal).
@@ -1202,7 +1222,10 @@ function buildPlot(plantIdx, opts = {}) {
   return plot;
 }
 
-function buildShelf(shelfIdx) {
+/* opts is threaded straight through to buildPlot() so a caller (currently
+   only renderGarden2) can swap in Patches-tab-only tap behaviour on every
+   plot in the row without buildShelf needing to know what that behaviour is. */
+function buildShelf(shelfIdx, opts = {}) {
   const unit = document.createElement('div');
   unit.className = 'shelf-unit';
   unit.setAttribute('role', 'group');
@@ -1213,26 +1236,34 @@ function buildShelf(shelfIdx) {
 
   for (let slot = 0; slot < SHELF_SLOTS; slot++) {
     const plantIdx = shelfIdx * SHELF_SLOTS + slot;
-    pots.appendChild(buildPlot(plantIdx));
+    pots.appendChild(buildPlot(plantIdx, opts));
   }
 
   unit.appendChild(pots);
   return unit;
 }
 
-/* ── GARDEN GRID VIEW (second tab) ──────────────────────────────
-   Same state.plants and the same buildPlot() as the primary garden, laid out
-   as a plain static grid instead of a pannable field. Read/tend only: no
-   land-buying tile here, that stays the primary garden's job. */
+/* ── PATCHES VIEW (second tab) ──────────────────────────────────
+   Same state.plants, the same buildShelf()/buildLockedShelf() and its own
+   createFieldPan() camera (patchesFieldPan) as the primary garden, just a
+   single column instead of two so the current row centers in the window.
+   Only the per-plot tap behaviour differs: tapping a bare patch opens the
+   in-place seed menu instead of navigating to the Shop tab, and a bloom is
+   harvested on the spot instead of opening the detail panel. */
 function renderGarden2() {
   updatePlantStates();
-  const grid = document.getElementById('garden2-grid');
-  if (!grid) return;
-  grid.innerHTML = '';
-  const capacity = gardenCapacity();
-  for (let i = 0; i < capacity; i++) {
-    grid.appendChild(buildPlot(i, { onEmptyTap: openSeedMenu, onBloomTap: harvestPlant, plantRenderer: plantSVGFruit }));
+  const scene = document.getElementById('garden2-scene');
+  if (!scene) return;
+  scene.innerHTML = '';
+
+  const patchOpts = { onEmptyTap: openSeedMenu, onBloomTap: harvestPlant, plantRenderer: plantSVGFruit };
+  for (let s = 0; s < state.shelves; s++) {
+    scene.appendChild(buildShelf(s, patchOpts));
   }
+  scene.appendChild(buildLockedShelf());
+
+  patchesFieldPan.bind();
+  patchesFieldPan.measure();
   updateCoinDisplay();
 }
 
