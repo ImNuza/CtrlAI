@@ -562,6 +562,19 @@ body{
 
 .plant-detail-sheet{padding-top:1.25rem}
 
+/* Seed menu (Patches tab: tap an empty patch to plant in place) shares the
+   plant detail modal's fade + slide-up open/close. */
+#seed-menu-modal{
+  transition:opacity 250ms var(--ease-gentle);
+  opacity:0;
+}
+#seed-menu-modal.open{opacity:1}
+#seed-menu-modal .modal-sheet{
+  transform:translateY(30px);
+  transition:transform 250ms var(--ease-spring);
+}
+#seed-menu-modal.open .modal-sheet{transform:translateY(0)}
+
 .plant-latin{
   font-family:var(--font-display);
   font-style:italic;

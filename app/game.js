@@ -205,6 +205,49 @@ function plantSVG(plant) {
   return svg;
 }
 
+/* Patches-tab-only renderer. Identical to plantSVG at every stage except
+   bloom, where it draws small hanging fruit instead of the flower disc, a
+   hint that this patch is ready to harvest. plantSVG itself stays untouched
+   since it is still the shared renderer for the primary garden, the shop
+   icons and the plant detail modal. */
+function plantSVGFruit(plant) {
+  const s = SEEDS.find(sd => sd.id === plant.seedId) || SEEDS[0];
+  const stage = plant.state;
+  const bc = s.bloomColor || '#73875D';
+  const wilted = stage === 'wilt';
+  const grown = stage === 'grown' || stage === 'bloom';
+  const bloom = stage === 'bloom';
+
+  const leafHi  = wilted ? '#B1B8A1' : '#B1B8A1';
+  const leafMid = wilted ? '#B1B8A1' : '#73875D';
+  const leafSh  = wilted ? '#958579' : '#44573D';
+  const opacity = wilted ? '0.55' : '1';
+
+  let svg = `<svg viewBox="0 0 80 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="${s.name}" role="img">`;
+  svg += `<ellipse cx="40" cy="90" rx="28" ry="7" fill="#958579" opacity="0.35"/>`;
+
+  if (stage === 'seed') {
+    svg += `<ellipse cx="40" cy="80" rx="10" ry="7" fill="#7A6B5C"/>
+            <ellipse cx="40" cy="77" rx="7" ry="5" fill="#B1B8A1" opacity="0.6"/>`;
+  } else if (stage === 'sprout' || (wilted && !grown)) {
+    svg += `<line x1="40" y1="90" x2="40" y2="${wilted ? '65' : '58'}" stroke="${wilted ? '#958579' : leafMid}" stroke-width="2" stroke-linecap="round"/>
+            <ellipse cx="28" cy="62" rx="12" ry="8" fill="${leafHi}" opacity="${opacity}" transform="rotate(-28 28 62)"/>
+            <ellipse cx="52" cy="58" rx="12" ry="8" fill="${leafMid}" opacity="${opacity}" transform="rotate(28 52 58)"/>`;
+  } else {
+    svg += `<line x1="40" y1="90" x2="40" y2="${bloom ? '45' : '52'}" stroke="${leafSh}" stroke-width="2.5" stroke-linecap="round" opacity="${opacity}"/>
+            <ellipse cx="22" cy="70" rx="14" ry="9" fill="${leafMid}" opacity="${opacity}" transform="rotate(-22 22 70)"/>
+            <ellipse cx="58" cy="66" rx="14" ry="9" fill="${leafSh}" opacity="${opacity}" transform="rotate(20 58 66)"/>
+            <ellipse cx="32" cy="56" rx="12" ry="8" fill="${leafHi}" opacity="${opacity}" transform="rotate(-10 32 56)"/>`;
+    if (bloom) {
+      svg += `<ellipse cx="35" cy="46" rx="6" ry="5.5" fill="${bc}"/>
+              <ellipse cx="45" cy="49" rx="6.5" ry="6" fill="${bc}"/>
+              <ellipse cx="40" cy="52" rx="5" ry="5" fill="${bc}"/>`;
+    }
+  }
+  svg += `</svg>`;
+  return svg;
+}
+
 /* ── STREAK LOGIC ───────────────────────────────────────────── */
 
 function updateStreak() {
@@ -1110,14 +1153,23 @@ function renderGarden() {
 /* One soil patch, filled or bare. Shared by the primary garden's rows
    (buildShelf) and the grid view (renderGarden2) so both read the same
    state.plants array through the same click behaviour instead of two
-   diverging implementations. */
-function buildPlot(plantIdx) {
+   diverging implementations.
+
+   opts lets a caller (currently only renderGarden2) swap in Patches-tab-only
+   tap behaviour without changing what buildShelf gets when it calls this
+   with no second argument at all:
+     - onEmptyTap(plantIdx): replaces the default "go to Shop" tap on a bare patch.
+     - onBloomTap(plantIdx): replaces openPlantDetail for a patch whose plant
+       has reached full bloom (other filled states still open the detail modal).
+     - plantRenderer(plant): replaces plantSVG for drawing the filled patch. */
+function buildPlot(plantIdx, opts = {}) {
+  const { onEmptyTap, onBloomTap, plantRenderer } = opts;
   const plant = state.plants[plantIdx];
   const plot = document.createElement('button');
   plot.className = 'shelf-plot';
   plot.setAttribute('aria-label', plant
-    ? `${SEEDS.find(sd => sd.id === plant.seedId)?.name || 'Plant'}, ${plant.state}`
-    : 'Bare patch of soil, visit the shop to plant');
+    ? `${SEEDS.find(sd => sd.id === plant.seedId)?.name || 'Plant'}, ${plant.state}${plant.state === 'bloom' && onBloomTap ? ', tap to harvest' : ''}`
+    : (onEmptyTap ? 'Bare patch of soil, tap to choose a seed to plant' : 'Bare patch of soil, visit the shop to plant'));
 
   plot.dataset.plantIdx = String(plantIdx);
   plot.dataset.filled = plant ? '1' : '0';
@@ -1126,16 +1178,25 @@ function buildPlot(plantIdx) {
     const isThirsty = plant.state === 'wilt';
     plot.classList.add('has-plant');
     if (isThirsty) plot.classList.add('thirsty');
-    plot.innerHTML = `<div class="plot-plant" aria-hidden="true">${plantSVG(plant)}</div><div class="plot-pot" aria-hidden="true"></div>`;
-    plot.addEventListener('click', () => openPlantDetail(plantIdx));
+    const renderer = plantRenderer || plantSVG;
+    plot.innerHTML = `<div class="plot-plant" aria-hidden="true">${renderer(plant)}</div><div class="plot-pot" aria-hidden="true"></div>`;
+    const tap = () => {
+      if (plant.state === 'bloom' && onBloomTap) onBloomTap(plantIdx);
+      else openPlantDetail(plantIdx);
+    };
+    plot.addEventListener('click', tap);
     plot.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openPlantDetail(plantIdx); }
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); tap(); }
     });
   } else {
     plot.innerHTML = `<div class="plot-pot empty" aria-hidden="true"></div>`;
-    plot.addEventListener('click', () => showScreen('shop'));
+    const tap = () => {
+      if (onEmptyTap) onEmptyTap(plantIdx);
+      else showScreen('shop');
+    };
+    plot.addEventListener('click', tap);
     plot.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); showScreen('shop'); }
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); tap(); }
     });
   }
   return plot;
@@ -1170,7 +1231,7 @@ function renderGarden2() {
   grid.innerHTML = '';
   const capacity = gardenCapacity();
   for (let i = 0; i < capacity; i++) {
-    grid.appendChild(buildPlot(i));
+    grid.appendChild(buildPlot(i, { onEmptyTap: openSeedMenu, onBloomTap: harvestPlant, plantRenderer: plantSVGFruit }));
   }
   updateCoinDisplay();
 }
@@ -1366,6 +1427,105 @@ function closePlantDetail() {
   setTimeout(() => { overlay.hidden = true; overlay.innerHTML = ''; }, 250);
 }
 
+/* ── SEED MENU (Patches tab: tap an empty patch to plant in place) ──────
+   Opens over the Patches grid instead of navigating to the Shop tab. Mirrors
+   renderShop()'s per-seed markup and owned/locked/full/afford states so it
+   reads as the same shop, just surfaced in place. Buying reuses buySeed()
+   as-is: it already handles the coin deduction, capacity check, ownedSeeds
+   tracking, notification and save. */
+
+function openSeedMenu(plantIdx) {
+  const overlay = document.getElementById('seed-menu-modal');
+  overlay.innerHTML = `
+    <div class="modal-sheet" role="document">
+      <div class="modal-header">
+        <h2 class="modal-title">Choose a seed to plant</h2>
+        <button class="icon-btn" id="btn-close-seed-menu" aria-label="Close">
+          <svg class="icon" aria-hidden="true"><use href="#icon-close"/></svg>
+        </button>
+      </div>
+      <div class="shop-grid" id="seed-menu-list" style="display:flex;flex-direction:column;gap:0.75rem"></div>
+    </div>
+  `;
+
+  renderSeedMenuList();
+
+  overlay.hidden = false;
+  requestAnimationFrame(() => overlay.classList.add('open'));
+
+  document.getElementById('btn-close-seed-menu').addEventListener('click', closeSeedMenu);
+  overlay.addEventListener('click', (e) => { if (e.target === overlay) closeSeedMenu(); });
+
+  // Keyboard: Escape to close
+  overlay.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeSeedMenu();
+  });
+  document.getElementById('btn-close-seed-menu').focus();
+}
+
+function renderSeedMenuList() {
+  const list = document.getElementById('seed-menu-list');
+  if (!list) return;
+  list.innerHTML = '';
+
+  SEEDS.forEach(seed => {
+    const owned = state.ownedSeeds.includes(seed.id);
+    const locked = seed.streakRequired && state.streak < seed.streakRequired;
+    const canAfford = state.coins >= seed.cost;
+    const gardenFull = state.plants.length >= gardenCapacity();
+
+    const item = document.createElement('div');
+    item.className = `shop-item${seed.rare ? ' rare' : ''}`;
+
+    const lockNote = locked ? `<div class="shop-lock-note">Unlocks at ${seed.streakRequired}-day streak</div>` : '';
+    const priceHTML = seed.cost === 0
+      ? `<span class="shop-free-label">Free</span>`
+      : `<span class="shop-item-price"><svg class="icon icon-sm" aria-hidden="true"><use href="#icon-coin"/></svg>${seed.cost}</span>`;
+
+    let btnHTML;
+    if (owned && !seed.rare) {
+      btnHTML = `<button class="shop-buy-btn owned" disabled>Owned</button>`;
+    } else if (locked) {
+      btnHTML = `<button class="shop-buy-btn locked" disabled>Locked</button>`;
+    } else if (gardenFull) {
+      btnHTML = `<button class="shop-buy-btn" disabled>Shelves full</button>`;
+    } else if (!canAfford) {
+      btnHTML = `<button class="shop-buy-btn" disabled>Not enough</button>`;
+    } else {
+      btnHTML = `<button class="shop-buy-btn" data-seed="${seed.id}">${seed.cost === 0 ? 'Plant' : 'Buy'}</button>`;
+    }
+
+    item.innerHTML = `
+      <div class="shop-item-icon">${plantSVG({ seedId: seed.id, state: 'bloom', plantedAt: todayStr(), wateredAt: todayStr() })}</div>
+      <div class="shop-item-info">
+        <div class="shop-item-name">${seed.name}${seed.rare ? ' <span class="rare-tag">RARE</span>' : ''}</div>
+        <div class="shop-item-desc">${seed.desc}</div>
+        ${lockNote}
+      </div>
+      <div class="shop-item-right">
+        ${priceHTML}
+        ${btnHTML}
+      </div>
+    `;
+
+    const buyBtn = item.querySelector('[data-seed]');
+    if (buyBtn) {
+      buyBtn.addEventListener('click', () => {
+        buySeed(seed);
+        closeSeedMenu();
+        renderGarden2();
+      });
+    }
+    list.appendChild(item);
+  });
+}
+
+function closeSeedMenu() {
+  const overlay = document.getElementById('seed-menu-modal');
+  overlay.classList.remove('open');
+  setTimeout(() => { overlay.hidden = true; overlay.innerHTML = ''; }, 250);
+}
+
 /* ── HARVEST ────────────────────────────────────────────────── */
 
 /* Without this the garden is a one-way ratchet: plots fill, coins lose all
@@ -1393,6 +1553,7 @@ function harvestPlant(index) {
   showNotif('success', `harvest-${Date.now()}`, `${seed.name} harvested`,
     `+${value} coins, and a patch is free again. Its meal card stays in your collection.`, 'icon-meal');
   renderGarden();
+  if (typeof renderGarden2 === 'function') renderGarden2();
 }
 
 function waterPlant(index, plotEl) {
@@ -1415,6 +1576,7 @@ function waterPlant(index, plotEl) {
   evaluateRecompute();
   saveState();
   renderGarden();
+  if (typeof renderGarden2 === 'function') renderGarden2();
 }
 
 document.getElementById('btn-water-all').addEventListener('click', () => {
