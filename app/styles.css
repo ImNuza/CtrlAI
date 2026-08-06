@@ -213,12 +213,20 @@ body{
    bottom, with a very low contrast blade texture. Backgrounds on a scroll
    container are painted against the padding box, so the field stays put
    while the rows scroll over it. */
+/* The overflow override is scoped to this id on purpose: the shared .screen
+   rule still scrolls every other tab. Here the page itself never scrolls, the
+   field is dragged inside .garden-viewport instead. */
+/* Tighter than the shared .screen padding: every pixel taken back here is a
+   pixel of field the player can see without panning. */
 #screen-garden{
+  overflow:hidden;
+  padding:1rem 1.25rem calc(var(--nav-height) + 0.75rem);
   background:
     repeating-linear-gradient(102deg,rgba(68,87,61,0.028) 0 2px,transparent 2px 16px),
     linear-gradient(180deg,#DDE2CE 0%,#CFD8BB 55%,#C5D0AE 100%);
 }
-.garden-header{margin-bottom:1rem}
+.garden-header{margin-bottom:0.75rem;flex-shrink:0}
+.garden-hint-slot:not(:empty){flex-shrink:0}
 .garden-title{
   font-family:var(--font-display);
   font-size:2.5rem;
@@ -241,31 +249,94 @@ body{
    GARDEN SCENE: an open field of soil patches
    ════════════════════════════════════════════════════════════ */
 
-.garden-scene{
-  display:flex;
-  flex-direction:column;
-  gap:0;
-  margin-bottom:1.25rem;
+/* The window the field is dragged under. It eats the screen padding with a
+   negative margin so the grass runs to both edges of the phone and the field
+   visibly continues past them. touch-action:none hands the gesture to the
+   pointer handlers instead of letting the browser try to scroll it. */
+.garden-viewport{
+  position:relative;
+  flex:1;
+  min-height:0;
+  margin:0 -1.25rem;
+  overflow:hidden;
+  touch-action:none;
+  user-select:none;
+  -webkit-user-select:none;
+  -webkit-tap-highlight-color:transparent;
+  cursor:grab;
+}
+.garden-viewport.panning{cursor:grabbing}
+
+/* The pannable layer. width:max-content makes offsetWidth the true content
+   width, which is what the pan bounds are measured from. Two plots of land
+   side by side is what makes the field wider than the phone. */
+.garden-field{
+  --field-col:300px;
+  display:grid;
+  grid-template-columns:repeat(2,var(--field-col));
+  align-content:start;
+  justify-content:start;
+  gap:0.25rem 0.75rem;
+  width:max-content;
+  min-width:100%;
+  padding:0.5rem 1rem 1.5rem;
+  will-change:transform;
+}
+/* Only on a programmatic move, never while a finger is down */
+.garden-field.pan-glide{transition:transform 420ms var(--ease-gentle)}
+
+/* Landscape and very short screens cannot fit the header, a useful pan window
+   and the action buttons at once. There the garden goes back to scrolling
+   like every other tab, with the pan window at a fixed height inside it. */
+@media (max-height:640px){
+  #screen-garden{overflow-y:auto;overflow-x:hidden}
+  .garden-viewport{flex:none;height:230px}
 }
 
-/* ── One row of soil patches in the grass ── */
+/* Discoverability pill. Sits in the headroom above the first row of patches,
+   where it covers grass rather than anything tappable. */
+.garden-pan-hint{
+  position:absolute;
+  left:50%;
+  top:0.4rem;
+  transform:translateX(-50%);
+  padding:0.5rem 1.1rem;
+  border-radius:var(--radius-pill);
+  background:var(--bg-surface);
+  border:1.5px solid var(--border-mid);
+  box-shadow:0 3px 8px rgba(43,33,24,0.22);
+  font-family:var(--font-body);
+  font-size:1.15rem;
+  color:var(--text-secondary);
+  white-space:nowrap;
+  pointer-events:none;
+  transition:opacity 400ms var(--ease-gentle);
+}
+.garden-pan-hint[hidden]{display:none}
+.garden-pan-hint.fading{opacity:0}
+
+/* ── One plot of soil patches in the grass ── */
 /* The space above each patch is headroom for a tall plant to grow into, so
-   it stays generous. The strip below is just grass between rows. */
+   it stays generous. The strip below is just grass between plots. */
 .shelf-unit{
   position:relative;
-  padding:0.75rem 0.5rem 1.25rem;
+  padding:0.75rem 0.5rem 1rem;
 }
 .shelf-pots{
   display:grid;
   grid-template-columns:repeat(3,1fr);
   gap:0.5rem;
-  padding:0 0.75rem;
+  padding:0 0.5rem;
   align-items:end;
 }
 
+/* The button is the tap target, and the soil tile fills its full width, so the
+   hit area is never smaller than what the eye aims at. At the 300px column
+   this lands near 84x128, well clear of the 64px floor. */
 .shelf-plot{
   position:relative;
   height:128px;
+  min-width:var(--tap-min);
   background:transparent;
   border:none;
   cursor:pointer;
@@ -284,10 +355,10 @@ body{
 
 .plot-plant{
   position:absolute;
-  bottom:30px;
+  bottom:34px;
   left:50%;
   transform:translateX(-50%);
-  width:92px;
+  width:84px;
   pointer-events:none;
   animation:plant-settle 400ms var(--ease-spring);
 }
@@ -297,13 +368,15 @@ body{
 }
 
 /* ── Soil patch ──
-   Tilled ground lying in the grass, not a pot standing on a shelf. The
-   furrows are a low-contrast repeating gradient so the patch reads as worked
-   soil without turning into a busy pattern behind the plant. */
+   A flat rectangular tile of tilled ground lying in the grass, not a pot
+   standing on a shelf. Filling the button width and dropping most of the
+   corner rounding is what turns the row into a field of plots. The furrows
+   are a low-contrast repeating gradient so the patch reads as worked soil
+   without turning into a busy pattern behind the plant. */
 .plot-pot{
-  width:88px;
-  height:52px;
-  border-radius:16px;
+  width:100%;
+  height:56px;
+  border-radius:8px;
   background:
     repeating-linear-gradient(96deg,rgba(43,33,24,0.10) 0 3px,transparent 3px 13px),
     linear-gradient(180deg,#7A6248 0%,#5A4834 100%);
@@ -341,7 +414,7 @@ body{
 .shelf-plot.thirsty::after{
   content:'';
   position:absolute;
-  bottom:42px;right:calc(50% - 38px);
+  bottom:7px;right:5px;
   width:14px;height:18px;
   background:var(--accent-orange);
   border:2px solid var(--bg-surface);
@@ -354,18 +427,17 @@ body{
   50%{opacity:1;transform:translateY(3px)}
 }
 
-/* ── Untilled land at the end of the field ──
-   The one affordance on the field that stays tappable from anywhere, so it
-   is drawn as ground waiting to be cleared rather than as a locked object.
-   The .shelf-locked-plank class is load-bearing: the floor pointer handler
-   exempts it and updateGardenDock() measures it. */
-.shelf-locked-unit{padding:0.5rem 0.5rem 1rem}
+/* ── Untilled land, the next plot over ──
+   Ground waiting to be cleared rather than a locked object. It sits in the
+   grid in reading order like any other plot, so the player pans to it the
+   same way they pan to their planted land. */
+.shelf-locked-unit{padding:0.75rem 0.5rem 1rem}
 .shelf-locked-plank{
   position:relative;
   width:100%;
   background:transparent;
   border:none;
-  padding:0.5rem 0.5rem 0.5rem;
+  padding:0.5rem 0 0.5rem;
   cursor:pointer;
   font-family:inherit;
 }
@@ -375,13 +447,13 @@ body{
   display:grid;
   grid-template-columns:repeat(3,1fr);
   gap:0.5rem;
-  padding:0 0.75rem;
-  justify-items:center;
+  padding:0 0.5rem;
+  justify-items:stretch;
 }
 .patch-locked-slot{
-  width:88px;
-  height:44px;
-  border-radius:16px;
+  width:100%;
+  height:56px;
+  border-radius:8px;
   border:2px dashed rgba(68,87,61,0.55);
   background:rgba(122,107,92,0.14);
 }
@@ -396,17 +468,20 @@ body{
   display:inline-flex;
   align-items:center;
   gap:0.5rem;
-  padding:0.55rem 1.1rem;
+  flex-wrap:wrap;
+  justify-content:center;
+  max-width:100%;
+  padding:0.55rem 0.95rem;
   background:var(--bg-surface);
   border:1.5px solid var(--border-mid);
-  border-radius:var(--radius-pill);
+  border-radius:var(--radius-lg);
   box-shadow:0 3px 8px rgba(43,33,24,0.22);
   font-family:var(--font-body);
   font-size:1.05rem;
   font-weight:500;
   color:var(--text-secondary);
-  white-space:nowrap;
 }
+.shelf-tag-text{white-space:nowrap}
 .shelf-tag.affordable{
   border-color:var(--foliage-mid);
   color:var(--foliage-shadow);
@@ -426,6 +501,7 @@ body{
   border-radius:var(--radius-pill);
   color:#7A2F10;
   font-weight:600;
+  white-space:nowrap;
 }
 .shelf-tag-hint{
   margin-top:0.5rem;
@@ -902,7 +978,8 @@ body{
 .notif-award{border-left-color:var(--accent-plum)}
 .notif-award .notif-icon{color:var(--accent-plum)}
 
-.garden-actions{display:flex;flex-direction:column;gap:0.75rem}
+/* Pinned below the pan window, never scrolls out of reach */
+.garden-actions{display:flex;flex-direction:column;gap:0.75rem;flex-shrink:0;padding-top:0.75rem}
 
 /* ── Buttons ── */
 .btn{
@@ -2750,30 +2827,32 @@ body{
 /* ════════════════════════════════════════════════════════════
    GARDEN HINT CARD (first visit)
    ════════════════════════════════════════════════════════════ */
+/* Stacked and compact: it sits above the pan window, where every pixel it
+   takes is a pixel of field the player loses. */
 .garden-hint-card{
-  grid-column:1/-1;
   display:flex;
-  align-items:center;
-  gap:1rem;
-  padding:1.25rem;
+  flex-direction:column;
+  gap:0.5rem;
+  padding:0.9rem 1rem;
   background:var(--bg-surface);
   border:1.5px solid var(--foliage-mid);
   border-radius:var(--radius-lg);
-  margin-bottom:0.75rem;
+  margin-bottom:0.6rem;
 }
+.garden-hint-head{display:flex;align-items:center;gap:0.6rem}
 .garden-hint-card .icon{color:var(--foliage-mid);flex-shrink:0}
 .garden-hint-title{
   font-family:var(--font-display);
-  font-size:1.2rem;
+  font-size:1.3rem;
   font-weight:500;
-  margin-bottom:0.2rem;
 }
 .garden-hint-body{
   font-family:var(--font-body);
-  font-size:0.9rem;
+  font-size:1rem;
   color:var(--text-secondary);
   line-height:1.4;
 }
+.garden-hint-card .btn{width:100%}
 
 /* ════════════════════════════════════════════════════════════
    MISC FIXES

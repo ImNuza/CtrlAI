@@ -249,7 +249,14 @@
         <h1 class="garden-title">Your Garden</h1>
         <p class="garden-subtitle" id="garden-date"></p>
       </div>
-      <div class="garden-scene" id="garden-scene"></div>
+      <div class="garden-hint-slot" id="garden-hint-slot"></div>
+      <!-- The field is larger than the phone. It is dragged under this fixed
+           window instead of scrolling the page, so the header and the action
+           buttons never move. -->
+      <div class="garden-viewport" id="garden-viewport">
+        <div class="garden-field" id="garden-scene"></div>
+        <p class="garden-pan-hint" id="garden-pan-hint" hidden>Drag to look around your field</p>
+      </div>
       <div class="garden-actions">
         <button class="btn btn-primary btn-lg" id="btn-water-all">
           <svg class="icon"><use href="#icon-water"/></svg>
