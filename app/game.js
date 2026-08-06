@@ -936,11 +936,12 @@ function clampPan(value, min, max) {
    to when that tab is the one on screen. hintId is optional: the Patches
    tab has no discoverability pill of its own, since the Garden tab already
    teaches the drag-to-look gesture first. */
-function createFieldPan(screenName, viewportId, fieldId, hintId) {
-  const pan = { x: 0, y: 0, minX: 0, minY: 0 };
+function createFieldPan(screenName, viewportId, fieldId, hintId, opts = {}) {
+  const pan = { x: 0, y: 0, minX: 0, minY: 0, maxX: 0 };
   let bound = false;
   let hintDone = false;
   let measureTimer = 0;
+  let centered = false;
 
   function apply() {
     const field = document.getElementById(fieldId);
@@ -986,7 +987,24 @@ function createFieldPan(screenName, viewportId, fieldId, hintId) {
     const slackY = field.offsetHeight - viewport.clientHeight;
     pan.minX = slackX > 0 ? -slackX : 0;
     pan.minY = slackY > 0 ? -slackY : 0;
-    pan.x = clampPan(pan.x, pan.minX, 0);
+
+    /* First measurement only: rest with the first patch centered instead of
+       flush against the corner, so there is slack to drag it either way
+       rather than starting pinned against a wall on one side. maxX moves out
+       to that centered offset so it is actually reachable (it defaults to 0,
+       which is the flush-left position) and becomes the new right-hand wall.
+       Later measurements (after planting, watering, clearing land) keep
+       whatever offset the player left it at, same as before. */
+    if (opts.centerFirst && !centered && field.firstElementChild) {
+      centered = true;
+      const vp = viewport.getBoundingClientRect();
+      const box = field.firstElementChild.getBoundingClientRect();
+      const centerX = pan.x + (vp.left + vp.width / 2) - (box.left + box.width / 2);
+      pan.maxX = Math.max(0, centerX);
+      pan.x = clampPan(centerX, pan.minX, pan.maxX);
+    } else {
+      pan.x = clampPan(pan.x, pan.minX, pan.maxX);
+    }
     pan.y = clampPan(pan.y, pan.minY, 0);
     apply();
     maybeShowHint();
@@ -1004,7 +1022,7 @@ function createFieldPan(screenName, viewportId, fieldId, hintId) {
     const box = el.getBoundingClientRect();
     const wantX = pan.x + (vp.left + vp.width / 2) - (box.left + box.width / 2);
     const wantY = pan.y + (vp.top + vp.height / 2) - (box.top + box.height / 2);
-    pan.x = clampPan(wantX, pan.minX, 0);
+    pan.x = clampPan(wantX, pan.minX, pan.maxX);
     pan.y = clampPan(wantY, pan.minY, 0);
     field.classList.add('pan-glide');
     apply();
@@ -1069,7 +1087,7 @@ function createFieldPan(screenName, viewportId, fieldId, hintId) {
         try { viewport.setPointerCapture(activeId); } catch (err) { /* drag still tracked without it */ }
       }
       e.preventDefault();
-      pan.x = clampPan(originX + dx, pan.minX, 0);
+      pan.x = clampPan(originX + dx, pan.minX, pan.maxX);
       pan.y = clampPan(originY + dy, pan.minY, 0);
       apply();
     });
@@ -1102,7 +1120,7 @@ function createFieldPan(screenName, viewportId, fieldId, hintId) {
 }
 
 const gardenFieldPan = createFieldPan('garden', 'garden-viewport', 'garden-scene', 'garden-pan-hint');
-const patchesFieldPan = createFieldPan('garden2', 'garden2-viewport', 'garden2-scene', null);
+const patchesFieldPan = createFieldPan('garden2', 'garden2-viewport', 'garden2-scene', null, { centerFirst: true });
 
 function renderGarden() {
   updatePlantStates();
