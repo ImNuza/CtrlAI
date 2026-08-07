@@ -1,0 +1,35 @@
+{
+  "id": "garden-of-life",
+  "name": "Garden of Life",
+  "short_name": "Garden",
+  "description": "A gentle cognitive wellness game for older adults. Grow your garden by exercising your mind.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#EEE9D9",
+  "theme_color": "#44573D",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": ["health", "games", "education"],
+  "lang": "en",
+  "dir": "ltr"
+}

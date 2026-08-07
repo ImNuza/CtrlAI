@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Garden of Life — Design System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Work+Sans:wght@400;500;600&family=Pinyon+Script&display=swap" rel="stylesheet">
+<style>
+/* ── Reset & base ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:16px}
+
+/* ── Design tokens ── */
+:root{
+  --color-bg-primary:#EEE9D9;
+  --color-bg-surface:#F5EFEB;
+  --color-bg-deep:#EAE2D0;
+  --color-bg-inset:#E3DBCA;
+  --color-foliage-highlight:#B1B8A1;
+  --color-foliage-mid:#73875D;
+  --color-foliage-shadow:#44573D;
+  --color-foliage-muted:#859B6A;
+  --color-foliage-deep:#31482E;
+  --color-earth:#958579;
+  --color-earth-deep:#7A6B5C;
+  --color-accent-red:#AE382B;
+  --color-accent-orange:#E78F37;
+  --color-accent-plum:#7B5371;
+  --color-accent-crimson:#C82A36;
+  --color-accent-coral:#E07A5F;
+  --color-health-full:#73875D;
+  --color-health-wilt:#B1B8A1;
+  --color-health-thirsty:#E78F37;
+  --color-reward-coin:#E07A5F;
+  --color-reward-rare:#7B5371;
+  --color-streak:#AE382B;
+  --color-success:#44573D;
+  --color-warning:#E78F37;
+  --color-error:#AE382B;
+  --color-text-primary:#2B2118;
+  --color-text-secondary:#5A4A3C;
+  --color-text-muted:#958579;
+  --color-text-on-dark:#F5EFEB;
+  --color-text-label:#44573D;
+  --color-border-light:#D9D0BC;
+  --color-border-mid:#C6BAA5;
+  --color-border-strong:#958579;
+  --font-display:'Fraunces','Cormorant Garamond',Georgia,serif;
+  --font-display-alt:'Cormorant Garamond',Georgia,serif;
+  --font-body:'Work Sans','Karla',system-ui,sans-serif;
+  --font-label:'Pinyon Script',cursive;
+  --text-xs:1.125rem;
+  --text-sm:1.375rem;
+  --text-base:1.75rem;
+  --text-lg:2rem;
+  --text-xl:2.25rem;
+  --text-2xl:2.75rem;
+  --text-3xl:3.5rem;
+  --text-4xl:4.5rem;
+  --leading-tight:1.15;
+  --leading-normal:1.55;
+  --leading-relaxed:1.75;
+  --weight-regular:400;
+  --weight-medium:500;
+  --weight-semibold:600;
+  --space-2:0.5rem;
+  --space-3:0.75rem;
+  --space-4:1rem;
+  --space-6:1.5rem;
+  --space-8:2rem;
+  --space-10:2.5rem;
+  --space-12:3rem;
+  --space-16:4rem;
+  --radius-sm:0.375rem;
+  --radius-md:0.75rem;
+  --radius-lg:1.25rem;
+  --radius-xl:2rem;
+  --radius-pill:9999px;
+  --shadow-sm:0 1px 3px rgba(43,33,24,0.10);
+  --shadow-md:0 4px 12px rgba(43,33,24,0.12);
+  --shadow-paper:0 2px 8px rgba(149,133,121,0.20);
+  --duration-normal:300ms;
+  --ease-gentle:cubic-bezier(0.4,0,0.2,1);
+  --ease-spring:cubic-bezier(0.34,1.56,0.64,1);
+}
+
+/* ── SVG icon base class ── */
+.icon{width:1.4em;height:1.4em;display:inline-block;vertical-align:middle;flex-shrink:0}
+.icon-sm{width:1em;height:1em}
+.icon-lg{width:2em;height:2em}
+.icon-xl{width:2.5em;height:2.5em}
+
+/* ── Doc layout ── */
+body{background:var(--color-bg-primary);color:var(--color-text-primary);font-family:var(--font-body);font-size:1rem;line-height:var(--leading-normal)}
+.page{max-width:900px;margin:0 auto;padding:3rem 2rem 8rem}
+.section{margin:4rem 0}
+.section+.section{border-top:1px solid var(--color-border-light);padding-top:4rem}
+
+/* ── Doc typography ── */
+.doc-kicker{font-family:var(--font-body);font-size:0.75rem;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--color-text-muted);margin-bottom:0.5rem}
+.doc-title{font-family:var(--font-display);font-size:clamp(2rem,5vw,3.5rem);font-weight:500;line-height:var(--leading-tight);color:var(--color-text-primary);margin-bottom:0.75rem}
+.doc-title em{font-style:italic;color:var(--color-foliage-mid)}
+.doc-subtitle{font-family:var(--font-body);font-size:1rem;color:var(--color-text-secondary);max-width:60ch;line-height:var(--leading-relaxed)}
+.section-head{font-family:var(--font-display);font-size:clamp(1.4rem,3vw,2rem);font-weight:500;margin-bottom:1.5rem;color:var(--color-text-primary)}
+.section-head em{font-style:italic;color:var(--color-foliage-mid)}
+.subsection-head{font-family:var(--font-body);font-size:0.8rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-text-muted);margin:2rem 0 1rem}
+.rule{height:1px;background:var(--color-border-light);border:none;margin:1.5rem 0}
+p.note{font-family:var(--font-body);font-size:0.875rem;color:var(--color-text-secondary);line-height:var(--leading-relaxed);max-width:64ch}
+
+/* ── Colour swatches ── */
+.palette-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:1rem;margin:1rem 0}
+.swatch{border-radius:var(--radius-md);overflow:hidden;box-shadow:var(--shadow-sm)}
+.swatch-color{height:72px;width:100%}
+.swatch-info{background:var(--color-bg-surface);padding:0.6rem 0.75rem}
+.swatch-name{font-family:var(--font-body);font-size:0.7rem;font-weight:500;color:var(--color-text-secondary);margin-bottom:0.15rem;text-transform:capitalize}
+.swatch-hex{font-family:monospace;font-size:0.7rem;color:var(--color-text-muted)}
+
+/* ── Typography specimens ── */
+.type-specimen{background:var(--color-bg-surface);border:1px solid var(--color-border-light);border-radius:var(--radius-lg);padding:2rem;margin:1rem 0}
+.type-row{display:flex;align-items:baseline;gap:1.5rem;padding:0.75rem 0;border-bottom:1px solid var(--color-border-light)}
+.type-row:last-child{border-bottom:none}
+.type-meta{width:120px;flex-shrink:0;font-family:monospace;font-size:0.7rem;color:var(--color-text-muted)}
+.type-sample{color:var(--color-text-primary);line-height:var(--leading-normal)}
+
+/* ── Chip components ── */
+.chip-row{display:flex;flex-wrap:wrap;gap:0.75rem;margin:1rem 0}
+.chip{display:inline-flex;align-items:center;justify-content:center;min-height:var(--space-16);padding:0 1.5rem;border-radius:var(--radius-pill);font-family:var(--font-body);font-size:var(--text-sm);font-weight:var(--weight-medium);cursor:pointer;border:2px solid transparent;transition:all var(--duration-normal) var(--ease-gentle);user-select:none;gap:0.4rem}
+.chip-primary{background:var(--color-foliage-mid);color:var(--color-text-on-dark);border-color:var(--color-foliage-mid)}
+.chip-primary:hover,.chip-primary:active{background:var(--color-foliage-shadow)}
+.chip-secondary{background:var(--color-bg-inset);color:var(--color-text-primary);border-color:var(--color-border-mid)}
+.chip-secondary:hover{border-color:var(--color-foliage-mid)}
+.chip-selected{background:var(--color-bg-surface);color:var(--color-foliage-shadow);border-color:var(--color-foliage-mid);box-shadow:0 0 0 3px rgba(115,135,93,0.20)}
+.chip-answer{background:var(--color-bg-surface);color:var(--color-text-primary);border-color:var(--color-border-mid);font-size:var(--text-sm);min-height:72px;border-radius:var(--radius-lg);padding:1rem 1.5rem;width:100%;justify-content:flex-start;text-align:left}
+.chip-answer:hover{border-color:var(--color-foliage-mid);background:var(--color-bg-deep)}
+
+/* ── Buttons ── */
+.btn-row{display:flex;flex-wrap:wrap;gap:1rem;align-items:center;margin:1rem 0}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:var(--space-16);padding:0 2rem;border-radius:var(--radius-md);font-family:var(--font-body);font-size:var(--text-sm);font-weight:var(--weight-medium);border:2px solid transparent;cursor:pointer;transition:all var(--duration-normal) var(--ease-gentle);letter-spacing:0.02em;gap:0.4rem}
+.btn:focus-visible{outline:3px solid var(--color-foliage-mid);outline-offset:3px}
+.btn-primary{background:var(--color-foliage-shadow);color:var(--color-text-on-dark);border-color:var(--color-foliage-shadow)}
+.btn-primary:hover{background:var(--color-foliage-deep)}
+.btn-secondary{background:transparent;color:var(--color-foliage-shadow);border-color:var(--color-foliage-mid)}
+.btn-secondary:hover{background:rgba(115,135,93,0.10)}
+.btn-ghost{background:transparent;color:var(--color-text-secondary);border-color:var(--color-border-mid)}
+.btn-ghost:hover{color:var(--color-text-primary);border-color:var(--color-border-strong)}
+.btn-danger{background:transparent;color:var(--color-accent-red);border-color:var(--color-accent-red)}
+.btn-lg{min-height:80px;font-size:var(--text-base);padding:0 2.5rem;border-radius:var(--radius-lg)}
+
+/* ── Cards ── */
+.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1.25rem;margin:1rem 0}
+.card{background:var(--color-bg-surface);border:1px solid var(--color-border-light);border-radius:var(--radius-lg);overflow:hidden;box-shadow:var(--shadow-paper);transition:box-shadow var(--duration-normal) var(--ease-gentle),transform var(--duration-normal) var(--ease-gentle)}
+.card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px)}
+.card-thumb{height:100px;display:flex;align-items:center;justify-content:center}
+.card-body{padding:1rem 1.25rem 1.25rem}
+.card-label{font-family:var(--font-label);font-size:1.5rem;color:var(--color-text-label);margin-bottom:0.25rem;line-height:1}
+.card-title{font-family:var(--font-display);font-size:1.25rem;font-weight:500;color:var(--color-text-primary);margin-bottom:0.25rem}
+.card-meta{font-family:var(--font-body);font-size:0.8rem;color:var(--color-text-muted)}
+
+/* ── Badges ── */
+.badge-row{display:flex;flex-wrap:wrap;gap:0.75rem;margin:1rem 0}
+.badge{display:inline-flex;align-items:center;gap:0.4rem;padding:0.4rem 0.85rem;border-radius:var(--radius-pill);font-family:var(--font-body);font-size:0.85rem;font-weight:500;border:1.5px solid transparent}
+.badge-healthy{background:rgba(115,135,93,0.15);color:var(--color-foliage-shadow);border-color:var(--color-foliage-mid)}
+.badge-wilt{background:rgba(177,184,161,0.25);color:var(--color-earth-deep);border-color:var(--color-foliage-highlight)}
+.badge-thirsty{background:rgba(231,143,55,0.15);color:#7A4800;border-color:var(--color-accent-orange)}
+.badge-rare{background:rgba(123,83,113,0.15);color:var(--color-accent-plum);border-color:var(--color-accent-plum)}
+.badge-coin{background:rgba(224,122,95,0.15);color:#7A2F10;border-color:var(--color-accent-coral)}
+.badge-streak{background:rgba(174,56,43,0.12);color:var(--color-accent-red);border-color:var(--color-accent-red)}
+
+/* ── Toast ── */
+.toast{background:var(--color-bg-surface);border:1px solid var(--color-border-mid);border-left:4px solid var(--color-foliage-mid);border-radius:var(--radius-md);padding:1rem 1.25rem;box-shadow:var(--shadow-md);margin:0.75rem 0;display:flex;align-items:flex-start;gap:0.75rem}
+.toast-icon{flex-shrink:0;color:var(--color-foliage-mid)}
+.toast-text{flex:1}
+.toast-title{font-family:var(--font-body);font-size:1rem;font-weight:500;color:var(--color-text-primary);margin-bottom:0.15rem}
+.toast-body{font-family:var(--font-body);font-size:0.875rem;color:var(--color-text-secondary)}
+.toast-warn{border-left-color:var(--color-accent-orange)}
+.toast-info{border-left-color:var(--color-foliage-mid)}
+.toast-success{border-left-color:var(--color-success)}
+.toast-warn .toast-icon{color:var(--color-accent-orange)}
+.toast-success .toast-icon{color:var(--color-success)}
+
+/* ── Symbol grid ── */
+.symbol-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:0.75rem;margin:1rem 0}
+.symbol-cell{background:var(--color-bg-surface);border:1px solid var(--color-border-light);border-radius:var(--radius-md);padding:1rem 0.75rem;text-align:center;display:flex;flex-direction:column;align-items:center;gap:0.4rem}
+.symbol-icon{color:var(--color-foliage-shadow)}
+.symbol-name{font-family:monospace;font-size:0.65rem;color:var(--color-text-muted)}
+.symbol-use{font-family:var(--font-body);font-size:0.7rem;color:var(--color-text-secondary)}
+
+/* ── Plant demo ── */
+.plant-demo{background:var(--color-bg-surface);border:1px solid var(--color-border-mid);border-radius:var(--radius-xl);padding:2rem;margin:1rem 0}
+.plant-canvas{display:flex;align-items:center;justify-content:center;gap:2rem;flex-wrap:wrap;margin-bottom:2rem}
+.plant-svg-wrap{text-align:center}
+.plant-svg-wrap figcaption{font-family:var(--font-label);font-size:1.2rem;color:var(--color-text-label);margin-top:0.5rem}
+.plant-state-row{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;text-align:center}
+.plant-state-item{display:flex;flex-direction:column;align-items:center;gap:0.4rem;padding:1rem;background:var(--color-bg-primary);border-radius:var(--radius-md)}
+.plant-state-label{font-family:var(--font-body);font-size:0.8rem;color:var(--color-text-muted);text-transform:uppercase;letter-spacing:0.08em;font-weight:500}
+
+/* ── Dialogue (notification style now) ── */
+.notif-panel{background:var(--color-bg-surface);border:1px solid var(--color-border-mid);border-radius:var(--radius-xl);padding:1.5rem;margin:1rem 0}
+.notif-title{font-family:var(--font-display);font-size:1.35rem;font-weight:500;font-style:italic;color:var(--color-text-primary);margin-bottom:1rem;line-height:var(--leading-normal);border-left:3px solid var(--color-foliage-mid);padding-left:1rem}
+.chip-answers{display:flex;flex-direction:column;gap:0.65rem}
+
+/* ── Streak bar ── */
+.streak-bar{background:var(--color-bg-inset);border-radius:var(--radius-pill);overflow:hidden;height:12px;margin:0.5rem 0;border:1px solid var(--color-border-light)}
+.streak-fill{height:100%;border-radius:var(--radius-pill);background:linear-gradient(90deg,var(--color-foliage-mid),var(--color-foliage-shadow));transition:width var(--duration-normal) var(--ease-gentle)}
+
+/* ── Floor table ── */
+.floor-table{width:100%;border-collapse:collapse;font-family:var(--font-body);font-size:0.9rem;margin:1rem 0}
+.floor-table th{text-align:left;padding:0.6rem 1rem;background:var(--color-bg-inset);color:var(--color-text-secondary);font-weight:500;font-size:0.75rem;letter-spacing:0.08em;text-transform:uppercase;border-bottom:1px solid var(--color-border-mid)}
+.floor-table td{padding:0.75rem 1rem;border-bottom:1px solid var(--color-border-light);color:var(--color-text-primary);vertical-align:top}
+.floor-table td:first-child{font-weight:500}
+.floor-table td:last-child{color:var(--color-success);font-weight:500}
+.floor-table tr:last-child td{border-bottom:none}
+.floor-table tr:hover td{background:rgba(238,233,217,0.6)}
+
+/* ── Nav ── */
+.doc-nav{position:sticky;top:0;z-index:10;background:rgba(238,233,217,0.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--color-border-light);padding:0.75rem 2rem;display:flex;flex-wrap:wrap;gap:0.5rem 1.5rem}
+.doc-nav a{font-family:var(--font-body);font-size:0.75rem;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;text-decoration:none;color:var(--color-text-muted)}
+.doc-nav a:hover{color:var(--color-foliage-shadow)}
+
+[id]{scroll-margin-top:4rem}
+
+/* ── Coin / economy ── */
+.economy-row{display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;margin:1rem 0}
+.coin{display:inline-flex;align-items:center;gap:0.35rem;background:rgba(224,122,95,0.15);color:#7A2F10;border:1.5px solid var(--color-accent-coral);border-radius:var(--radius-pill);padding:0.4rem 1rem;font-family:var(--font-body);font-size:1rem;font-weight:500}
+.coin .icon{color:#7A2F10}
+</style>
+</head>
+<body>
+
+<nav class="doc-nav" aria-label="Design system sections">
+  <a href="#colours">Colours</a>
+  <a href="#typography">Typography</a>
+  <a href="#symbols">Symbols</a>
+  <a href="#components">Components</a>
+  <a href="#plant-art">Plant art</a>
+  <a href="#notifications">Notifications</a>
+  <a href="#kakis">Kakis</a>
+  <a href="#ux-floor">UX floor</a>
+</nav>
+
+<main class="page">
+
+  <!-- ── Header ── -->
+  <div class="doc-kicker">Garden of Life · Design System · v1.1 · Aug 2026</div>
+  <h1 class="doc-title">Muted <em>Botanical</em> Design System</h1>
+  <p class="doc-subtitle">A quiet, editorial visual language drawn from 18th–19th century botanical illustration and pixel-measured muted herbarium photography. All icons are custom SVG — no emoji. Every decision is senior-safe: large text, large tap targets, warm neutrals, no shame.</p>
+
+  <hr class="rule">
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- SECTION 1 — COLOURS                                    -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <section class="section" id="colours">
+    <h2 class="section-head">Colour <em>system</em></h2>
+    <p class="note">All colours measured from real botanical source imagery (k-means pixel clustering). Maximum saturation ~45%. Shadows always warm taupe or deep olive — never cool grey or pure black.</p>
+
+    <div class="subsection-head">Backgrounds — warm cream / parchment family</div>
+    <div class="palette-grid">
+      <div class="swatch"><div class="swatch-color" style="background:#EEE9D9"></div><div class="swatch-info"><div class="swatch-name">bg-primary</div><div class="swatch-hex">#EEE9D9</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#F5EFEB"></div><div class="swatch-info"><div class="swatch-name">bg-surface</div><div class="swatch-hex">#F5EFEB</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#EAE2D0"></div><div class="swatch-info"><div class="swatch-name">bg-deep</div><div class="swatch-hex">#EAE2D0</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#E3DBCA"></div><div class="swatch-info"><div class="swatch-name">bg-inset</div><div class="swatch-hex">#E3DBCA</div></div></div>
+    </div>
+
+    <div class="subsection-head">Foliage — olive to sage, no blue or yellow greens</div>
+    <div class="palette-grid">
+      <div class="swatch"><div class="swatch-color" style="background:#B1B8A1"></div><div class="swatch-info"><div class="swatch-name">foliage-highlight</div><div class="swatch-hex">#B1B8A1</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#859B6A"></div><div class="swatch-info"><div class="swatch-name">foliage-muted</div><div class="swatch-hex">#859B6A</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#73875D"></div><div class="swatch-info"><div class="swatch-name">foliage-mid ★</div><div class="swatch-hex">#73875D</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#44573D"></div><div class="swatch-info"><div class="swatch-name">foliage-shadow</div><div class="swatch-hex">#44573D</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#31482E"></div><div class="swatch-info"><div class="swatch-name">foliage-deep</div><div class="swatch-hex">#31482E</div></div></div>
+    </div>
+
+    <div class="subsection-head">Earth / stem / warm shadow</div>
+    <div class="palette-grid">
+      <div class="swatch"><div class="swatch-color" style="background:#958579"></div><div class="swatch-info"><div class="swatch-name">earth</div><div class="swatch-hex">#958579</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#7A6B5C"></div><div class="swatch-info"><div class="swatch-name">earth-deep</div><div class="swatch-hex">#7A6B5C</div></div></div>
+    </div>
+
+    <div class="subsection-head">Accent blooms — concentrated, not spread thin (1-in-3 rule)</div>
+    <p class="note" style="margin-bottom:0.75rem">Per the pixel data: roughly 1-in-3 assets uses a saturated warm bloom as the main subject. The rest stay in the green/neutral family. Never spread warm accents evenly as a thin wash.</p>
+    <div class="palette-grid">
+      <div class="swatch"><div class="swatch-color" style="background:#AE382B"></div><div class="swatch-info"><div class="swatch-name">accent-red</div><div class="swatch-hex">#AE382B</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#C82A36"></div><div class="swatch-info"><div class="swatch-name">accent-crimson</div><div class="swatch-hex">#C82A36</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#E07A5F"></div><div class="swatch-info"><div class="swatch-name">accent-coral</div><div class="swatch-hex">#E07A5F</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#E78F37"></div><div class="swatch-info"><div class="swatch-name">accent-orange</div><div class="swatch-hex">#E78F37</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#7B5371"></div><div class="swatch-info"><div class="swatch-name">accent-plum</div><div class="swatch-hex">#7B5371</div></div></div>
+    </div>
+
+    <div class="subsection-head">Kopitiam Corner, Mahjong Kakis</div>
+    <p class="note">The fifth island. Derived entirely from the palette above, with one exception: <strong>kaki-skin</strong>. There is no skin tone in a botanical palette and a foliage green would not do, so it is a new warm value in the same family as earth. The portrait colours are aria-hidden decoration and are never used as text.</p>
+    <div class="palette-grid">
+      <div class="swatch"><div class="swatch-color" style="background:#7A4800"></div><div class="swatch-info"><div class="swatch-name">kopi-accent ★</div><div class="swatch-hex">#7A4800</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#EAE2D0"></div><div class="swatch-info"><div class="swatch-name">kopi-tint</div><div class="swatch-hex">#EAE2D0</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#7B5371"></div><div class="swatch-info"><div class="swatch-name">kaki-dots</div><div class="swatch-hex">#7B5371</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#44573D"></div><div class="swatch-info"><div class="swatch-name">kaki-bamboo</div><div class="swatch-hex">#44573D</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#AE382B"></div><div class="swatch-info"><div class="swatch-name">kaki-wind</div><div class="swatch-hex">#AE382B</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#E0BC94"></div><div class="swatch-info"><div class="swatch-name">kaki-skin ✚</div><div class="swatch-hex">#E0BC94</div></div></div>
+    </div>
+    <table class="floor-table">
+      <thead><tr><th>Pair</th><th>Measured</th><th>Verdict</th></tr></thead>
+      <tbody>
+        <tr><td>kopi-accent on bg-surface</td><td>6.66:1</td><td>AA all text, AAA large</td></tr>
+        <tr><td>kopi-accent on kopi-tint</td><td>5.91:1</td><td>AA all text, AAA large</td></tr>
+        <tr><td>kaki-dots on tile face</td><td>5.53:1</td><td>Non-text, floor is 3:1</td></tr>
+        <tr><td>kaki-bamboo on tile face</td><td>6.85:1</td><td>Non-text, floor is 3:1</td></tr>
+        <tr><td>kaki-wind on tile face</td><td>5.39:1</td><td>Non-text, floor is 3:1</td></tr>
+      </tbody>
+    </table>
+
+    <div class="subsection-head">Semantic game states</div>
+    <div class="badge-row" style="margin-top:1rem">
+      <span class="badge badge-healthy">Healthy</span>
+      <span class="badge badge-wilt">Needs water</span>
+      <span class="badge badge-thirsty">Thirsty</span>
+      <span class="badge badge-rare">Rare seed</span>
+      <span class="badge badge-coin">+6 coins</span>
+      <span class="badge badge-streak">3-day streak</span>
+    </div>
+
+    <div class="subsection-head">Text colours</div>
+    <div class="palette-grid">
+      <div class="swatch"><div class="swatch-color" style="background:#2B2118"></div><div class="swatch-info"><div class="swatch-name">text-primary</div><div class="swatch-hex">#2B2118</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#5A4A3C"></div><div class="swatch-info"><div class="swatch-name">text-secondary</div><div class="swatch-hex">#5A4A3C</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#958579"></div><div class="swatch-info"><div class="swatch-name">text-muted</div><div class="swatch-hex">#958579</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#44573D"></div><div class="swatch-info"><div class="swatch-name">text-label</div><div class="swatch-hex">#44573D</div></div></div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- SECTION 2 — TYPOGRAPHY                                 -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <section class="section" id="typography">
+    <h2 class="section-head"><em>Typography</em> system</h2>
+    <p class="note">Two-font system: Fraunces (display/headings — soft irregular serif, organic editorial feel) + Work Sans (UI body — humanist warm sans). Pinyon Script is used only for botanical plant name labels. Avoid geometric sans (Poppins, Montserrat) and all hand-drawn/cartoonish faces.</p>
+
+    <div class="subsection-head">Display — Fraunces · Cormorant Garamond alt</div>
+    <div class="type-specimen">
+      <div class="type-row">
+        <div class="type-meta">4xl · 72px<br>Fraunces 500</div>
+        <div class="type-sample" style="font-family:'Fraunces',Georgia,serif;font-size:4.5rem;font-weight:500;line-height:1.1">Garden of Life</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">3xl · 56px<br>Fraunces 500</div>
+        <div class="type-sample" style="font-family:'Fraunces',Georgia,serif;font-size:3.5rem;font-weight:500;line-height:1.1">Welcome back</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">2xl · 44px<br>Fraunces 500</div>
+        <div class="type-sample" style="font-family:'Fraunces',Georgia,serif;font-size:2.75rem;font-weight:500">Your garden</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">xl · 36px<br>Fraunces italic</div>
+        <div class="type-sample" style="font-family:'Fraunces',Georgia,serif;font-size:2.25rem;font-style:italic;color:#44573D">Hibiscus rosa-sinensis</div>
+      </div>
+    </div>
+
+    <div class="subsection-head">Body + UI — Work Sans (senior floor: min 28px)</div>
+    <div class="type-specimen">
+      <div class="type-row">
+        <div class="type-meta">base · 28px<br>Work Sans 400<br>SENIOR MIN</div>
+        <div class="type-sample" style="font-size:1.75rem;line-height:1.75">Your plant grew overnight. Water it today to keep it healthy.</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">lg · 32px<br>Work Sans 500<br>Chip text</div>
+        <div class="type-sample" style="font-size:2rem;font-weight:500">Plant a new seed</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">sm · 22px<br>Work Sans 500<br>LABEL MIN</div>
+        <div class="type-sample" style="font-size:1.375rem;font-weight:500;color:#5A4A3C;letter-spacing:0.06em;text-transform:uppercase">Day 3 streak</div>
+      </div>
+    </div>
+
+    <div class="subsection-head">Field-note labels — Pinyon Script (plant names only)</div>
+    <div class="type-specimen">
+      <div class="type-row">
+        <div class="type-meta">Pinyon Script<br>24–32px<br>Plant labels</div>
+        <div class="type-sample" style="font-family:'Pinyon Script',cursive;font-size:2.2rem;color:#44573D">Sampaguita · Memory Fern · Pandan Herb</div>
+      </div>
+    </div>
+
+    <div class="subsection-head">Do not use</div>
+    <p class="note">&#x2715; Poppins &nbsp;&#x2715; Montserrat &nbsp;&#x2715; Any hand-lettered/doodle face &nbsp;&#x2715; Any text below 22px in UI &nbsp;&#x2715; Bold 700+ weight in display type</p>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- SECTION 3 — SVG SYMBOLS & ICONS                       -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <section class="section" id="symbols">
+    <h2 class="section-head">SVG <em>symbols &amp; icons</em></h2>
+    <p class="note">All icons rendered as inline SVG, warm-toned, never filled with pure black. Stroke weight 1.5–2px, colour follows the foliage palette. Icon minimum touch target 64×64px even if the glyph is smaller. All icons are self-contained SVG — no emoji anywhere in the game UI.</p>
+
+    <!-- SVG DEFS — all game icons defined once here -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+      <defs>
+        <!-- Seed -->
+        <symbol id="icon-seed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2c-1.5 0-3 1-3 3 0 3 3 5 3 5s3-2 3-5c0-2-1.5-3-3-3z"/>
+          <path d="M12 10v2"/>
+          <path d="M9 15c-2 0-4 2-4 4h14c0-2-2-4-4-4H9z"/>
+          <path d="M12 15v2"/>
+        </symbol>
+        <!-- Sprout -->
+        <symbol id="icon-sprout" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22V14"/>
+          <path d="M12 14c0-3-2-5-5-5 0 3 2 5 5 5z"/>
+          <path d="M12 14c0-3 2-5 5-5 0 3-2 5-5 5z"/>
+          <path d="M12 14c0-4-1-6-3-8"/>
+          <path d="M12 14c0-4 1-6 3-8"/>
+          <path d="M12 14V6"/>
+        </symbol>
+        <!-- Bloom -->
+        <symbol id="icon-bloom" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="10" r="3"/>
+          <path d="M12 7c0-2 1-4 2-5 1 1 1 3-2 5z"/>
+          <path d="M12 7c0-2-1-4-2-5-1 1-1 3 2 5z"/>
+          <path d="M12 13c0 2 1 4 2 5 1-1 1-3-2-5z"/>
+          <path d="M12 13c0 2-1 4-2 5-1-1-1-3 2-5z"/>
+          <path d="M9 10c-2 0-4 1-5 2 1 1 3 1 5-2z"/>
+          <path d="M15 10c2 0 4 1 5 2-1 1-3 1-5-2z"/>
+          <path d="M12 13v4"/>
+          <path d="M9 19c0 2 1.5 3 3 3s3-1 3-3"/>
+        </symbol>
+        <!-- Wilt / leaf drop -->
+        <symbol id="icon-wilt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22V14"/>
+          <path d="M12 14c0-2-1-3-3-3 0 2 1 3 3 3z"/>
+          <path d="M12 14c0-2 1-3 3-3 0 2-1 3-3 3z"/>
+          <path d="M12 14V9"/>
+          <path d="M8 20h8"/>
+          <path d="M10 6c0-1 1-2 2-2s2 1 2 2"/>
+        </symbol>
+        <!-- Water droplet -->
+        <symbol id="icon-water" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 3c-2 3-5 6-5 9 0 3 2 5 5 5s5-2 5-5c0-3-3-6-5-9z"/>
+          <path d="M9 14c0 2 1 3 3 3"/>
+        </symbol>
+        <!-- Sun -->
+        <symbol id="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="4"/>
+          <path d="M12 2v2"/>
+          <path d="M12 20v2"/>
+          <path d="M4.22 4.22l1.42 1.42"/>
+          <path d="M18.36 18.36l1.42 1.42"/>
+          <path d="M2 12h2"/>
+          <path d="M20 12h2"/>
+          <path d="M4.22 19.78l1.42-1.42"/>
+          <path d="M18.36 5.64l1.42-1.42"/>
+        </symbol>
+        <!-- Camera -->
+        <symbol id="icon-camera" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+          <circle cx="12" cy="13" r="4"/>
+        </symbol>
+        <!-- Pot / planter -->
+        <symbol id="icon-pot" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 10h14"/>
+          <path d="M6 10l1.5 9c.3 1.5 1.5 2 3 2h3c1.5 0 2.7-.5 3-2l1.5-9"/>
+          <path d="M8 10V8c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+          <path d="M10 6V5"/>
+          <path d="M14 6V5"/>
+        </symbol>
+        <!-- Coin -->
+        <symbol id="icon-coin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="9"/>
+          <path d="M12 7v10"/>
+          <path d="M9 9.5c0-1 1.5-2 3-2s3 1 3 2-1 2-3 2-3 1-3 2 1.5 2 3 2 3-1 3-2"/>
+        </symbol>
+        <!-- Shop -->
+        <symbol id="icon-shop" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+          <path d="M9 22V12h6v10"/>
+          <path d="M3 9h18"/>
+        </symbol>
+        <!-- Star / rare -->
+        <symbol id="icon-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/>
+        </symbol>
+        <!-- Streak flame -->
+        <symbol id="icon-streak" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2c0 3-2 4-2 6 0 1 .5 2 1.5 2.5C10 11 9 12 9 14c0 3 2 5 5 5s4-2 4-4c0-2-1-3-1.5-3.5.5.5 1 1 1 2 0 1-1 2-2 2s-2-1-2-2c0-2 2-3 2-5s-1.5-4.5-3.5-6z"/>
+          <path d="M12 22v-2"/>
+        </symbol>
+        <!-- Meal / bowl -->
+        <symbol id="icon-meal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 12h20c0 5-4 9-10 9S2 17 2 12z"/>
+          <path d="M8 8c1-1 2-2 2-4"/>
+          <path d="M12 8c1-1 2-2 2-4"/>
+          <path d="M16 8c1-1 2-2 2-4"/>
+          <path d="M4 12c0-4 3-7 8-7s8 3 8 7"/>
+        </symbol>
+        <!-- Gift / reward -->
+        <symbol id="icon-kopi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M6 9h12l-1.4 7.8c-.25 1.3-1.3 2.2-2.6 2.2h-3.9c-1.3 0-2.35-.9-2.6-2.2z"/>
+          <path d="M5 9h14"/>
+          <path d="M4 21h16"/>
+          <path d="M9.5 6c0-1.1 1-1.6 1-2.7"/>
+          <path d="M13.5 6c0-1.1 1-1.6 1-2.7"/>
+        </symbol>
+        <symbol id="icon-gift" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="8" width="18" height="4" rx="1"/>
+          <path d="M12 8v13"/>
+          <path d="M5 12v9h14v-9"/>
+          <path d="M8 8c-1.5 0-3-1.5-3-3s1.5-3 3-3c2 0 3 2 4 6-1-1-2-2-4-2z"/>
+          <path d="M16 8c1.5 0 3-1.5 3-3s-1.5-3-3-3c-2 0-3 2-4 6 1-1 2-2 4-2z"/>
+        </symbol>
+        <!-- Book / guide -->
+        <symbol id="icon-book" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+          <path d="M9 7h6"/>
+          <path d="M9 11h4"/>
+        </symbol>
+        <!-- Brain / cognitive -->
+        <symbol id="icon-brain" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9.5 2a3 3 0 0 1 3 3v1a3 3 0 0 1 3-3 3 3 0 0 1 3 3c0 1-.5 2-1 2.5.5.5 1 1.5 1 2.5 0 2-1.5 3.5-3.5 3.5H14"/>
+          <path d="M9.5 2a3 3 0 0 0-3 3v1a3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 1 .5 2 1 2.5C4 9 3 10.5 3 11.5c0 2 1.5 3.5 3.5 3.5H8"/>
+          <path d="M12 6v12"/>
+          <path d="M9 12h6"/>
+          <path d="M8 16h8"/>
+        </symbol>
+        <!-- Garden / home -->
+        <symbol id="icon-garden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 12l9-9 9 9"/>
+          <path d="M5 12v9h14v-9"/>
+          <path d="M12 16c0-2 1-3 2-4 1 1 1 2 0 4"/>
+          <path d="M12 16c0-2-1-3-2-4-1 1-1 2 0 4"/>
+          <path d="M12 16v4"/>
+        </symbol>
+        <!-- Share -->
+        <symbol id="icon-share" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="18" cy="5" r="3"/>
+          <circle cx="6" cy="12" r="3"/>
+          <circle cx="18" cy="19" r="3"/>
+          <path d="M8.59 10.49l6.83-3.97"/>
+          <path d="M8.59 13.51l6.83 3.97"/>
+        </symbol>
+        <!-- Puzzle -->
+        <symbol id="icon-puzzle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 7h4a1 1 0 0 0 1-1V5a2 2 0 0 1 4 0v1a1 1 0 0 0 1 1h4a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1h-4a2 2 0 0 0 0 4h4a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h4a2 2 0 0 0 0-4H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1z"/>
+        </symbol>
+        <!-- Mute / sound off -->
+        <symbol id="icon-mute" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+          <path d="M22 9l-6 6"/>
+          <path d="M16 9l6 6"/>
+        </symbol>
+        <!-- Sound on -->
+        <symbol id="icon-sound" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+          <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+        </symbol>
+        <!-- Home -->
+        <symbol id="icon-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+          <path d="M9 22V12h6v10"/>
+        </symbol>
+        <!-- Profile -->
+        <symbol id="icon-profile" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+          <circle cx="12" cy="7" r="4"/>
+        </symbol>
+        <!-- Checkmark -->
+        <symbol id="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 6L9 17l-5-5"/>
+        </symbol>
+        <!-- X / close -->
+        <symbol id="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 6L6 18"/>
+          <path d="M6 6l12 12"/>
+        </symbol>
+        <!-- Arrow right -->
+        <symbol id="icon-arrow-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 12h14"/>
+          <path d="M12 5l7 7-7 7"/>
+        </symbol>
+        <!-- Arrow left -->
+        <symbol id="icon-arrow-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 12H5"/>
+          <path d="M12 19l-7-7 7-7"/>
+        </symbol>
+        <!-- Memory / lightbulb (cognitive) -->
+        <symbol id="icon-memory" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="9" r="6"/>
+          <path d="M9 18h6"/>
+          <path d="M10 21h4"/>
+          <path d="M12 5c0-1.5-1-2.5-2.5-2.5"/>
+        </symbol>
+        <!-- Tiles / grid (for tile-match puzzle) -->
+        <symbol id="icon-tiles" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="7" rx="1"/>
+          <rect x="14" y="3" width="7" height="7" rx="1"/>
+          <rect x="3" y="14" width="7" height="7" rx="1"/>
+          <rect x="14" y="14" width="7" height="7" rx="1"/>
+        </symbol>
+        <!-- Bell / notification -->
+        <symbol id="icon-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+        </symbol>
+        <!-- Clock / time -->
+        <symbol id="icon-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="9"/>
+          <path d="M12 7v5l3 3"/>
+        </symbol>
+        <!-- Leaf / generic plant -->
+        <symbol id="icon-leaf" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/>
+          <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+        </symbol>
+        <!-- Flower / decorative -->
+        <symbol id="icon-flower" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="2"/>
+          <path d="M12 10c0-2-1-3-2-4-1 1-1 2 0 4"/>
+          <path d="M12 10c0-2 1-3 2-4 1 1 1 2 0 4"/>
+          <path d="M12 14c0 2-1 3-2 4-1-1-1-2 0-4"/>
+          <path d="M12 14c0 2 1 3 2 4 1-1 1-2 0-4"/>
+          <path d="M10 12c-2 0-3-1-4-2 1-1 2-1 4 0"/>
+          <path d="M14 12c2 0 3-1 4-2-1-1-2-1-4 0"/>
+          <path d="M12 14v8"/>
+          <path d="M9 19c0 2 1 3 3 3s3-1 3-3"/>
+        </symbol>
+      </defs>
+    </svg>
+
+    <div class="subsection-head">Core gameplay icons</div>
+    <div class="symbol-grid">
+      <div class="symbol-cell"><div class="symbol-icon"><svg class="icon icon-xl"><use href="#icon-seed"/></svg></div><div class="symbol-name">icon-seed</div><div class="symbol-use">Seed shop, daily free seed</div></div>
+      <div class="symbol-cell"><div class="symbol-icon"><svg class="icon icon-xl"><use href="#icon-sprout"/></svg></div><div class="symbol-name">icon-sprout</div><div class="symbol-use">Plant planted / growing</div></div>
+      <div class="symbol-cell"><div class="symbol-icon"><svg class="icon icon-xl"><use href="#icon-bloom"/></svg></div><div class="symbol-name">icon-bloom</div><div class="symbol-use">Plant fully grown</div></div>
+      <div class="symbol-cell"><div class="symbol-icon"><svg class="icon icon-xl"><use href="#icon-wilt"/></svg></div><div class="symbol-name">icon-wilt</div><div class="symbol-use">Plant needs water</div></div>
+      <div class="symbol-cell"><div class="symbol-icon"><svg class="icon icon-xl"><use href="#icon-water"/></svg></div><div class="symbol-name">icon-water</div><div class="symbol-use">Water action</div></div>
+      <div class="symbol-cell"><div class="symbol-icon"><svg class="icon icon-xl"><use href="#icon-sun"/></svg></div><div class="symbol-name">icon-sun</div><div class="symbol-use">Daily return / streak day</div></div>
+      <div class="symbol-cell"><div class="symbol-icon"><svg class="icon icon-xl"><use href="#icon-camera"/></svg></div><div class="symbol-name">icon-camera</div><div class="symbol-use">Photo quest trigger</div></div>
+      <div class="symbol-cell"><div class="symbol-icon"><svg class="icon icon-xl"><use href="#icon-pot"/></svg></div><div class="symbol-name">icon-pot</div><div class="symbol-use">Empty plot / ready</div></div>
+    </div>
+
+    <div class="subsection-head">Economy &amp; reward icons</div>
+    <div class="symbol-grid">
+      <div class="symbol-cell"><div class="symbol-icon"><svg class="icon icon-xl"><use href="#icon-coin"/></svg></div><div class="symbol-name">icon-coin</div><div class="symbol-use">In-game currency</div></div>
+      <div class="symbol-cell"><div class="symbol-icon"><svg class="icon icon-xl"><use href="#icon-shop"/></svg></div><div class="symbol-name">icon-shop</div><div class="symbol-use">Seed shop / store</div></div>
+      <div class="symbol-cell"><div class="symbol-icon"><svg class="icon icon-xl"><use href="#icon-star"/></svg></div><div class="symbol-name">icon-star</div><div class="symbol-use">Rare seed tier</div></div>
+      <div class="symbol-cell"><div class="symbol-icon"><svg class="icon icon-xl"><use href="#icon-streak"/></svg></div><div class="symbol-name">icon-streak</div><div class="symbol-use">Streak counter badge</div></div>
+      <div class="symbol-cell"><div class="symbol-icon"><svg class="icon icon-xl"><use href="#icon-meal"/></svg></div><div class="symbol-name">icon-meal</div><div class="symbol-use">Meal card unlocked</div></div>
+      <div class="symbol-cell"><div class="symbol-icon"><svg class="icon icon-xl"><use href="#icon-kopi"/></svg></div><div class="symbol-name">icon-kopi</div><div class="symbol-use">Kopitiam Corner island, coffee shrub seed</div></div>
+      <div class="symbol-cell"><div class="symbol-icon"><svg class="icon icon-xl"><use href="#icon-gift"/></svg></div><div class="symbol-name">icon-gift</div><div class="symbol-use">Streak milestone</div></div>
+    </div>
+
+    <div class="subsection-head">Cognitive exercise icons</div>
+    <div class="symbol-grid">
+      <div class="symbol-cell"><div class="symbol-icon"><svg class="icon icon-xl"><use href="#icon-brain"/></svg></div><div class="symbol-name">icon-brain</div><div class="symbol-use">Cognitive exercise hub</div></div>
+      <div class="symbol-cell"><div class="symbol-icon"><svg class="icon icon-xl"><use href="#icon-memory"/></svg></div><div class="symbol-name">icon-memory</div><div class="symbol-use">Memory exercise</div></div>
+      <div class="symbol-cell"><div class="symbol-icon"><svg class="icon icon-xl"><use href="#icon-tiles"/></svg></div><div class="symbol-name">icon-tiles</div><div class="symbol-use">Tile matching puzzle</div></div>
+      <div class="symbol-cell"><div class="symbol-icon"><svg class="icon icon-xl"><use href="#icon-puzzle"/></svg></div><div class="symbol-name">icon-puzzle</div><div class="symbol-use">Logic puzzle</div></div>
+      <div class="symbol-cell"><div class="symbol-icon"><svg class="icon icon-xl"><use href="#icon-book"/></svg></div><div class="symbol-name">icon-book</div><div class="symbol-use">Word / language</div></div>
+      <div class="symbol-cell"><div class="symbol-icon"><svg class="icon icon-xl"><use href="#icon-clock"/></svg></div><div class="symbol-name">icon-clock</div><div class="symbol-use">Pattern / sequence</div></div>
+    </div>
+
+    <div class="subsection-head">Navigation &amp; UI icons</div>
+    <div class="symbol-grid">
+      <div class="symbol-cell"><div class="symbol-icon"><svg class="icon icon-xl"><use href="#icon-garden"/></svg></div><div class="symbol-name">icon-garden</div><div class="symbol-use">Garden / home screen</div></div>
+      <div class="symbol-cell"><div class="symbol-icon"><svg class="icon icon-xl"><use href="#icon-share"/></svg></div><div class="symbol-name">icon-share</div><div class="symbol-use">Share garden card</div></div>
+      <div class="symbol-cell"><div class="symbol-icon"><svg class="icon icon-xl"><use href="#icon-mute"/></svg></div><div class="symbol-name">icon-mute</div><div class="symbol-use">Mute (always visible)</div></div>
+      <div class="symbol-cell"><div class="symbol-icon"><svg class="icon icon-xl"><use href="#icon-sound"/></svg></div><div class="symbol-name">icon-sound</div><div class="symbol-use">Sound on toggle</div></div>
+      <div class="symbol-cell"><div class="symbol-icon"><svg class="icon icon-xl"><use href="#icon-home"/></svg></div><div class="symbol-name">icon-home</div><div class="symbol-use">Bottom nav — garden</div></div>
+      <div class="symbol-cell"><div class="symbol-icon"><svg class="icon icon-xl"><use href="#icon-profile"/></svg></div><div class="symbol-name">icon-profile</div><div class="symbol-use">Bottom nav — player</div></div>
+      <div class="symbol-cell"><div class="symbol-icon"><svg class="icon icon-xl"><use href="#icon-bell"/></svg></div><div class="symbol-name">icon-bell</div><div class="symbol-use">Notifications</div></div>
+      <div class="symbol-cell"><div class="symbol-icon"><svg class="icon icon-xl"><use href="#icon-arrow-right"/></svg></div><div class="symbol-name">icon-arrow-right</div><div class="symbol-use">Navigate forward</div></div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- SECTION 4 — COMPONENTS                                 -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <section class="section" id="components">
+    <h2 class="section-head">UI <em>components</em></h2>
+
+    <div class="subsection-head">Tap-chip answer buttons (primary interaction — senior-safe)</div>
+    <p class="note" style="margin-bottom:1rem">These are the ONLY input type for most screens. Min height 72px, full-width, large text, no typing required.</p>
+    <div class="notif-panel" style="max-width:400px">
+      <div class="notif-title">Which of these do you remember most fondly?</div>
+      <div class="chip-answers">
+        <button class="chip chip-answer">
+          <svg class="icon"><use href="#icon-seed"/></svg>
+          The family garden at home
+        </button>
+        <button class="chip chip-answer">
+          <svg class="icon"><use href="#icon-camera"/></svg>
+          Sunday morning markets
+        </button>
+        <button class="chip chip-answer">
+          <svg class="icon"><use href="#icon-book"/></svg>
+          Cooking with grandmother
+        </button>
+      </div>
+    </div>
+
+    <div class="subsection-head">Buttons</div>
+    <div class="btn-row">
+      <button class="btn btn-lg btn-primary">
+        <svg class="icon"><use href="#icon-water"/></svg>
+        Water my plant
+      </button>
+      <button class="btn btn-lg btn-secondary">Visit shop</button>
+      <button class="btn btn-lg btn-ghost">Skip for now</button>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-primary">
+        <svg class="icon icon-sm"><use href="#icon-check"/></svg>
+        Confirm
+      </button>
+      <button class="btn btn-secondary">View garden</button>
+      <button class="btn btn-danger">
+        <svg class="icon icon-sm"><use href="#icon-close"/></svg>
+        Cancel
+      </button>
+    </div>
+
+    <div class="subsection-head">Chips — tag-style</div>
+    <div class="chip-row">
+      <button class="chip chip-primary">
+        <svg class="icon icon-sm"><use href="#icon-seed"/></svg>
+        Plant seed
+      </button>
+      <button class="chip chip-selected">
+        <svg class="icon icon-sm"><use href="#icon-sprout"/></svg>
+        Pandan herb
+      </button>
+      <button class="chip chip-secondary">Day 1</button>
+      <button class="chip chip-secondary">
+        <svg class="icon icon-sm"><use href="#icon-streak"/></svg>
+        Day 3
+      </button>
+    </div>
+
+    <div class="subsection-head">Plant / seed cards</div>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-thumb" style="background:#EAE2D0">
+          <svg width="60" height="80" viewBox="0 0 80 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="40" cy="90" rx="28" ry="7" fill="#958579" opacity="0.4"/>
+            <line x1="40" y1="90" x2="40" y2="45" stroke="#44573D" stroke-width="2.5" stroke-linecap="round"/>
+            <ellipse cx="24" cy="68" rx="14" ry="9" fill="#73875D" transform="rotate(-20 24 68)"/>
+            <ellipse cx="56" cy="65" rx="14" ry="9" fill="#44573D" transform="rotate(18 56 65)"/>
+            <circle cx="40" cy="38" r="12" fill="#E07A5F" opacity="0.9"/>
+            <circle cx="40" cy="38" r="6" fill="#C82A36" opacity="0.85"/>
+            <circle cx="40" cy="38" r="2.5" fill="#EAE2D0"/>
+          </svg>
+        </div>
+        <div class="card-body">
+          <div class="card-label">Sampaguita</div>
+          <div class="card-title">Memory plant</div>
+          <div class="card-meta">From: cognitive exercise</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-thumb" style="background:#EEE9D9">
+          <svg width="60" height="80" viewBox="0 0 80 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="40" cy="90" rx="28" ry="7" fill="#958579" opacity="0.4"/>
+            <line x1="40" y1="90" x2="40" y2="60" stroke="#73875D" stroke-width="2" stroke-linecap="round"/>
+            <ellipse cx="28" cy="62" rx="12" ry="8" fill="#B1B8A1" transform="rotate(-30 28 62)"/>
+            <ellipse cx="52" cy="58" rx="12" ry="8" fill="#73875D" transform="rotate(30 52 58)"/>
+          </svg>
+        </div>
+        <div class="card-body">
+          <div class="card-label">Pandan herb</div>
+          <div class="card-title">Common seed</div>
+          <div class="card-meta">12 coins · shop</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-thumb" style="background:#F5EFEB">
+          <svg width="60" height="80" viewBox="0 0 80 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="40" cy="92" rx="28" ry="7" fill="#958579" opacity="0.4"/>
+            <line x1="40" y1="90" x2="40" y2="48" stroke="#73875D" stroke-width="2.5" stroke-linecap="round"/>
+            <ellipse cx="24" cy="68" rx="13" ry="9" fill="#73875D" transform="rotate(-20 24 68)"/>
+            <ellipse cx="56" cy="65" rx="13" ry="9" fill="#44573D" transform="rotate(18 56 65)"/>
+            <circle cx="40" cy="41" r="10" fill="#7B5371" opacity="0.85"/>
+            <circle cx="40" cy="41" r="4.5" fill="#EAE2D0"/>
+          </svg>
+        </div>
+        <div class="card-body">
+          <div class="card-label">Hibiscus</div>
+          <div class="card-title">Rare seed</div>
+          <div class="card-meta">Streak day 3 unlock</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="subsection-head">State badges</div>
+    <div class="badge-row">
+      <span class="badge badge-healthy">
+        <svg class="icon icon-sm"><use href="#icon-bloom"/></svg>
+        Healthy
+      </span>
+      <span class="badge badge-wilt">
+        <svg class="icon icon-sm"><use href="#icon-wilt"/></svg>
+        Needs water
+      </span>
+      <span class="badge badge-thirsty">
+        <svg class="icon icon-sm"><use href="#icon-water"/></svg>
+        Thirsty
+      </span>
+      <span class="badge badge-rare">
+        <svg class="icon icon-sm"><use href="#icon-star"/></svg>
+        Rare
+      </span>
+      <span class="badge badge-coin">
+        <svg class="icon icon-sm"><use href="#icon-coin"/></svg>
+        +6 coins
+      </span>
+      <span class="badge badge-streak">
+        <svg class="icon icon-sm"><use href="#icon-streak"/></svg>
+        3-day streak
+      </span>
+    </div>
+
+    <div class="subsection-head">Notification cards (replaces Auntie Bee dialogue)</div>
+    <div class="toast toast-success">
+      <div class="toast-icon">
+        <svg class="icon icon-lg"><use href="#icon-bloom"/></svg>
+      </div>
+      <div class="toast-text">
+        <div class="toast-title">Plant is flourishing!</div>
+        <div class="toast-body">Your sampaguita grew overnight. Tap to water it.</div>
+      </div>
+    </div>
+    <div class="toast toast-warn">
+      <div class="toast-icon">
+        <svg class="icon icon-lg"><use href="#icon-water"/></svg>
+      </div>
+      <div class="toast-text">
+        <div class="toast-title">Your plant is thirsty</div>
+        <div class="toast-body">It's been 2 days. No pressure — it will recover when you water it.</div>
+      </div>
+    </div>
+    <div class="toast toast-info">
+      <div class="toast-icon">
+        <svg class="icon icon-lg"><use href="#icon-gift"/></svg>
+      </div>
+      <div class="toast-text">
+        <div class="toast-title">3-day streak reached!</div>
+        <div class="toast-body">Rare seed shelf is now open in the shop.</div>
+      </div>
+    </div>
+
+    <div class="subsection-head">Economy / coin display</div>
+    <div class="economy-row">
+      <span class="coin">
+        <svg class="icon icon-sm"><use href="#icon-coin"/></svg>
+        24 coins
+      </span>
+      <span class="coin">
+        <svg class="icon icon-sm"><use href="#icon-coin"/></svg>
+        +6
+      </span>
+      <span class="badge badge-streak">
+        <svg class="icon icon-sm"><use href="#icon-streak"/></svg>
+        Day 3
+      </span>
+      <span class="badge badge-rare">
+        <svg class="icon icon-sm"><use href="#icon-star"/></svg>
+        Rare shelf open
+      </span>
+    </div>
+
+    <div class="subsection-head">Streak progress bar</div>
+    <p class="note">Day 5 of 7-day streak. No pressure framing — gentle progress only.</p>
+    <div style="margin:0.5rem 0 0.25rem;display:flex;align-items:center;gap:0.4rem">
+      <svg class="icon icon-sm" style="color:var(--color-streak)"><use href="#icon-streak"/></svg>
+      <span style="font-family:var(--font-body);font-size:1rem;font-weight:500;color:var(--color-text-secondary)">Day 5 of 7</span>
+    </div>
+    <div class="streak-bar"><div class="streak-fill" style="width:71%"></div></div>
+    <div style="display:flex;justify-content:space-between;font-family:var(--font-body);font-size:0.8rem;color:var(--color-text-muted);margin-top:0.25rem">
+      <span>Keep going!</span><span>Hibiscus unlocks at day 7</span>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- SECTION 5 — PLANT ART DIRECTION                       -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <section class="section" id="plant-art">
+    <h2 class="section-head">Plant <em>art direction</em></h2>
+    <p class="note">Classical botanical illustration style: fine sepia/black ink outlines, soft watercolour washes, cross-hatching for volume. High-key overall (mean value 83%), max saturation ~45%. Never pure black shadows — resolve to warm taupe or deep olive.</p>
+
+    <div class="subsection-head">Rendering rules (for Miora / AI generation prompts)</div>
+    <div class="plant-demo">
+      <table class="floor-table" style="font-size:0.85rem">
+        <thead><tr><th>Property</th><th>Rule</th><th>Why</th></tr></thead>
+        <tbody>
+          <tr><td>Outline</td><td>Fine sepia or warm dark-brown ink, 1–2px. Cross-hatching for volume.</td><td>Classical engraving feel</td></tr>
+          <tr><td>Coloring</td><td>Soft watercolour washes. Never flat fills. Velvety organic depth.</td><td>Herbarium field-journal look</td></tr>
+          <tr><td>Saturation</td><td>Max ~45% HSV. Desaturate anything hotter before use.</td><td>Muted botanical palette</td></tr>
+          <tr><td>Value range</td><td>56–100% brightness. Never pure black, never pure white.</td><td>Warm parchment feel</td></tr>
+          <tr><td>Shadow hue</td><td>Always warm: taupe (#958579) or deep olive (#44573D). Never grey or blue-black.</td><td>Palette rule — warm-only</td></tr>
+          <tr><td>Background</td><td>Empty warm neutral (#EEE9D9 family). Subject isolated, no clutter.</td><td>Portrait herbarium framing</td></tr>
+          <tr><td>Framing</td><td>Tight / macro-adjacent. Portrait orientation. Visible texture (leaf veins, petal edges).</td><td>Measured composition rule</td></tr>
+          <tr><td>Lighting</td><td>Soft diffuse overcast. No hard specular highlights, no cast black shadows.</td><td>Anti-pattern: no hard sun</td></tr>
+          <tr><td>Green hue</td><td>Olive-to-sage band only. No blue-greens, no yellow-greens.</td><td>Foliage palette constraint</td></tr>
+          <tr><td>Warm accents</td><td>Concentrated in 1-in-3 assets as the main subject. Not spread thin across all art.</td><td>Bimodal pixel data finding</td></tr>
+        </tbody>
+      </table>
+
+      <div class="subsection-head">Plant growth states — SVG reference specimens</div>
+      <div class="plant-state-row">
+        <div class="plant-state-item">
+          <svg width="80" height="100" viewBox="0 0 80 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Seed in soil">
+            <ellipse cx="40" cy="82" rx="28" ry="8" fill="#958579" opacity="0.5"/>
+            <ellipse cx="40" cy="78" rx="10" ry="7" fill="#7A6B5C"/>
+            <ellipse cx="40" cy="75" rx="7" ry="5" fill="#B1B8A1" opacity="0.6"/>
+          </svg>
+          <span class="plant-state-label">Seed planted</span>
+        </div>
+        <div class="plant-state-item">
+          <svg width="80" height="100" viewBox="0 0 80 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Sprout growing">
+            <ellipse cx="40" cy="90" rx="28" ry="7" fill="#958579" opacity="0.4"/>
+            <line x1="40" y1="88" x2="40" y2="60" stroke="#73875D" stroke-width="2" stroke-linecap="round"/>
+            <ellipse cx="28" cy="62" rx="12" ry="8" fill="#B1B8A1" transform="rotate(-30 28 62)"/>
+            <ellipse cx="52" cy="58" rx="12" ry="8" fill="#73875D" transform="rotate(30 52 58)"/>
+          </svg>
+          <span class="plant-state-label">Sprouting</span>
+        </div>
+        <div class="plant-state-item">
+          <svg width="80" height="100" viewBox="0 0 80 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Fully grown plant with bloom">
+            <ellipse cx="40" cy="92" rx="28" ry="7" fill="#958579" opacity="0.4"/>
+            <line x1="40" y1="90" x2="40" y2="45" stroke="#44573D" stroke-width="2.5" stroke-linecap="round"/>
+            <ellipse cx="22" cy="70" rx="14" ry="9" fill="#73875D" transform="rotate(-25 22 70)"/>
+            <ellipse cx="58" cy="66" rx="14" ry="9" fill="#44573D" transform="rotate(20 58 66)"/>
+            <ellipse cx="32" cy="52" rx="12" ry="8" fill="#859B6A" transform="rotate(-10 32 52)"/>
+            <circle cx="40" cy="38" r="12" fill="#E07A5F" opacity="0.9"/>
+            <circle cx="40" cy="38" r="6" fill="#C82A36" opacity="0.85"/>
+            <circle cx="40" cy="38" r="2.5" fill="#EAE2D0"/>
+          </svg>
+          <span class="plant-state-label">Flourishing</span>
+        </div>
+        <div class="plant-state-item">
+          <svg width="80" height="100" viewBox="0 0 80 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Wilting plant">
+            <ellipse cx="40" cy="92" rx="28" ry="7" fill="#958579" opacity="0.3"/>
+            <line x1="40" y1="90" x2="40" y2="50" stroke="#958579" stroke-width="2" stroke-linecap="round"/>
+            <ellipse cx="22" cy="72" rx="13" ry="8" fill="#B1B8A1" opacity="0.7" transform="rotate(-10 22 72)"/>
+            <ellipse cx="56" cy="70" rx="13" ry="8" fill="#B1B8A1" opacity="0.6" transform="rotate(15 56 70)"/>
+            <ellipse cx="32" cy="56" rx="11" ry="7" fill="#B1B8A1" opacity="0.5" transform="rotate(5 32 56)"/>
+          </svg>
+          <span class="plant-state-label">Wilting (needs water)</span>
+        </div>
+        <div class="plant-state-item">
+          <svg width="80" height="100" viewBox="0 0 80 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Recovered plant">
+            <ellipse cx="40" cy="92" rx="28" ry="7" fill="#958579" opacity="0.4"/>
+            <line x1="40" y1="90" x2="40" y2="48" stroke="#73875D" stroke-width="2.5" stroke-linecap="round"/>
+            <ellipse cx="24" cy="68" rx="13" ry="9" fill="#73875D" transform="rotate(-20 24 68)"/>
+            <ellipse cx="56" cy="65" rx="13" ry="9" fill="#44573D" transform="rotate(18 56 65)"/>
+            <ellipse cx="35" cy="54" rx="11" ry="7" fill="#859B6A" transform="rotate(-5 35 54)"/>
+            <circle cx="40" cy="41" r="9" fill="#7B5371" opacity="0.8"/>
+            <circle cx="40" cy="41" r="4" fill="#EAE2D0"/>
+          </svg>
+          <span class="plant-state-label">Recovered!</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="subsection-head">Procedural plant composition variables (cognitive exercise → plant)</div>
+    <p class="note">Each of these is determined by the player's chosen cognitive exercise type and completion result. The plant that grows is fully personalised.</p>
+    <table class="floor-table">
+      <thead><tr><th>Variable</th><th>Possible values</th><th>Source</th></tr></thead>
+      <tbody>
+        <tr><td>Species family</td><td>Hibiscus · Sampaguita · Pandan · Fern · Orchid · Heliotrope · Passionfruit · Torch ginger</td><td>Exercise category chosen</td></tr>
+        <tr><td>Leaf colour ramp</td><td>foliage-highlight → foliage-mid → foliage-shadow</td><td>Difficulty level completed</td></tr>
+        <tr><td>Bloom colour</td><td>accent-coral · accent-plum · accent-orange · accent-crimson · none</td><td>Exercise performance</td></tr>
+        <tr><td>Ornament detail</td><td>Fine stippling · Cross-hatch veins · Sepia outline weight</td><td>Completion accuracy</td></tr>
+        <tr><td>Composition</td><td>Single stem · Multi-branch · Ground cover · Climbing vine</td><td>Consecutive days active</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- SECTION 6 — NOTIFICATION PATTERN                       -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <section class="section" id="notifications">
+    <h2 class="section-head">Notification <em>pattern</em></h2>
+    <p class="note">Replaces the NPC dialogue system. Clean, single-focus notification cards that deliver one message and one action. No chat, no free-text input, no AI companion character. Simple, warm, human copy.</p>
+
+    <div class="subsection-head">Daily return notification</div>
+    <div class="notif-panel" style="max-width:400px">
+      <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem">
+        <svg class="icon icon-lg" style="color:var(--color-foliage-mid)"><use href="#icon-sun"/></svg>
+        <div>
+          <div style="font-family:var(--font-display);font-size:1.2rem;font-weight:500">Good morning</div>
+          <div style="font-family:var(--font-body);font-size:0.8rem;color:var(--color-text-muted)">Day 3 · Your garden is waiting</div>
+        </div>
+      </div>
+      <div class="notif-title">Your pandan herb grew overnight. Water it to keep it healthy.</div>
+      <div class="chip-answers">
+        <button class="chip chip-answer">
+          <svg class="icon"><use href="#icon-water"/></svg>
+          Water now
+        </button>
+        <button class="chip chip-answer">
+          <svg class="icon"><use href="#icon-brain"/></svg>
+          Do a brain exercise first
+        </button>
+      </div>
+    </div>
+
+    <div class="subsection-head">Streak milestone notification</div>
+    <div class="notif-panel" style="max-width:400px">
+      <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem">
+        <svg class="icon icon-lg" style="color:var(--color-streak)"><use href="#icon-streak"/></svg>
+        <div>
+          <div style="font-family:var(--font-display);font-size:1.2rem;font-weight:500">3-day streak!</div>
+          <div style="font-family:var(--font-body);font-size:0.8rem;color:var(--color-text-muted)">You've been wonderful this week</div>
+        </div>
+      </div>
+      <div class="notif-title">The rare seed shelf is now open. Hibiscus and orchid seeds are waiting.</div>
+      <div class="chip-answers">
+        <button class="chip chip-answer">
+          <svg class="icon"><use href="#icon-shop"/></svg>
+          Visit the seed shop
+        </button>
+      </div>
+    </div>
+
+    <div class="subsection-head">Cognitive exercise complete</div>
+    <div class="notif-panel" style="max-width:400px">
+      <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem">
+        <svg class="icon icon-lg" style="color:var(--color-foliage-mid)"><use href="#icon-brain"/></svg>
+        <div>
+          <div style="font-family:var(--font-display);font-size:1.2rem;font-weight:500">Well done!</div>
+          <div style="font-family:var(--font-body);font-size:0.8rem;color:var(--color-text-muted)">Tile matching · 6 coins earned</div>
+        </div>
+      </div>
+      <div class="notif-title">You matched all the tiles. A new seed has been added to your collection.</div>
+      <div class="chip-answers">
+        <button class="chip chip-answer">
+          <svg class="icon"><use href="#icon-garden"/></svg>
+          See my garden
+        </button>
+        <button class="chip chip-answer">
+          <svg class="icon"><use href="#icon-tiles"/></svg>
+          Play again
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- SECTION 7: KOPITIAM CORNER / MAHJONG KAKIS            -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <section class="section" id="kakis">
+    <h2 class="section-head">Kopitiam <em>Corner</em></h2>
+    <p class="note">The fifth island, ported from the round-one Mahjong Kakis prototype. Face-up tiles, tap two that match, clear the table. Three companions share one speech bubble and take turns. <strong>There is no timer anywhere in this game.</strong> The only counter is taps since the last match, and all it does is ask a kaki to say something.</p>
+
+    <div class="subsection-head">The three kakis</div>
+    <p class="note">Only one talks at a time. Affinity decides who owns a moment — Lily softens a near miss, Beng crows over a win, Rose nudges — everything else rotates, and nobody speaks twice in a row. The rotation is seated off the visit count, so a different face says hello each time the player comes back.</p>
+    <div style="display:flex;gap:2rem;flex-wrap:wrap;align-items:flex-start">
+      <div style="text-align:center">
+        <div style="width:5rem;height:5rem;border-radius:50%;background:var(--color-bg-surface);box-shadow:0 0 0 4px #7A4800,var(--shadow-md)">
+          <svg viewBox="0 0 100 100" style="width:100%;height:100%;border-radius:50%" aria-hidden="true">
+            <circle cx="50" cy="50" r="50" fill="#E3DBCA"></circle>
+            <path d="M12 100 C12 79 29 69 50 69 C71 69 88 79 88 100 Z" fill="#E07A5F" stroke="#958579" stroke-width="2"></path>
+            <circle cx="50" cy="46" r="24" fill="#E0BC94" stroke="#958579" stroke-width="2"></circle>
+            <path d="M25 46 C25 26 37 17 50 17 C63 17 75 26 75 46 C70 36 62 31 50 31 C38 31 30 36 25 46 Z" fill="#2B2118"></path>
+            <circle cx="75" cy="30" r="4.4" fill="#E78F37"></circle>
+            <circle cx="41" cy="46" r="3" fill="#2B2118"></circle><circle cx="59" cy="46" r="3" fill="#2B2118"></circle>
+            <path d="M39 55 Q50 65 61 55" fill="none" stroke="#2B2118" stroke-width="3" stroke-linecap="round"></path>
+          </svg>
+        </div>
+        <div style="margin-top:0.4rem;font-family:var(--font-body);font-size:0.95rem;font-weight:600;color:#7A4800">Lily</div>
+        <div style="font-family:var(--font-body);font-size:0.75rem;color:var(--color-text-muted)">warm, flowery</div>
+      </div>
+      <div style="text-align:center">
+        <div style="width:5rem;height:5rem;border-radius:50%;background:var(--color-bg-surface);box-shadow:var(--shadow-sm)">
+          <svg viewBox="0 0 100 100" style="width:100%;height:100%;border-radius:50%" aria-hidden="true">
+            <circle cx="50" cy="50" r="50" fill="#E3DBCA"></circle>
+            <path d="M14 100 C14 80 31 70 50 70 C69 70 86 80 86 100 Z" fill="#E0BC94" stroke="#958579" stroke-width="2"></path>
+            <path d="M36 100 L36 82 Q50 78 64 82 L64 100 Z" fill="#F5EFEB" stroke="#958579" stroke-width="2"></path>
+            <circle cx="50" cy="48" r="24" fill="#E0BC94" stroke="#958579" stroke-width="2"></circle>
+            <path d="M27 42 C27 26 38 18 50 18 C62 18 73 26 73 42 Z" fill="#31482E"></path>
+            <rect x="21" y="39" width="58" height="7" rx="3.5" fill="#31482E"></rect>
+            <circle cx="42" cy="54" r="3" fill="#2B2118"></circle><circle cx="60" cy="54" r="3" fill="#2B2118"></circle>
+            <path d="M40 62 Q51 71 62 60" fill="none" stroke="#2B2118" stroke-width="3" stroke-linecap="round"></path>
+            <path d="M66 76 L82 76 L79 89 L69 89 Z" fill="#EAE2D0" stroke="#958579" stroke-width="2"></path>
+            <ellipse cx="74" cy="76" rx="8" ry="3" fill="#7A6B5C"></ellipse>
+          </svg>
+        </div>
+        <div style="margin-top:0.4rem;font-family:var(--font-body);font-size:0.95rem;font-weight:500">Beng</div>
+        <div style="font-family:var(--font-body);font-size:0.75rem;color:var(--color-text-muted)">cheeky, kopi</div>
+      </div>
+      <div style="text-align:center">
+        <div style="width:5rem;height:5rem;border-radius:50%;background:var(--color-bg-surface);box-shadow:var(--shadow-sm)">
+          <svg viewBox="0 0 100 100" style="width:100%;height:100%;border-radius:50%" aria-hidden="true">
+            <circle cx="50" cy="50" r="50" fill="#E3DBCA"></circle>
+            <path d="M13 100 C13 80 30 70 50 70 C70 70 87 80 87 100 Z" fill="#7B5371" stroke="#958579" stroke-width="2"></path>
+            <circle cx="50" cy="16" r="11" fill="#B1B8A1" stroke="#958579" stroke-width="2"></circle>
+            <circle cx="50" cy="48" r="24" fill="#E0BC94" stroke="#958579" stroke-width="2"></circle>
+            <path d="M26 48 C26 30 37 22 50 22 C63 22 74 30 74 48 C69 40 61 36 50 36 C39 36 31 40 26 48 Z" fill="#B1B8A1"></path>
+            <circle cx="39" cy="50" r="9.5" fill="none" stroke="#2B2118" stroke-width="2.6"></circle>
+            <circle cx="61" cy="50" r="9.5" fill="none" stroke="#2B2118" stroke-width="2.6"></circle>
+            <path d="M48.5 50 L51.5 50" stroke="#2B2118" stroke-width="2.6" stroke-linecap="round"></path>
+            <circle cx="39" cy="50" r="2.6" fill="#2B2118"></circle><circle cx="61" cy="50" r="2.6" fill="#2B2118"></circle>
+            <path d="M42 62 Q50 68 58 62" fill="none" stroke="#2B2118" stroke-width="3" stroke-linecap="round"></path>
+          </svg>
+        </div>
+        <div style="margin-top:0.4rem;font-family:var(--font-body);font-size:0.95rem;font-weight:500">Rose</div>
+        <div style="font-family:var(--font-body);font-size:0.75rem;color:var(--color-text-muted)">gentle, knitting</div>
+      </div>
+    </div>
+    <p class="note">Lily wears the speaking state above: a 4px accent ring and a 4px lift. The name goes bold and turns kopi brown. Two portraits can never wear it at once.</p>
+
+    <div class="subsection-head">The shared bubble</div>
+    <p class="note"><strong>No line ever erases itself.</strong> A kaki's words stay on the table until the next line replaces them or the player taps the bubble to put it away, and putting a line away is a fade, not a delete. The words stay in the box so the box keeps its height and the tiles below do not move a pixel.</p>
+    <div style="max-width:400px;margin-top:1rem">
+      <div style="position:relative;display:flex;flex-direction:column;gap:0.25rem;padding:0.875rem 1.125rem;border:3px solid #7A4800;border-radius:var(--radius-md);background:#EAE2D0;min-height:8rem;justify-content:center">
+        <div style="position:absolute;top:-16px;left:16.6%;transform:translateX(-50%);width:0;height:0;border-left:15px solid transparent;border-right:15px solid transparent;border-bottom:16px solid #7A4800"></div>
+        <div style="position:absolute;top:-11px;left:16.6%;transform:translateX(-50%);width:0;height:0;border-left:12px solid transparent;border-right:12px solid transparent;border-bottom:13px solid #EAE2D0"></div>
+        <div style="font-family:var(--font-body);font-size:1.05rem;font-weight:600;color:#7A4800">Auntie Lily</div>
+        <div style="font-family:var(--font-body);font-size:1.1rem;line-height:1.5;color:var(--color-text-primary)">You came back Ah Ma. Last time we played a few rounds together.</div>
+      </div>
+    </div>
+    <p class="note">The pointer is two stacked triangles, outer in the border colour and inner in the bubble face, positioned under whichever portrait is speaking. The slot underneath it <strong>only ever grows</strong>: game.js measures it after every line and writes the tallest it has seen this deal into <code>--kaki-slot-floor</code>, so a shorter line afterwards cannot pull the table up under the player's finger. The floor clears on a new deal, which is the one moment the player expects the table to change.</p>
+
+    <div class="subsection-head">Tiles</div>
+    <p class="note">Twelve identities: dots 1–4, bamboo 1–4, and the four winds. Plain SVG in a 60×66 box so the faces scale with the tile. Every tile is 64px minimum and face up from the deal — nothing is hidden, so this is recognition, not recall.</p>
+    <div style="display:flex;gap:0.5rem;padding:0.5rem;border:5px solid #7A4800;border-radius:var(--radius-lg);background:#F5EFEB;max-width:340px;margin-top:1rem">
+      <div style="width:70px;aspect-ratio:1/1.08;padding:0.25rem;border:3px solid #C6BAA5;border-radius:var(--radius-sm);background:#F5EFEB;box-shadow:inset 0 -10px 0 #EAE2D0,0 4px 0 rgba(122,72,0,0.3)">
+        <svg viewBox="0 0 60 66" style="width:100%;height:100%" aria-hidden="true">
+          <circle cx="16" cy="17" r="10" fill="#7B5371"></circle><circle cx="16" cy="17" r="4" fill="#F5EFEB"></circle>
+          <circle cx="30" cy="33" r="10" fill="#7B5371"></circle><circle cx="30" cy="33" r="4" fill="#F5EFEB"></circle>
+          <circle cx="44" cy="49" r="10" fill="#7B5371"></circle><circle cx="44" cy="49" r="4" fill="#F5EFEB"></circle>
+        </svg>
+      </div>
+      <div style="width:70px;aspect-ratio:1/1.08;padding:0.25rem;border:3px solid #C6BAA5;border-radius:var(--radius-sm);background:#F5EFEB;box-shadow:inset 0 -10px 0 #EAE2D0,0 4px 0 rgba(122,72,0,0.3)">
+        <svg viewBox="0 0 60 66" style="width:100%;height:100%" aria-hidden="true">
+          <rect x="13" y="10" width="13" height="46" rx="6.5" fill="#44573D"></rect>
+          <rect x="34" y="10" width="13" height="46" rx="6.5" fill="#44573D"></rect>
+        </svg>
+      </div>
+      <div style="width:70px;aspect-ratio:1/1.08;padding:0.25rem;border:3px solid #C6BAA5;border-radius:var(--radius-sm);background:#F5EFEB;box-shadow:inset 0 -10px 0 #EAE2D0,0 4px 0 rgba(122,72,0,0.3)">
+        <svg viewBox="0 0 60 66" style="width:100%;height:100%" aria-hidden="true">
+          <text x="30" y="34" text-anchor="middle" dominant-baseline="central" font-size="42" font-weight="700" fill="#AE382B" font-family="var(--font-body)">&#26481;</text>
+        </svg>
+      </div>
+      <div style="width:70px;aspect-ratio:1/1.08;padding:0.25rem;border:3px solid #7A4800;border-radius:var(--radius-sm);background:#EAE2D0;transform:translateY(-4px);box-shadow:inset 0 -10px 0 rgba(122,72,0,0.18),0 8px 0 rgba(122,72,0,0.3),var(--shadow-md)">
+        <svg viewBox="0 0 60 66" style="width:100%;height:100%" aria-hidden="true">
+          <circle cx="30" cy="18" r="12" fill="#7B5371"></circle><circle cx="30" cy="18" r="4.8" fill="#F5EFEB"></circle>
+          <circle cx="30" cy="48" r="12" fill="#7B5371"></circle><circle cx="30" cy="48" r="4.8" fill="#F5EFEB"></circle>
+        </svg>
+      </div>
+    </div>
+    <p class="note">Three dots, two bamboo, east wind, and on the right a tile in the selected state — kopi border, tinted face, 4px lift, deeper lip. The table itself is light marble: two soft veins and a corner sheen over bg-surface.</p>
+
+    <div class="subsection-head">Player bar</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:0.75rem;max-width:400px;margin-top:1rem;padding:0.5rem 0.75rem;border-radius:var(--radius-md);background:var(--color-bg-inset);font-family:var(--font-body)">
+      <span style="font-size:1.05rem;font-weight:600;color:#7A4800;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:4px">Ah Ma</span>
+      <span style="display:flex;gap:0.25rem">
+        <span style="width:0.5rem;height:0.5rem;border-radius:50%;background:#7A4800"></span>
+        <span style="width:0.5rem;height:0.5rem;border-radius:50%;background:#7A4800"></span>
+        <span style="width:0.5rem;height:0.5rem;border-radius:50%;box-shadow:inset 0 0 0 2px var(--color-text-muted)"></span>
+        <span style="width:0.5rem;height:0.5rem;border-radius:50%;box-shadow:inset 0 0 0 2px var(--color-text-muted)"></span>
+      </span>
+      <span style="font-size:1.05rem;color:var(--color-text-secondary)">2 of 4 pairs</span>
+    </div>
+    <p class="note">The name wins the space fight — it is the whole promise of the game, and tapping it reopens the name chooser without throwing away the round in progress. The dot row is aria-hidden decoration repeating the sentence beside it word for word, which is why <em>the dots</em> stand down below 24rem and never the name.</p>
+
+    <div class="subsection-head">Behaviour rules</div>
+    <table class="floor-table">
+      <thead><tr><th>Moment</th><th>What happens</th><th>What never happens</th></tr></thead>
+      <tbody>
+        <tr><td>Mismatch</td><td>Both tiles wiggle, a kaki says something warm, tiles return face up after 600ms</td><td>No error state, no red, no score penalty shown</td></tr>
+        <tr><td>Six taps, no match</td><td>A kaki offers a thought. Twice running and one real pair breathes for 900ms</td><td>Nothing on screen calls it a hint or help</td></tr>
+        <tr><td>Difficulty</td><td>The level sets a base pair count; recent miss rate moves the real wall one pair either side and thins or crowds the lookalike tiles</td><td>No level number, badge or label ever names it</td></tr>
+        <tr><td>Waiting</td><td>Counted in taps since the last match</td><td>Never a clock. There is no timer in this game</td></tr>
+        <tr><td>Coming back</td><td>A kaki greets the player by name with a warm phrase from their history</td><td>Never a statistic, never a count of what they got wrong</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- SECTION 8 — SENIOR UX FLOOR                           -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <section class="section" id="ux-floor">
+    <h2 class="section-head">Senior <em>UX floor</em></h2>
+    <p class="note">Every screen must pass all of the following. These are hard constraints — not guidelines. Every new screen must re-verify against this table.</p>
+
+    <table class="floor-table">
+      <thead><tr><th>Rule</th><th>Requirement</th><th>Token / value</th><th>Status</th></tr></thead>
+      <tbody>
+        <tr><td>Tap targets</td><td>Every interactive element: minimum 64×64px</td><td>--min-tap-target: 4rem</td><td>&#x2705; Required</td></tr>
+        <tr><td>Body text size</td><td>All body text: minimum 28px (1.75rem)</td><td>--text-base: 1.75rem</td><td>&#x2705; Required</td></tr>
+        <tr><td>Label text size</td><td>All secondary labels: minimum 22px</td><td>--text-sm: 1.375rem</td><td>&#x2705; Required</td></tr>
+        <tr><td>Colour contrast</td><td>4.5:1 minimum ratio — WCAG AA</td><td>--min-contrast: 4.5</td><td>&#x2705; Required</td></tr>
+        <tr><td>No timers</td><td>Zero countdown timers anywhere. All exercises untimed.</td><td>—</td><td>&#x2705; Required</td></tr>
+        <tr><td>No shame</td><td>Wilt / missed day: never blames the player. Recovery always possible.</td><td>—</td><td>&#x2705; Required</td></tr>
+        <tr><td>Tap-only input</td><td>No free-text keyboard required for any core flow. Chip answers only.</td><td>—</td><td>&#x2705; Required</td></tr>
+        <tr><td>Mute button</td><td>Always-visible audio mute — large (min 64px), on every screen.</td><td>--min-tap-target</td><td>&#x2705; Required</td></tr>
+        <tr><td>Zero onboarding</td><td>First-time senior: no instruction manual, no tutorial gate.</td><td>—</td><td>&#x2705; Required</td></tr>
+        <tr><td>Reduced motion</td><td>All animations off when prefers-reduced-motion: reduce is set.</td><td>@media query</td><td>&#x2705; Required</td></tr>
+        <tr><td>Warm-only palette</td><td>No cool grey, no pure white, no pure black in any UI element.</td><td>Colour tokens above</td><td>&#x2705; Required</td></tr>
+        <tr><td>No emoji in UI</td><td>All icons are inline SVG. Emoji never appears in the game interface.</td><td>SVG icon system</td><td>&#x2705; Required</td></tr>
+      </tbody>
+    </table>
+
+    <div style="margin-top:2rem;padding:1.25rem 1.5rem;background:rgba(115,135,93,0.12);border:1px solid var(--color-foliage-mid);border-left:4px solid var(--color-foliage-shadow);border-radius:var(--radius-md)">
+      <div style="font-family:var(--font-body);font-size:0.75rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-foliage-shadow);margin-bottom:0.5rem">Design principle</div>
+      <p style="font-family:var(--font-display);font-size:1.4rem;font-style:italic;color:var(--color-text-primary);line-height:1.5;margin:0">"This game should feel like receiving a letter from an old friend — warm, unhurried, and glad you came."</p>
+    </div>
+  </section>
+
+  <!-- ── Footer ── -->
+  <hr class="rule" style="margin-top:4rem">
+  <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;padding-top:1rem">
+    <div style="font-family:var(--font-body);font-size:0.8rem;color:var(--color-text-muted)">Garden of Life Design System · v1.1 · Aug 2026</div>
+    <div style="font-family:var(--font-body);font-size:0.8rem;color:var(--color-text-muted)">Muted Botanical · SVG icons · Senior-safe UX floor · Cognitive exercise focus</div>
+  </div>
+
+</main>
+</body>
+</html>

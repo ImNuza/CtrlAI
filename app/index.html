@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#EEE9D9">
+<meta name="description" content="A gentle cognitive wellness game for older adults. Grow your garden by exercising your mind.">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Garden">
+<meta name="format-detection" content="telephone=no">
+<title>Garden of Life</title>
+<link rel="icon" href="icons/favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="manifest" href="manifest.json">
+</head>
+<body>
+
+<!-- ══ SVG ICON DEFS — defined once, referenced everywhere ══ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="icon-seed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 2c-1.5 0-3 1-3 3 0 3 3 5 3 5s3-2 3-5c0-2-1.5-3-3-3z"/>
+      <path d="M12 10v2"/>
+      <path d="M9 15c-2 0-4 2-4 4h14c0-2-2-4-4-4H9z"/>
+      <path d="M12 15v2"/>
+    </symbol>
+    <symbol id="icon-sprout" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 22V14"/>
+      <path d="M12 14c0-3-2-5-5-5 0 3 2 5 5 5z"/>
+      <path d="M12 14c0-3 2-5 5-5 0 3-2 5-5 5z"/>
+      <path d="M12 14V6"/>
+    </symbol>
+    <symbol id="icon-bloom" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="10" r="3"/>
+      <path d="M12 7c0-2 1-4 2-5 1 1 1 3-2 5z"/>
+      <path d="M12 7c0-2-1-4-2-5-1 1-1 3 2 5z"/>
+      <path d="M12 13c0 2 1 4 2 5 1-1 1-3-2-5z"/>
+      <path d="M12 13c0 2-1 4-2 5-1-1-1-3 2-5z"/>
+      <path d="M9 10c-2 0-4 1-5 2 1 1 3 1 5-2z"/>
+      <path d="M15 10c2 0 4 1 5 2-1 1-3 1-5-2z"/>
+      <path d="M12 13v4"/>
+      <path d="M9 19c0 2 1.5 3 3 3s3-1 3-3"/>
+    </symbol>
+    <symbol id="icon-wilt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 22V14"/>
+      <path d="M12 14c0-2-1-3-3-3 0 2 1 3 3 3z"/>
+      <path d="M12 14c0-2 1-3 3-3 0 2-1 3-3 3z"/>
+      <path d="M12 14V9"/>
+      <path d="M8 20h8"/>
+      <path d="M10 6c0-1 1-2 2-2s2 1 2 2"/>
+    </symbol>
+    <symbol id="icon-water" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 3c-2 3-5 6-5 9 0 3 2 5 5 5s5-2 5-5c0-3-3-6-5-9z"/>
+      <path d="M9 14c0 2 1 3 3 3"/>
+    </symbol>
+    <symbol id="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="4"/>
+      <path d="M12 2v2"/><path d="M12 20v2"/>
+      <path d="M4.22 4.22l1.42 1.42"/><path d="M18.36 18.36l1.42 1.42"/>
+      <path d="M2 12h2"/><path d="M20 12h2"/>
+      <path d="M4.22 19.78l1.42-1.42"/><path d="M18.36 5.64l1.42-1.42"/>
+    </symbol>
+    <symbol id="icon-camera" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+      <circle cx="12" cy="13" r="4"/>
+    </symbol>
+    <symbol id="icon-pot" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M5 10h14"/>
+      <path d="M6 10l1.5 9c.3 1.5 1.5 2 3 2h3c1.5 0 2.7-.5 3-2l1.5-9"/>
+      <path d="M8 10V8c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+      <path d="M10 6V5"/><path d="M14 6V5"/>
+    </symbol>
+    <symbol id="icon-coin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="9"/>
+      <path d="M12 7v10"/>
+      <path d="M9 9.5c0-1 1.5-2 3-2s3 1 3 2-1 2-3 2-3 1-3 2 1.5 2 3 2 3-1 3-2"/>
+    </symbol>
+    <symbol id="icon-shop" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+      <path d="M9 22V12h6v10"/>
+      <path d="M3 9h18"/>
+    </symbol>
+    <symbol id="icon-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/>
+    </symbol>
+    <symbol id="icon-streak" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 2c0 3-2 4-2 6 0 1 .5 2 1.5 2.5C10 11 9 12 9 14c0 3 2 5 5 5s4-2 4-4c0-2-1-3-1.5-3.5.5.5 1 1 1 2 0 1-1 2-2 2s-2-1-2-2c0-2 2-3 2-5s-1.5-4.5-3.5-6z"/>
+      <path d="M12 22v-2"/>
+    </symbol>
+    <symbol id="icon-meal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M2 12h20c0 5-4 9-10 9S2 17 2 12z"/>
+      <path d="M8 8c1-1 2-2 2-4"/>
+      <path d="M12 8c1-1 2-2 2-4"/>
+      <path d="M16 8c1-1 2-2 2-4"/>
+      <path d="M4 12c0-4 3-7 8-7s8 3 8 7"/>
+    </symbol>
+    <symbol id="icon-kopi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M6 9h12l-1.4 7.8c-.25 1.3-1.3 2.2-2.6 2.2h-3.9c-1.3 0-2.35-.9-2.6-2.2z"/>
+      <path d="M5 9h14"/>
+      <path d="M4 21h16"/>
+      <path d="M9.5 6c0-1.1 1-1.6 1-2.7"/>
+      <path d="M13.5 6c0-1.1 1-1.6 1-2.7"/>
+    </symbol>
+    <symbol id="icon-gift" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="8" width="18" height="4" rx="1"/>
+      <path d="M12 8v13"/>
+      <path d="M5 12v9h14v-9"/>
+      <path d="M8 8c-1.5 0-3-1.5-3-3s1.5-3 3-3c2 0 3 2 4 6-1-1-2-2-4-2z"/>
+      <path d="M16 8c1.5 0 3-1.5 3-3s-1.5-3-3-3c-2 0-3 2-4 6 1-1 2-2 4-2z"/>
+    </symbol>
+    <symbol id="icon-book" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+      <path d="M9 7h6"/><path d="M9 11h4"/>
+    </symbol>
+    <symbol id="icon-brain" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9.5 2a3 3 0 0 1 3 3v1a3 3 0 0 1 3-3 3 3 0 0 1 3 3c0 1-.5 2-1 2.5.5.5 1 1.5 1 2.5 0 2-1.5 3.5-3.5 3.5H14"/>
+      <path d="M9.5 2a3 3 0 0 0-3 3v1a3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 1 .5 2 1 2.5C4 9 3 10.5 3 11.5c0 2 1.5 3.5 3.5 3.5H8"/>
+      <path d="M12 6v12"/><path d="M9 12h6"/><path d="M8 16h8"/>
+    </symbol>
+    <symbol id="icon-garden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 12l9-9 9 9"/>
+      <path d="M5 12v9h14v-9"/>
+      <path d="M12 16c0-2 1-3 2-4 1 1 1 2 0 4"/>
+      <path d="M12 16c0-2-1-3-2-4-1 1-1 2 0 4"/>
+      <path d="M12 16v4"/>
+    </symbol>
+    <symbol id="icon-share" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="18" cy="5" r="3"/>
+      <circle cx="6" cy="12" r="3"/>
+      <circle cx="18" cy="19" r="3"/>
+      <path d="M8.59 10.49l6.83-3.97"/>
+      <path d="M8.59 13.51l6.83 3.97"/>
+    </symbol>
+    <symbol id="icon-mute" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+      <path d="M22 9l-6 6"/><path d="M16 9l6 6"/>
+    </symbol>
+    <symbol id="icon-sound" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+      <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+      <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+    </symbol>
+    <symbol id="icon-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+      <path d="M9 22V12h6v10"/>
+    </symbol>
+    <symbol id="icon-profile" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+      <circle cx="12" cy="7" r="4"/>
+    </symbol>
+    <symbol id="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20 6L9 17l-5-5"/>
+    </symbol>
+    <symbol id="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M18 6L6 18"/><path d="M6 6l12 12"/>
+    </symbol>
+    <symbol id="icon-arrow-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M5 12h14"/><path d="M12 5l7 7-7 7"/>
+    </symbol>
+    <symbol id="icon-arrow-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/>
+    </symbol>
+    <symbol id="icon-memory" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="9" r="6"/>
+      <path d="M9 18h6"/><path d="M10 21h4"/>
+      <path d="M12 5c0-1.5-1-2.5-2.5-2.5"/>
+    </symbol>
+    <symbol id="icon-tiles" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="3" width="7" height="7" rx="1"/>
+      <rect x="14" y="3" width="7" height="7" rx="1"/>
+      <rect x="3" y="14" width="7" height="7" rx="1"/>
+      <rect x="14" y="14" width="7" height="7" rx="1"/>
+    </symbol>
+    <symbol id="icon-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+      <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+    </symbol>
+    <symbol id="icon-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="9"/>
+      <path d="M12 7v5l3 3"/>
+    </symbol>
+    <symbol id="icon-leaf" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/>
+      <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+    </symbol>
+    <symbol id="icon-flower" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="2"/>
+      <path d="M12 10c0-2-1-3-2-4-1 1-1 2 0 4"/>
+      <path d="M12 10c0-2 1-3 2-4 1 1 1 2 0 4"/>
+      <path d="M12 14c0 2-1 3-2 4-1-1-1-2 0-4"/>
+      <path d="M12 14c0 2 1 3 2 4 1-1 1-2 0-4"/>
+      <path d="M10 12c-2 0-3-1-4-2 1-1 2-1 4 0"/>
+      <path d="M14 12c2 0 3-1 4-2-1-1-2-1-4 0"/>
+      <path d="M12 14v8"/>
+      <path d="M9 19c0 2 1 3 3 3s3-1 3-3"/>
+    </symbol>
+    <symbol id="icon-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M23 4v6h-6"/>
+      <path d="M1 20v-6h6"/>
+      <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- ══ APP ROOT ══ -->
+<div id="app">
+
+  <!-- Top bar -->
+  <header class="topbar" role="banner">
+    <div class="topbar-left">
+      <span class="coin-chip" id="coin-display" aria-label="Coins">
+        <svg class="icon icon-sm"><use href="#icon-coin"/></svg>
+        <span id="coin-count">0</span>
+      </span>
+      <span class="streak-chip" id="streak-display" aria-label="Streak">
+        <svg class="icon icon-sm"><use href="#icon-streak"/></svg>
+        <span id="streak-count">0</span>
+      </span>
+    </div>
+    <div class="topbar-right">
+      <button class="icon-btn" id="mute-btn" aria-label="Toggle sound" aria-pressed="false">
+        <svg class="icon" id="mute-icon"><use href="#icon-sound"/></svg>
+      </button>
+      <button class="icon-btn" id="share-btn" aria-label="Share garden">
+        <svg class="icon"><use href="#icon-share"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Notification stack -->
+  <div id="notification-stack" aria-live="polite" aria-atomic="false"></div>
+
+  <!-- ══ SCREENS ══ -->
+  <main class="screens" role="main">
+
+    <!-- ── GARDEN SCREEN ── -->
+    <section class="screen active" id="screen-garden" role="tabpanel" aria-labelledby="nav-garden">
+      <div class="garden-header">
+        <h1 class="garden-title">Your Garden</h1>
+        <p class="garden-subtitle" id="garden-date"></p>
+      </div>
+      <div class="garden-scene" id="garden-scene"></div>
+      <div class="garden-actions">
+        <button class="btn btn-primary btn-lg" id="btn-water-all">
+          <svg class="icon"><use href="#icon-water"/></svg>
+          Water all plants
+        </button>
+        <button class="btn btn-secondary" id="btn-goto-shop">
+          <svg class="icon"><use href="#icon-shop"/></svg>
+          Visit seed shop
+        </button>
+      </div>
+    </section>
+
+    <!-- ── EXERCISES SCREEN — LEVEL PATH ── -->
+    <section class="screen" id="screen-exercises" role="tabpanel" aria-labelledby="nav-exercises">
+      <div class="screen-header">
+        <h1 class="screen-title">Brain Exercises</h1>
+        <p class="screen-subtitle">Complete each level to unlock the next. No timers, no pressure.</p>
+      </div>
+      <div id="level-path-container"></div>
+    </section>
+
+    <!-- ── SHOP SCREEN ── -->
+    <section class="screen" id="screen-shop" role="tabpanel" aria-labelledby="nav-shop">
+      <div class="screen-header">
+        <h1 class="screen-title">Seed Shop</h1>
+        <p class="screen-subtitle">Fixed prices, no randomness. One free seed every day.</p>
+      </div>
+      <div class="shop-coins-bar">
+        <span class="coin-chip large">
+          <svg class="icon"><use href="#icon-coin"/></svg>
+          <span id="shop-coin-count">0</span> coins
+        </span>
+        <button class="btn btn-ghost btn-sm" id="btn-free-seed">
+          <svg class="icon icon-sm"><use href="#icon-gift"/></svg>
+          Free daily seed
+        </button>
+      </div>
+      <div class="shop-grid" id="shop-grid"></div>
+    </section>
+
+    <!-- ── PROFILE SCREEN ── -->
+    <section class="screen" id="screen-profile" role="tabpanel" aria-labelledby="nav-profile">
+      <div class="screen-header">
+        <h1 class="screen-title">Your Profile</h1>
+      </div>
+      <div class="profile-cards" id="profile-cards"></div>
+
+      <!-- Meal cards section -->
+      <div class="subsection-head" style="margin-top:2rem">Meal Collection</div>
+      <div class="meal-grid" id="meal-grid"></div>
+    </section>
+
+    <!-- ── ALMANAC SCREEN ── -->
+    <section class="screen" id="screen-almanac" aria-label="Garden Almanac">
+      <div class="play-header">
+        <button class="icon-btn" id="btn-back-from-almanac" aria-label="Back to profile">
+          <svg class="icon" aria-hidden="true"><use href="#icon-arrow-left"/></svg>
+        </button>
+        <div class="play-title">The Garden Almanac</div>
+        <div style="width:44px"></div>
+      </div>
+      <div class="almanac-body" id="almanac-body"></div>
+    </section>
+
+    <!-- ── EXERCISE PLAY SCREEN ── -->
+    <section class="screen" id="screen-play" role="dialog" aria-modal="true" aria-label="Exercise">
+      <div class="play-header">
+        <button class="icon-btn" id="btn-back-from-play" aria-label="Back to exercises">
+          <svg class="icon"><use href="#icon-arrow-left"/></svg>
+        </button>
+        <div class="play-title" id="play-title"></div>
+        <div style="width:44px"></div>
+      </div>
+      <div class="play-area" id="play-area"></div>
+      <div class="play-footer" id="play-footer"></div>
+    </section>
+
+  </main>
+
+  <!-- ══ BOTTOM NAV ══ -->
+  <nav class="bottom-nav" role="navigation" aria-label="Main navigation">
+    <button class="nav-item active" id="nav-garden" data-screen="garden" role="tab" aria-selected="true" aria-controls="screen-garden" aria-label="Garden">
+      <svg class="icon" aria-hidden="true"><use href="#icon-garden"/></svg>
+      <span>Garden</span>
+    </button>
+    <button class="nav-item" id="nav-exercises" data-screen="exercises" role="tab" aria-selected="false" aria-controls="screen-exercises" aria-label="Brain exercises">
+      <svg class="icon" aria-hidden="true"><use href="#icon-brain"/></svg>
+      <span>Exercises</span>
+    </button>
+    <button class="nav-item" id="nav-shop" data-screen="shop" role="tab" aria-selected="false" aria-controls="screen-shop" aria-label="Seed shop">
+      <svg class="icon" aria-hidden="true"><use href="#icon-shop"/></svg>
+      <span>Shop</span>
+    </button>
+    <button class="nav-item" id="nav-profile" data-screen="profile" role="tab" aria-selected="false" aria-controls="screen-profile" aria-label="Profile">
+      <svg class="icon" aria-hidden="true"><use href="#icon-profile"/></svg>
+      <span>Profile</span>
+    </button>
+  </nav>
+
+  <!-- ══ SHARE MODAL ══ -->
+  <div class="modal-overlay" id="share-modal" role="dialog" aria-modal="true" aria-labelledby="share-title" hidden>
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <h2 class="modal-title" id="share-title">Share Your Garden</h2>
+        <button class="icon-btn" id="btn-close-share" aria-label="Close">
+          <svg class="icon"><use href="#icon-close"/></svg>
+        </button>
+      </div>
+      <div class="share-card" id="share-card">
+        <div class="share-card-inner">
+          <div class="share-garden-preview" id="share-preview"></div>
+          <div class="share-stats" id="share-stats"></div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-primary btn-lg" id="btn-share-native">
+          <svg class="icon"><use href="#icon-share"/></svg>
+          Share
+        </button>
+        <button class="btn btn-secondary" id="btn-copy-share">
+          <svg class="icon"><use href="#icon-arrow-right"/></svg>
+          Copy text
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PLANT DETAIL MODAL ══ -->
+  <div class="modal-overlay" id="plant-detail-modal" role="dialog" aria-modal="true" aria-label="Plant details" hidden></div>
+
+  <!-- ══ WATER ANIMATION OVERLAY ══ -->
+  <div id="water-overlay" aria-hidden="true"></div>
+
+  <!-- ══ CONFETTI / CELEBRATION ══ -->
+  <div id="celebration-overlay" aria-hidden="true"></div>
+
+</div><!-- /app -->
+
+<script src="game.js"></script>
+</body>
+</html>

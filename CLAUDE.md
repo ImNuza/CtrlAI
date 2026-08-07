@@ -2,7 +2,15 @@
 
 Repo for the Tencent Cloud "Age Well" Social Good Challenge Singapore, Game Track. Team: Dewa, Matthew, Zoe. Submission deadline: Aug 9, 2026, 11:59 PM SGT.
 
-Round one (done) was a three-prototype bake-off; the prototypes now live under `archive/` as lift-from material. The team picked the gardening direction on 29 Jul; the repo carries the chosen game's spec, content, and reference build at `games/garden-of-life/`.
+Round one (done) was a three-prototype bake-off; the prototypes now live under `archive/` as lift-from material. The team picked the gardening direction on 29 Jul.
+
+**The shipping build is `app/`.** One classic script (`app/game.js`), one stylesheet, no ES modules and no build step. `app/` is also the deploy root on EdgeOne Pages, which is why `manifest.json` and `sw.js` live inside it. The older modular build that was at `games/garden-of-life/` is gone; it was superseded and is recoverable from git history on `main`.
+
+`app/` deliberately imports nothing from `shared/`. It is a standalone static bundle, and `shared/` only exists now to keep the archived prototypes running. Do not add an import from `app/` into `shared/` without reading `PORT_MAHJONG_KAKIS.md` first.
+
+Mahjong Kakis was ported out of `archive/mahjong-kakis/` into `app/` as the fifth exercise island, "Kopitiam Corner". The archived copy is intentionally left intact as the reference. `PORT_MAHJONG_KAKIS.md` is the record of what moved, what was remapped, and what is still a known limit.
+
+Run it with `node server.js`, then open `http://localhost:4173/app/` at 390x844. The service worker caches hard, so tick "Bypass for network" in DevTools while working, or you will spend an hour debugging a build you already fixed.
 
 ## First actions for any new session
 
