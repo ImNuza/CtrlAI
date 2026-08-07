@@ -136,6 +136,28 @@ body{
   transition:all var(--duration-fast) var(--ease-gentle);
   flex-shrink:0;
 }
+/* Menu button and its badge: the one mark that says today has tasks left,
+   now that the daily card lives inside the menu rather than in the garden. */
+#menu-btn{position:relative}
+.menu-badge{
+  position:absolute;
+  top:9px;
+  right:9px;
+  width:14px;
+  height:14px;
+  border-radius:50%;
+  background:var(--accent-red);
+  border:2px solid var(--bg-surface);
+}
+.menu-badge[hidden]{display:none}
+
+/* Full width rows inside the menu sheet */
+.menu-row{
+  width:100%;
+  justify-content:flex-start;
+  padding:0 1.25rem;
+}
+
 .icon-btn:hover{border-color:var(--border-strong);color:var(--text-primary)}
 .icon-btn:active{transform:scale(0.96)}
 .icon-btn:focus-visible{outline:3px solid var(--foliage-mid);outline-offset:2px}
@@ -185,7 +207,26 @@ body{
 }
 
 /* ── Garden screen ── */
-.garden-header{margin-bottom:1rem}
+/* The whole tab is the field. One continuous grass surface edge to edge, in
+   the foliage palette so it sits beside the shop and profile screens rather
+   than shouting over them: a soft sage that deepens slightly toward the
+   bottom, with a very low contrast blade texture. Backgrounds on a scroll
+   container are painted against the padding box, so the field stays put
+   while the rows scroll over it. */
+/* The overflow override is scoped to this id on purpose: the shared .screen
+   rule still scrolls every other tab. Here the page itself never scrolls, the
+   field is dragged inside .garden-viewport instead. */
+/* Tighter than the shared .screen padding: every pixel taken back here is a
+   pixel of field the player can see without panning. */
+#screen-garden{
+  overflow:hidden;
+  padding:1rem 1.25rem calc(var(--nav-height) + 0.75rem);
+  background:
+    repeating-linear-gradient(102deg,rgba(68,87,61,0.028) 0 2px,transparent 2px 16px),
+    linear-gradient(180deg,#DDE2CE 0%,#CFD8BB 55%,#C5D0AE 100%);
+}
+.garden-header{margin-bottom:0.75rem;flex-shrink:0}
+.garden-hint-slot:not(:empty){flex-shrink:0}
 .garden-title{
   font-family:var(--font-display);
   font-size:2.5rem;
@@ -193,136 +234,109 @@ body{
   line-height:1.1;
   margin-bottom:0.2rem;
 }
+/* One step darker than --text-muted: muted clears 4.5:1 on the cream paper
+   but not on the deeper end of the grass. */
 .garden-subtitle{
   font-family:var(--font-body);
   font-size:1rem;
-  color:var(--text-muted);
+  color:var(--text-secondary);
 }
+
+/* Outlined buttons need a surface under them to stay legible on grass */
+#screen-garden .btn-secondary{background:rgba(245,239,235,0.88)}
 
 /* ════════════════════════════════════════════════════════════
-   GARDEN SCENE — retro window + shelf system
+   GARDEN SCENE: an open field of soil patches
    ════════════════════════════════════════════════════════════ */
 
-.garden-scene{
-  display:flex;
-  flex-direction:column;
-  gap:0;
-  margin-bottom:1.25rem;
-}
-
-/* ── The window ── */
-.garden-window{
+/* The window the field is dragged under. It eats the screen padding with a
+   negative margin so the grass runs to both edges of the phone and the field
+   visibly continues past them. touch-action:none hands the gesture to the
+   pointer handlers instead of letting the browser try to scroll it. */
+.garden-viewport{
   position:relative;
-  height:180px;
-  border-radius:var(--radius-lg) var(--radius-lg) 0 0;
-  border:6px solid #7A5C3E;
-  border-bottom:none;
+  flex:1;
+  min-height:0;
+  margin:0 -1.25rem;
   overflow:hidden;
-  flex-shrink:0;
-  margin-bottom:0;
+  touch-action:none;
+  user-select:none;
+  -webkit-user-select:none;
+  -webkit-tap-highlight-color:transparent;
+  cursor:grab;
 }
-.sky-morning{background:linear-gradient(180deg,#F5D9A8 0%,#F0E4C8 55%,#E8DCC0 100%)}
-.sky-midday{background:linear-gradient(180deg,#C8D8C0 0%,#E4E8D4 55%,#EFE9D4 100%)}
-.sky-evening{background:linear-gradient(180deg,#E8B078 0%,#E8C898 50%,#E4D4B0 100%)}
-.sky-night{background:linear-gradient(180deg,#3A4054 0%,#555A6E 60%,#6B6A72 100%)}
+.garden-viewport.panning{cursor:grabbing}
 
-.sky-sun{
+/* The pannable layer. width:max-content makes offsetWidth the true content
+   width, which is what the pan bounds are measured from. Two plots of land
+   side by side is what makes the field wider than the phone. */
+.garden-field{
+  --field-col:300px;
+  display:grid;
+  grid-template-columns:repeat(2,var(--field-col));
+  align-content:start;
+  justify-content:start;
+  gap:0.25rem 0.75rem;
+  width:max-content;
+  min-width:100%;
+  padding:0.5rem 1rem 1.5rem;
+  will-change:transform;
+}
+/* Only on a programmatic move, never while a finger is down */
+.garden-field.pan-glide{transition:transform 420ms var(--ease-gentle)}
+
+/* Landscape and very short screens cannot fit the header, a useful pan window
+   and the action buttons at once. There the garden goes back to scrolling
+   like every other tab, with the pan window at a fixed height inside it. */
+@media (max-height:640px){
+  #screen-garden{overflow-y:auto;overflow-x:hidden}
+  .garden-viewport{flex:none;height:230px}
+}
+
+/* Discoverability pill. Sits in the headroom above the first row of patches,
+   where it covers grass rather than anything tappable. */
+.garden-pan-hint{
   position:absolute;
-  top:18px;right:26px;
-  width:44px;height:44px;
-  color:#E8A84C;
-  filter:drop-shadow(0 0 10px rgba(232,168,76,0.55));
-  animation:sun-glow 4s ease-in-out infinite;
-}
-.sky-evening .sky-sun{top:60px;color:#D4692B;filter:drop-shadow(0 0 14px rgba(212,105,43,0.6))}
-.sky-moon{
-  position:absolute;
-  top:20px;right:30px;
-  width:38px;height:38px;
-  color:#E4DFC8;
-  filter:drop-shadow(0 0 12px rgba(228,223,200,0.5));
-}
-@keyframes sun-glow{
-  0%,100%{transform:scale(1)}
-  50%{transform:scale(1.06)}
-}
-
-.sky-night::before{
-  content:'';
-  position:absolute;inset:0;
-  background-image:
-    radial-gradient(1.5px 1.5px at 15% 25%, #F5EFEB 100%, transparent),
-    radial-gradient(1px 1px at 35% 15%, #F5EFEB 100%, transparent),
-    radial-gradient(1.5px 1.5px at 55% 35%, #F5EFEB 100%, transparent),
-    radial-gradient(1px 1px at 70% 12%, #F5EFEB 100%, transparent),
-    radial-gradient(1px 1px at 85% 30%, #F5EFEB 100%, transparent),
-    radial-gradient(1.5px 1.5px at 45% 8%, #F5EFEB 100%, transparent);
-  opacity:0.8;
-}
-
-.window-hills{
-  position:absolute;
-  bottom:0;left:-10%;right:-10%;
-  height:56px;
-  background:
-    radial-gradient(120px 40px at 20% 100%, #73875D 60%, transparent),
-    radial-gradient(150px 48px at 55% 100%, #859B6A 62%, transparent),
-    radial-gradient(120px 40px at 88% 100%, #44573D 60%, transparent);
-}
-.sky-night .window-hills{filter:brightness(0.45) saturate(0.6)}
-.sky-evening .window-hills{filter:brightness(0.8) sepia(0.2)}
-
-.window-frame-bars{
-  position:absolute;inset:0;
-  background:
-    linear-gradient(90deg, transparent calc(50% - 3px), #7A5C3E calc(50% - 3px), #7A5C3E calc(50% + 3px), transparent calc(50% + 3px));
+  left:50%;
+  top:0.4rem;
+  transform:translateX(-50%);
+  padding:0.5rem 1.1rem;
+  border-radius:var(--radius-pill);
+  background:var(--bg-surface);
+  border:1.5px solid var(--border-mid);
+  box-shadow:0 3px 8px rgba(43,33,24,0.22);
+  font-family:var(--font-body);
+  font-size:1.15rem;
+  color:var(--text-secondary);
+  white-space:nowrap;
   pointer-events:none;
+  transition:opacity 400ms var(--ease-gentle);
 }
-.window-sill{
-  position:absolute;
-  bottom:-6px;left:-10px;right:-10px;
-  height:14px;
-  background:linear-gradient(180deg,#9A7850 0%,#7A5C3E 100%);
-  border-radius:0 0 4px 4px;
-  box-shadow:0 3px 6px rgba(43,33,24,0.25);
-}
+.garden-pan-hint[hidden]{display:none}
+.garden-pan-hint.fading{opacity:0}
 
-.window-curtain{
-  position:absolute;
-  top:0;bottom:0;
-  width:34px;
-  background:linear-gradient(90deg,#A8493C 0%,#8E3A30 50%,#A8493C 100%);
-  opacity:0.92;
-}
-.curtain-left{
-  left:0;
-  border-radius:0 0 18px 0;
-  box-shadow:4px 0 6px rgba(43,33,24,0.18);
-  background:repeating-linear-gradient(90deg,#A8493C 0 6px,#8E3A30 6px 12px);
-}
-.curtain-right{
-  right:0;
-  border-radius:0 0 0 18px;
-  box-shadow:-4px 0 6px rgba(43,33,24,0.18);
-  background:repeating-linear-gradient(90deg,#A8493C 0 6px,#8E3A30 6px 12px);
-}
-
-/* ── Shelf unit ── */
+/* ── One plot of soil patches in the grass ── */
+/* The space above each patch is headroom for a tall plant to grow into, so
+   it stays generous. The strip below is just grass between plots. */
 .shelf-unit{
   position:relative;
-  padding:0.75rem 0.5rem 0;
+  padding:0.75rem 0.5rem 1rem;
 }
 .shelf-pots{
   display:grid;
   grid-template-columns:repeat(3,1fr);
   gap:0.5rem;
-  padding:0 0.75rem;
+  padding:0 0.5rem;
   align-items:end;
 }
 
+/* The button is the tap target, and the soil tile fills its full width, so the
+   hit area is never smaller than what the eye aims at. At the 300px column
+   this lands near 84x128, well clear of the 64px floor. */
 .shelf-plot{
   position:relative;
-  height:150px;
+  height:128px;
+  min-width:var(--tap-min);
   background:transparent;
   border:none;
   cursor:pointer;
@@ -341,10 +355,10 @@ body{
 
 .plot-plant{
   position:absolute;
-  bottom:44px;
+  bottom:34px;
   left:50%;
   transform:translateX(-50%);
-  width:92px;
+  width:84px;
   pointer-events:none;
   animation:plant-settle 400ms var(--ease-spring);
 }
@@ -353,122 +367,132 @@ body{
   to{transform:translateX(-50%) translateY(0);opacity:1}
 }
 
+/* ── Soil patch ──
+   A flat rectangular tile of tilled ground lying in the grass, not a pot
+   standing on a shelf. Filling the button width and dropping most of the
+   corner rounding is what turns the row into a field of plots. The furrows
+   are a low-contrast repeating gradient so the patch reads as worked soil
+   without turning into a busy pattern behind the plant. */
 .plot-pot{
-  width:72px;
-  height:48px;
-  background:linear-gradient(180deg,#C1724F 0%,#A85B3C 100%);
-  clip-path:polygon(8% 0,92% 0,80% 100%,20% 100%);
-  border-radius:0 0 4px 4px;
-  box-shadow:inset 0 -4px 6px rgba(43,33,24,0.25), 0 3px 4px rgba(43,33,24,0.18);
+  width:100%;
+  height:56px;
+  border-radius:8px;
+  background:
+    repeating-linear-gradient(96deg,rgba(43,33,24,0.10) 0 3px,transparent 3px 13px),
+    linear-gradient(180deg,#7A6248 0%,#5A4834 100%);
+  /* The spread ring is the loose earth where the patch meets the grass. It is
+     a shadow rather than a pseudo-element behind the patch, because a
+     negative z-index child can fall behind the screen background once the
+     screen picks up a transform during a transition. */
+  box-shadow:
+    0 0 0 3px rgba(122,107,92,0.32),
+    inset 0 2px 0 rgba(255,255,255,0.10),
+    inset 0 -3px 5px rgba(43,33,24,0.22),
+    0 2px 3px rgba(43,33,24,0.16);
   position:relative;
 }
-.plot-pot::before{
-  content:'';
-  position:absolute;
-  top:0;left:-5px;right:-5px;
-  height:10px;
-  background:linear-gradient(180deg,#D1815C 0%,#B96844 100%);
-  border-radius:3px;
-}
+/* Bare soil is pale dry earth, which on its own sits only about 1.3:1 against
+   the grass. The solid earth border is what carries the boundary: it clears
+   3:1 against both the grass and the fill, so the patch stays discernible as
+   something you can tap without darkening it into looking planted. */
 .plot-pot.empty{
-  background:linear-gradient(180deg,#C6BAA5 0%,#A89B85 100%);
-  opacity:0.55;
+  background:
+    repeating-linear-gradient(96deg,rgba(43,33,24,0.05) 0 3px,transparent 3px 13px),
+    linear-gradient(180deg,#CFC4B0 0%,#B8AB95 100%);
+  border:2px solid var(--earth-deep);
+  box-shadow:inset 0 -2px 4px rgba(43,33,24,0.16);
 }
-.plot-pot.empty::before{background:linear-gradient(180deg,#D3C8B4 0%,#B4A892 100%)}
 
+/* Thirsty shows in the ground itself, dry and pale, with a droplet resting on
+   the near edge of the patch. Never a fail state, just soil asking for water. */
 .shelf-plot.thirsty .plot-plant{animation:thirsty-sway 3s ease-in-out infinite}
+.shelf-plot.thirsty .plot-pot{
+  background:
+    repeating-linear-gradient(96deg,rgba(43,33,24,0.09) 0 3px,transparent 3px 13px),
+    linear-gradient(180deg,#9A8465 0%,#7C6A50 100%);
+}
 .shelf-plot.thirsty::after{
   content:'';
   position:absolute;
-  top:6px;right:calc(50% - 30px);
-  width:10px;height:14px;
+  bottom:7px;right:5px;
+  width:14px;height:18px;
   background:var(--accent-orange);
-  border-radius:50% 50% 50% 50% / 60% 60% 40% 40%;
+  border:2px solid var(--bg-surface);
+  border-radius:50% 50% 50% 50% / 65% 65% 38% 38%;
+  box-shadow:0 1px 2px rgba(43,33,24,0.30);
   animation:thirsty-drip 1.6s ease-in-out infinite;
 }
 @keyframes thirsty-drip{
-  0%,100%{opacity:0.4;transform:translateY(0)}
+  0%,100%{opacity:0.55;transform:translateY(0)}
   50%{opacity:1;transform:translateY(3px)}
 }
 
-/* ── Wooden plank ── */
-.shelf-plank{
-  position:relative;
-  height:18px;
-  margin-top:2px;
-  background:linear-gradient(180deg,#9A7850 0%,#7A5C3E 55%,#644830 100%);
-  border-radius:3px;
-  box-shadow:0 5px 10px rgba(43,33,24,0.28), inset 0 1px 0 rgba(255,255,255,0.18);
-}
-.shelf-plank::before{
-  content:'';
-  position:absolute;inset:2px 4px;
-  background:repeating-linear-gradient(90deg,transparent 0 26px,rgba(43,33,24,0.10) 26px 28px);
-  border-radius:2px;
-}
-.shelf-bracket{
-  position:absolute;
-  bottom:-12px;
-  width:12px;height:12px;
-  background:linear-gradient(180deg,#8A6A44 0%,#5E4530 100%);
-  clip-path:polygon(0 0,100% 0,0 100%);
-}
-.shelf-bracket.left{left:12%}
-.shelf-bracket.right{right:12%;transform:scaleX(-1)}
-
-/* ── Locked shelf ── */
-.shelf-locked-unit{padding-top:1.5rem}
+/* ── Untilled land, the next plot over ──
+   Ground waiting to be cleared rather than a locked object. It sits in the
+   grid in reading order like any other plot, so the player pans to it the
+   same way they pan to their planted land. */
+/* Spans both field columns so it always starts a fresh row below every
+   opened patch, regardless of whether the shelf count is odd or even. */
+.shelf-locked-unit{padding:0.75rem 0.5rem 1rem;grid-column:1 / -1}
 .shelf-locked-plank{
   position:relative;
-  width:100%;
+  width:var(--field-col);
+  max-width:100%;
   background:transparent;
   border:none;
-  padding:1rem 0.5rem 0.5rem;
+  padding:0.5rem 0 0.5rem;
   cursor:pointer;
   font-family:inherit;
 }
 .shelf-locked-plank:disabled{cursor:default}
-.shelf-plank.locked{
-  background:linear-gradient(180deg,#B4A892 0%,#95886E 55%,#7A6F58 100%);
-  opacity:0.65;
+
+.patch-locked-row{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:0.5rem;
+  padding:0 0.5rem;
+  justify-items:stretch;
 }
+.patch-locked-slot{
+  width:100%;
+  height:56px;
+  border-radius:8px;
+  border:2px dashed rgba(68,87,61,0.55);
+  background:rgba(122,107,92,0.14);
+}
+.shelf-locked-plank:not(:disabled) .patch-locked-slot{
+  border-color:var(--foliage-shadow);
+  background:rgba(122,107,92,0.22);
+}
+
 .shelf-tag{
-  position:absolute;
-  top:0;
-  left:50%;
-  transform:translateX(-50%) rotate(-2deg);
-  display:flex;
+  position:relative;
+  margin:-0.5rem auto 0;
+  display:inline-flex;
   align-items:center;
   gap:0.5rem;
-  padding:0.55rem 1.1rem;
+  flex-wrap:wrap;
+  justify-content:center;
+  max-width:100%;
+  padding:0.55rem 0.95rem;
   background:var(--bg-surface);
   border:1.5px solid var(--border-mid);
-  border-radius:var(--radius-md);
+  border-radius:var(--radius-lg);
   box-shadow:0 3px 8px rgba(43,33,24,0.22);
   font-family:var(--font-body);
   font-size:1.05rem;
   font-weight:500;
   color:var(--text-secondary);
-  white-space:nowrap;
 }
-.shelf-tag::before{
-  content:'';
-  position:absolute;
-  top:-6px;left:50%;
-  transform:translateX(-50%);
-  width:8px;height:8px;
-  border-radius:50%;
-  background:#8A6A44;
-  box-shadow:inset 0 1px 2px rgba(43,33,24,0.4);
-}
+.shelf-tag-text{white-space:nowrap}
 .shelf-tag.affordable{
   border-color:var(--foliage-mid);
   color:var(--foliage-shadow);
-  animation:tag-swing 2.4s ease-in-out infinite;
+  animation:tag-rise 2.4s ease-in-out infinite;
 }
-@keyframes tag-swing{
-  0%,100%{transform:translateX(-50%) rotate(-2.5deg)}
-  50%{transform:translateX(-50%) rotate(2.5deg)}
+@keyframes tag-rise{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-4px)}
 }
 .shelf-tag-price{
   display:inline-flex;
@@ -480,13 +504,65 @@ body{
   border-radius:var(--radius-pill);
   color:#7A2F10;
   font-weight:600;
+  white-space:nowrap;
 }
 .shelf-tag-hint{
   margin-top:0.5rem;
   text-align:center;
   font-family:var(--font-body);
-  font-size:0.85rem;
-  color:var(--text-muted);
+  font-size:0.95rem;
+  color:var(--text-secondary);
+}
+
+/* ════════════════════════════════════════════════════════════
+   PATCHES SCREEN (second tab): same soil patches, its own pan camera
+   Same bounded-viewport idea as the primary garden: the field is dragged
+   under a fixed window instead of the page scrolling, so the header never
+   moves. Two columns of patches side by side, same as the primary garden,
+   so the field runs past the phone edge and needs a left-right pan. The
+   background is a flatter, lighter variant of the primary garden's grass
+   so the two feel related but not identical.
+   ════════════════════════════════════════════════════════════ */
+#screen-garden2{
+  overflow:hidden;
+  padding:1rem 1.25rem calc(var(--nav-height) + 0.75rem);
+  background:linear-gradient(180deg,#DCE4CC 0%,#CBD6B4 100%);
+}
+
+.garden2-viewport{
+  position:relative;
+  flex:1;
+  min-height:0;
+  margin:0 -1.25rem;
+  overflow:hidden;
+  touch-action:none;
+  user-select:none;
+  -webkit-user-select:none;
+  -webkit-tap-highlight-color:transparent;
+  cursor:grab;
+}
+.garden2-viewport.panning{cursor:grabbing}
+
+/* width:max-content makes offsetWidth the true content width, which is what
+   the pan bounds are measured from. Two plots of land side by side is what
+   makes the field wider than the phone. */
+.garden2-field{
+  --field-col:300px;
+  display:grid;
+  grid-template-columns:repeat(2,var(--field-col));
+  align-content:start;
+  justify-content:start;
+  gap:0.25rem 0.75rem;
+  width:max-content;
+  min-width:100%;
+  padding:0.5rem 1rem 1.5rem;
+  will-change:transform;
+}
+.garden2-field.pan-glide{transition:transform 420ms var(--ease-gentle)}
+
+@media (max-height:640px){
+  #screen-garden2{overflow-y:auto;overflow-x:hidden}
+  .garden2-viewport{flex:none;height:230px}
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -505,6 +581,19 @@ body{
 #plant-detail-modal.open .modal-sheet{transform:translateY(0)}
 
 .plant-detail-sheet{padding-top:1.25rem}
+
+/* Seed menu (Patches tab: tap an empty patch to plant in place) shares the
+   plant detail modal's fade + slide-up open/close. */
+#seed-menu-modal{
+  transition:opacity 250ms var(--ease-gentle);
+  opacity:0;
+}
+#seed-menu-modal.open{opacity:1}
+#seed-menu-modal .modal-sheet{
+  transform:translateY(30px);
+  transition:transform 250ms var(--ease-spring);
+}
+#seed-menu-modal.open .modal-sheet{transform:translateY(0)}
 
 .plant-latin{
   font-family:var(--font-display);
@@ -656,6 +745,14 @@ body{
   padding:1.25rem 1.25rem 1rem;
   box-shadow:var(--shadow-paper);
 }
+/* Inside the menu the sheet already provides the card, so the card drops its
+   own frame and reads as the first section of the panel. */
+#menu-modal .daily-card{
+  background:transparent;
+  border:none;
+  box-shadow:none;
+  padding:0;
+}
 .daily-card-title{
   display:flex;
   align-items:center;
@@ -757,7 +854,18 @@ body{
   color:var(--text-muted);
   white-space:nowrap;
 }
-.daily-week-dots{margin:0;flex:1}
+/* Label and count on one line, the ten dots on their own line beneath. All
+   three side by side ran past the right edge at phone width. */
+.daily-week{flex-wrap:wrap}
+.daily-week-label{order:1}
+.daily-week-hint,.daily-week-done{order:2;margin-left:auto}
+.daily-week-dots{
+  order:3;
+  flex-basis:100%;
+  margin:0.5rem 0 0;
+  justify-content:flex-start;
+  flex-wrap:wrap;
+}
 .daily-week-hint{font-size:0.85rem;color:var(--text-muted);white-space:nowrap}
 .daily-week-done{
   display:inline-flex;
@@ -937,7 +1045,8 @@ body{
 .notif-award{border-left-color:var(--accent-plum)}
 .notif-award .notif-icon{color:var(--accent-plum)}
 
-.garden-actions{display:flex;flex-direction:column;gap:0.75rem}
+/* Pinned below the pan window, never scrolls out of reach */
+.garden-actions{display:flex;flex-direction:column;gap:0.75rem;flex-shrink:0;padding-top:0.75rem}
 
 /* ── Buttons ── */
 .btn{
@@ -1929,6 +2038,7 @@ body{
   letter-spacing:0.02em;
   padding:0.5rem;
 }
+.nav-item[hidden]{display:none}
 .nav-item:active{transform:scale(0.95)}
 .nav-item.active{color:var(--foliage-shadow)}
 .nav-item.active .icon{color:var(--foliage-mid)}
@@ -2785,30 +2895,32 @@ body{
 /* ════════════════════════════════════════════════════════════
    GARDEN HINT CARD (first visit)
    ════════════════════════════════════════════════════════════ */
+/* Stacked and compact: it sits above the pan window, where every pixel it
+   takes is a pixel of field the player loses. */
 .garden-hint-card{
-  grid-column:1/-1;
   display:flex;
-  align-items:center;
-  gap:1rem;
-  padding:1.25rem;
+  flex-direction:column;
+  gap:0.5rem;
+  padding:0.9rem 1rem;
   background:var(--bg-surface);
   border:1.5px solid var(--foliage-mid);
   border-radius:var(--radius-lg);
-  margin-bottom:0.75rem;
+  margin-bottom:0.6rem;
 }
+.garden-hint-head{display:flex;align-items:center;gap:0.6rem}
 .garden-hint-card .icon{color:var(--foliage-mid);flex-shrink:0}
 .garden-hint-title{
   font-family:var(--font-display);
-  font-size:1.2rem;
+  font-size:1.3rem;
   font-weight:500;
-  margin-bottom:0.2rem;
 }
 .garden-hint-body{
   font-family:var(--font-body);
-  font-size:0.9rem;
+  font-size:1rem;
   color:var(--text-secondary);
   line-height:1.4;
 }
+.garden-hint-card .btn{width:100%}
 
 /* ════════════════════════════════════════════════════════════
    MISC FIXES
@@ -2864,7 +2976,6 @@ body{
   }
   .shelf-plot.thirsty .plot-plant{animation:none}
   .shelf-tag.affordable{animation:none}
-  .sky-sun{animation:none}
 }
 
 /* ── Safe area ── */

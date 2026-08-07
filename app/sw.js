@@ -3,7 +3,7 @@
    Offline-first shell. Bump CACHE_VERSION on every deploy.
    ============================================================ */
 
-const CACHE_VERSION = 'gol-v2';
+const CACHE_VERSION = 'gol-v6';
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const FONT_CACHE  = `${CACHE_VERSION}-fonts`;
 

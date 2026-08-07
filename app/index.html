@@ -206,6 +206,11 @@
       <path d="M1 20v-6h6"/>
       <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
     </symbol>
+    <symbol id="icon-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 7h16"/>
+      <path d="M4 12h16"/>
+      <path d="M4 17h16"/>
+    </symbol>
   </defs>
 </svg>
 
@@ -225,11 +230,9 @@
       </span>
     </div>
     <div class="topbar-right">
-      <button class="icon-btn" id="mute-btn" aria-label="Toggle sound" aria-pressed="false">
-        <svg class="icon" id="mute-icon"><use href="#icon-sound"/></svg>
-      </button>
-      <button class="icon-btn" id="share-btn" aria-label="Share garden">
-        <svg class="icon"><use href="#icon-share"/></svg>
+      <button class="icon-btn" id="menu-btn" aria-label="Open menu" aria-haspopup="dialog" aria-expanded="false">
+        <svg class="icon"><use href="#icon-menu"/></svg>
+        <span class="menu-badge" id="menu-badge" hidden></span>
       </button>
     </div>
   </header>
@@ -241,12 +244,19 @@
   <main class="screens" role="main">
 
     <!-- ── GARDEN SCREEN ── -->
-    <section class="screen active" id="screen-garden" role="tabpanel" aria-labelledby="nav-garden">
+    <section class="screen" id="screen-garden" role="tabpanel" aria-labelledby="nav-garden">
       <div class="garden-header">
         <h1 class="garden-title">Your Garden</h1>
         <p class="garden-subtitle" id="garden-date"></p>
       </div>
-      <div class="garden-scene" id="garden-scene"></div>
+      <div class="garden-hint-slot" id="garden-hint-slot"></div>
+      <!-- The field is larger than the phone. It is dragged under this fixed
+           window instead of scrolling the page, so the header and the action
+           buttons never move. -->
+      <div class="garden-viewport" id="garden-viewport">
+        <div class="garden-field" id="garden-scene"></div>
+        <p class="garden-pan-hint" id="garden-pan-hint" hidden>Drag to look around your field</p>
+      </div>
       <div class="garden-actions">
         <button class="btn btn-primary btn-lg" id="btn-water-all">
           <svg class="icon"><use href="#icon-water"/></svg>
@@ -256,6 +266,21 @@
           <svg class="icon"><use href="#icon-shop"/></svg>
           Visit seed shop
         </button>
+      </div>
+    </section>
+
+    <!-- ── GARDEN GRID SCREEN: same plants, a plain static grid ── -->
+    <section class="screen active" id="screen-garden2" role="tabpanel" aria-labelledby="nav-garden2">
+      <div class="screen-header">
+        <h1 class="screen-title">Your Patches</h1>
+        <p class="screen-subtitle">The same garden, laid out all at once.</p>
+      </div>
+      <!-- Bounded pan window, same idea as the primary garden's field: the
+           current row of patches sits at the top, a locked row waits below
+           it, and the player drags to look around instead of the page
+           scrolling. -->
+      <div class="garden2-viewport" id="garden2-viewport">
+        <div class="garden2-field" id="garden2-scene"></div>
       </div>
     </section>
 
@@ -328,9 +353,13 @@
 
   <!-- ══ BOTTOM NAV ══ -->
   <nav class="bottom-nav" role="navigation" aria-label="Main navigation">
-    <button class="nav-item active" id="nav-garden" data-screen="garden" role="tab" aria-selected="true" aria-controls="screen-garden" aria-label="Garden">
+    <button class="nav-item" id="nav-garden" data-screen="garden" role="tab" aria-selected="false" aria-controls="screen-garden" aria-label="Garden" hidden>
       <svg class="icon" aria-hidden="true"><use href="#icon-garden"/></svg>
       <span>Garden</span>
+    </button>
+    <button class="nav-item active" id="nav-garden2" data-screen="garden2" role="tab" aria-selected="true" aria-controls="screen-garden2" aria-label="Garden patches grid view">
+      <svg class="icon" aria-hidden="true"><use href="#icon-leaf"/></svg>
+      <span>Patches</span>
     </button>
     <button class="nav-item" id="nav-exercises" data-screen="exercises" role="tab" aria-selected="false" aria-controls="screen-exercises" aria-label="Brain exercises">
       <svg class="icon" aria-hidden="true"><use href="#icon-brain"/></svg>
@@ -376,6 +405,34 @@
 
   <!-- ══ PLANT DETAIL MODAL ══ -->
   <div class="modal-overlay" id="plant-detail-modal" role="dialog" aria-modal="true" aria-label="Plant details" hidden></div>
+
+  <!-- ══ SEED MENU MODAL (Patches tab: tap an empty patch to plant) ══ -->
+  <div class="modal-overlay" id="seed-menu-modal" role="dialog" aria-modal="true" aria-label="Choose a seed to plant" hidden></div>
+
+  <!-- ══ MENU ══
+       Today's tasks, sound and sharing, all behind one button so the top bar
+       stays quiet. The daily card host lives here now, not in the garden. -->
+  <div class="modal-overlay" id="menu-modal" role="dialog" aria-modal="true" aria-labelledby="menu-title" hidden>
+    <div class="modal-sheet" role="document">
+      <div class="modal-header">
+        <h2 class="modal-title" id="menu-title">Menu</h2>
+        <button class="icon-btn" id="btn-close-menu" aria-label="Close menu">
+          <svg class="icon"><use href="#icon-close"/></svg>
+        </button>
+      </div>
+      <div id="daily-card"></div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary menu-row" id="mute-btn" aria-pressed="false">
+          <svg class="icon" id="mute-icon"><use href="#icon-sound"/></svg>
+          <span id="mute-label">Sound is on</span>
+        </button>
+        <button class="btn btn-secondary menu-row" id="share-btn">
+          <svg class="icon"><use href="#icon-share"/></svg>
+          Share your garden
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- ══ WATER ANIMATION OVERLAY ══ -->
   <div id="water-overlay" aria-hidden="true"></div>
