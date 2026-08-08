@@ -198,122 +198,13 @@ body{
 }
 .subsection-head{
   font-family:var(--font-body);
-  font-size:0.8rem;
+  font-size:1rem;
   font-weight:500;
   letter-spacing:0.1em;
   text-transform:uppercase;
   color:var(--text-muted);
   margin:1.5rem 0 0.75rem;
 }
-
-/* ── Garden screen ── */
-/* The whole tab is the field. One continuous grass surface edge to edge, in
-   the foliage palette so it sits beside the shop and profile screens rather
-   than shouting over them: a soft sage that deepens slightly toward the
-   bottom, with a very low contrast blade texture. Backgrounds on a scroll
-   container are painted against the padding box, so the field stays put
-   while the rows scroll over it. */
-/* The overflow override is scoped to this id on purpose: the shared .screen
-   rule still scrolls every other tab. Here the page itself never scrolls, the
-   field is dragged inside .garden-viewport instead. */
-/* Tighter than the shared .screen padding: every pixel taken back here is a
-   pixel of field the player can see without panning. */
-#screen-garden{
-  overflow:hidden;
-  padding:1rem 1.25rem calc(var(--nav-height) + 0.75rem);
-  background:
-    repeating-linear-gradient(102deg,rgba(68,87,61,0.028) 0 2px,transparent 2px 16px),
-    linear-gradient(180deg,#DDE2CE 0%,#CFD8BB 55%,#C5D0AE 100%);
-}
-.garden-header{margin-bottom:0.75rem;flex-shrink:0}
-.garden-hint-slot:not(:empty){flex-shrink:0}
-.garden-title{
-  font-family:var(--font-display);
-  font-size:2.5rem;
-  font-weight:500;
-  line-height:1.1;
-  margin-bottom:0.2rem;
-}
-/* One step darker than --text-muted: muted clears 4.5:1 on the cream paper
-   but not on the deeper end of the grass. */
-.garden-subtitle{
-  font-family:var(--font-body);
-  font-size:1rem;
-  color:var(--text-secondary);
-}
-
-/* Outlined buttons need a surface under them to stay legible on grass */
-#screen-garden .btn-secondary{background:rgba(245,239,235,0.88)}
-
-/* ════════════════════════════════════════════════════════════
-   GARDEN SCENE: an open field of soil patches
-   ════════════════════════════════════════════════════════════ */
-
-/* The window the field is dragged under. It eats the screen padding with a
-   negative margin so the grass runs to both edges of the phone and the field
-   visibly continues past them. touch-action:none hands the gesture to the
-   pointer handlers instead of letting the browser try to scroll it. */
-.garden-viewport{
-  position:relative;
-  flex:1;
-  min-height:0;
-  margin:0 -1.25rem;
-  overflow:hidden;
-  touch-action:none;
-  user-select:none;
-  -webkit-user-select:none;
-  -webkit-tap-highlight-color:transparent;
-  cursor:grab;
-}
-.garden-viewport.panning{cursor:grabbing}
-
-/* The pannable layer. width:max-content makes offsetWidth the true content
-   width, which is what the pan bounds are measured from. Two plots of land
-   side by side is what makes the field wider than the phone. */
-.garden-field{
-  --field-col:300px;
-  display:grid;
-  grid-template-columns:repeat(2,var(--field-col));
-  align-content:start;
-  justify-content:start;
-  gap:0.25rem 0.75rem;
-  width:max-content;
-  min-width:100%;
-  padding:0.5rem 1rem 1.5rem;
-  will-change:transform;
-}
-/* Only on a programmatic move, never while a finger is down */
-.garden-field.pan-glide{transition:transform 420ms var(--ease-gentle)}
-
-/* Landscape and very short screens cannot fit the header, a useful pan window
-   and the action buttons at once. There the garden goes back to scrolling
-   like every other tab, with the pan window at a fixed height inside it. */
-@media (max-height:640px){
-  #screen-garden{overflow-y:auto;overflow-x:hidden}
-  .garden-viewport{flex:none;height:230px}
-}
-
-/* Discoverability pill. Sits in the headroom above the first row of patches,
-   where it covers grass rather than anything tappable. */
-.garden-pan-hint{
-  position:absolute;
-  left:50%;
-  top:0.4rem;
-  transform:translateX(-50%);
-  padding:0.5rem 1.1rem;
-  border-radius:var(--radius-pill);
-  background:var(--bg-surface);
-  border:1.5px solid var(--border-mid);
-  box-shadow:0 3px 8px rgba(43,33,24,0.22);
-  font-family:var(--font-body);
-  font-size:1.15rem;
-  color:var(--text-secondary);
-  white-space:nowrap;
-  pointer-events:none;
-  transition:opacity 400ms var(--ease-gentle);
-}
-.garden-pan-hint[hidden]{display:none}
-.garden-pan-hint.fading{opacity:0}
 
 /* ── One plot of soil patches in the grass ── */
 /* The space above each patch is headroom for a tall plant to grow into, so
@@ -465,9 +356,12 @@ body{
   background:rgba(122,107,92,0.22);
 }
 
+/* Sits below the dashed slots, not lapped over them. The old negative top
+   margin tucked it up into the row, and tag-rise lifted it another 4px, so at
+   390px the pill covered the slots it was labelling. */
 .shelf-tag{
   position:relative;
-  margin:-0.5rem auto 0;
+  margin:0.65rem auto 0;
   display:inline-flex;
   align-items:center;
   gap:0.5rem;
@@ -510,24 +404,35 @@ body{
   margin-top:0.5rem;
   text-align:center;
   font-family:var(--font-body);
-  font-size:0.95rem;
+  font-size:1rem;
   color:var(--text-secondary);
 }
 
 /* ════════════════════════════════════════════════════════════
-   PATCHES SCREEN (second tab): same soil patches, its own pan camera
-   Same bounded-viewport idea as the primary garden: the field is dragged
-   under a fixed window instead of the page scrolling, so the header never
-   moves. Two columns of patches side by side, same as the primary garden,
-   so the field runs past the phone edge and needs a left-right pan. The
-   background is a flatter, lighter variant of the primary garden's grass
-   so the two feel related but not identical.
+   PATCHES SCREEN: the garden, on one continuous grass surface
+   The field is dragged under a fixed window instead of the page scrolling,
+   so the header and the water button never move. Two columns of patches side
+   by side, so the field runs past the phone edge and needs a left-right pan.
+
+   The overflow override is scoped to this id on purpose: the shared .screen
+   rule still scrolls every other tab. Here the page itself never scrolls.
+   The padding is tighter than the shared .screen padding, because every pixel
+   taken back is a pixel of field visible without panning.
    ════════════════════════════════════════════════════════════ */
 #screen-garden2{
   overflow:hidden;
   padding:1rem 1.25rem calc(var(--nav-height) + 0.75rem);
   background:linear-gradient(180deg,#DCE4CC 0%,#CBD6B4 100%);
 }
+
+/* Header, hint and action dock are fixed furniture; the pan window takes
+   whatever is left. Without flex-shrink they get squeezed as the field grows. */
+#screen-garden2 .screen-header{margin-bottom:0.75rem;flex-shrink:0}
+#screen-garden2 .screen-title{font-size:2.5rem;line-height:1.1;margin-bottom:0.2rem}
+/* One step darker than --text-muted: muted clears 4.5:1 on the cream paper
+   but not on the deeper end of the grass. */
+#screen-garden2 .screen-subtitle{color:var(--text-secondary)}
+.garden-hint-slot:not(:empty){flex-shrink:0}
 
 .garden2-viewport{
   position:relative;
@@ -545,20 +450,104 @@ body{
 
 /* width:max-content makes offsetWidth the true content width, which is what
    the pan bounds are measured from. Two plots of land side by side is what
-   makes the field wider than the phone. */
+   makes the field wider than the phone.
+
+   The generous padding and the min sizes are the walkable margin. Without
+   them the grid is exactly as big as its rows and the gardener has nowhere
+   to stand that is not already a patch. */
 .garden2-field{
   --field-col:300px;
+  position:relative;
   display:grid;
   grid-template-columns:repeat(2,var(--field-col));
   align-content:start;
   justify-content:start;
-  gap:0.25rem 0.75rem;
+  gap:0.75rem 0.75rem;
   width:max-content;
   min-width:100%;
-  padding:0.5rem 1rem 1.5rem;
+  min-height:560px;
+  padding:2.5rem 2.5rem 4rem;
   will-change:transform;
 }
 .garden2-field.pan-glide{transition:transform 420ms var(--ease-gentle)}
+
+/* ── The gardener ────────────────────────────────────────────
+   A view detail, never saved. pointer-events:none so it can never sit
+   between a finger and a patch. */
+.garden-avatar{
+  position:absolute;
+  left:0;
+  top:0;
+  width:52px;
+  height:52px;
+  z-index:6;
+  pointer-events:none;
+  will-change:transform;
+  filter:drop-shadow(0 1px 2px rgba(43,33,24,0.35));
+}
+/* Soft ellipse so the gardener reads as standing on the grass, not floating */
+.garden-avatar::before{
+  content:'';
+  position:absolute;
+  left:50%;
+  bottom:0;
+  transform:translateX(-50%);
+  width:34px;
+  height:9px;
+  border-radius:50%;
+  background:rgba(43,33,24,0.28);
+}
+.avatar-body{
+  position:absolute;
+  left:50%;
+  bottom:4px;
+  transform:translateX(-50%);
+  width:28px;
+  height:24px;
+  border-radius:14px 14px 8px 8px;
+  background:linear-gradient(180deg,var(--foliage-shadow) 0%,var(--foliage-deep) 100%);
+  border:2px solid var(--bg-surface);
+}
+.avatar-head{
+  position:absolute;
+  left:50%;
+  bottom:23px;
+  transform:translateX(-50%);
+  width:24px;
+  height:24px;
+  border-radius:50%;
+  background:#EFDFC6;
+  border:2px solid var(--bg-surface);
+  box-shadow:0 0 0 1.5px var(--earth-deep);
+}
+.avatar-sprout{
+  position:absolute;
+  left:50%;
+  bottom:48px;
+  transform:translateX(-50%) rotate(-20deg);
+  width:18px;
+  height:12px;
+  border-radius:0 100% 0 100%;
+  background:var(--foliage-muted);
+  border:1.5px solid var(--bg-surface);
+}
+.garden-avatar.facing-left .avatar-sprout{
+  transform:translateX(-50%) rotate(20deg) scaleX(-1);
+}
+.garden-avatar.walking .avatar-head{animation:avatar-bob 0.5s ease-in-out infinite}
+.garden-avatar.walking .avatar-sprout{animation:avatar-sway 0.5s ease-in-out infinite}
+@keyframes avatar-bob{
+  0%,100%{transform:translateX(-50%) translateY(0)}
+  50%{transform:translateX(-50%) translateY(-2px)}
+}
+@keyframes avatar-sway{
+  0%,100%{transform:translateX(-50%) rotate(-20deg)}
+  50%{transform:translateX(-50%) rotate(-8deg) translateY(-2px)}
+}
+@media (prefers-reduced-motion:reduce){
+  .garden-avatar.walking .avatar-head,
+  .garden-avatar.walking .avatar-sprout{animation:none}
+}
 
 @media (max-height:640px){
   #screen-garden2{overflow-y:auto;overflow-x:hidden}
@@ -639,7 +628,7 @@ body{
 .plant-touch-hint{
   margin-top:0.75rem;
   font-family:var(--font-body);
-  font-size:0.9rem;
+  font-size:1rem;
   color:var(--text-muted);
   font-style:italic;
 }
@@ -664,7 +653,6 @@ body{
   border:1.5px solid transparent;
 }
 .plant-state-badge.state-seed{background:var(--bg-inset);color:var(--text-secondary);border-color:var(--border-mid)}
-.plant-state-badge.state-sprout{background:rgba(177,184,161,0.25);color:var(--foliage-shadow);border-color:var(--foliage-highlight)}
 .plant-state-badge.state-grown{background:rgba(115,135,93,0.15);color:var(--foliage-shadow);border-color:var(--foliage-mid)}
 .plant-state-badge.state-bloom{background:rgba(224,122,95,0.15);color:#7A2F10;border-color:var(--accent-coral)}
 .plant-state-badge.state-wilt{background:rgba(231,143,55,0.15);color:#7A4800;border-color:var(--accent-orange)}
@@ -692,7 +680,7 @@ body{
   align-items:center;
   gap:0.5rem;
   font-family:var(--font-body);
-  font-size:0.85rem;
+  font-size:1rem;
   font-weight:600;
   letter-spacing:0.08em;
   text-transform:uppercase;
@@ -722,7 +710,7 @@ body{
   border:1.5px solid var(--foliage-highlight);
   color:var(--foliage-shadow);
   font-family:var(--font-body);
-  font-size:0.95rem;
+  font-size:1rem;
   font-weight:500;
 }
 
@@ -814,7 +802,7 @@ body{
 }
 .daily-task-meta{display:flex;align-items:center;gap:0.5rem;flex-shrink:0}
 .daily-task-progress{
-  font-size:0.95rem;
+  font-size:1rem;
   font-weight:600;
   color:var(--text-secondary);
 }
@@ -827,7 +815,7 @@ body{
   background:rgba(224,122,95,0.15);
   border:1.5px solid var(--accent-coral);
   color:#7A2F10;
-  font-size:0.95rem;
+  font-size:1rem;
   font-weight:600;
 }
 .daily-all-done{
@@ -847,7 +835,7 @@ body{
 }
 .daily-week-label{
   font-family:var(--font-body);
-  font-size:0.85rem;
+  font-size:1rem;
   font-weight:600;
   letter-spacing:0.06em;
   text-transform:uppercase;
@@ -866,12 +854,12 @@ body{
   justify-content:flex-start;
   flex-wrap:wrap;
 }
-.daily-week-hint{font-size:0.85rem;color:var(--text-muted);white-space:nowrap}
+.daily-week-hint{font-size:1rem;color:var(--text-muted);white-space:nowrap}
 .daily-week-done{
   display:inline-flex;
   align-items:center;
   gap:0.3rem;
-  font-size:0.85rem;
+  font-size:1rem;
   font-weight:500;
   color:var(--accent-plum);
   white-space:nowrap;
@@ -917,7 +905,7 @@ body{
 }
 .almanac-summary-sub{
   font-family:var(--font-body);
-  font-size:0.9rem;
+  font-size:1rem;
   color:var(--text-secondary);
   margin-top:0.15rem;
 }
@@ -928,7 +916,7 @@ body{
   align-items:center;
   gap:0.5rem;
   font-family:var(--font-body);
-  font-size:0.85rem;
+  font-size:1rem;
   font-weight:600;
   letter-spacing:0.1em;
   text-transform:uppercase;
@@ -987,7 +975,7 @@ body{
 }
 .plate-desc{
   font-family:var(--font-body);
-  font-size:0.9rem;
+  font-size:1rem;
   line-height:1.4;
   text-align:center;
   color:var(--text-secondary);
@@ -1007,13 +995,13 @@ body{
   border:1.5px solid var(--foliage-mid);
   color:var(--foliage-shadow);
   font-family:var(--font-body);
-  font-size:0.8rem;
+  font-size:1rem;
   font-weight:600;
   letter-spacing:0.04em;
 }
 .plate-progress{
   font-family:var(--font-body);
-  font-size:0.85rem;
+  font-size:1rem;
   font-weight:500;
   color:var(--text-muted);
 }
@@ -1076,69 +1064,22 @@ body{
 .btn-secondary:hover:not(:disabled){background:rgba(115,135,93,0.10)}
 .btn-ghost{background:transparent;color:var(--text-secondary);border-color:var(--border-mid)}
 .btn-ghost:hover:not(:disabled){color:var(--text-primary);border-color:var(--border-strong)}
-.btn-danger{background:transparent;color:var(--accent-red);border-color:var(--accent-red)}
 .btn-lg{min-height:80px;font-size:1.35rem;padding:0 2.5rem;border-radius:var(--radius-lg)}
-.btn-sm{min-height:52px;font-size:1rem;padding:0 1.25rem}
-
-/* ── Exercise cards ── */
-.exercise-list{display:flex;flex-direction:column;gap:0.875rem}
-.exercise-card{
-  display:flex;
-  align-items:center;
-  gap:1rem;
-  padding:1.25rem;
-  background:var(--bg-surface);
-  border:1.5px solid var(--border-light);
-  border-radius:var(--radius-lg);
-  cursor:pointer;
-  transition:all var(--duration-normal) var(--ease-gentle);
-  text-align:left;
-  width:100%;
-  box-shadow:var(--shadow-paper);
-}
-.exercise-card:hover{border-color:var(--foliage-mid);transform:translateY(-2px);box-shadow:var(--shadow-md)}
-.exercise-card:active{transform:scale(0.98)}
-.exercise-card:focus-visible{outline:3px solid var(--foliage-mid);outline-offset:2px}
-.exercise-icon{
-  width:72px;height:72px;
-  border-radius:var(--radius-md);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  flex-shrink:0;
-}
-.exercise-info{flex:1}
-.exercise-name{
-  font-family:var(--font-display);
-  font-size:1.4rem;
-  font-weight:500;
-  color:var(--text-primary);
-  margin-bottom:0.2rem;
-}
-.exercise-desc{
-  font-family:var(--font-body);
-  font-size:0.95rem;
-  color:var(--text-secondary);
-  line-height:1.4;
-  margin-bottom:0.35rem;
-}
-.exercise-reward{
-  font-family:var(--font-body);
-  font-size:0.9rem;
-  font-weight:500;
-  color:#7A2F10;
-  display:flex;
-  align-items:center;
-  gap:0.25rem;
-}
-.exercise-reward .icon{color:var(--accent-coral)}
-.exercise-card>.icon{color:var(--text-muted);flex-shrink:0}
+/* Still the small button, but never below the 60px tap floor. It was 52px,
+   which was the only control on any screen under the floor. */
+.btn-sm{min-height:60px;font-size:1.05rem;padding:0 1.25rem}
 
 /* ── Shop ── */
+/* Wraps rather than squeezing: at 390px the coin chip and the free-seed
+   button together overflowed their row and broke the button label onto two
+   lines. Given the room they sit side by side, otherwise the button takes
+   its own full-width line. */
 .shop-coins-bar{
   display:flex;
   align-items:center;
   justify-content:space-between;
+  flex-wrap:wrap;
+  gap:0.75rem;
   margin-bottom:1.25rem;
   padding:0.75rem 1rem;
   background:var(--bg-inset);
@@ -1146,10 +1087,15 @@ body{
   border:1px solid var(--border-light);
 }
 .shop-grid{display:flex;flex-direction:column;gap:0.75rem}
+/* Icon, name and price share the top row; the description and the buy button
+   each span the full card. The old three-column row left the name about 106px
+   at 390px, which broke every two-word seed name across two lines. */
 .shop-item{
-  display:flex;
+  display:grid;
+  grid-template-columns:auto 1fr auto;
   align-items:center;
-  gap:1rem;
+  column-gap:0.85rem;
+  row-gap:0.55rem;
   padding:1rem 1.25rem;
   background:var(--bg-surface);
   border:1.5px solid var(--border-light);
@@ -1160,7 +1106,8 @@ body{
 .shop-item:hover{border-color:var(--foliage-mid)}
 .shop-item.rare{border-color:var(--accent-plum);background:rgba(123,83,113,0.04)}
 .shop-item-icon{
-  width:72px;height:72px;
+  grid-column:1;
+  width:60px;height:60px;
   background:var(--bg-deep);
   border-radius:var(--radius-md);
   display:flex;
@@ -1168,20 +1115,24 @@ body{
   justify-content:center;
   flex-shrink:0;
 }
-.shop-item-icon svg{width:55%;height:55%}
-.shop-item-info{flex:1}
+.shop-item-icon svg{width:60%;height:60%}
 .shop-item-name{
+  grid-column:2;
   font-family:var(--font-display);
-  font-size:1.3rem;
+  font-size:1.35rem;
   font-weight:500;
-  margin-bottom:0.15rem;
+  line-height:1.15;
 }
+.shop-item-price-slot{grid-column:3;justify-self:end}
 .shop-item-desc{
+  grid-column:1 / -1;
   font-family:var(--font-body);
-  font-size:0.9rem;
+  font-size:1.05rem;
   color:var(--text-secondary);
-  line-height:1.35;
+  line-height:1.4;
 }
+.shop-item-action{grid-column:1 / -1}
+.shop-item-action .shop-buy-btn{width:100%}
 .shop-item-price{
   display:flex;
   align-items:center;
@@ -1238,7 +1189,7 @@ body{
 }
 .profile-card-title{
   font-family:var(--font-body);
-  font-size:0.85rem;
+  font-size:1rem;
   font-weight:500;
   letter-spacing:0.06em;
   text-transform:uppercase;
@@ -1254,7 +1205,7 @@ body{
 }
 .profile-card-sub{
   font-family:var(--font-body);
-  font-size:0.85rem;
+  font-size:1rem;
   color:var(--text-secondary);
   margin-top:0.15rem;
 }
@@ -1287,7 +1238,7 @@ body{
 }
 .meal-card-ingredients{
   font-family:var(--font-body);
-  font-size:0.8rem;
+  font-size:1rem;
   color:var(--text-secondary);
   line-height:1.35;
 }
@@ -1298,7 +1249,7 @@ body{
   padding:0.2rem 0.5rem;
   border-radius:var(--radius-pill);
   font-family:var(--font-body);
-  font-size:0.7rem;
+  font-size:1rem;
   font-weight:500;
   margin-top:0.4rem;
 }
@@ -1370,16 +1321,6 @@ body{
 .tile.flipped{background:var(--bg-surface);border-color:var(--foliage-mid)}
 .tile.matched{background:rgba(115,135,93,0.12);border-color:var(--foliage-mid);opacity:0.7;cursor:default}
 .tile.matched svg{color:var(--foliage-mid)}
-.tile-label{
-  position:absolute;
-  bottom:4px;
-  left:50%;
-  transform:translateX(-50%);
-  font-family:var(--font-body);
-  font-size:0.55rem;
-  color:var(--text-muted);
-  white-space:nowrap;
-}
 
 /* ── Pattern sequence game ── */
 .pattern-display{
@@ -1463,7 +1404,7 @@ body{
 .odd-item svg{width:48px;height:48px;color:var(--foliage-shadow)}
 .odd-item-label{
   font-family:var(--font-body);
-  font-size:0.85rem;
+  font-size:1rem;
   font-weight:500;
   color:var(--text-secondary);
   text-align:center;
@@ -1995,7 +1936,7 @@ body{
 }
 .notif-body{
   font-family:var(--font-body);
-  font-size:0.875rem;
+  font-size:1rem;
   color:var(--text-secondary);
   line-height:1.4;
 }
@@ -2033,7 +1974,7 @@ body{
   color:var(--text-muted);
   transition:all var(--duration-fast) var(--ease-gentle);
   font-family:var(--font-body);
-  font-size:0.75rem;
+  font-size:1rem;
   font-weight:500;
   letter-spacing:0.02em;
   padding:0.5rem;
@@ -2118,7 +2059,7 @@ body{
 .share-preview-plant{width:60px;height:75px}
 .share-stats{
   font-family:var(--font-body);
-  font-size:0.95rem;
+  font-size:1rem;
   color:var(--text-secondary);
   text-align:center;
   line-height:1.6;
@@ -2302,9 +2243,6 @@ body{
    ════════════════════════════════════════════════════════════ */
 
 /* Island section */
-.island-block{
-  margin-bottom:3rem;
-}
 .island-header{
   display:flex;
   align-items:center;
@@ -2359,13 +2297,13 @@ body{
 }
 .island-desc{
   font-family:var(--font-body);
-  font-size:0.95rem;
+  font-size:1rem;
   color:var(--text-secondary);
   line-height:1.4;
 }
 .island-progress{
   font-family:var(--font-body);
-  font-size:0.8rem;
+  font-size:1rem;
   font-weight:500;
   color:var(--text-muted);
   margin-top:0.3rem;
@@ -2441,7 +2379,7 @@ body{
   align-items:center;
   justify-content:center;
   font-family:var(--font-body);
-  font-size:0.75rem;
+  font-size:1rem;
   font-weight:600;
   color:var(--text-primary);
   box-shadow:var(--shadow-sm);
@@ -2452,7 +2390,7 @@ body{
 .node-label{
   margin-top:0.6rem;
   font-family:var(--font-body);
-  font-size:0.8rem;
+  font-size:1rem;
   font-weight:500;
   color:var(--text-secondary);
   text-align:center;
@@ -2518,42 +2456,8 @@ body{
 }
 
 /* ── Path connector line ── */
-.path-connector{
-  position:absolute;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  z-index:0;
-  pointer-events:none;
-}
 
 /* Island completion banner */
-.island-complete-banner{
-  display:flex;
-  align-items:center;
-  gap:1rem;
-  padding:1.25rem 1.5rem;
-  background:rgba(115,135,93,0.10);
-  border:1.5px solid var(--foliage-mid);
-  border-radius:var(--radius-xl);
-  margin-bottom:2rem;
-}
-.island-complete-banner svg{
-  color:var(--foliage-mid);
-  flex-shrink:0;
-}
-.island-complete-text{
-  font-family:var(--font-display);
-  font-size:1.3rem;
-  font-weight:500;
-  color:var(--foliage-shadow);
-}
-.island-complete-sub{
-  font-family:var(--font-body);
-  font-size:0.9rem;
-  color:var(--text-secondary);
-  margin-top:0.2rem;
-}
 
 /* Level reward preview inside node label */
 .node-reward{
@@ -2562,27 +2466,12 @@ body{
   justify-content:center;
   gap:0.2rem;
   margin-top:0.25rem;
-  font-size:0.75rem;
+  font-size:1rem;
   color:var(--text-muted);
 }
 .node-reward .icon{width:0.9em;height:0.9em}
 
 /* Path start indicator */
-.path-start{
-  display:flex;
-  align-items:center;
-  gap:0.5rem;
-  padding:0.6rem 1.25rem;
-  background:var(--bg-inset);
-  border:1.5px dashed var(--border-mid);
-  border-radius:var(--radius-pill);
-  font-family:var(--font-body);
-  font-size:0.85rem;
-  font-weight:500;
-  color:var(--text-muted);
-  margin-bottom:2rem;
-  letter-spacing:0.04em;
-}
 
 /* Exercise type tag on node */
 .node-type-tag{
@@ -2593,7 +2482,7 @@ body{
   padding:0.2rem 0.6rem;
   border-radius:var(--radius-pill);
   font-family:var(--font-body);
-  font-size:0.65rem;
+  font-size:1rem;
   font-weight:600;
   letter-spacing:0.06em;
   text-transform:uppercase;
@@ -2615,22 +2504,6 @@ body{
    COURSE SELECT SCREEN
    ════════════════════════════════════════════════════════════ */
 
-.course-select-header{
-  margin-bottom:1.5rem;
-}
-.course-select-title{
-  font-family:var(--font-display);
-  font-size:2rem;
-  font-weight:500;
-  margin-bottom:0.4rem;
-}
-.course-select-sub{
-  font-family:var(--font-body);
-  font-size:1rem;
-  color:var(--text-secondary);
-  line-height:1.5;
-}
-
 .course-list{
   display:flex;
   flex-direction:column;
@@ -2638,10 +2511,12 @@ body{
 }
 
 .course-card{
-  display:flex;
+  display:grid;
+  grid-template-columns:auto 1fr auto;
   align-items:center;
-  gap:1rem;
-  padding:1.25rem 1.5rem;
+  column-gap:1rem;
+  row-gap:0.5rem;
+  padding:1.25rem 1.25rem;
   background:var(--bg-surface);
   border:2px solid var(--border-light);
   border-radius:var(--radius-xl);
@@ -2683,7 +2558,8 @@ body{
 }
 
 .course-card-icon{
-  width:72px;height:72px;
+  grid-column:1;
+  width:56px;height:56px;
   border-radius:var(--radius-lg);
   background:var(--bg-deep);
   display:flex;
@@ -2699,20 +2575,24 @@ body{
 .course-card.word-woods .course-card-icon{color:var(--accent-red)}
 .course-card.kopitiam-corner .course-card-icon{color:var(--kopi-accent)}
 
-.course-card-info{flex:1}
+/* 1.35rem rather than 1.5rem: at 390px the longest course name, "Memory
+   Meadow", broke onto a second line at the larger size once the icon and
+   arrow had taken their columns. */
 .course-card-name{
+  grid-column:2;
   font-family:var(--font-display);
-  font-size:1.5rem;
+  font-size:1.35rem;
   font-weight:500;
-  margin-bottom:0.2rem;
+  line-height:1.15;
 }
 .course-card-desc{
+  grid-column:1 / -1;
   font-family:var(--font-body);
-  font-size:0.95rem;
+  font-size:1.05rem;
   color:var(--text-secondary);
-  line-height:1.4;
-  margin-bottom:0.5rem;
+  line-height:1.45;
 }
+.course-card-progress{grid-column:1 / -1}
 .course-card-progress{
   display:flex;
   align-items:center;
@@ -2725,7 +2605,7 @@ body{
   padding:0.25rem 0.75rem;
   border-radius:var(--radius-pill);
   font-family:var(--font-body);
-  font-size:0.85rem;
+  font-size:1rem;
   font-weight:500;
   border:1.5px solid transparent;
 }
@@ -2852,25 +2732,6 @@ body{
 /* ════════════════════════════════════════════════════════════
    COIN FLY ANIMATION
    ════════════════════════════════════════════════════════════ */
-.coin-fly{
-  position:fixed;
-  width:16px;height:16px;
-  border-radius:50%;
-  background:var(--accent-coral);
-  border:2px solid #E07A5F;
-  z-index:300;
-  pointer-events:none;
-  animation:coin-fly 0.8s var(--ease-gentle) forwards;
-  transform:translate(-50%,-50%);
-}
-@keyframes coin-fly{
-  0%{opacity:1;transform:translate(-50%,-50%) scale(1)}
-  80%{opacity:1}
-  100%{
-    opacity:0;
-    transform:translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(0.5);
-  }
-}
 
 /* ════════════════════════════════════════════════════════════
    STAGGER ENTRY
@@ -2928,30 +2789,25 @@ body{
 
 /* Shop lock note */
 .shop-lock-note{
+  grid-column:1 / -1;
   font-family:var(--font-body);
-  font-size:0.85rem;
+  font-size:1rem;
   color:var(--accent-plum);
-  margin-top:0.2rem;
 }
 .shop-free-label{
   font-family:var(--font-body);
-  font-size:1rem;
+  font-size:1.1rem;
   font-weight:500;
   color:var(--foliage-shadow);
-}
-.shop-item-right{
-  display:flex;
-  flex-direction:column;
-  align-items:flex-end;
-  gap:0.5rem;
-  flex-shrink:0;
+  white-space:nowrap;
 }
 .rare-tag{
   color:var(--accent-plum);
-  font-size:0.75rem;
+  font-size:1rem;
   font-family:var(--font-body);
   font-weight:500;
   letter-spacing:0.06em;
+  white-space:nowrap;
 }
 
 /* Pattern turn message */

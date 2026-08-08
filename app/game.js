@@ -205,11 +205,10 @@ function plantSVG(plant) {
   return svg;
 }
 
-/* Patches-tab-only renderer. Identical to plantSVG at every stage except
-   bloom, where it draws small hanging fruit instead of the flower disc, a
-   hint that this patch is ready to harvest. plantSVG itself stays untouched
-   since it is still the shared renderer for the primary garden, the shop
-   icons and the plant detail modal. */
+/* Field renderer. Identical to plantSVG at every stage except bloom, where it
+   draws small hanging fruit instead of the flower disc, a hint that this patch
+   is ready to harvest. plantSVG itself stays untouched since it is still the
+   renderer for the shop icons and the plant detail modal. */
 function plantSVGFruit(plant) {
   const s = SEEDS.find(sd => sd.id === plant.seedId) || SEEDS[0];
   const stage = plant.state;
@@ -733,8 +732,7 @@ function showScreen(name, direction) {
   }
 
   currentScreenName = name;
-  if (name === 'garden') { renderGarden(); progressTask('g_visit'); }
-  if (name === 'garden2') renderGarden2();
+  if (name === 'garden2') { renderGarden2(); progressTask('g_visit'); }
   if (name === 'exercises') renderExercises();
   if (name === 'shop') { renderShop(); progressTask('g_shop'); }
   if (name === 'profile') renderProfile();
@@ -760,9 +758,6 @@ function nextShelfCost() {
   return 300 + (idx - SHELF_BASE_COSTS.length + 1) * 150;
 }
 
-/* Both tabs show a locked-shelf tile, and either can be the one tapped, so
-   the render + pan-into-view afterward targets whichever tab is on screen
-   rather than always the primary garden. */
 function buyShelf() {
   const cost = nextShelfCost();
   if (state.coins < cost) return;
@@ -773,18 +768,15 @@ function buyShelf() {
   playCoin();
   showNotif('success', 'new-shelf', `New land cleared!`, `You now have room for ${gardenCapacity()} plants.`, 'icon-garden');
 
-  const onPatches = currentScreenName === 'garden2';
-  const sceneId = onPatches ? 'garden2-scene' : 'garden-scene';
-  const fieldPan = onPatches ? patchesFieldPan : gardenFieldPan;
-  if (onPatches) renderGarden2(); else renderGarden();
+  renderGarden2();
   // One-shot install animation on the newest shelf
-  const units = document.querySelectorAll(`#${sceneId} .shelf-unit:not(.shelf-locked-unit)`);
+  const units = document.querySelectorAll('#garden2-scene .shelf-unit:not(.shelf-locked-unit)');
   const newest = units[units.length - 1];
   if (newest) {
     newest.classList.add('installed');
     newest.addEventListener('animationend', () => newest.classList.remove('installed'), { once: true });
     // The field no longer scrolls, so bring the new plot into view by panning.
-    fieldPan.panIntoView(newest);
+    patchesFieldPan.panIntoView(newest);
   }
 }
 
@@ -800,10 +792,10 @@ function renderDailyCard() {
   const weekDots = Array.from({ length: 10 }, (_, i) =>
     `<div class="round-dot${i < state.daily.weekCompleted ? ' done' : ''}"></div>`).join('');
 
-  const taskRoute = { g_water1: 'garden', g_visit: 'garden', g_look: 'garden', g_shop: 'shop', g_almanac: 'almanac',
-    c_ex1: 'exercises', c_waterall: 'garden', c_level: 'exercises', c_tiles: 'exercises', c_pattern: 'exercises',
-    c_words: 'exercises', c_revive: 'garden', s_ex3: 'exercises', s_perfect: 'exercises', s_twotypes: 'exercises',
-    s_bloom: 'garden', s_plant: 'shop' };
+  const taskRoute = { g_water1: 'garden2', g_visit: 'garden2', g_look: 'garden2', g_shop: 'shop', g_almanac: 'almanac',
+    c_ex1: 'exercises', c_waterall: 'garden2', c_level: 'exercises', c_tiles: 'exercises', c_pattern: 'exercises',
+    c_words: 'exercises', c_revive: 'garden2', s_ex3: 'exercises', s_perfect: 'exercises', s_twotypes: 'exercises',
+    s_bloom: 'garden2', s_plant: 'shop' };
 
   host.innerHTML = `
     <div class="daily-card">
@@ -815,7 +807,7 @@ function renderDailyCard() {
         ? `<div class="daily-all-done">All done for today. Lovely work.</div>`
         : `<div class="daily-tasks">
             ${tasks.map(t => `
-              <button class="daily-task${t.done ? ' done' : ''}" data-route="${taskRoute[t.id] || 'garden'}" ${t.done ? 'disabled' : ''}>
+              <button class="daily-task${t.done ? ' done' : ''}" data-route="${taskRoute[t.id] || 'garden2'}" ${t.done ? 'disabled' : ''}>
                 <span class="daily-task-check">
                   ${t.done
                     ? `<svg class="icon icon-sm" aria-hidden="true"><use href="#icon-check"/></svg>`
@@ -1010,6 +1002,37 @@ function createFieldPan(screenName, viewportId, fieldId, hintId, opts = {}) {
     maybeShowHint();
   }
 
+  /* Keeps a field-space point inside a comfortable inset of the viewport, so
+     the gardener never walks off the edge of what the player can see. A field
+     point x sits at viewport x + pan.x, which is what the two comparisons
+     below are rearranged from. Nudges only when the point is actually outside
+     the inset, so a gardener walking about the middle leaves the view still
+     and the player keeps whatever framing they dragged to. */
+  function follow(x, y, margin) {
+    const viewport = document.getElementById(viewportId);
+    if (!viewport) return;
+    const w = viewport.clientWidth;
+    const h = viewport.clientHeight;
+    if (!w || !h) return;
+    const mx = Math.min(margin, w / 2);
+    const my = Math.min(margin, h / 2);
+
+    let nextX = pan.x;
+    if (x + pan.x < mx) nextX = mx - x;
+    else if (x + pan.x > w - mx) nextX = w - mx - x;
+
+    let nextY = pan.y;
+    if (y + pan.y < my) nextY = my - y;
+    else if (y + pan.y > h - my) nextY = h - my - y;
+
+    nextX = clampPan(nextX, pan.minX, pan.maxX);
+    nextY = clampPan(nextY, pan.minY, 0);
+    if (nextX === pan.x && nextY === pan.y) return;
+    pan.x = nextX;
+    pan.y = nextY;
+    apply();
+  }
+
   /* Used after clearing new land, in place of the scroll the field no longer
      does. Rects are measured after the transform, so the move is expressed as
      a delta from where the element currently sits. */
@@ -1116,72 +1139,13 @@ function createFieldPan(screenName, viewportId, fieldId, hintId, opts = {}) {
     });
   }
 
-  return { pan, bind, measure, panIntoView, hasSlack };
+  return { pan, bind, measure, panIntoView, hasSlack, follow };
 }
 
-const gardenFieldPan = createFieldPan('garden', 'garden-viewport', 'garden-scene', 'garden-pan-hint');
-const patchesFieldPan = createFieldPan('garden2', 'garden2-viewport', 'garden2-scene', null, { centerFirst: true });
-
-function renderGarden() {
-  updatePlantStates();
-  const scene = document.getElementById('garden-scene');
-  const dateEl = document.getElementById('garden-date');
-  scene.innerHTML = '';
-
-  const today = new Date();
-  dateEl.textContent = today.toLocaleDateString('en-SG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-
-  /* Today's tasks used to sit here. They live in the menu now, so the garden
-     itself is just the garden. The badge on the menu button is what says
-     there is something waiting. */
-  renderDailyCard();
-  updateMenuBadge();
-
-  /* First-visit hint. It lives above the pan window, not inside the field, so
-     it cannot be dragged out of sight. */
-  const hintSlot = document.getElementById('garden-hint-slot');
-  if (hintSlot) hintSlot.innerHTML = '';
-  if (hintSlot && state.plants.length === 0) {
-    const hint = document.createElement('div');
-    hint.className = 'garden-hint-card';
-    /* Stacked rather than a three column strip: above the pan window the card
-       has the full width but no vertical room to spare, and the old side by
-       side layout squeezed the copy into a very tall narrow column. */
-    hint.innerHTML = `
-      <div class="garden-hint-head">
-        <svg class="icon icon-lg" aria-hidden="true"><use href="#icon-seed"/></svg>
-        <div class="garden-hint-title">Start by planting a seed</div>
-      </div>
-      <div class="garden-hint-body">Do a brain exercise to earn coins, then visit the shop to buy your first seed.</div>
-      <button class="btn btn-primary btn-sm" id="btn-hint-exercise">
-        <svg class="icon icon-sm" aria-hidden="true"><use href="#icon-brain"/></svg>
-        Do an exercise
-      </button>
-    `;
-    hintSlot.appendChild(hint);
-    document.getElementById('btn-hint-exercise').addEventListener('click', () => showScreen('exercises'));
-  }
-
-  // Plots of land, laid out two across so the field runs past the phone edge
-  for (let s = 0; s < state.shelves; s++) {
-    scene.appendChild(buildShelf(s));
-  }
-
-  // The untilled plot at the end, always there so there is always a goal
-  scene.appendChild(buildLockedShelf());
-
-  gardenFieldPan.bind();
-  gardenFieldPan.measure();
-
-  const waterBtn = document.getElementById('btn-water-all');
-  const hasThirsty = state.plants.some(p => p.state === 'wilt');
-  waterBtn.disabled = state.plants.length === 0;
-  waterBtn.innerHTML = hasThirsty
-    ? `<svg class="icon" aria-hidden="true"><use href="#icon-water"/></svg> Water thirsty plants`
-    : `<svg class="icon" aria-hidden="true"><use href="#icon-water"/></svg> Water all plants`;
-
-  updateCoinDisplay();
-}
+/* No centerFirst here any more: the camera follows the gardener, and the
+   gardener starts beside the first patch, so the opening framing that
+   centerFirst used to arrange now falls out of the follow on the first frame. */
+const patchesFieldPan = createFieldPan('garden2', 'garden2-viewport', 'garden2-scene', null);
 
 /* The function and data names below still say shelf, because state.shelves,
    SHELF_SLOTS and gardenCapacity() are the saved model and renaming them
@@ -1261,28 +1225,325 @@ function buildShelf(shelfIdx, opts = {}) {
   return unit;
 }
 
-/* ── PATCHES VIEW (second tab) ──────────────────────────────────
-   Same state.plants, the same buildShelf()/buildLockedShelf(), and the same
-   two-column grid and createFieldPan() camera (patchesFieldPan) as the
-   primary garden. Only the per-plot tap behaviour differs: tapping a bare
-   patch opens the in-place seed menu instead of navigating to the Shop tab,
-   and a bloom is harvested on the spot instead of opening the detail panel. */
+/* ── PATCHES VIEW — the garden screen ───────────────────────────
+   Tapping a bare patch opens the in-place seed menu rather than sending the
+   player to the Shop tab, and a bloom is harvested where it stands rather
+   than opening the detail panel. Filled patches still open the detail panel,
+   which is where a single plant is watered.
+
+   The id names below still say garden2, and buildShelf()/buildLockedShelf()
+   still say shelf, because both predate this becoming the only garden view.
+   Renaming them would touch the saved model (state.shelves, SHELF_SLOTS),
+   so the names stay and this comment carries the meaning. */
 function renderGarden2() {
   updatePlantStates();
   const scene = document.getElementById('garden2-scene');
   if (!scene) return;
   scene.innerHTML = '';
 
+  const dateEl = document.getElementById('garden-date');
+  if (dateEl) {
+    dateEl.textContent = new Date().toLocaleDateString('en-SG',
+      { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  }
+
+  /* Today's tasks live in the menu, so the field itself is just the field.
+     The badge on the menu button is what says there is something waiting. */
+  renderDailyCard();
+  updateMenuBadge();
+
+  /* First-visit hint, stacked rather than a side-by-side strip: above the pan
+     window the card has the full width but no vertical room to spare. */
+  const hintSlot = document.getElementById('garden-hint-slot');
+  if (hintSlot) {
+    hintSlot.innerHTML = '';
+    if (state.plants.length === 0) {
+      const hint = document.createElement('div');
+      hint.className = 'garden-hint-card';
+      hint.innerHTML = `
+        <div class="garden-hint-head">
+          <svg class="icon icon-lg" aria-hidden="true"><use href="#icon-seed"/></svg>
+          <div class="garden-hint-title">Start by planting a seed</div>
+        </div>
+        <div class="garden-hint-body">Do a brain exercise to earn coins, then visit the shop to buy your first seed.</div>
+        <button class="btn btn-primary btn-sm" id="btn-hint-exercise">
+          <svg class="icon icon-sm" aria-hidden="true"><use href="#icon-brain"/></svg>
+          Do an exercise
+        </button>
+      `;
+      hintSlot.appendChild(hint);
+      document.getElementById('btn-hint-exercise')
+        .addEventListener('click', () => showScreen('exercises'));
+    }
+  }
+
   const patchOpts = { onEmptyTap: openSeedMenu, onBloomTap: harvestPlant, plantRenderer: plantSVGFruit };
   for (let s = 0; s < state.shelves; s++) {
     scene.appendChild(buildShelf(s, patchOpts));
   }
+  // The untilled plot at the end, always there so there is always a goal
   scene.appendChild(buildLockedShelf());
 
   patchesFieldPan.bind();
   patchesFieldPan.measure();
+
+  const waterBtn = document.getElementById('btn-water-all');
+  if (waterBtn) {
+    const hasThirsty = state.plants.some(p => p.state === 'wilt');
+    waterBtn.disabled = state.plants.length === 0;
+    waterBtn.innerHTML = hasThirsty
+      ? `<svg class="icon" aria-hidden="true"><use href="#icon-water"/></svg> Water thirsty plants`
+      : `<svg class="icon" aria-hidden="true"><use href="#icon-water"/></svg> Water all plants`;
+  }
+
+  mountGardener(scene);
+  bindGardenerTaps();
   updateCoinDisplay();
 }
+
+/* ════════════════════════════════════════════════════════════
+   THE GARDENER
+   ════════════════════════════════════════════════════════════
+
+   A little figure the player walks around the field. Tapping bare grass
+   sends it there; tapping a patch sends it there too, but the patch's own
+   action fires straight away rather than waiting for the walk. That is the
+   whole design rule: walking is something to watch, never something to get
+   through. An earlier build gated every interaction on arrival and was
+   reverted for exactly that reason, so nothing here is allowed to sit
+   between a tap and its result. The keyboard path is untouched: Tab to a
+   patch and press Enter and it acts at once, with no walking at all.
+
+   Position is a view detail, not progress, so it lives here and is never
+   written to localStorage. renderGarden2() empties the field on every
+   water, harvest and purchase, and these variables are what survive it. */
+
+const AVATAR_SIZE = 52;        // must match .garden-avatar in styles.css
+const AVATAR_SPEED = 320;      // px per second
+const AVATAR_ARRIVE = 1.5;     // px, close enough to stop
+const FOLLOW_MARGIN = 96;      // keep the gardener this far inside the viewport
+/* Centre offset below a patch's bottom edge. The avatar is 52px tall and
+   drawn from its centre, so 0 puts its feet about 26px past the edge, which
+   lands in the gap between rows rather than on the row below. */
+const STAND_BELOW_PATCH = 0;
+
+let avatarX = 0;
+let avatarY = 0;
+let avatarPlaced = false;
+let avatarWalking = false;
+let avatarFacingLeft = false;
+let avatarTarget = null;
+let avatarFrameStamp = 0;
+const walkKeys = { up: false, down: false, left: false, right: false };
+
+function prefersReducedMotion() {
+  return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
+/* Re-appended after every render, because renderGarden2() clears the field.
+   The element is rebuilt but the coordinates are not, so the gardener stays
+   where the player left it across a water or a harvest. */
+function mountGardener(scene) {
+  let av = document.getElementById('garden-avatar');
+  if (!av) {
+    av = document.createElement('div');
+    av.className = 'garden-avatar';
+    av.id = 'garden-avatar';
+    av.setAttribute('aria-hidden', 'true');
+    av.innerHTML = '<span class="avatar-sprout"></span><span class="avatar-head"></span><span class="avatar-body"></span>';
+  }
+  scene.appendChild(av);
+  if (!avatarPlaced) placeGardenerAtStart(scene);
+  applyAvatarTransform();
+}
+
+/* Rect maths rather than offsetLeft/offsetTop. .shelf-unit is position:
+   relative, so it is the offsetParent of every patch and those properties
+   measure from the row rather than from the field. Both rects are read in
+   the same frame and both carry the field's pan transform, so subtracting
+   them cancels it and leaves plain field coordinates. */
+function plotPointInField(scene, plot) {
+  const fr = scene.getBoundingClientRect();
+  const pr = plot.getBoundingClientRect();
+  return {
+    x: pr.left - fr.left + pr.width / 2,
+    y: pr.top - fr.top + pr.height,
+  };
+}
+
+function placeGardenerAtStart(scene) {
+  const firstPlot = scene.querySelector('.shelf-plot');
+  if (firstPlot) {
+    const p = plotPointInField(scene, firstPlot);
+    avatarX = p.x;
+    avatarY = p.y + STAND_BELOW_PATCH;
+  } else {
+    avatarX = scene.offsetWidth / 2;
+    avatarY = scene.offsetHeight / 2;
+  }
+  avatarPlaced = true;
+  clampGardenerToField(scene);
+}
+
+function clampGardenerToField(scene) {
+  const half = AVATAR_SIZE / 2;
+  const maxX = Math.max(half, scene.offsetWidth - half);
+  const maxY = Math.max(half, scene.offsetHeight - half);
+  avatarX = Math.min(Math.max(avatarX, half), maxX);
+  avatarY = Math.min(Math.max(avatarY, half), maxY);
+}
+
+function applyAvatarTransform() {
+  const av = document.getElementById('garden-avatar');
+  if (!av) return;
+  av.style.transform = `translate3d(${avatarX - AVATAR_SIZE / 2}px, ${avatarY - AVATAR_SIZE / 2}px, 0)`;
+  av.classList.toggle('walking', avatarWalking);
+  av.classList.toggle('facing-left', avatarFacingLeft);
+}
+
+/* Where to send the gardener for a given field point. Reduced motion gets
+   the destination immediately rather than a walk it did not ask for. */
+function walkGardenerTo(x, y) {
+  const scene = document.getElementById('garden2-scene');
+  if (!scene) return;
+  if (prefersReducedMotion()) {
+    avatarTarget = null;
+    avatarX = x;
+    avatarY = y;
+    clampGardenerToField(scene);
+    avatarWalking = false;
+    applyAvatarTransform();
+    patchesFieldPan.follow(avatarX, avatarY, FOLLOW_MARGIN);
+    return;
+  }
+  avatarTarget = { x, y };
+}
+
+/* Stand at the near edge of a patch rather than on top of it, so the plant
+   stays visible with the gardener beside it. */
+function walkGardenerToPatch(plot) {
+  const scene = document.getElementById('garden2-scene');
+  if (!plot || !scene) return;
+  const p = plotPointInField(scene, plot);
+  walkGardenerTo(p.x, p.y + STAND_BELOW_PATCH);
+}
+
+function gardenerFrame(now) {
+  requestAnimationFrame(gardenerFrame);
+  const previous = avatarFrameStamp || now;
+  avatarFrameStamp = now;
+
+  if (currentScreenName !== 'garden2') return;
+  const scene = document.getElementById('garden2-scene');
+  // Zero while the screen transition still has the tab hidden and unpainted.
+  if (!scene || !scene.offsetWidth) return;
+  if (!avatarPlaced) { placeGardenerAtStart(scene); applyAvatarTransform(); }
+
+  // Clamped so a backgrounded tab does not teleport the gardener on return.
+  const dt = Math.min((now - previous) / 1000, 0.05);
+  const step = AVATAR_SPEED * dt;
+  const fromX = avatarX;
+  const fromY = avatarY;
+
+  const dirX = (walkKeys.right ? 1 : 0) - (walkKeys.left ? 1 : 0);
+  const dirY = (walkKeys.down ? 1 : 0) - (walkKeys.up ? 1 : 0);
+
+  if (dirX || dirY) {
+    // A key takes over from a walk already in progress, the same way a tap does.
+    avatarTarget = null;
+    const len = Math.hypot(dirX, dirY) || 1;
+    avatarX += (dirX / len) * step;
+    avatarY += (dirY / len) * step;
+  } else if (avatarTarget) {
+    const dx = avatarTarget.x - avatarX;
+    const dy = avatarTarget.y - avatarY;
+    const dist = Math.hypot(dx, dy);
+    if (dist <= Math.max(step, AVATAR_ARRIVE)) {
+      avatarX = avatarTarget.x;
+      avatarY = avatarTarget.y;
+      avatarTarget = null;
+    } else {
+      avatarX += (dx / dist) * step;
+      avatarY += (dy / dist) * step;
+    }
+  }
+
+  clampGardenerToField(scene);
+
+  const movedX = avatarX - fromX;
+  const moved = Math.abs(movedX) > 0.01 || Math.abs(avatarY - fromY) > 0.01;
+  if (Math.abs(movedX) > 0.01) avatarFacingLeft = movedX < 0;
+
+  if (moved !== avatarWalking || moved) {
+    avatarWalking = moved;
+    applyAvatarTransform();
+  }
+  if (moved) patchesFieldPan.follow(avatarX, avatarY, FOLLOW_MARGIN);
+}
+
+requestAnimationFrame(gardenerFrame);
+
+/* Bound to the viewport, which survives the re-renders that empty the field,
+   and in the bubble phase on purpose. A patch's own click handler has already
+   run and opened its panel by the time this fires, so the walk is started
+   alongside the result rather than in front of it. A drag never reaches here:
+   the pan's swallowNextClick() eats that click in the capture phase. */
+let gardenerTapsBound = false;
+
+function bindGardenerTaps() {
+  const viewport = document.getElementById('garden2-viewport');
+  if (!viewport || gardenerTapsBound) return;
+  gardenerTapsBound = true;
+
+  viewport.addEventListener('click', (e) => {
+    const scene = document.getElementById('garden2-scene');
+    if (!scene) return;
+
+    const plot = e.target.closest && e.target.closest('.shelf-plot');
+    if (plot && scene.contains(plot)) {
+      walkGardenerToPatch(plot);
+      return;
+    }
+    // Bare grass, or the locked plank: walk to the spot that was touched.
+    const rect = scene.getBoundingClientRect();
+    walkGardenerTo(e.clientX - rect.left, e.clientY - rect.top);
+  });
+}
+
+/* Arrow keys and WASD are an extra on top of Tab, not a replacement for it.
+   Ignored while a modal is open or a text field has focus. */
+const WALK_KEY_MAP = {
+  ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right',
+  w: 'up', a: 'left', s: 'down', d: 'right',
+  W: 'up', A: 'left', S: 'down', D: 'right',
+};
+
+function walkKeyAllowed() {
+  if (currentScreenName !== 'garden2') return false;
+  const tag = document.activeElement && document.activeElement.tagName;
+  if (tag === 'INPUT' || tag === 'TEXTAREA') return false;
+  const open = ['plant-detail-modal', 'seed-menu-modal', 'menu-modal', 'share-modal']
+    .some(id => { const m = document.getElementById(id); return m && !m.hidden; });
+  return !open;
+}
+
+window.addEventListener('keydown', (e) => {
+  const dir = WALK_KEY_MAP[e.key];
+  if (!dir || !walkKeyAllowed()) return;
+  e.preventDefault();
+  walkKeys[dir] = true;
+});
+
+window.addEventListener('keyup', (e) => {
+  const dir = WALK_KEY_MAP[e.key];
+  if (!dir) return;
+  walkKeys[dir] = false;
+});
+
+// A tab switch mid-stride would otherwise leave a key latched down.
+window.addEventListener('blur', () => {
+  walkKeys.up = walkKeys.down = walkKeys.left = walkKeys.right = false;
+});
 
 function buildLockedShelf() {
   const cost = nextShelfCost();
@@ -1545,15 +1806,11 @@ function renderSeedMenuList() {
 
     item.innerHTML = `
       <div class="shop-item-icon">${plantSVG({ seedId: seed.id, state: 'bloom', plantedAt: todayStr(), wateredAt: todayStr() })}</div>
-      <div class="shop-item-info">
-        <div class="shop-item-name">${seed.name}${seed.rare ? ' <span class="rare-tag">RARE</span>' : ''}</div>
-        <div class="shop-item-desc">${seed.desc}</div>
-        ${lockNote}
-      </div>
-      <div class="shop-item-right">
-        ${priceHTML}
-        ${btnHTML}
-      </div>
+      <div class="shop-item-name">${seed.name}${seed.rare ? ' <span class="rare-tag">RARE</span>' : ''}</div>
+      <div class="shop-item-price-slot">${priceHTML}</div>
+      <div class="shop-item-desc">${seed.desc}</div>
+      ${lockNote}
+      <div class="shop-item-action">${btnHTML}</div>
     `;
 
     const buyBtn = item.querySelector('[data-seed]');
@@ -1600,8 +1857,7 @@ function harvestPlant(index) {
   playCoin();
   showNotif('success', `harvest-${Date.now()}`, `${seed.name} harvested`,
     `+${value} coins, and a patch is free again. Its meal card stays in your collection.`, 'icon-meal');
-  renderGarden();
-  if (typeof renderGarden2 === 'function') renderGarden2();
+  renderGarden2();
 }
 
 function waterPlant(index, plotEl) {
@@ -1623,8 +1879,7 @@ function waterPlant(index, plotEl) {
   triggerWaterAnimation(plotEl || null);
   evaluateRecompute();
   saveState();
-  renderGarden();
-  if (typeof renderGarden2 === 'function') renderGarden2();
+  renderGarden2();
 }
 
 document.getElementById('btn-water-all').addEventListener('click', () => {
@@ -1650,10 +1905,8 @@ document.getElementById('btn-water-all').addEventListener('click', () => {
   triggerWaterAnimation(null);
   evaluateRecompute();
   saveState();
-  renderGarden();
+  renderGarden2();
 });
-
-document.getElementById('btn-goto-shop').addEventListener('click', () => showScreen('shop'));
 
 /* ── COIN DISPLAY ───────────────────────────────────────────── */
 
@@ -1661,36 +1914,6 @@ function updateCoinDisplay() {
   document.getElementById('coin-count').textContent = state.coins;
   document.getElementById('shop-coin-count').textContent = state.coins;
   document.getElementById('streak-count').textContent = state.streak;
-}
-
-function animateCoinFly(fromEl, amount) {
-  const counter = document.getElementById('coin-display');
-  if (!fromEl || !counter) return;
-  const fromRect = fromEl.getBoundingClientRect();
-  const toRect = counter.getBoundingClientRect();
-
-  for (let i = 0; i < Math.min(4, Math.ceil(amount / 3)); i++) {
-    const coin = document.createElement('div');
-    coin.className = 'coin-fly';
-    coin.style.left = `${fromRect.left + fromRect.width / 2}px`;
-    coin.style.top = `${fromRect.top + fromRect.height / 2}px`;
-    coin.style.setProperty('--tx', `${toRect.left + toRect.width / 2 - fromRect.left - fromRect.width / 2}px`);
-    coin.style.setProperty('--ty', `${toRect.top + toRect.height / 2 - fromRect.top - fromRect.height / 2}px`);
-    coin.style.animationDelay = `${i * 60}ms`;
-    document.body.appendChild(coin);
-    setTimeout(() => coin.remove(), 900 + i * 60);
-  }
-
-  // Count up
-  const start = state.coins - amount;
-  const counter2 = document.getElementById('coin-count');
-  let displayed = start;
-  const step = Math.max(1, Math.ceil(amount / 10));
-  const interval = setInterval(() => {
-    displayed = Math.min(displayed + step, state.coins);
-    counter2.textContent = displayed;
-    if (displayed >= state.coins) clearInterval(interval);
-  }, 40);
 }
 
 /* ── LEVEL PATH SYSTEM ──────────────────────────────────────── */
@@ -1850,14 +2073,9 @@ function renderExercises() {
     return;
   }
 
-  // Otherwise show course select
-  const header = document.createElement('div');
-  header.className = 'course-select-header';
-  header.innerHTML = `
-    <h2 class="course-select-title">Choose your course</h2>
-    <p class="course-select-sub">Each course trains a different part of your mind. Start anywhere you like.</p>
-  `;
-  container.appendChild(header);
+  /* No second header here. The screen's own "Brain Exercises" heading sits
+     directly above, and running both cost about 500px of an 844px screen
+     before the first card. */
 
   const list = document.createElement('div');
   list.className = 'course-list';
@@ -1873,23 +2091,25 @@ function renderExercises() {
     card.setAttribute('aria-label', unlocked ? `${island.name} — ${doneCount} of ${total} levels done` : `${island.name} — locked`);
     card.setAttribute('tabindex', unlocked ? '0' : '-1');
 
+    /* Same flat-grid reason as the shop card: icon, name and the arrow share
+       the top row, and the description and progress badge span the card. The
+       nested info column used to leave the name too narrow to hold a
+       two-word course title on one line. */
     card.innerHTML = `
       <div class="course-card-icon">
         <svg><use href="#${island.icon}"/></svg>
       </div>
-      <div class="course-card-info">
-        <div class="course-card-name">${island.name}</div>
-        <div class="course-card-desc">${island.desc}</div>
-        <div class="course-card-progress">
-          ${isComplete
-            ? `<span class="course-badge done"><svg class="icon icon-sm"><use href="#icon-check"/></svg> Complete</span>`
-            : unlocked
-              ? `<span class="course-badge progress">${doneCount} / ${total} levels</span>`
-              : `<span class="course-badge locked"><svg class="icon icon-sm"><use href="#icon-close"/></svg> Complete 5 levels in ${ISLANDS[idx-1].name} to unlock</span>`
-          }
-        </div>
-      </div>
+      <div class="course-card-name">${island.name}</div>
       ${unlocked ? `<svg class="icon course-arrow"><use href="#icon-arrow-right"/></svg>` : `<svg class="icon course-lock"><use href="#icon-close"/></svg>`}
+      <div class="course-card-desc">${island.desc}</div>
+      <div class="course-card-progress">
+        ${isComplete
+          ? `<span class="course-badge done"><svg class="icon icon-sm"><use href="#icon-check"/></svg> Complete</span>`
+          : unlocked
+            ? `<span class="course-badge progress">${doneCount} / ${total} levels</span>`
+            : `<span class="course-badge locked"><svg class="icon icon-sm"><use href="#icon-close"/></svg> Complete 5 levels in ${ISLANDS[idx-1].name} to unlock</span>`
+        }
+      </div>
     `;
 
     if (unlocked) {
@@ -2119,15 +2339,11 @@ function renderShop() {
 
     item.innerHTML = `
       <div class="shop-item-icon">${plantSVG({ seedId: seed.id, state: 'bloom', plantedAt: todayStr(), wateredAt: todayStr() })}</div>
-      <div class="shop-item-info">
-        <div class="shop-item-name">${seed.name}${seed.rare ? ' <span class="rare-tag">RARE</span>' : ''}</div>
-        <div class="shop-item-desc">${seed.desc}</div>
-        ${lockNote}
-      </div>
-      <div class="shop-item-right">
-        ${priceHTML}
-        ${btnHTML}
-      </div>
+      <div class="shop-item-name">${seed.name}${seed.rare ? ' <span class="rare-tag">RARE</span>' : ''}</div>
+      <div class="shop-item-price-slot">${priceHTML}</div>
+      <div class="shop-item-desc">${seed.desc}</div>
+      ${lockNote}
+      <div class="shop-item-action">${btnHTML}</div>
     `;
 
     const buyBtn = item.querySelector('[data-seed]');
@@ -2617,7 +2833,7 @@ function completeExercise(coins, exerciseType) {
   }
   document.getElementById('btn-goto-garden').addEventListener('click', () => {
     currentLevelRef = null;
-    showScreen('garden', 'back');
+    showScreen('garden2', 'back');
   });
 }
 
@@ -4422,7 +4638,6 @@ function init() {
   checkMealUnlocks();
   rollDailyTasks();
   updateCoinDisplay();
-  renderGarden();
   renderGarden2();
 
   // init() renders the garden directly rather than routing through
