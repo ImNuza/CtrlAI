@@ -198,7 +198,7 @@ body{
 }
 .subsection-head{
   font-family:var(--font-body);
-  font-size:0.8rem;
+  font-size:1rem;
   font-weight:500;
   letter-spacing:0.1em;
   text-transform:uppercase;
@@ -356,9 +356,12 @@ body{
   background:rgba(122,107,92,0.22);
 }
 
+/* Sits below the dashed slots, not lapped over them. The old negative top
+   margin tucked it up into the row, and tag-rise lifted it another 4px, so at
+   390px the pill covered the slots it was labelling. */
 .shelf-tag{
   position:relative;
-  margin:-0.5rem auto 0;
+  margin:0.65rem auto 0;
   display:inline-flex;
   align-items:center;
   gap:0.5rem;
@@ -401,7 +404,7 @@ body{
   margin-top:0.5rem;
   text-align:center;
   font-family:var(--font-body);
-  font-size:0.95rem;
+  font-size:1rem;
   color:var(--text-secondary);
 }
 
@@ -541,7 +544,7 @@ body{
 .plant-touch-hint{
   margin-top:0.75rem;
   font-family:var(--font-body);
-  font-size:0.9rem;
+  font-size:1rem;
   color:var(--text-muted);
   font-style:italic;
 }
@@ -593,7 +596,7 @@ body{
   align-items:center;
   gap:0.5rem;
   font-family:var(--font-body);
-  font-size:0.85rem;
+  font-size:1rem;
   font-weight:600;
   letter-spacing:0.08em;
   text-transform:uppercase;
@@ -623,7 +626,7 @@ body{
   border:1.5px solid var(--foliage-highlight);
   color:var(--foliage-shadow);
   font-family:var(--font-body);
-  font-size:0.95rem;
+  font-size:1rem;
   font-weight:500;
 }
 
@@ -715,7 +718,7 @@ body{
 }
 .daily-task-meta{display:flex;align-items:center;gap:0.5rem;flex-shrink:0}
 .daily-task-progress{
-  font-size:0.95rem;
+  font-size:1rem;
   font-weight:600;
   color:var(--text-secondary);
 }
@@ -728,7 +731,7 @@ body{
   background:rgba(224,122,95,0.15);
   border:1.5px solid var(--accent-coral);
   color:#7A2F10;
-  font-size:0.95rem;
+  font-size:1rem;
   font-weight:600;
 }
 .daily-all-done{
@@ -748,7 +751,7 @@ body{
 }
 .daily-week-label{
   font-family:var(--font-body);
-  font-size:0.85rem;
+  font-size:1rem;
   font-weight:600;
   letter-spacing:0.06em;
   text-transform:uppercase;
@@ -767,12 +770,12 @@ body{
   justify-content:flex-start;
   flex-wrap:wrap;
 }
-.daily-week-hint{font-size:0.85rem;color:var(--text-muted);white-space:nowrap}
+.daily-week-hint{font-size:1rem;color:var(--text-muted);white-space:nowrap}
 .daily-week-done{
   display:inline-flex;
   align-items:center;
   gap:0.3rem;
-  font-size:0.85rem;
+  font-size:1rem;
   font-weight:500;
   color:var(--accent-plum);
   white-space:nowrap;
@@ -818,7 +821,7 @@ body{
 }
 .almanac-summary-sub{
   font-family:var(--font-body);
-  font-size:0.9rem;
+  font-size:1rem;
   color:var(--text-secondary);
   margin-top:0.15rem;
 }
@@ -829,7 +832,7 @@ body{
   align-items:center;
   gap:0.5rem;
   font-family:var(--font-body);
-  font-size:0.85rem;
+  font-size:1rem;
   font-weight:600;
   letter-spacing:0.1em;
   text-transform:uppercase;
@@ -888,7 +891,7 @@ body{
 }
 .plate-desc{
   font-family:var(--font-body);
-  font-size:0.9rem;
+  font-size:1rem;
   line-height:1.4;
   text-align:center;
   color:var(--text-secondary);
@@ -908,13 +911,13 @@ body{
   border:1.5px solid var(--foliage-mid);
   color:var(--foliage-shadow);
   font-family:var(--font-body);
-  font-size:0.8rem;
+  font-size:1rem;
   font-weight:600;
   letter-spacing:0.04em;
 }
 .plate-progress{
   font-family:var(--font-body);
-  font-size:0.85rem;
+  font-size:1rem;
   font-weight:500;
   color:var(--text-muted);
 }
@@ -978,13 +981,21 @@ body{
 .btn-ghost{background:transparent;color:var(--text-secondary);border-color:var(--border-mid)}
 .btn-ghost:hover:not(:disabled){color:var(--text-primary);border-color:var(--border-strong)}
 .btn-lg{min-height:80px;font-size:1.35rem;padding:0 2.5rem;border-radius:var(--radius-lg)}
-.btn-sm{min-height:52px;font-size:1rem;padding:0 1.25rem}
+/* Still the small button, but never below the 60px tap floor. It was 52px,
+   which was the only control on any screen under the floor. */
+.btn-sm{min-height:60px;font-size:1.05rem;padding:0 1.25rem}
 
 /* ── Shop ── */
+/* Wraps rather than squeezing: at 390px the coin chip and the free-seed
+   button together overflowed their row and broke the button label onto two
+   lines. Given the room they sit side by side, otherwise the button takes
+   its own full-width line. */
 .shop-coins-bar{
   display:flex;
   align-items:center;
   justify-content:space-between;
+  flex-wrap:wrap;
+  gap:0.75rem;
   margin-bottom:1.25rem;
   padding:0.75rem 1rem;
   background:var(--bg-inset);
@@ -992,10 +1003,15 @@ body{
   border:1px solid var(--border-light);
 }
 .shop-grid{display:flex;flex-direction:column;gap:0.75rem}
+/* Icon, name and price share the top row; the description and the buy button
+   each span the full card. The old three-column row left the name about 106px
+   at 390px, which broke every two-word seed name across two lines. */
 .shop-item{
-  display:flex;
+  display:grid;
+  grid-template-columns:auto 1fr auto;
   align-items:center;
-  gap:1rem;
+  column-gap:0.85rem;
+  row-gap:0.55rem;
   padding:1rem 1.25rem;
   background:var(--bg-surface);
   border:1.5px solid var(--border-light);
@@ -1006,7 +1022,8 @@ body{
 .shop-item:hover{border-color:var(--foliage-mid)}
 .shop-item.rare{border-color:var(--accent-plum);background:rgba(123,83,113,0.04)}
 .shop-item-icon{
-  width:72px;height:72px;
+  grid-column:1;
+  width:60px;height:60px;
   background:var(--bg-deep);
   border-radius:var(--radius-md);
   display:flex;
@@ -1014,20 +1031,24 @@ body{
   justify-content:center;
   flex-shrink:0;
 }
-.shop-item-icon svg{width:55%;height:55%}
-.shop-item-info{flex:1}
+.shop-item-icon svg{width:60%;height:60%}
 .shop-item-name{
+  grid-column:2;
   font-family:var(--font-display);
-  font-size:1.3rem;
+  font-size:1.35rem;
   font-weight:500;
-  margin-bottom:0.15rem;
+  line-height:1.15;
 }
+.shop-item-price-slot{grid-column:3;justify-self:end}
 .shop-item-desc{
+  grid-column:1 / -1;
   font-family:var(--font-body);
-  font-size:0.9rem;
+  font-size:1.05rem;
   color:var(--text-secondary);
-  line-height:1.35;
+  line-height:1.4;
 }
+.shop-item-action{grid-column:1 / -1}
+.shop-item-action .shop-buy-btn{width:100%}
 .shop-item-price{
   display:flex;
   align-items:center;
@@ -1084,7 +1105,7 @@ body{
 }
 .profile-card-title{
   font-family:var(--font-body);
-  font-size:0.85rem;
+  font-size:1rem;
   font-weight:500;
   letter-spacing:0.06em;
   text-transform:uppercase;
@@ -1100,7 +1121,7 @@ body{
 }
 .profile-card-sub{
   font-family:var(--font-body);
-  font-size:0.85rem;
+  font-size:1rem;
   color:var(--text-secondary);
   margin-top:0.15rem;
 }
@@ -1133,7 +1154,7 @@ body{
 }
 .meal-card-ingredients{
   font-family:var(--font-body);
-  font-size:0.8rem;
+  font-size:1rem;
   color:var(--text-secondary);
   line-height:1.35;
 }
@@ -1144,7 +1165,7 @@ body{
   padding:0.2rem 0.5rem;
   border-radius:var(--radius-pill);
   font-family:var(--font-body);
-  font-size:0.7rem;
+  font-size:1rem;
   font-weight:500;
   margin-top:0.4rem;
 }
@@ -1299,7 +1320,7 @@ body{
 .odd-item svg{width:48px;height:48px;color:var(--foliage-shadow)}
 .odd-item-label{
   font-family:var(--font-body);
-  font-size:0.85rem;
+  font-size:1rem;
   font-weight:500;
   color:var(--text-secondary);
   text-align:center;
@@ -1831,7 +1852,7 @@ body{
 }
 .notif-body{
   font-family:var(--font-body);
-  font-size:0.875rem;
+  font-size:1rem;
   color:var(--text-secondary);
   line-height:1.4;
 }
@@ -1869,7 +1890,7 @@ body{
   color:var(--text-muted);
   transition:all var(--duration-fast) var(--ease-gentle);
   font-family:var(--font-body);
-  font-size:0.75rem;
+  font-size:1rem;
   font-weight:500;
   letter-spacing:0.02em;
   padding:0.5rem;
@@ -1954,7 +1975,7 @@ body{
 .share-preview-plant{width:60px;height:75px}
 .share-stats{
   font-family:var(--font-body);
-  font-size:0.95rem;
+  font-size:1rem;
   color:var(--text-secondary);
   text-align:center;
   line-height:1.6;
@@ -2192,13 +2213,13 @@ body{
 }
 .island-desc{
   font-family:var(--font-body);
-  font-size:0.95rem;
+  font-size:1rem;
   color:var(--text-secondary);
   line-height:1.4;
 }
 .island-progress{
   font-family:var(--font-body);
-  font-size:0.8rem;
+  font-size:1rem;
   font-weight:500;
   color:var(--text-muted);
   margin-top:0.3rem;
@@ -2274,7 +2295,7 @@ body{
   align-items:center;
   justify-content:center;
   font-family:var(--font-body);
-  font-size:0.75rem;
+  font-size:1rem;
   font-weight:600;
   color:var(--text-primary);
   box-shadow:var(--shadow-sm);
@@ -2285,7 +2306,7 @@ body{
 .node-label{
   margin-top:0.6rem;
   font-family:var(--font-body);
-  font-size:0.8rem;
+  font-size:1rem;
   font-weight:500;
   color:var(--text-secondary);
   text-align:center;
@@ -2361,7 +2382,7 @@ body{
   justify-content:center;
   gap:0.2rem;
   margin-top:0.25rem;
-  font-size:0.75rem;
+  font-size:1rem;
   color:var(--text-muted);
 }
 .node-reward .icon{width:0.9em;height:0.9em}
@@ -2377,7 +2398,7 @@ body{
   padding:0.2rem 0.6rem;
   border-radius:var(--radius-pill);
   font-family:var(--font-body);
-  font-size:0.65rem;
+  font-size:1rem;
   font-weight:600;
   letter-spacing:0.06em;
   text-transform:uppercase;
@@ -2399,22 +2420,6 @@ body{
    COURSE SELECT SCREEN
    ════════════════════════════════════════════════════════════ */
 
-.course-select-header{
-  margin-bottom:1.5rem;
-}
-.course-select-title{
-  font-family:var(--font-display);
-  font-size:2rem;
-  font-weight:500;
-  margin-bottom:0.4rem;
-}
-.course-select-sub{
-  font-family:var(--font-body);
-  font-size:1rem;
-  color:var(--text-secondary);
-  line-height:1.5;
-}
-
 .course-list{
   display:flex;
   flex-direction:column;
@@ -2422,10 +2427,12 @@ body{
 }
 
 .course-card{
-  display:flex;
+  display:grid;
+  grid-template-columns:auto 1fr auto;
   align-items:center;
-  gap:1rem;
-  padding:1.25rem 1.5rem;
+  column-gap:1rem;
+  row-gap:0.5rem;
+  padding:1.25rem 1.25rem;
   background:var(--bg-surface);
   border:2px solid var(--border-light);
   border-radius:var(--radius-xl);
@@ -2467,7 +2474,8 @@ body{
 }
 
 .course-card-icon{
-  width:72px;height:72px;
+  grid-column:1;
+  width:56px;height:56px;
   border-radius:var(--radius-lg);
   background:var(--bg-deep);
   display:flex;
@@ -2483,20 +2491,24 @@ body{
 .course-card.word-woods .course-card-icon{color:var(--accent-red)}
 .course-card.kopitiam-corner .course-card-icon{color:var(--kopi-accent)}
 
-.course-card-info{flex:1}
+/* 1.35rem rather than 1.5rem: at 390px the longest course name, "Memory
+   Meadow", broke onto a second line at the larger size once the icon and
+   arrow had taken their columns. */
 .course-card-name{
+  grid-column:2;
   font-family:var(--font-display);
-  font-size:1.5rem;
+  font-size:1.35rem;
   font-weight:500;
-  margin-bottom:0.2rem;
+  line-height:1.15;
 }
 .course-card-desc{
+  grid-column:1 / -1;
   font-family:var(--font-body);
-  font-size:0.95rem;
+  font-size:1.05rem;
   color:var(--text-secondary);
-  line-height:1.4;
-  margin-bottom:0.5rem;
+  line-height:1.45;
 }
+.course-card-progress{grid-column:1 / -1}
 .course-card-progress{
   display:flex;
   align-items:center;
@@ -2509,7 +2521,7 @@ body{
   padding:0.25rem 0.75rem;
   border-radius:var(--radius-pill);
   font-family:var(--font-body);
-  font-size:0.85rem;
+  font-size:1rem;
   font-weight:500;
   border:1.5px solid transparent;
 }
@@ -2693,30 +2705,25 @@ body{
 
 /* Shop lock note */
 .shop-lock-note{
+  grid-column:1 / -1;
   font-family:var(--font-body);
-  font-size:0.85rem;
+  font-size:1rem;
   color:var(--accent-plum);
-  margin-top:0.2rem;
 }
 .shop-free-label{
   font-family:var(--font-body);
-  font-size:1rem;
+  font-size:1.1rem;
   font-weight:500;
   color:var(--foliage-shadow);
-}
-.shop-item-right{
-  display:flex;
-  flex-direction:column;
-  align-items:flex-end;
-  gap:0.5rem;
-  flex-shrink:0;
+  white-space:nowrap;
 }
 .rare-tag{
   color:var(--accent-plum);
-  font-size:0.75rem;
+  font-size:1rem;
   font-family:var(--font-body);
   font-weight:500;
   letter-spacing:0.06em;
+  white-space:nowrap;
 }
 
 /* Pattern turn message */

@@ -1526,15 +1526,11 @@ function renderSeedMenuList() {
 
     item.innerHTML = `
       <div class="shop-item-icon">${plantSVG({ seedId: seed.id, state: 'bloom', plantedAt: todayStr(), wateredAt: todayStr() })}</div>
-      <div class="shop-item-info">
-        <div class="shop-item-name">${seed.name}${seed.rare ? ' <span class="rare-tag">RARE</span>' : ''}</div>
-        <div class="shop-item-desc">${seed.desc}</div>
-        ${lockNote}
-      </div>
-      <div class="shop-item-right">
-        ${priceHTML}
-        ${btnHTML}
-      </div>
+      <div class="shop-item-name">${seed.name}${seed.rare ? ' <span class="rare-tag">RARE</span>' : ''}</div>
+      <div class="shop-item-price-slot">${priceHTML}</div>
+      <div class="shop-item-desc">${seed.desc}</div>
+      ${lockNote}
+      <div class="shop-item-action">${btnHTML}</div>
     `;
 
     const buyBtn = item.querySelector('[data-seed]');
@@ -1797,14 +1793,9 @@ function renderExercises() {
     return;
   }
 
-  // Otherwise show course select
-  const header = document.createElement('div');
-  header.className = 'course-select-header';
-  header.innerHTML = `
-    <h2 class="course-select-title">Choose your course</h2>
-    <p class="course-select-sub">Each course trains a different part of your mind. Start anywhere you like.</p>
-  `;
-  container.appendChild(header);
+  /* No second header here. The screen's own "Brain Exercises" heading sits
+     directly above, and running both cost about 500px of an 844px screen
+     before the first card. */
 
   const list = document.createElement('div');
   list.className = 'course-list';
@@ -1820,23 +1811,25 @@ function renderExercises() {
     card.setAttribute('aria-label', unlocked ? `${island.name} — ${doneCount} of ${total} levels done` : `${island.name} — locked`);
     card.setAttribute('tabindex', unlocked ? '0' : '-1');
 
+    /* Same flat-grid reason as the shop card: icon, name and the arrow share
+       the top row, and the description and progress badge span the card. The
+       nested info column used to leave the name too narrow to hold a
+       two-word course title on one line. */
     card.innerHTML = `
       <div class="course-card-icon">
         <svg><use href="#${island.icon}"/></svg>
       </div>
-      <div class="course-card-info">
-        <div class="course-card-name">${island.name}</div>
-        <div class="course-card-desc">${island.desc}</div>
-        <div class="course-card-progress">
-          ${isComplete
-            ? `<span class="course-badge done"><svg class="icon icon-sm"><use href="#icon-check"/></svg> Complete</span>`
-            : unlocked
-              ? `<span class="course-badge progress">${doneCount} / ${total} levels</span>`
-              : `<span class="course-badge locked"><svg class="icon icon-sm"><use href="#icon-close"/></svg> Complete 5 levels in ${ISLANDS[idx-1].name} to unlock</span>`
-          }
-        </div>
-      </div>
+      <div class="course-card-name">${island.name}</div>
       ${unlocked ? `<svg class="icon course-arrow"><use href="#icon-arrow-right"/></svg>` : `<svg class="icon course-lock"><use href="#icon-close"/></svg>`}
+      <div class="course-card-desc">${island.desc}</div>
+      <div class="course-card-progress">
+        ${isComplete
+          ? `<span class="course-badge done"><svg class="icon icon-sm"><use href="#icon-check"/></svg> Complete</span>`
+          : unlocked
+            ? `<span class="course-badge progress">${doneCount} / ${total} levels</span>`
+            : `<span class="course-badge locked"><svg class="icon icon-sm"><use href="#icon-close"/></svg> Complete 5 levels in ${ISLANDS[idx-1].name} to unlock</span>`
+        }
+      </div>
     `;
 
     if (unlocked) {
@@ -2066,15 +2059,11 @@ function renderShop() {
 
     item.innerHTML = `
       <div class="shop-item-icon">${plantSVG({ seedId: seed.id, state: 'bloom', plantedAt: todayStr(), wateredAt: todayStr() })}</div>
-      <div class="shop-item-info">
-        <div class="shop-item-name">${seed.name}${seed.rare ? ' <span class="rare-tag">RARE</span>' : ''}</div>
-        <div class="shop-item-desc">${seed.desc}</div>
-        ${lockNote}
-      </div>
-      <div class="shop-item-right">
-        ${priceHTML}
-        ${btnHTML}
-      </div>
+      <div class="shop-item-name">${seed.name}${seed.rare ? ' <span class="rare-tag">RARE</span>' : ''}</div>
+      <div class="shop-item-price-slot">${priceHTML}</div>
+      <div class="shop-item-desc">${seed.desc}</div>
+      ${lockNote}
+      <div class="shop-item-action">${btnHTML}</div>
     `;
 
     const buyBtn = item.querySelector('[data-seed]');
