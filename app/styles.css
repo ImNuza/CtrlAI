@@ -653,6 +653,7 @@ body{
   border:1.5px solid transparent;
 }
 .plant-state-badge.state-seed{background:var(--bg-inset);color:var(--text-secondary);border-color:var(--border-mid)}
+.plant-state-badge.state-sprout{background:rgba(177,184,161,0.25);color:var(--foliage-shadow);border-color:var(--foliage-highlight)}
 .plant-state-badge.state-grown{background:rgba(115,135,93,0.15);color:var(--foliage-shadow);border-color:var(--foliage-mid)}
 .plant-state-badge.state-bloom{background:rgba(224,122,95,0.15);color:#7A2F10;border-color:var(--accent-coral)}
 .plant-state-badge.state-wilt{background:rgba(231,143,55,0.15);color:#7A4800;border-color:var(--accent-orange)}
