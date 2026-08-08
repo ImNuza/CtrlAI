@@ -205,11 +205,10 @@ function plantSVG(plant) {
   return svg;
 }
 
-/* Patches-tab-only renderer. Identical to plantSVG at every stage except
-   bloom, where it draws small hanging fruit instead of the flower disc, a
-   hint that this patch is ready to harvest. plantSVG itself stays untouched
-   since it is still the shared renderer for the primary garden, the shop
-   icons and the plant detail modal. */
+/* Field renderer. Identical to plantSVG at every stage except bloom, where it
+   draws small hanging fruit instead of the flower disc, a hint that this patch
+   is ready to harvest. plantSVG itself stays untouched since it is still the
+   renderer for the shop icons and the plant detail modal. */
 function plantSVGFruit(plant) {
   const s = SEEDS.find(sd => sd.id === plant.seedId) || SEEDS[0];
   const stage = plant.state;
@@ -733,8 +732,7 @@ function showScreen(name, direction) {
   }
 
   currentScreenName = name;
-  if (name === 'garden') { renderGarden(); progressTask('g_visit'); }
-  if (name === 'garden2') renderGarden2();
+  if (name === 'garden2') { renderGarden2(); progressTask('g_visit'); }
   if (name === 'exercises') renderExercises();
   if (name === 'shop') { renderShop(); progressTask('g_shop'); }
   if (name === 'profile') renderProfile();
@@ -760,9 +758,6 @@ function nextShelfCost() {
   return 300 + (idx - SHELF_BASE_COSTS.length + 1) * 150;
 }
 
-/* Both tabs show a locked-shelf tile, and either can be the one tapped, so
-   the render + pan-into-view afterward targets whichever tab is on screen
-   rather than always the primary garden. */
 function buyShelf() {
   const cost = nextShelfCost();
   if (state.coins < cost) return;
@@ -773,18 +768,15 @@ function buyShelf() {
   playCoin();
   showNotif('success', 'new-shelf', `New land cleared!`, `You now have room for ${gardenCapacity()} plants.`, 'icon-garden');
 
-  const onPatches = currentScreenName === 'garden2';
-  const sceneId = onPatches ? 'garden2-scene' : 'garden-scene';
-  const fieldPan = onPatches ? patchesFieldPan : gardenFieldPan;
-  if (onPatches) renderGarden2(); else renderGarden();
+  renderGarden2();
   // One-shot install animation on the newest shelf
-  const units = document.querySelectorAll(`#${sceneId} .shelf-unit:not(.shelf-locked-unit)`);
+  const units = document.querySelectorAll('#garden2-scene .shelf-unit:not(.shelf-locked-unit)');
   const newest = units[units.length - 1];
   if (newest) {
     newest.classList.add('installed');
     newest.addEventListener('animationend', () => newest.classList.remove('installed'), { once: true });
     // The field no longer scrolls, so bring the new plot into view by panning.
-    fieldPan.panIntoView(newest);
+    patchesFieldPan.panIntoView(newest);
   }
 }
 
@@ -800,10 +792,10 @@ function renderDailyCard() {
   const weekDots = Array.from({ length: 10 }, (_, i) =>
     `<div class="round-dot${i < state.daily.weekCompleted ? ' done' : ''}"></div>`).join('');
 
-  const taskRoute = { g_water1: 'garden', g_visit: 'garden', g_look: 'garden', g_shop: 'shop', g_almanac: 'almanac',
-    c_ex1: 'exercises', c_waterall: 'garden', c_level: 'exercises', c_tiles: 'exercises', c_pattern: 'exercises',
-    c_words: 'exercises', c_revive: 'garden', s_ex3: 'exercises', s_perfect: 'exercises', s_twotypes: 'exercises',
-    s_bloom: 'garden', s_plant: 'shop' };
+  const taskRoute = { g_water1: 'garden2', g_visit: 'garden2', g_look: 'garden2', g_shop: 'shop', g_almanac: 'almanac',
+    c_ex1: 'exercises', c_waterall: 'garden2', c_level: 'exercises', c_tiles: 'exercises', c_pattern: 'exercises',
+    c_words: 'exercises', c_revive: 'garden2', s_ex3: 'exercises', s_perfect: 'exercises', s_twotypes: 'exercises',
+    s_bloom: 'garden2', s_plant: 'shop' };
 
   host.innerHTML = `
     <div class="daily-card">
@@ -815,7 +807,7 @@ function renderDailyCard() {
         ? `<div class="daily-all-done">All done for today. Lovely work.</div>`
         : `<div class="daily-tasks">
             ${tasks.map(t => `
-              <button class="daily-task${t.done ? ' done' : ''}" data-route="${taskRoute[t.id] || 'garden'}" ${t.done ? 'disabled' : ''}>
+              <button class="daily-task${t.done ? ' done' : ''}" data-route="${taskRoute[t.id] || 'garden2'}" ${t.done ? 'disabled' : ''}>
                 <span class="daily-task-check">
                   ${t.done
                     ? `<svg class="icon icon-sm" aria-hidden="true"><use href="#icon-check"/></svg>`
@@ -1119,69 +1111,7 @@ function createFieldPan(screenName, viewportId, fieldId, hintId, opts = {}) {
   return { pan, bind, measure, panIntoView, hasSlack };
 }
 
-const gardenFieldPan = createFieldPan('garden', 'garden-viewport', 'garden-scene', 'garden-pan-hint');
 const patchesFieldPan = createFieldPan('garden2', 'garden2-viewport', 'garden2-scene', null, { centerFirst: true });
-
-function renderGarden() {
-  updatePlantStates();
-  const scene = document.getElementById('garden-scene');
-  const dateEl = document.getElementById('garden-date');
-  scene.innerHTML = '';
-
-  const today = new Date();
-  dateEl.textContent = today.toLocaleDateString('en-SG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-
-  /* Today's tasks used to sit here. They live in the menu now, so the garden
-     itself is just the garden. The badge on the menu button is what says
-     there is something waiting. */
-  renderDailyCard();
-  updateMenuBadge();
-
-  /* First-visit hint. It lives above the pan window, not inside the field, so
-     it cannot be dragged out of sight. */
-  const hintSlot = document.getElementById('garden-hint-slot');
-  if (hintSlot) hintSlot.innerHTML = '';
-  if (hintSlot && state.plants.length === 0) {
-    const hint = document.createElement('div');
-    hint.className = 'garden-hint-card';
-    /* Stacked rather than a three column strip: above the pan window the card
-       has the full width but no vertical room to spare, and the old side by
-       side layout squeezed the copy into a very tall narrow column. */
-    hint.innerHTML = `
-      <div class="garden-hint-head">
-        <svg class="icon icon-lg" aria-hidden="true"><use href="#icon-seed"/></svg>
-        <div class="garden-hint-title">Start by planting a seed</div>
-      </div>
-      <div class="garden-hint-body">Do a brain exercise to earn coins, then visit the shop to buy your first seed.</div>
-      <button class="btn btn-primary btn-sm" id="btn-hint-exercise">
-        <svg class="icon icon-sm" aria-hidden="true"><use href="#icon-brain"/></svg>
-        Do an exercise
-      </button>
-    `;
-    hintSlot.appendChild(hint);
-    document.getElementById('btn-hint-exercise').addEventListener('click', () => showScreen('exercises'));
-  }
-
-  // Plots of land, laid out two across so the field runs past the phone edge
-  for (let s = 0; s < state.shelves; s++) {
-    scene.appendChild(buildShelf(s));
-  }
-
-  // The untilled plot at the end, always there so there is always a goal
-  scene.appendChild(buildLockedShelf());
-
-  gardenFieldPan.bind();
-  gardenFieldPan.measure();
-
-  const waterBtn = document.getElementById('btn-water-all');
-  const hasThirsty = state.plants.some(p => p.state === 'wilt');
-  waterBtn.disabled = state.plants.length === 0;
-  waterBtn.innerHTML = hasThirsty
-    ? `<svg class="icon" aria-hidden="true"><use href="#icon-water"/></svg> Water thirsty plants`
-    : `<svg class="icon" aria-hidden="true"><use href="#icon-water"/></svg> Water all plants`;
-
-  updateCoinDisplay();
-}
 
 /* The function and data names below still say shelf, because state.shelves,
    SHELF_SLOTS and gardenCapacity() are the saved model and renaming them
@@ -1261,26 +1191,77 @@ function buildShelf(shelfIdx, opts = {}) {
   return unit;
 }
 
-/* ── PATCHES VIEW (second tab) ──────────────────────────────────
-   Same state.plants, the same buildShelf()/buildLockedShelf(), and the same
-   two-column grid and createFieldPan() camera (patchesFieldPan) as the
-   primary garden. Only the per-plot tap behaviour differs: tapping a bare
-   patch opens the in-place seed menu instead of navigating to the Shop tab,
-   and a bloom is harvested on the spot instead of opening the detail panel. */
+/* ── PATCHES VIEW — the garden screen ───────────────────────────
+   Tapping a bare patch opens the in-place seed menu rather than sending the
+   player to the Shop tab, and a bloom is harvested where it stands rather
+   than opening the detail panel. Filled patches still open the detail panel,
+   which is where a single plant is watered.
+
+   The id names below still say garden2, and buildShelf()/buildLockedShelf()
+   still say shelf, because both predate this becoming the only garden view.
+   Renaming them would touch the saved model (state.shelves, SHELF_SLOTS),
+   so the names stay and this comment carries the meaning. */
 function renderGarden2() {
   updatePlantStates();
   const scene = document.getElementById('garden2-scene');
   if (!scene) return;
   scene.innerHTML = '';
 
+  const dateEl = document.getElementById('garden-date');
+  if (dateEl) {
+    dateEl.textContent = new Date().toLocaleDateString('en-SG',
+      { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  }
+
+  /* Today's tasks live in the menu, so the field itself is just the field.
+     The badge on the menu button is what says there is something waiting. */
+  renderDailyCard();
+  updateMenuBadge();
+
+  /* First-visit hint, stacked rather than a side-by-side strip: above the pan
+     window the card has the full width but no vertical room to spare. */
+  const hintSlot = document.getElementById('garden-hint-slot');
+  if (hintSlot) {
+    hintSlot.innerHTML = '';
+    if (state.plants.length === 0) {
+      const hint = document.createElement('div');
+      hint.className = 'garden-hint-card';
+      hint.innerHTML = `
+        <div class="garden-hint-head">
+          <svg class="icon icon-lg" aria-hidden="true"><use href="#icon-seed"/></svg>
+          <div class="garden-hint-title">Start by planting a seed</div>
+        </div>
+        <div class="garden-hint-body">Do a brain exercise to earn coins, then visit the shop to buy your first seed.</div>
+        <button class="btn btn-primary btn-sm" id="btn-hint-exercise">
+          <svg class="icon icon-sm" aria-hidden="true"><use href="#icon-brain"/></svg>
+          Do an exercise
+        </button>
+      `;
+      hintSlot.appendChild(hint);
+      document.getElementById('btn-hint-exercise')
+        .addEventListener('click', () => showScreen('exercises'));
+    }
+  }
+
   const patchOpts = { onEmptyTap: openSeedMenu, onBloomTap: harvestPlant, plantRenderer: plantSVGFruit };
   for (let s = 0; s < state.shelves; s++) {
     scene.appendChild(buildShelf(s, patchOpts));
   }
+  // The untilled plot at the end, always there so there is always a goal
   scene.appendChild(buildLockedShelf());
 
   patchesFieldPan.bind();
   patchesFieldPan.measure();
+
+  const waterBtn = document.getElementById('btn-water-all');
+  if (waterBtn) {
+    const hasThirsty = state.plants.some(p => p.state === 'wilt');
+    waterBtn.disabled = state.plants.length === 0;
+    waterBtn.innerHTML = hasThirsty
+      ? `<svg class="icon" aria-hidden="true"><use href="#icon-water"/></svg> Water thirsty plants`
+      : `<svg class="icon" aria-hidden="true"><use href="#icon-water"/></svg> Water all plants`;
+  }
+
   updateCoinDisplay();
 }
 
@@ -1600,8 +1581,7 @@ function harvestPlant(index) {
   playCoin();
   showNotif('success', `harvest-${Date.now()}`, `${seed.name} harvested`,
     `+${value} coins, and a patch is free again. Its meal card stays in your collection.`, 'icon-meal');
-  renderGarden();
-  if (typeof renderGarden2 === 'function') renderGarden2();
+  renderGarden2();
 }
 
 function waterPlant(index, plotEl) {
@@ -1623,8 +1603,7 @@ function waterPlant(index, plotEl) {
   triggerWaterAnimation(plotEl || null);
   evaluateRecompute();
   saveState();
-  renderGarden();
-  if (typeof renderGarden2 === 'function') renderGarden2();
+  renderGarden2();
 }
 
 document.getElementById('btn-water-all').addEventListener('click', () => {
@@ -1650,10 +1629,8 @@ document.getElementById('btn-water-all').addEventListener('click', () => {
   triggerWaterAnimation(null);
   evaluateRecompute();
   saveState();
-  renderGarden();
+  renderGarden2();
 });
-
-document.getElementById('btn-goto-shop').addEventListener('click', () => showScreen('shop'));
 
 /* ── COIN DISPLAY ───────────────────────────────────────────── */
 
@@ -1661,36 +1638,6 @@ function updateCoinDisplay() {
   document.getElementById('coin-count').textContent = state.coins;
   document.getElementById('shop-coin-count').textContent = state.coins;
   document.getElementById('streak-count').textContent = state.streak;
-}
-
-function animateCoinFly(fromEl, amount) {
-  const counter = document.getElementById('coin-display');
-  if (!fromEl || !counter) return;
-  const fromRect = fromEl.getBoundingClientRect();
-  const toRect = counter.getBoundingClientRect();
-
-  for (let i = 0; i < Math.min(4, Math.ceil(amount / 3)); i++) {
-    const coin = document.createElement('div');
-    coin.className = 'coin-fly';
-    coin.style.left = `${fromRect.left + fromRect.width / 2}px`;
-    coin.style.top = `${fromRect.top + fromRect.height / 2}px`;
-    coin.style.setProperty('--tx', `${toRect.left + toRect.width / 2 - fromRect.left - fromRect.width / 2}px`);
-    coin.style.setProperty('--ty', `${toRect.top + toRect.height / 2 - fromRect.top - fromRect.height / 2}px`);
-    coin.style.animationDelay = `${i * 60}ms`;
-    document.body.appendChild(coin);
-    setTimeout(() => coin.remove(), 900 + i * 60);
-  }
-
-  // Count up
-  const start = state.coins - amount;
-  const counter2 = document.getElementById('coin-count');
-  let displayed = start;
-  const step = Math.max(1, Math.ceil(amount / 10));
-  const interval = setInterval(() => {
-    displayed = Math.min(displayed + step, state.coins);
-    counter2.textContent = displayed;
-    if (displayed >= state.coins) clearInterval(interval);
-  }, 40);
 }
 
 /* ── LEVEL PATH SYSTEM ──────────────────────────────────────── */
@@ -2617,7 +2564,7 @@ function completeExercise(coins, exerciseType) {
   }
   document.getElementById('btn-goto-garden').addEventListener('click', () => {
     currentLevelRef = null;
-    showScreen('garden', 'back');
+    showScreen('garden2', 'back');
   });
 }
 
@@ -4422,7 +4369,6 @@ function init() {
   checkMealUnlocks();
   rollDailyTasks();
   updateCoinDisplay();
-  renderGarden();
   renderGarden2();
 
   // init() renders the garden directly rather than routing through

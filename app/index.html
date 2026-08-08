@@ -47,14 +47,6 @@
       <path d="M12 13v4"/>
       <path d="M9 19c0 2 1.5 3 3 3s3-1 3-3"/>
     </symbol>
-    <symbol id="icon-wilt" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M12 22V14"/>
-      <path d="M12 14c0-2-1-3-3-3 0 2 1 3 3 3z"/>
-      <path d="M12 14c0-2 1-3 3-3 0 2-1 3-3 3z"/>
-      <path d="M12 14V9"/>
-      <path d="M8 20h8"/>
-      <path d="M10 6c0-1 1-2 2-2s2 1 2 2"/>
-    </symbol>
     <symbol id="icon-water" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
       <path d="M12 3c-2 3-5 6-5 9 0 3 2 5 5 5s5-2 5-5c0-3-3-6-5-9z"/>
       <path d="M9 14c0 2 1 3 3 3"/>
@@ -85,9 +77,6 @@
       <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
       <path d="M9 22V12h6v10"/>
       <path d="M3 9h18"/>
-    </symbol>
-    <symbol id="icon-star" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/>
     </symbol>
     <symbol id="icon-streak" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
       <path d="M12 2c0 3-2 4-2 6 0 1 .5 2 1.5 2.5C10 11 9 12 9 14c0 3 2 5 5 5s4-2 4-4c0-2-1-3-1.5-3.5.5.5 1 1 1 2 0 1-1 2-2 2s-2-1-2-2c0-2 2-3 2-5s-1.5-4.5-3.5-6z"/>
@@ -167,11 +156,6 @@
     <symbol id="icon-arrow-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
       <path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/>
     </symbol>
-    <symbol id="icon-memory" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-      <circle cx="12" cy="9" r="6"/>
-      <path d="M9 18h6"/><path d="M10 21h4"/>
-      <path d="M12 5c0-1.5-1-2.5-2.5-2.5"/>
-    </symbol>
     <symbol id="icon-tiles" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
       <rect x="3" y="3" width="7" height="7" rx="1"/>
       <rect x="14" y="3" width="7" height="7" rx="1"/>
@@ -201,11 +185,6 @@
       <path d="M12 14v8"/>
       <path d="M9 19c0 2 1 3 3 3s3-1 3-3"/>
     </symbol>
-    <symbol id="icon-refresh" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M23 4v6h-6"/>
-      <path d="M1 20v-6h6"/>
-      <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
-    </symbol>
     <symbol id="icon-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M4 7h16"/>
       <path d="M4 12h16"/>
@@ -224,7 +203,7 @@
         <svg class="icon icon-sm"><use href="#icon-coin"/></svg>
         <span id="coin-count">0</span>
       </span>
-      <span class="streak-chip" id="streak-display" aria-label="Streak">
+      <span class="streak-chip" aria-label="Streak">
         <svg class="icon icon-sm"><use href="#icon-streak"/></svg>
         <span id="streak-count">0</span>
       </span>
@@ -243,44 +222,26 @@
   <!-- ══ SCREENS ══ -->
   <main class="screens" role="main">
 
-    <!-- ── GARDEN SCREEN ── -->
-    <section class="screen" id="screen-garden" role="tabpanel" aria-labelledby="nav-garden">
-      <div class="garden-header">
-        <h1 class="garden-title">Your Garden</h1>
-        <p class="garden-subtitle" id="garden-date"></p>
+    <!-- ── PATCHES SCREEN — the garden itself ── -->
+    <section class="screen active" id="screen-garden2" role="tabpanel" aria-labelledby="nav-garden2">
+      <div class="screen-header">
+        <h1 class="screen-title">Your Patches</h1>
+        <p class="screen-subtitle" id="garden-date"></p>
       </div>
+      <!-- First-visit hint. It lives above the pan window, not inside the
+           field, so it cannot be dragged out of sight. -->
       <div class="garden-hint-slot" id="garden-hint-slot"></div>
-      <!-- The field is larger than the phone. It is dragged under this fixed
-           window instead of scrolling the page, so the header and the action
-           buttons never move. -->
-      <div class="garden-viewport" id="garden-viewport">
-        <div class="garden-field" id="garden-scene"></div>
-        <p class="garden-pan-hint" id="garden-pan-hint" hidden>Drag to look around your field</p>
+      <!-- Bounded pan window: the field is larger than the phone, so it is
+           dragged under this fixed window instead of the page scrolling. The
+           header and the water button never move. -->
+      <div class="garden2-viewport" id="garden2-viewport">
+        <div class="garden2-field" id="garden2-scene"></div>
       </div>
       <div class="garden-actions">
         <button class="btn btn-primary btn-lg" id="btn-water-all">
           <svg class="icon"><use href="#icon-water"/></svg>
           Water all plants
         </button>
-        <button class="btn btn-secondary" id="btn-goto-shop">
-          <svg class="icon"><use href="#icon-shop"/></svg>
-          Visit seed shop
-        </button>
-      </div>
-    </section>
-
-    <!-- ── GARDEN GRID SCREEN: same plants, a plain static grid ── -->
-    <section class="screen active" id="screen-garden2" role="tabpanel" aria-labelledby="nav-garden2">
-      <div class="screen-header">
-        <h1 class="screen-title">Your Patches</h1>
-        <p class="screen-subtitle">The same garden, laid out all at once.</p>
-      </div>
-      <!-- Bounded pan window, same idea as the primary garden's field: the
-           current row of patches sits at the top, a locked row waits below
-           it, and the player drags to look around instead of the page
-           scrolling. -->
-      <div class="garden2-viewport" id="garden2-viewport">
-        <div class="garden2-field" id="garden2-scene"></div>
       </div>
     </section>
 
@@ -353,11 +314,7 @@
 
   <!-- ══ BOTTOM NAV ══ -->
   <nav class="bottom-nav" role="navigation" aria-label="Main navigation">
-    <button class="nav-item" id="nav-garden" data-screen="garden" role="tab" aria-selected="false" aria-controls="screen-garden" aria-label="Garden" hidden>
-      <svg class="icon" aria-hidden="true"><use href="#icon-garden"/></svg>
-      <span>Garden</span>
-    </button>
-    <button class="nav-item active" id="nav-garden2" data-screen="garden2" role="tab" aria-selected="true" aria-controls="screen-garden2" aria-label="Garden patches grid view">
+    <button class="nav-item active" id="nav-garden2" data-screen="garden2" role="tab" aria-selected="true" aria-controls="screen-garden2" aria-label="Your patches">
       <svg class="icon" aria-hidden="true"><use href="#icon-leaf"/></svg>
       <span>Patches</span>
     </button>
@@ -384,7 +341,7 @@
           <svg class="icon"><use href="#icon-close"/></svg>
         </button>
       </div>
-      <div class="share-card" id="share-card">
+      <div class="share-card">
         <div class="share-card-inner">
           <div class="share-garden-preview" id="share-preview"></div>
           <div class="share-stats" id="share-stats"></div>
