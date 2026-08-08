@@ -246,24 +246,35 @@ body{
 
 .plot-plant{
   position:absolute;
-  bottom:34px;
+  /* Above the soil rather than behind it. .plot-pot is painted after this in
+     the DOM, so without the stacking order the sprite was hidden by the very
+     patch it is meant to be growing in. The sprite carries its own small
+     mound, so overlapping the top of the patch is what reads as planted. */
+  z-index:2;
+  bottom:26px;
   left:50%;
   transform:translateX(-50%);
   width:84px;
   pointer-events:none;
   animation:plant-settle 400ms var(--ease-spring);
 }
-/* The Miora plates are square with the plant sitting on the bottom edge, so
-   they can drop straight into the slot the SVG used without re-anchoring. */
+/* 32x32 pixel sprites with the plant on the bottom edge, so they drop into
+   the slot the SVG used without re-anchoring. Scaled by whole numbers only:
+   pixelated rendering at a fractional scale gives some pixels one screen
+   pixel and their neighbours two, which reads as a wobble along every edge. */
 .plant-art{
   display:block;
   width:100%;
   height:auto;
-  /* Grounds the cutout on the soil. Without it the plant reads as floating,
-     because the plate carries no shadow of its own. */
-  filter:drop-shadow(0 2px 2px rgba(43,33,24,0.30));
+  image-rendering:pixelated;
+  /* Grounds the sprite on the soil. Without it the plant reads as floating,
+     because the sprite carries no shadow of its own. */
+  filter:drop-shadow(0 2px 0 rgba(43,33,24,0.28));
 }
-.plot-plant .plant-art{width:112px;margin:0 auto -6px}
+/* 2x. 1x would be pixel-perfect against the gardener but leaves a mature
+   bush smaller than a seedling patch; 2x reads clearly at arm's length,
+   which matters more here. */
+.plot-plant .plant-art{width:64px;margin:0 auto -4px}
 /* A ripe patch lifts very slightly. The plates already draw open flowers and
    fruit at bloom, so this only has to catch the eye, not explain anything. */
 .plant-art.is-ripe{animation:ripe-bob 2.6s ease-in-out infinite}
@@ -274,9 +285,9 @@ body{
 @media (prefers-reduced-motion:reduce){
   .plant-art.is-ripe{animation:none}
 }
-/* Shop rows and the seed menu draw the same plates at thumbnail size. */
-.shop-item-icon .plant-art{width:82%;filter:none}
-.plant-detail-svg .plant-art{width:150px;margin:0 auto}
+/* Shop rows and the seed menu draw the same sprites, at whole scales again. */
+.shop-item-icon .plant-art{width:64px;filter:none}
+.plant-detail-svg .plant-art{width:128px;margin:0 auto}
 @keyframes plant-settle{
   from{transform:translateX(-50%) translateY(-8px);opacity:0}
   to{transform:translateX(-50%) translateY(0);opacity:1}
@@ -336,9 +347,10 @@ body{
 .plot-pot{
   width:100%;
   height:56px;
+  image-rendering:pixelated;
   border-radius:8px;
   background:
-    image-set(url("art/land/patch-planted.png") 1x) center/cover no-repeat,
+    url("art/land/patch-planted.png") center/cover no-repeat,
     repeating-linear-gradient(96deg,rgba(43,33,24,0.10) 0 3px,transparent 3px 13px),
     linear-gradient(180deg,#7A6248 0%,#5A4834 100%);
   /* The spread ring is the loose earth where the patch meets the grass. It is
@@ -358,7 +370,7 @@ body{
    something you can tap without darkening it into looking planted. */
 .plot-pot.empty{
   background:
-    image-set(url("art/land/patch-bare.png") 1x) center/cover no-repeat,
+    url("art/land/patch-bare.png") center/cover no-repeat,
     repeating-linear-gradient(96deg,rgba(43,33,24,0.05) 0 3px,transparent 3px 13px),
     linear-gradient(180deg,#CFC4B0 0%,#B8AB95 100%);
   border:2px solid var(--earth-deep);
@@ -497,10 +509,14 @@ body{
 #screen-garden2{
   overflow:hidden;
   padding:1rem 1.25rem calc(var(--nav-height) + 0.75rem);
+  /* 128px is the 64px tile at exactly 2x, matching the plant sprites. The
+     tile is mirrored into itself in the build, so it repeats without a seam.
+     No wash over it any more: the pixel tile is already quiet, and a
+     translucent layer on top only muddied the palette. */
   background:
-    linear-gradient(180deg,rgba(220,228,204,0.55) 0%,rgba(203,214,180,0.62) 100%),
-    url("art/land/grass.png") 0 0/210px 210px repeat,
+    url("art/land/grass.png") 0 0/128px 128px repeat,
     linear-gradient(180deg,#DCE4CC 0%,#CBD6B4 100%);
+  image-rendering:pixelated;
 }
 
 /* Header, hint and action dock are fixed furniture; the pan window takes

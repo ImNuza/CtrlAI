@@ -10,6 +10,16 @@
 const STORAGE_KEY = 'garden-of-life-v1';
 const SCHEMA_VERSION = 5;
 
+/* Visiting ?reset wipes the save and reloads onto a clean garden.
+   Wanted for two reasons: it is the only way to see the first-run experience
+   again once you have played, and a demo needs a fresh garden between takes
+   and between judges. The parameter is stripped on the way out so a reload
+   or a bookmark does not silently wipe the save a second time. */
+if (typeof location !== 'undefined' && /[?&]reset\b/.test(location.search)) {
+  try { localStorage.removeItem(STORAGE_KEY); } catch (e) { /* nothing to clear */ }
+  location.replace(location.pathname);
+}
+
 const DEFAULT_STATE = {
   schemaVersion: SCHEMA_VERSION,
   coins: 20,
@@ -168,18 +178,21 @@ const MEALS = [
 /* ── PLANT SVG GENERATOR ────────────────────────────────────── */
 
 /* ── PLANT ART ──────────────────────────────────────────────────
-   Miora supplied botanical plates for six of the seven seeds, five growth
-   states each, cut out and palette-reduced by tools/process_miora.py into
-   app/art/plants/{seedId}-{state}.png.
+   32x32 pixel sprites, all seven seeds across all five growth states, built
+   by tools/build_pixel_garden.py into app/art/plants/{seedId}-{state}.png.
 
-   Pandan is not in the drop and it is the seed every new player starts with,
-   so it still draws from the procedural SVG below. That is the one visible
-   inconsistency in the game and it is the top of the next art batch.
+   These replaced the watercolour botanical plates. Both sets were good, but
+   the gardener is pixel art and a pixel figure standing on a watercolour
+   hibiscus looked like two games at once. Pixel throughout also took the art
+   from 538KB to 23KB.
 
-   The SVG path is not dead code and should not be deleted: it is the fallback
-   for any seed without a plate, and it is what the app draws if the art fails
-   to load. */
-const PLANT_ART = ['orchid', 'fern', 'hibiscus', 'kopi', 'passion', 'sampaguita'];
+   Pandan is finally included. It is the seed every new player starts with and
+   it was the last thing still drawing as a flat SVG.
+
+   The SVG path below is not dead code and should not be deleted: it is the
+   fallback for any seed without a sprite, and it is what draws if the art
+   fails to load. */
+const PLANT_ART = ['pandan', 'orchid', 'fern', 'hibiscus', 'kopi', 'passion', 'sampaguita'];
 const PLANT_ART_STATES = ['seed', 'sprout', 'grown', 'bloom', 'wilt'];
 
 function plantArtSrc(plant) {
