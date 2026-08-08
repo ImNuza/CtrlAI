@@ -698,6 +698,9 @@ function playCoin()    { playTone(880, 0.1); setTimeout(() => playTone(1108, 0.1
 function playWater()   { playTone(330, 0.2, 'sine', 0.06); }
 function playWrong()   { playTone(220, 0.2, 'sine', 0.05); }
 function playSelect()  { playTone(440, 0.08, 'sine', 0.04); }
+/* Sowing: a low soft landing, then a smaller one settling after it. Timed to
+   the seed-drop keyframes so the sound lands when the seed meets the soil. */
+function playSow()     { playTone(196, 0.18, 'sine', 0.05); setTimeout(() => playTone(262, 0.22, 'sine', 0.035), 170); }
 
 /* ── WATER ANIMATION ────────────────────────────────────────── */
 
@@ -1277,7 +1280,13 @@ function buildPlot(plantIdx, opts = {}) {
     plot.classList.add('has-plant');
     if (isThirsty) plot.classList.add('thirsty');
     const renderer = plantRenderer || plantSVG;
-    plot.innerHTML = `<div class="plot-plant" aria-hidden="true">${renderer(plant)}</div><div class="plot-pot" aria-hidden="true"></div>`;
+    /* The sowing beat: only the patch just planted, and only once. The soil
+       ring is a sibling rather than a pseudo-element on the plant, so it can
+       expand past the plant's own box. */
+    const sowing = plantIdx === justPlantedIdx;
+    plot.innerHTML = `<div class="plot-plant${sowing ? ' sowing' : ''}" aria-hidden="true">${renderer(plant)}</div>`
+      + `<div class="plot-pot" aria-hidden="true"></div>`
+      + (sowing ? '<div class="sow-puff" aria-hidden="true"></div>' : '');
     const tap = () => {
       if (plant.state === 'bloom' && onBloomTap) onBloomTap(plantIdx);
       else openPlantDetail(plantIdx);
@@ -1354,6 +1363,8 @@ function renderGarden2() {
   bindGardenerTaps();
   applyGardenView();
   updateCoinDisplay();
+  // Consumed. The animation is a one-off, not a property of the plant.
+  justPlantedIdx = null;
 
   const waterBtn = document.getElementById('btn-water-all');
   if (waterBtn) {
@@ -2540,11 +2551,20 @@ function buySeed(seed) {
   state.coins -= seed.cost;
   if (!state.ownedSeeds.includes(seed.id)) state.ownedSeeds.push(seed.id);
   plantSeed(seed.id);
+  /* Coin for the spend, then the seed landing. Delayed to meet the contact
+     frame of seed-drop rather than firing while it is still in the air. */
   playCoin();
+  setTimeout(playSow, 260);
   showNotif('success', 'buy-seed', `${seed.name} planted!`, 'It has been added to your garden.', 'icon-seed');
   renderShop();
   saveState();
 }
+
+/* Index of the patch planted this tick, or null. The next render gives that
+   one plot the sowing animation and then clears this, so the seed drops in
+   once when it is actually planted rather than every time the field is
+   rebuilt, which happens on every water, harvest and land purchase. */
+let justPlantedIdx = null;
 
 function plantSeed(seedId) {
   if (state.plants.length >= gardenCapacity()) return false;
@@ -2557,6 +2577,7 @@ function plantSeed(seedId) {
     state: 'seed',
     exerciseType: seed ? seed.exerciseType : 'any',
   });
+  justPlantedIdx = state.plants.length - 1;
   if (!state.stats.speciesEverGrown.includes(seedId)) {
     state.stats.speciesEverGrown.push(seedId);
     ACHIEVEMENTS.filter(a => a.metric === 'speciesEverGrown').forEach(evaluateAchievement);
@@ -2580,6 +2601,7 @@ document.getElementById('btn-free-seed').addEventListener('click', () => {
     : SEEDS.find(s => s.id === 'pandan');
   if (!state.ownedSeeds.includes(freeSeed.id)) state.ownedSeeds.push(freeSeed.id);
   plantSeed(freeSeed.id);
+  setTimeout(playSow, 260);
   playCoin();
   showNotif('success', 'free-seed', 'Free seed claimed!', `A ${freeSeed.name} has been planted in your garden.`, 'icon-gift');
   saveState();

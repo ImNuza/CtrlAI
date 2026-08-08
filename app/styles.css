@@ -282,6 +282,49 @@ body{
   to{transform:translateX(-50%) translateY(0);opacity:1}
 }
 
+/* ── Sowing ──
+   The seed drops in from above the patch, lands, and the soil takes it with
+   a small settle. Longer and more deliberate than plant-settle, because this
+   one marks something the player chose to do rather than a redraw. */
+.plot-plant.sowing{
+  animation:seed-drop 620ms var(--ease-spring);
+}
+@keyframes seed-drop{
+  0%   {transform:translateX(-50%) translateY(-46px) scale(0.55);opacity:0}
+  45%  {opacity:1}
+  /* Contact with the soil */
+  62%  {transform:translateX(-50%) translateY(2px)  scale(1.06)}
+  78%  {transform:translateX(-50%) translateY(-3px) scale(0.98)}
+  100% {transform:translateX(-50%) translateY(0)    scale(1);opacity:1}
+}
+
+/* Ring of loose earth thrown up as the seed lands. Timed to start at the
+   moment of contact rather than with the drop. */
+.sow-puff{
+  position:absolute;
+  bottom:16px;
+  left:50%;
+  width:26px;
+  height:10px;
+  margin-left:-13px;
+  border-radius:50%;
+  border:2px solid rgba(122,107,92,0.65);
+  opacity:0;
+  pointer-events:none;
+  animation:sow-puff 520ms var(--ease-gentle) 340ms;
+}
+@keyframes sow-puff{
+  0%  {transform:scale(0.3);opacity:0}
+  30% {transform:scale(1);  opacity:0.9}
+  100%{transform:scale(2.1);opacity:0}
+}
+
+/* Reduced motion gets the result, not the performance. */
+@media (prefers-reduced-motion:reduce){
+  .plot-plant.sowing{animation:none}
+  .sow-puff{display:none}
+}
+
 /* ── Soil patch ──
    A flat rectangular tile of tilled ground lying in the grass, not a pot
    standing on a shelf. Filling the button width and dropping most of the
