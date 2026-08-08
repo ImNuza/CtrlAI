@@ -228,6 +228,14 @@
         <h1 class="screen-title">Your Patches</h1>
         <p class="screen-subtitle" id="garden-date"></p>
       </div>
+      <!-- Today's tasks, in one line. The full list still lives in the menu;
+           this is here so a player who never opens the menu still knows there
+           is something waiting today. -->
+      <button class="today-strip" id="today-strip" hidden>
+        <svg class="icon" aria-hidden="true"><use href="#icon-sun"/></svg>
+        <span class="today-strip-text" id="today-strip-text"></span>
+        <svg class="icon icon-sm today-strip-arrow" aria-hidden="true"><use href="#icon-arrow-right"/></svg>
+      </button>
       <!-- First-visit hint. It lives above the pan window, not inside the
            field, so it cannot be dragged out of sight. -->
       <div class="garden-hint-slot" id="garden-hint-slot"></div>
@@ -282,6 +290,7 @@
 
       <!-- Meal cards section -->
       <div class="subsection-head" style="margin-top:2rem">Meal Collection</div>
+      <p class="meal-collection-note" id="meal-collection-note"></p>
       <div class="meal-grid" id="meal-grid"></div>
     </section>
 

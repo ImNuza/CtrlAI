@@ -573,10 +573,12 @@ function progressTask(...ids) {
     }
   });
   if (changed) { saveState(); updateCoinDisplay(); }
-  /* The card is a static host in the menu now, so it can be kept current from
-     any screen rather than only while the garden is on show. */
+  /* Both hosts are static, so they can be kept current from any screen rather
+     than only while the garden is on show. The strip is a no-op when the
+     Patches tab is not the one rendered. */
   renderDailyCard();
   updateMenuBadge();
+  renderTodayStrip();
 }
 
 function checkWeekReward() {
@@ -840,6 +842,36 @@ function renderDailyCard() {
       else showScreen(route, 'forward');
     });
   });
+}
+
+/* One line on the garden screen saying what is left today, and a way into the
+   full list. The tasks themselves still live in the menu, but a red dot on a
+   menu button is not an invitation: a player who never opens that menu never
+   learns daily tasks exist at all, which wasted the best reason the game has
+   to be opened tomorrow. */
+function renderTodayStrip() {
+  const strip = document.getElementById('today-strip');
+  const label = document.getElementById('today-strip-text');
+  if (!strip || !label) return;
+
+  const tasks = state.daily.tasks || [];
+  if (tasks.length === 0) { strip.hidden = true; return; }
+
+  const done = tasks.filter(t => t.done).length;
+  const allDone = done === tasks.length;
+  strip.hidden = false;
+  strip.classList.toggle('all-done', allDone);
+  label.textContent = allDone
+    ? 'All done today. Lovely work.'
+    : `Today in the garden: ${done} of ${tasks.length} done`;
+  strip.setAttribute('aria-label', allDone
+    ? 'All of today\'s tasks are done. Open the menu.'
+    : `${done} of ${tasks.length} tasks done today. Open today's tasks.`);
+
+  if (!strip.dataset.bound) {
+    strip.dataset.bound = '1';
+    strip.addEventListener('click', openMenu);
+  }
 }
 
 /* ── MENU ───────────────────────────────────────────────────── */
@@ -1247,10 +1279,9 @@ function renderGarden2() {
       { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
   }
 
-  /* Today's tasks live in the menu, so the field itself is just the field.
-     The badge on the menu button is what says there is something waiting. */
   renderDailyCard();
   updateMenuBadge();
+  renderTodayStrip();
 
   /* First-visit hint, stacked rather than a side-by-side strip: above the pan
      window the card has the full width but no vertical room to spare. */
@@ -2561,6 +2592,16 @@ function renderProfile() {
     </div>
   `);
 
+  /* States the bonus plainly, because a reward the player cannot see is not a
+     reward. Reads as a kitchen, not as a stat line. */
+  const note = document.getElementById('meal-collection-note');
+  if (note) {
+    const k = kitchenBonus();
+    note.textContent = k === 0
+      ? 'Harvest the right plants together to cook a meal. Every meal you cook adds a coin to every exercise.'
+      : `Your kitchen adds +${k} coin${k > 1 ? 's' : ''} to every exercise. Cook more meals to add more.`;
+  }
+
   MEALS.forEach((meal, i) => {
     const unlocked = state.unlockedMeals.includes(meal.id);
     const card = document.createElement('div');
@@ -2702,13 +2743,25 @@ function startExercise(type) {
   }
 }
 
+/* Every meal card in the collection adds one coin to every exercise from then
+   on. Meal cards used to unlock, sit in the profile and do nothing else, which
+   made the whole collection a dead end and gave the player no reason to plant
+   any particular seed. This turns the collection into a small compounding
+   bonus and makes specific seed combinations worth chasing. Seven meals is
+   seven extra coins a run, which is roughly one extra exercise's worth. */
+function kitchenBonus() {
+  return state.unlockedMeals.length;
+}
+
 function completeExercise(coins, exerciseType) {
   const firstClear = currentLevelRef
     ? !isLevelComplete(currentLevelRef.islandId, currentLevelRef.levelIdx)
     : true;
-  const rewardCoins = currentLevelRef
+  const baseCoins = currentLevelRef
     ? (firstClear ? currentLevelRef.level.coins : Math.max(1, Math.floor(currentLevelRef.level.coins * 0.25)))
     : coins;
+  const kitchen = kitchenBonus();
+  const rewardCoins = baseCoins + kitchen;
 
   state.coins += rewardCoins;
   state.totalExercises++;
@@ -2791,6 +2844,10 @@ function completeExercise(coins, exerciseType) {
           <svg class="icon icon-sm" aria-hidden="true"><use href="#icon-coin"/></svg>
           +${rewardCoins} coins
         </span>
+        ${kitchen > 0 ? `<span class="reward-chip kitchen">
+          <svg class="icon icon-sm" aria-hidden="true"><use href="#icon-meal"/></svg>
+          includes +${kitchen} from your kitchen
+        </span>` : ''}
         ${seedAwarded ? `<span class="reward-chip seed">
           <svg class="icon icon-sm" aria-hidden="true"><use href="#icon-seed"/></svg>
           ${seedAwarded.name} seed

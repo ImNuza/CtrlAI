@@ -434,6 +434,37 @@ body{
 #screen-garden2 .screen-subtitle{color:var(--text-secondary)}
 .garden-hint-slot:not(:empty){flex-shrink:0}
 
+/* One tappable line above the field. Full width and 64px tall so it clears the
+   tap floor without competing with the water button for attention. */
+.today-strip{
+  display:flex;
+  align-items:center;
+  gap:0.7rem;
+  width:100%;
+  min-height:64px;
+  flex-shrink:0;
+  margin-bottom:0.75rem;
+  padding:0 1rem;
+  background:var(--bg-surface);
+  border:1.5px solid var(--border-mid);
+  border-radius:var(--radius-lg);
+  box-shadow:var(--shadow-paper);
+  font-family:var(--font-body);
+  font-size:1.1rem;
+  font-weight:500;
+  color:var(--text-primary);
+  text-align:left;
+  cursor:pointer;
+}
+.today-strip[hidden]{display:none}
+.today-strip .icon{color:var(--accent-orange);flex-shrink:0}
+.today-strip-text{flex:1}
+.today-strip-arrow{color:var(--text-muted)}
+.today-strip:active{transform:scale(0.99)}
+.today-strip:focus-visible{outline:3px solid var(--foliage-mid);outline-offset:2px}
+.today-strip.all-done{border-color:var(--foliage-mid)}
+.today-strip.all-done .icon{color:var(--foliage-mid)}
+
 .garden2-viewport{
   position:relative;
   flex:1;
@@ -1212,6 +1243,13 @@ body{
 }
 
 /* ── Meal cards ── */
+.meal-collection-note{
+  font-family:var(--font-body);
+  font-size:1.05rem;
+  line-height:1.45;
+  color:var(--text-secondary);
+  margin-bottom:0.9rem;
+}
 .meal-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0.75rem}
 .meal-card{
   background:var(--bg-surface);
