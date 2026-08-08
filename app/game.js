@@ -3696,11 +3696,73 @@ function kakiFillSlots(template, context) {
   return { text: kakiTidy(raw), missing };
 }
 
+/* ── THE AI SWAP POINT ───────────────────────────────────────
+   The kakis are the game's NPCs and this is the one function that decides
+   what they say. It is deliberately the only place a real model has to be
+   wired in: everything downstream takes { text, meta } and nothing else
+   changes when the source does.
+
+   Off by default, and it must stay that way in this repo. RULES.md forbids
+   network calls in the product, and CONTEXT.md forbids depending on Tencent
+   Cloud access before Dewa confirms it has landed. With enabled:false not one
+   request is made and the banks answer exactly as they always have.
+
+   endpoint is a same-origin path on purpose. A browser cannot hold an API key
+   without publishing it, so the key belongs in an EdgeOne Edge Function that
+   proxies this path and talks to the model server-side. Never put a key here.
+
+   The proxy is expected to answer { "text": "..." }. Anything else, any
+   non-200, any timeout, and the banks take over silently. A kaki going quiet
+   mid-round because a network call failed is not acceptable, so every failure
+   path lands on a real line. */
+const KAKI_AI = {
+  enabled: false,
+  endpoint: '/api/kaki',
+  timeoutMs: 2500,
+  maxChars: 180,
+};
+
+/* Resolves to a string, or to null on any failure at all. Never throws and
+   never hangs: the abort timer is the hard ceiling on how long a kaki can
+   keep the player waiting. */
+async function kakiGenerateLive(event, context) {
+  if (typeof fetch !== 'function' || typeof AbortController !== 'function') return null;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), KAKI_AI.timeoutMs);
+  try {
+    const res = await fetch(KAKI_AI.endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ event, context }),
+      signal: controller.signal,
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    const text = data && typeof data.text === 'string' ? kakiTidy(data.text) : '';
+    // A blank answer is a failed answer, and an essay breaks the speech bubble.
+    if (!text || text.length > KAKI_AI.maxChars) return null;
+    return text;
+  } catch (err) {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 /* Never throws. A round mid-play must not die because a template was missing. */
 async function kakiGenerate(request) {
   const input = request === null || typeof request !== 'object' ? {} : request;
   const event = typeof input.event === 'string' ? input.event : '';
   const context = input.context === null || typeof input.context !== 'object' ? {} : input.context;
+
+  /* meta.source is how the demo tells a real answer from a banked one, so it
+     has to be honest: 'model' is set only when a model actually answered. */
+  if (KAKI_AI.enabled && KAKI_AI.endpoint) {
+    const live = await kakiGenerateLive(event, context);
+    if (live !== null) {
+      return { text: live, meta: { source: 'model', event, templateIndex: -1, missingSlots: [] } };
+    }
+  }
 
   const templates = Array.isArray(KAKI_BANTER[event]) ? KAKI_BANTER[event] : null;
   if (templates === null || templates.length === 0) {
