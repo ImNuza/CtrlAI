@@ -253,6 +253,30 @@ body{
   pointer-events:none;
   animation:plant-settle 400ms var(--ease-spring);
 }
+/* The Miora plates are square with the plant sitting on the bottom edge, so
+   they can drop straight into the slot the SVG used without re-anchoring. */
+.plant-art{
+  display:block;
+  width:100%;
+  height:auto;
+  /* Grounds the cutout on the soil. Without it the plant reads as floating,
+     because the plate carries no shadow of its own. */
+  filter:drop-shadow(0 2px 2px rgba(43,33,24,0.30));
+}
+.plot-plant .plant-art{width:112px;margin:0 auto -6px}
+/* A ripe patch lifts very slightly. The plates already draw open flowers and
+   fruit at bloom, so this only has to catch the eye, not explain anything. */
+.plant-art.is-ripe{animation:ripe-bob 2.6s ease-in-out infinite}
+@keyframes ripe-bob{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-3px)}
+}
+@media (prefers-reduced-motion:reduce){
+  .plant-art.is-ripe{animation:none}
+}
+/* Shop rows and the seed menu draw the same plates at thumbnail size. */
+.shop-item-icon .plant-art{width:82%;filter:none}
+.plant-detail-svg .plant-art{width:150px;margin:0 auto}
 @keyframes plant-settle{
   from{transform:translateX(-50%) translateY(-8px);opacity:0}
   to{transform:translateX(-50%) translateY(0);opacity:1}
@@ -264,11 +288,14 @@ body{
    corner rounding is what turns the row into a field of plots. The furrows
    are a low-contrast repeating gradient so the patch reads as worked soil
    without turning into a busy pattern behind the plant. */
+/* The gradient stays underneath the Miora soil plate as the fallback, so a
+   patch is never a blank rectangle if the texture has not loaded yet. */
 .plot-pot{
   width:100%;
   height:56px;
   border-radius:8px;
   background:
+    image-set(url("art/land/patch-planted.png") 1x) center/cover no-repeat,
     repeating-linear-gradient(96deg,rgba(43,33,24,0.10) 0 3px,transparent 3px 13px),
     linear-gradient(180deg,#7A6248 0%,#5A4834 100%);
   /* The spread ring is the loose earth where the patch meets the grass. It is
@@ -288,6 +315,7 @@ body{
    something you can tap without darkening it into looking planted. */
 .plot-pot.empty{
   background:
+    image-set(url("art/land/patch-bare.png") 1x) center/cover no-repeat,
     repeating-linear-gradient(96deg,rgba(43,33,24,0.05) 0 3px,transparent 3px 13px),
     linear-gradient(180deg,#CFC4B0 0%,#B8AB95 100%);
   border:2px solid var(--earth-deep);
@@ -419,20 +447,61 @@ body{
    The padding is tighter than the shared .screen padding, because every pixel
    taken back is a pixel of field visible without panning.
    ════════════════════════════════════════════════════════════ */
+/* The Miora grass plate tiles under the whole tab. The gradient stays beneath
+   it so the field still reads as grass if the texture has not loaded, and the
+   overlay keeps the texture quiet enough that the patches and the plants stay
+   the things the eye lands on. */
 #screen-garden2{
   overflow:hidden;
   padding:1rem 1.25rem calc(var(--nav-height) + 0.75rem);
-  background:linear-gradient(180deg,#DCE4CC 0%,#CBD6B4 100%);
+  background:
+    linear-gradient(180deg,rgba(220,228,204,0.55) 0%,rgba(203,214,180,0.62) 100%),
+    url("art/land/grass.png") 0 0/210px 210px repeat,
+    linear-gradient(180deg,#DCE4CC 0%,#CBD6B4 100%);
 }
 
 /* Header, hint and action dock are fixed furniture; the pan window takes
    whatever is left. Without flex-shrink they get squeezed as the field grows. */
-#screen-garden2 .screen-header{margin-bottom:0.75rem;flex-shrink:0}
-#screen-garden2 .screen-title{font-size:2.5rem;line-height:1.1;margin-bottom:0.2rem}
+/* Tighter than the other tabs on purpose. Here the field is the content, and
+   every pixel the heading gives back is a pixel of garden visible without
+   panning. Still 32px, comfortably above the body-text floor. */
+#screen-garden2 .screen-header{margin-bottom:0.5rem;flex-shrink:0}
+#screen-garden2 .screen-title{font-size:2rem;line-height:1.05;margin-bottom:0.1rem}
 /* One step darker than --text-muted: muted clears 4.5:1 on the cream paper
    but not on the deeper end of the grass. */
 #screen-garden2 .screen-subtitle{color:var(--text-secondary)}
 .garden-hint-slot:not(:empty){flex-shrink:0}
+
+/* One tappable line above the field. Full width and 64px tall so it clears the
+   tap floor without competing with the water button for attention. */
+.today-strip{
+  display:flex;
+  align-items:center;
+  gap:0.7rem;
+  width:100%;
+  min-height:64px;
+  flex-shrink:0;
+  margin-bottom:0.75rem;
+  padding:0 1rem;
+  background:var(--bg-surface);
+  border:1.5px solid var(--border-mid);
+  border-radius:var(--radius-lg);
+  box-shadow:var(--shadow-paper);
+  font-family:var(--font-body);
+  font-size:1.1rem;
+  font-weight:500;
+  color:var(--text-primary);
+  text-align:left;
+  cursor:pointer;
+}
+.today-strip[hidden]{display:none}
+.today-strip .icon{color:var(--accent-orange);flex-shrink:0}
+.today-strip-text{flex:1}
+.today-strip-arrow{color:var(--text-muted)}
+.today-strip:active{transform:scale(0.99)}
+.today-strip:focus-visible{outline:3px solid var(--foliage-mid);outline-offset:2px}
+.today-strip.all-done{border-color:var(--foliage-mid)}
+.today-strip.all-done .icon{color:var(--foliage-mid)}
 
 .garden2-viewport{
   position:relative;
@@ -471,82 +540,66 @@ body{
 }
 .garden2-field.pan-glide{transition:transform 420ms var(--ease-gentle)}
 
+/* ── Simple view ──────────────────────────────────────────────
+   One column, full-size patches, ordinary vertical scrolling. No horizontal
+   panning exists in this mode, and no patch is ever off the side of the
+   screen. The transform is cleared so the scroll container, not the camera,
+   is what moves. */
+.garden2-viewport.is-simple{
+  overflow-y:auto;
+  overflow-x:hidden;
+  touch-action:pan-y;
+  cursor:default;
+}
+.garden2-field.is-simple{
+  grid-template-columns:1fr;
+  width:100%;
+  min-width:0;
+  min-height:0;
+  padding:0.25rem 1.25rem 1.5rem;
+  transform:none !important;
+}
+.garden2-field.is-simple .shelf-locked-unit{grid-column:1}
+.garden2-field.is-simple .shelf-locked-plank{width:100%}
+
 /* ── The gardener ────────────────────────────────────────────
    A view detail, never saved. pointer-events:none so it can never sit
    between a finger and a patch. */
+/* One 4x8 sprite sheet: four walk frames across, eight facings down. The row
+   is set from JS as backgroundPositionY, the column is stepped by the
+   animation below. Paused, it parks on column 0, which is the standing pose,
+   so idle and walking are the same element in two states. */
 .garden-avatar{
   position:absolute;
   left:0;
   top:0;
-  width:52px;
-  height:52px;
+  width:88px;
+  height:88px;
   z-index:6;
   pointer-events:none;
   will-change:transform;
-  filter:drop-shadow(0 1px 2px rgba(43,33,24,0.35));
+  background-image:url("art/characters/gardener-walk.png");
+  background-repeat:no-repeat;
+  background-position:0 0;
+  /* Pixel art. Smoothing it on the way up turns the hat into porridge. */
+  image-rendering:pixelated;
+  filter:drop-shadow(0 2px 2px rgba(43,33,24,0.32));
 }
-/* Soft ellipse so the gardener reads as standing on the grass, not floating */
-.garden-avatar::before{
-  content:'';
-  position:absolute;
-  left:50%;
-  bottom:0;
-  transform:translateX(-50%);
-  width:34px;
-  height:9px;
-  border-radius:50%;
-  background:rgba(43,33,24,0.28);
+.garden-avatar[hidden]{display:none}
+
+/* steps(4) walks the four columns and never lands between them. The sheet is
+   4 cells wide, so the loop travels exactly one sheet width. */
+@keyframes gardener-walk{
+  from{background-position-x:0}
+  to{background-position-x:-352px}
 }
-.avatar-body{
-  position:absolute;
-  left:50%;
-  bottom:4px;
-  transform:translateX(-50%);
-  width:28px;
-  height:24px;
-  border-radius:14px 14px 8px 8px;
-  background:linear-gradient(180deg,var(--foliage-shadow) 0%,var(--foliage-deep) 100%);
-  border:2px solid var(--bg-surface);
+.garden-avatar.walking{
+  animation:gardener-walk 0.6s steps(4) infinite;
 }
-.avatar-head{
-  position:absolute;
-  left:50%;
-  bottom:23px;
-  transform:translateX(-50%);
-  width:24px;
-  height:24px;
-  border-radius:50%;
-  background:#EFDFC6;
-  border:2px solid var(--bg-surface);
-  box-shadow:0 0 0 1.5px var(--earth-deep);
-}
-.avatar-sprout{
-  position:absolute;
-  left:50%;
-  bottom:48px;
-  transform:translateX(-50%) rotate(-20deg);
-  width:18px;
-  height:12px;
-  border-radius:0 100% 0 100%;
-  background:var(--foliage-muted);
-  border:1.5px solid var(--bg-surface);
-}
-.garden-avatar.facing-left .avatar-sprout{
-  transform:translateX(-50%) rotate(20deg) scaleX(-1);
-}
-.garden-avatar.walking .avatar-head{animation:avatar-bob 0.5s ease-in-out infinite}
-.garden-avatar.walking .avatar-sprout{animation:avatar-sway 0.5s ease-in-out infinite}
-@keyframes avatar-bob{
-  0%,100%{transform:translateX(-50%) translateY(0)}
-  50%{transform:translateX(-50%) translateY(-2px)}
-}
-@keyframes avatar-sway{
-  0%,100%{transform:translateX(-50%) rotate(-20deg)}
-  50%{transform:translateX(-50%) rotate(-8deg) translateY(-2px)}
-}
+/* Standing still is the walk held on its first frame rather than a separate
+   pose, which is what keeps the facing correct when the gardener stops. */
 @media (prefers-reduced-motion:reduce){
-  .garden-avatar.walking .avatar-head,
-  .garden-avatar.walking .avatar-sprout{animation:none}
+  .garden-avatar.walking{animation:none}
 }
 
 @media (max-height:640px){
@@ -653,6 +706,7 @@ body{
   border:1.5px solid transparent;
 }
 .plant-state-badge.state-seed{background:var(--bg-inset);color:var(--text-secondary);border-color:var(--border-mid)}
+.plant-state-badge.state-sprout{background:rgba(177,184,161,0.25);color:var(--foliage-shadow);border-color:var(--foliage-highlight)}
 .plant-state-badge.state-grown{background:rgba(115,135,93,0.15);color:var(--foliage-shadow);border-color:var(--foliage-mid)}
 .plant-state-badge.state-bloom{background:rgba(224,122,95,0.15);color:#7A2F10;border-color:var(--accent-coral)}
 .plant-state-badge.state-wilt{background:rgba(231,143,55,0.15);color:#7A4800;border-color:var(--accent-orange)}
@@ -1034,7 +1088,15 @@ body{
 .notif-award .notif-icon{color:var(--accent-plum)}
 
 /* Pinned below the pan window, never scrolls out of reach */
-.garden-actions{display:flex;flex-direction:column;gap:0.75rem;flex-shrink:0;padding-top:0.75rem}
+.garden-actions{display:flex;flex-direction:column;gap:0.5rem;flex-shrink:0;padding-top:0.5rem}
+/* Secondary to the watering button and shorter than it, but still over the
+   60px tap floor. Sits on grass, so it needs its own surface to stay legible. */
+.btn-view{
+  min-height:60px;
+  font-size:1.05rem;
+  background:rgba(245,239,235,0.92);
+}
+.btn-view[hidden]{display:none}
 
 /* ── Buttons ── */
 .btn{
@@ -1211,6 +1273,13 @@ body{
 }
 
 /* ── Meal cards ── */
+.meal-collection-note{
+  font-family:var(--font-body);
+  font-size:1.05rem;
+  line-height:1.45;
+  color:var(--text-secondary);
+  margin-bottom:0.9rem;
+}
 .meal-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0.75rem}
 .meal-card{
   background:var(--bg-surface);
@@ -1349,15 +1418,30 @@ body{
   transition:all var(--duration-fast) var(--ease-gentle);
 }
 .pattern-dot.active{transform:scale(1.1)}
+/* A fixed row of four rather than a wrapping flex line. Wrapping put three
+   buttons on one row and orphaned the fourth on its own, which reads as a
+   different kind of choice. Equal columns keep the four reading as one set. */
 .pattern-options{
-  display:flex;
-  justify-content:center;
-  gap:0.75rem;
-  flex-wrap:wrap;
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:0.5rem;
+  justify-items:stretch;
 }
+.pattern-options .pattern-opt-btn{min-width:0;width:100%}
+.pattern-opt-label{
+  font-family:var(--font-body);
+  font-size:1rem;
+  font-weight:500;
+  line-height:1.1;
+  color:var(--text-secondary);
+}
+/* Icon over its name. Taller than the tap floor because it now carries two
+   rows, and the name is what makes the choice readable without having to
+   interpret a small line drawing. */
 .pattern-opt-btn{
   min-width:80px;
-  min-height:var(--tap-min);
+  min-height:84px;
+  padding:0.5rem 0.6rem;
   border-radius:var(--radius-lg);
   font-family:var(--font-body);
   font-size:1.5rem;
@@ -1367,8 +1451,10 @@ body{
   cursor:pointer;
   transition:all var(--duration-fast) var(--ease-gentle);
   display:flex;
+  flex-direction:column;
   align-items:center;
   justify-content:center;
+  gap:0.15rem;
   color:var(--text-primary);
 }
 .pattern-opt-btn:active{transform:scale(0.93)}
@@ -2114,12 +2200,15 @@ body{
 }
 
 /* ── Exercise instruction card ── */
+/* Tighter than it was. At 390px the instruction card was pushing the game
+   itself below the fold, so the player had to scroll past how-to-play to
+   reach the thing it describes. */
 .exercise-intro{
   background:var(--bg-surface);
   border:1.5px solid var(--border-light);
   border-radius:var(--radius-lg);
-  padding:1.25rem 1.5rem;
-  margin-bottom:1.25rem;
+  padding:0.9rem 1.1rem;
+  margin-bottom:0.9rem;
 }
 .exercise-intro-title{
   font-family:var(--font-display);

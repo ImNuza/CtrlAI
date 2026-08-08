@@ -3,7 +3,7 @@
    Offline-first shell. Bump CACHE_VERSION on every deploy.
    ============================================================ */
 
-const CACHE_VERSION = 'gol-v6';
+const CACHE_VERSION = 'gol-v8';
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const FONT_CACHE  = `${CACHE_VERSION}-fonts`;
 
@@ -18,6 +18,16 @@ const SHELL = [
   './icons/icon-512.png',
   './icons/apple-touch-icon.png',
   './icons/favicon-32.png',
+  /* The land plates are referenced from CSS, so they are wanted on first
+     paint. The plant plates are deliberately left out: thirty of them is
+     about 400KB, they are only needed once something is actually growing,
+     and the stale-while-revalidate branch below caches each one the first
+     time it is drawn. */
+  './art/land/grass.png',
+  './art/land/patch-bare.png',
+  './art/land/patch-planted.png',
+  // The gardener is on screen the moment the garden is, and it is 12KB.
+  './art/characters/gardener-walk.png',
 ];
 
 /* ── Install: precache the shell ───────────────────────────── */

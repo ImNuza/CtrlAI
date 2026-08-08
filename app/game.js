@@ -167,7 +167,43 @@ const MEALS = [
 
 /* ── PLANT SVG GENERATOR ────────────────────────────────────── */
 
+/* ── PLANT ART ──────────────────────────────────────────────────
+   Miora supplied botanical plates for six of the seven seeds, five growth
+   states each, cut out and palette-reduced by tools/process_miora.py into
+   app/art/plants/{seedId}-{state}.png.
+
+   Pandan is not in the drop and it is the seed every new player starts with,
+   so it still draws from the procedural SVG below. That is the one visible
+   inconsistency in the game and it is the top of the next art batch.
+
+   The SVG path is not dead code and should not be deleted: it is the fallback
+   for any seed without a plate, and it is what the app draws if the art fails
+   to load. */
+const PLANT_ART = ['orchid', 'fern', 'hibiscus', 'kopi', 'passion', 'sampaguita'];
+const PLANT_ART_STATES = ['seed', 'sprout', 'grown', 'bloom', 'wilt'];
+
+function plantArtSrc(plant) {
+  if (!plant || PLANT_ART.indexOf(plant.seedId) === -1) return null;
+  const state = PLANT_ART_STATES.indexOf(plant.state) === -1 ? 'grown' : plant.state;
+  return `art/plants/${plant.seedId}-${state}.png`;
+}
+
+/* alt is empty on purpose. Every caller already carries the plant's name and
+   state in the surrounding aria-label, so a description here would make a
+   screen reader say it twice. */
+function plantImg(plant, cls) {
+  const src = plantArtSrc(plant);
+  if (!src) return null;
+  return `<img class="${cls}" src="${src}" alt="" draggable="false">`;
+}
+
 function plantSVG(plant) {
+  const img = plantImg(plant, 'plant-art');
+  if (img) return img;
+  return plantSVGGeometry(plant);
+}
+
+function plantSVGGeometry(plant) {
   const s = SEEDS.find(sd => sd.id === plant.seedId) || SEEDS[0];
   const stage = plant.state;
   const bc = s.bloomColor || '#73875D';
@@ -205,11 +241,18 @@ function plantSVG(plant) {
   return svg;
 }
 
-/* Field renderer. Identical to plantSVG at every stage except bloom, where it
-   draws small hanging fruit instead of the flower disc, a hint that this patch
-   is ready to harvest. plantSVG itself stays untouched since it is still the
-   renderer for the shop icons and the plant detail modal. */
+/* Field renderer. Where a Miora plate exists it is the same image plantSVG
+   uses, marked ready-to-harvest with a class rather than different art, since
+   the plates already draw fruit and open flowers at bloom. Seeds without a
+   plate fall through to the geometry below, which swaps the flower disc for
+   hanging fruit to make the same point. */
 function plantSVGFruit(plant) {
+  const img = plantImg(plant, 'plant-art' + (plant.state === 'bloom' ? ' is-ripe' : ''));
+  if (img) return img;
+  return plantSVGFruitGeometry(plant);
+}
+
+function plantSVGFruitGeometry(plant) {
   const s = SEEDS.find(sd => sd.id === plant.seedId) || SEEDS[0];
   const stage = plant.state;
   const bc = s.bloomColor || '#73875D';
@@ -527,8 +570,16 @@ function rollDailyTasks() {
   const used = new Set();
   const tasks = pools.map((pool, pi) => {
     const viable = pool.filter(t => taskPossible(t.id) && !used.has(t.id));
-    const finalPool = viable.length ? viable : GENTLE_POOL.filter(t => !used.has(t.id));
-    const picked = finalPool[(h >> (pi * 8)) % finalPool.length];
+    const spare = GENTLE_POOL.filter(t => !used.has(t.id));
+    /* pool itself is the last resort so this is never empty. An empty list
+       here divides by zero, which indexes with NaN and hands back undefined. */
+    const finalPool = viable.length ? viable : (spare.length ? spare : pool);
+    /* Unsigned shift. dayHash() returns a full 32-bit value via >>> 0, but >>
+       is signed, so every hash above 2^31 shifted negative, and a negative
+       modulo stays negative in JS. finalPool[-1] is undefined and reading .id
+       off it threw, which killed init() before the garden was ever drawn.
+       Roughly half of all date pairs hash high enough to hit it. */
+    const picked = finalPool[(h >>> (pi * 8)) % finalPool.length];
     used.add(picked.id);
     // Carry partial progress if the same task was rolled yesterday
     const prev = prevTasks.find(t => t.id === picked.id);
@@ -573,10 +624,12 @@ function progressTask(...ids) {
     }
   });
   if (changed) { saveState(); updateCoinDisplay(); }
-  /* The card is a static host in the menu now, so it can be kept current from
-     any screen rather than only while the garden is on show. */
+  /* Both hosts are static, so they can be kept current from any screen rather
+     than only while the garden is on show. The strip is a no-op when the
+     Patches tab is not the one rendered. */
   renderDailyCard();
   updateMenuBadge();
+  renderTodayStrip();
 }
 
 function checkWeekReward() {
@@ -842,6 +895,37 @@ function renderDailyCard() {
   });
 }
 
+/* One line on the garden screen saying what is left today, and a way into the
+   full list. The tasks themselves still live in the menu, but a red dot on a
+   menu button is not an invitation: a player who never opens that menu never
+   learns daily tasks exist at all, which wasted the best reason the game has
+   to be opened tomorrow. */
+function renderTodayStrip() {
+  const strip = document.getElementById('today-strip');
+  const label = document.getElementById('today-strip-text');
+  if (!strip || !label) return;
+
+  const tasks = state.daily.tasks || [];
+  if (tasks.length === 0) { strip.hidden = true; return; }
+
+  const done = tasks.filter(t => t.done).length;
+  const allDone = done === tasks.length;
+  strip.hidden = false;
+  strip.classList.toggle('all-done', allDone);
+  // Kept short so it holds one line at 390px. The old wording wrapped.
+  label.textContent = allDone
+    ? 'All done today. Lovely work.'
+    : `Today's tasks: ${done} of ${tasks.length} done`;
+  strip.setAttribute('aria-label', allDone
+    ? 'All of today\'s tasks are done. Open the menu.'
+    : `${done} of ${tasks.length} tasks done today. Open today's tasks.`);
+
+  if (!strip.dataset.bound) {
+    strip.dataset.bound = '1';
+    strip.addEventListener('click', openMenu);
+  }
+}
+
 /* ── MENU ───────────────────────────────────────────────────── */
 
 /* One button in the top bar instead of two, holding today's tasks, the sound
@@ -940,6 +1024,15 @@ function createFieldPan(screenName, viewportId, fieldId, hintId, opts = {}) {
     if (field) field.style.transform = `translate3d(${pan.x}px, ${pan.y}px, 0)`;
   }
 
+  /* Resets the camera to the corner. Used when the field re-flows to a single
+     column and there is no longer anything to pan to. */
+  function reset() {
+    pan.x = 0;
+    pan.y = 0;
+    measure();
+    apply();
+  }
+
   function hasSlack() {
     return pan.minX < 0 || pan.minY < 0;
   }
@@ -1016,6 +1109,9 @@ function createFieldPan(screenName, viewportId, fieldId, hintId, opts = {}) {
     if (!w || !h) return;
     const mx = Math.min(margin, w / 2);
     const my = Math.min(margin, h / 2);
+
+    // Nothing to follow when the whole field already fits the window.
+    if (pan.minX === 0 && pan.minY === 0) return;
 
     let nextX = pan.x;
     if (x + pan.x < mx) nextX = mx - x;
@@ -1139,7 +1235,7 @@ function createFieldPan(screenName, viewportId, fieldId, hintId, opts = {}) {
     });
   }
 
-  return { pan, bind, measure, panIntoView, hasSlack, follow };
+  return { pan, bind, measure, panIntoView, hasSlack, follow, reset };
 }
 
 /* No centerFirst here any more: the camera follows the gardener, and the
@@ -1241,16 +1337,42 @@ function renderGarden2() {
   if (!scene) return;
   scene.innerHTML = '';
 
+  /* The field is built first, before anything optional. A daily-task bug once
+     threw in renderDailyCard() and took the whole garden down with it: the
+     player got a screen of empty grass with no patches and no gardener. The
+     field is the game, so nothing that is not the field may run ahead of it. */
+  const patchOpts = { onEmptyTap: openSeedMenu, onBloomTap: harvestPlant, plantRenderer: plantSVGFruit };
+  for (let s = 0; s < state.shelves; s++) {
+    scene.appendChild(buildShelf(s, patchOpts));
+  }
+  // The untilled plot at the end, always there so there is always a goal
+  scene.appendChild(buildLockedShelf());
+
+  patchesFieldPan.bind();
+  patchesFieldPan.measure();
+  mountGardener(scene);
+  bindGardenerTaps();
+  applyGardenView();
+  updateCoinDisplay();
+
+  const waterBtn = document.getElementById('btn-water-all');
+  if (waterBtn) {
+    const hasThirsty = state.plants.some(p => p.state === 'wilt');
+    waterBtn.disabled = state.plants.length === 0;
+    waterBtn.innerHTML = hasThirsty
+      ? `<svg class="icon" aria-hidden="true"><use href="#icon-water"/></svg> Water thirsty plants`
+      : `<svg class="icon" aria-hidden="true"><use href="#icon-water"/></svg> Water all plants`;
+  }
+
   const dateEl = document.getElementById('garden-date');
   if (dateEl) {
     dateEl.textContent = new Date().toLocaleDateString('en-SG',
       { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
   }
 
-  /* Today's tasks live in the menu, so the field itself is just the field.
-     The badge on the menu button is what says there is something waiting. */
   renderDailyCard();
   updateMenuBadge();
+  renderTodayStrip();
 
   /* First-visit hint, stacked rather than a side-by-side strip: above the pan
      window the card has the full width but no vertical room to spare. */
@@ -1276,29 +1398,6 @@ function renderGarden2() {
         .addEventListener('click', () => showScreen('exercises'));
     }
   }
-
-  const patchOpts = { onEmptyTap: openSeedMenu, onBloomTap: harvestPlant, plantRenderer: plantSVGFruit };
-  for (let s = 0; s < state.shelves; s++) {
-    scene.appendChild(buildShelf(s, patchOpts));
-  }
-  // The untilled plot at the end, always there so there is always a goal
-  scene.appendChild(buildLockedShelf());
-
-  patchesFieldPan.bind();
-  patchesFieldPan.measure();
-
-  const waterBtn = document.getElementById('btn-water-all');
-  if (waterBtn) {
-    const hasThirsty = state.plants.some(p => p.state === 'wilt');
-    waterBtn.disabled = state.plants.length === 0;
-    waterBtn.innerHTML = hasThirsty
-      ? `<svg class="icon" aria-hidden="true"><use href="#icon-water"/></svg> Water thirsty plants`
-      : `<svg class="icon" aria-hidden="true"><use href="#icon-water"/></svg> Water all plants`;
-  }
-
-  mountGardener(scene);
-  bindGardenerTaps();
-  updateCoinDisplay();
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -1318,10 +1417,17 @@ function renderGarden2() {
    written to localStorage. renderGarden2() empties the field on every
    water, harvest and purchase, and these variables are what survive it. */
 
-const AVATAR_SIZE = 52;        // must match .garden-avatar in styles.css
+const AVATAR_SIZE = 88;        // one sprite cell, must match .garden-avatar
 const AVATAR_SPEED = 320;      // px per second
 const AVATAR_ARRIVE = 1.5;     // px, close enough to stop
 const FOLLOW_MARGIN = 96;      // keep the gardener this far inside the viewport
+
+/* Row order in art/characters/gardener-walk.png, clockwise from east. The
+   field's y axis points down, so a positive angle from atan2 turns clockwise
+   on screen and indexes straight into this list. */
+const AVATAR_DIRS = ['east', 'south-east', 'south', 'south-west',
+                     'west', 'north-west', 'north', 'north-east'];
+let avatarDir = 2;             // facing south, toward the player, at rest
 /* Centre offset below a patch's bottom edge. The avatar is 52px tall and
    drawn from its centre, so 0 puts its feet about 26px past the edge, which
    lands in the gap between rows rather than on the row below. */
@@ -1331,7 +1437,6 @@ let avatarX = 0;
 let avatarY = 0;
 let avatarPlaced = false;
 let avatarWalking = false;
-let avatarFacingLeft = false;
 let avatarTarget = null;
 let avatarFrameStamp = 0;
 const walkKeys = { up: false, down: false, left: false, right: false };
@@ -1350,7 +1455,9 @@ function mountGardener(scene) {
     av.className = 'garden-avatar';
     av.id = 'garden-avatar';
     av.setAttribute('aria-hidden', 'true');
-    av.innerHTML = '<span class="avatar-sprout"></span><span class="avatar-head"></span><span class="avatar-body"></span>';
+    /* No child elements. The whole figure is one sprite sheet driven by
+       background-position: the row picks the facing, the CSS animation steps
+       through the four frames, and pausing it parks on the standing frame. */
   }
   scene.appendChild(av);
   if (!avatarPlaced) placeGardenerAtStart(scene);
@@ -1396,9 +1503,23 @@ function clampGardenerToField(scene) {
 function applyAvatarTransform() {
   const av = document.getElementById('garden-avatar');
   if (!av) return;
-  av.style.transform = `translate3d(${avatarX - AVATAR_SIZE / 2}px, ${avatarY - AVATAR_SIZE / 2}px, 0)`;
+  /* Anchored on the feet, not the middle. The sprite stands on the bottom of
+     its cell, so centring it vertically would float the gardener above
+     whatever it is standing next to. */
+  av.style.transform =
+    `translate3d(${avatarX - AVATAR_SIZE / 2}px, ${avatarY - AVATAR_SIZE + 12}px, 0)`;
+  av.style.backgroundPositionY = `${-avatarDir * AVATAR_SIZE}px`;
   av.classList.toggle('walking', avatarWalking);
-  av.classList.toggle('facing-left', avatarFacingLeft);
+}
+
+/* Movement vector to one of eight sprite rows. Returns the current facing
+   unchanged for a vector too small to read, so a gardener easing to a stop
+   does not spin on the spot. */
+function avatarDirFrom(dx, dy) {
+  if (Math.abs(dx) < 0.05 && Math.abs(dy) < 0.05) return avatarDir;
+  const step = Math.PI / 4;
+  let i = Math.round(Math.atan2(dy, dx) / step);
+  return ((i % 8) + 8) % 8;
 }
 
 /* Where to send the gardener for a given field point. Reduced motion gets
@@ -1433,7 +1554,8 @@ function gardenerFrame(now) {
   const previous = avatarFrameStamp || now;
   avatarFrameStamp = now;
 
-  if (currentScreenName !== 'garden2') return;
+  // Nothing walks in simple view: it is a list of patches, not a place.
+  if (currentScreenName !== 'garden2' || simpleView) return;
   const scene = document.getElementById('garden2-scene');
   // Zero while the screen transition still has the tab hidden and unpainted.
   if (!scene || !scene.offsetWidth) return;
@@ -1471,8 +1593,9 @@ function gardenerFrame(now) {
   clampGardenerToField(scene);
 
   const movedX = avatarX - fromX;
-  const moved = Math.abs(movedX) > 0.01 || Math.abs(avatarY - fromY) > 0.01;
-  if (Math.abs(movedX) > 0.01) avatarFacingLeft = movedX < 0;
+  const movedY = avatarY - fromY;
+  const moved = Math.abs(movedX) > 0.01 || Math.abs(movedY) > 0.01;
+  if (moved) avatarDir = avatarDirFrom(movedX, movedY);
 
   if (moved !== avatarWalking || moved) {
     avatarWalking = moved;
@@ -1482,6 +1605,60 @@ function gardenerFrame(now) {
 }
 
 requestAnimationFrame(gardenerFrame);
+
+/* ── SIMPLE VIEW ─────────────────────────────────────────────
+   The roaming field is two columns wide and taller than its window, so at
+   full land some of the player's own patches can only be reached by dragging.
+   Guidance for this audience is consistent that gestures need finer motor
+   control than taps and should never be the only route to anything.
+
+   The fix is a re-flow, not a zoom. Scaling the field down did make every
+   patch visible, but at four rows it shrank them to 40x62px, which is under
+   the 60px tap floor: one accessibility problem traded for another. Dropping
+   to a single column instead keeps every patch full size, removes horizontal
+   panning entirely, and leaves plain vertical scrolling as the only movement,
+   which is the most familiar gesture on a phone by a wide margin.
+
+   View state, not progress, so it is never saved. */
+let simpleView = false;
+
+function applyGardenView() {
+  const label = document.getElementById('btn-fit-view-label');
+  const btn = document.getElementById('btn-fit-view');
+  const scene = document.getElementById('garden2-scene');
+  const viewport = document.getElementById('garden2-viewport');
+  if (!btn || !label || !scene || !viewport) return;
+
+  scene.classList.toggle('is-simple', simpleView);
+  viewport.classList.toggle('is-simple', simpleView);
+  label.textContent = simpleView ? 'Walk in the garden' : 'See all my patches';
+  btn.setAttribute('aria-pressed', String(simpleView));
+
+  const avatar = document.getElementById('garden-avatar');
+  if (avatar) avatar.hidden = simpleView;
+
+  if (simpleView) {
+    patchesFieldPan.reset();
+    viewport.scrollTop = 0;
+  } else {
+    patchesFieldPan.measure();
+  }
+}
+
+function toggleGardenView() {
+  simpleView = !simpleView;
+  playSelect();
+  applyGardenView();
+  /* Only on a deliberate switch back to roaming, and only after layout has
+     settled. Following during renderGarden2() measured a viewport that was
+     still mid-transition and pinned the camera against a height that no
+     longer existed, which parked the view below the plants and left every
+     one of them cropped at the top of the window. The frame loop already
+     follows the gardener whenever it actually moves. */
+  if (!simpleView) {
+    requestAnimationFrame(() => patchesFieldPan.follow(avatarX, avatarY, FOLLOW_MARGIN));
+  }
+}
 
 /* Bound to the viewport, which survives the re-renders that empty the field,
    and in the bubble phase on purpose. A patch's own click handler has already
@@ -1497,7 +1674,7 @@ function bindGardenerTaps() {
 
   viewport.addEventListener('click', (e) => {
     const scene = document.getElementById('garden2-scene');
-    if (!scene) return;
+    if (!scene || simpleView) return;
 
     const plot = e.target.closest && e.target.closest('.shelf-plot');
     if (plot && scene.contains(plot)) {
@@ -1881,6 +2058,8 @@ function waterPlant(index, plotEl) {
   saveState();
   renderGarden2();
 }
+
+document.getElementById('btn-fit-view').addEventListener('click', toggleGardenView);
 
 document.getElementById('btn-water-all').addEventListener('click', () => {
   const today = todayStr();
@@ -2561,6 +2740,16 @@ function renderProfile() {
     </div>
   `);
 
+  /* States the bonus plainly, because a reward the player cannot see is not a
+     reward. Reads as a kitchen, not as a stat line. */
+  const note = document.getElementById('meal-collection-note');
+  if (note) {
+    const k = kitchenBonus();
+    note.textContent = k === 0
+      ? 'Harvest the right plants together to cook a meal. Every meal you cook adds a coin to every exercise.'
+      : `Your kitchen adds +${k} coin${k > 1 ? 's' : ''} to every exercise. Cook more meals to add more.`;
+  }
+
   MEALS.forEach((meal, i) => {
     const unlocked = state.unlockedMeals.includes(meal.id);
     const card = document.createElement('div');
@@ -2702,13 +2891,25 @@ function startExercise(type) {
   }
 }
 
+/* Every meal card in the collection adds one coin to every exercise from then
+   on. Meal cards used to unlock, sit in the profile and do nothing else, which
+   made the whole collection a dead end and gave the player no reason to plant
+   any particular seed. This turns the collection into a small compounding
+   bonus and makes specific seed combinations worth chasing. Seven meals is
+   seven extra coins a run, which is roughly one extra exercise's worth. */
+function kitchenBonus() {
+  return state.unlockedMeals.length;
+}
+
 function completeExercise(coins, exerciseType) {
   const firstClear = currentLevelRef
     ? !isLevelComplete(currentLevelRef.islandId, currentLevelRef.levelIdx)
     : true;
-  const rewardCoins = currentLevelRef
+  const baseCoins = currentLevelRef
     ? (firstClear ? currentLevelRef.level.coins : Math.max(1, Math.floor(currentLevelRef.level.coins * 0.25)))
     : coins;
+  const kitchen = kitchenBonus();
+  const rewardCoins = baseCoins + kitchen;
 
   state.coins += rewardCoins;
   state.totalExercises++;
@@ -2791,6 +2992,10 @@ function completeExercise(coins, exerciseType) {
           <svg class="icon icon-sm" aria-hidden="true"><use href="#icon-coin"/></svg>
           +${rewardCoins} coins
         </span>
+        ${kitchen > 0 ? `<span class="reward-chip kitchen">
+          <svg class="icon icon-sm" aria-hidden="true"><use href="#icon-meal"/></svg>
+          includes +${kitchen} from your kitchen
+        </span>` : ''}
         ${seedAwarded ? `<span class="reward-chip seed">
           <svg class="icon icon-sm" aria-hidden="true"><use href="#icon-seed"/></svg>
           ${seedAwarded.name} seed
@@ -2948,12 +3153,32 @@ function initTileMatch(level) {
 
 /* ── EXERCISE 2: PATTERN SEQUENCE ──────────────────────────── */
 
+/* Ten symbols, not the original four. Pattern is eight of the forty levels
+   and every round drew from the same four things, which made it far and away
+   the most repetitive exercise in the game.
+
+   Each one has to be tellable from every other at a glance, so they are
+   picked for distinct silhouettes rather than for being garden-themed: a
+   watering can and a raindrop would be a cruel pair. Colour is a second cue
+   on top of shape, never the only one, since colour vision narrows with age.
+   Only the first PATTERN_CHOICES of these are offered in any single round. */
 const PATTERN_ITEMS = [
   { label: 'Leaf',   icon: 'icon-leaf',   color: '#73875D' },
   { label: 'Flower', icon: 'icon-flower', color: '#E07A5F' },
   { label: 'Sun',    icon: 'icon-sun',    color: '#E78F37' },
   { label: 'Water',  icon: 'icon-water',  color: '#7B5371' },
+  { label: 'Seed',   icon: 'icon-seed',   color: '#7A6B5C' },
+  { label: 'Pot',    icon: 'icon-pot',    color: '#AE382B' },
+  { label: 'Coin',   icon: 'icon-coin',   color: '#C87A2A' },
+  { label: 'Book',   icon: 'icon-book',   color: '#44573D' },
+  { label: 'Bell',   icon: 'icon-bell',   color: '#7B5371' },
+  { label: 'Clock',  icon: 'icon-clock',  color: '#5A4A3C' },
 ];
+
+/* How many of the ten are on offer in one round. Four keeps the answer row
+   readable at 390px and the choice gentle; the variety comes from which four,
+   which is re-drawn every round. */
+const PATTERN_CHOICES = 4;
 
 function initPatternSeq(level) {
   const totalRounds = level ? level.rounds : 4;
@@ -3000,9 +3225,25 @@ function updatePatternDots() {
 
 function startPatternRound() {
   const len = playState.lengths[playState.round];
-  playState.sequence = Array.from({ length: len }, () =>
-    PATTERN_ITEMS[Math.floor(Math.random() * PATTERN_ITEMS.length)]
-  );
+
+  /* A fresh handful of symbols each round. Drawing the whole game from one
+     fixed four was what made this exercise feel like the same round over and
+     over. */
+  playState.choices = shuffle(PATTERN_ITEMS).slice(0, PATTERN_CHOICES);
+
+  /* No symbol twice in a row. Independent random picks produced sequences
+     like Water, Water, and with no timer and no counter on screen there is
+     no honest way for the player to tell one long look from two short ones.
+     That is ambiguity, not difficulty. Length is what makes it harder. */
+  const seq = [];
+  for (let i = 0; i < len; i++) {
+    let pick;
+    do {
+      pick = playState.choices[Math.floor(Math.random() * playState.choices.length)];
+    } while (playState.choices.length > 1 && seq.length && pick.label === seq[seq.length - 1].label);
+    seq.push(pick);
+  }
+  playState.sequence = seq;
   playState.userSeq = [];
 
   const btn = document.getElementById('btn-show-pattern');
@@ -3046,12 +3287,17 @@ function renderPatternOptions() {
   const opts = document.getElementById('pattern-options');
   opts.innerHTML = '';
 
-  PATTERN_ITEMS.forEach(item => {
+  /* Only this round's symbols, and each one named. These buttons used to be
+     four bare icons with the word hidden in an aria-label, which asked the
+     player to identify a small line drawing with nothing to read. Naming them
+     costs a line and removes the guesswork. */
+  (playState.choices || PATTERN_ITEMS.slice(0, PATTERN_CHOICES)).forEach(item => {
     const btn = document.createElement('button');
     btn.className = 'pattern-opt-btn';
     btn.setAttribute('aria-label', item.label);
     btn.style.borderColor = item.color;
-    btn.innerHTML = `<svg class="icon icon-lg" style="color:${item.color}" aria-hidden="true"><use href="#${item.icon}"/></svg>`;
+    btn.innerHTML = `<svg class="icon icon-lg" style="color:${item.color}" aria-hidden="true"><use href="#${item.icon}"/></svg>`
+      + `<span class="pattern-opt-label">${item.label}</span>`;
 
     btn.addEventListener('click', () => {
       playState.userSeq.push(item);
@@ -3639,11 +3885,73 @@ function kakiFillSlots(template, context) {
   return { text: kakiTidy(raw), missing };
 }
 
+/* ── THE AI SWAP POINT ───────────────────────────────────────
+   The kakis are the game's NPCs and this is the one function that decides
+   what they say. It is deliberately the only place a real model has to be
+   wired in: everything downstream takes { text, meta } and nothing else
+   changes when the source does.
+
+   Off by default, and it must stay that way in this repo. RULES.md forbids
+   network calls in the product, and CONTEXT.md forbids depending on Tencent
+   Cloud access before Dewa confirms it has landed. With enabled:false not one
+   request is made and the banks answer exactly as they always have.
+
+   endpoint is a same-origin path on purpose. A browser cannot hold an API key
+   without publishing it, so the key belongs in an EdgeOne Edge Function that
+   proxies this path and talks to the model server-side. Never put a key here.
+
+   The proxy is expected to answer { "text": "..." }. Anything else, any
+   non-200, any timeout, and the banks take over silently. A kaki going quiet
+   mid-round because a network call failed is not acceptable, so every failure
+   path lands on a real line. */
+const KAKI_AI = {
+  enabled: false,
+  endpoint: '/api/kaki',
+  timeoutMs: 2500,
+  maxChars: 180,
+};
+
+/* Resolves to a string, or to null on any failure at all. Never throws and
+   never hangs: the abort timer is the hard ceiling on how long a kaki can
+   keep the player waiting. */
+async function kakiGenerateLive(event, context) {
+  if (typeof fetch !== 'function' || typeof AbortController !== 'function') return null;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), KAKI_AI.timeoutMs);
+  try {
+    const res = await fetch(KAKI_AI.endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ event, context }),
+      signal: controller.signal,
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    const text = data && typeof data.text === 'string' ? kakiTidy(data.text) : '';
+    // A blank answer is a failed answer, and an essay breaks the speech bubble.
+    if (!text || text.length > KAKI_AI.maxChars) return null;
+    return text;
+  } catch (err) {
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 /* Never throws. A round mid-play must not die because a template was missing. */
 async function kakiGenerate(request) {
   const input = request === null || typeof request !== 'object' ? {} : request;
   const event = typeof input.event === 'string' ? input.event : '';
   const context = input.context === null || typeof input.context !== 'object' ? {} : input.context;
+
+  /* meta.source is how the demo tells a real answer from a banked one, so it
+     has to be honest: 'model' is set only when a model actually answered. */
+  if (KAKI_AI.enabled && KAKI_AI.endpoint) {
+    const live = await kakiGenerateLive(event, context);
+    if (live !== null) {
+      return { text: live, meta: { source: 'model', event, templateIndex: -1, missingSlots: [] } };
+    }
+  }
 
   const templates = Array.isArray(KAKI_BANTER[event]) ? KAKI_BANTER[event] : null;
   if (templates === null || templates.length === 0) {
