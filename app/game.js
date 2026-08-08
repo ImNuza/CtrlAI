@@ -3398,6 +3398,23 @@ const ODD_SETS = [
   { items: [{ label: 'Read',    icon: 'icon-book'   }, { label: 'Write',   icon: 'icon-book'   }, { label: 'Learn',   icon: 'icon-brain'  }, { label: 'Swim',    icon: 'icon-water'  }], odd: 'Swim',    hint: 'Three use the mind, one uses the body in water.' },
   { items: [{ label: 'Knit',    icon: 'icon-leaf'   }, { label: 'Sew',     icon: 'icon-leaf'   }, { label: 'Weave',   icon: 'icon-leaf'   }, { label: 'Drive',   icon: 'icon-home'   }], odd: 'Drive',   hint: 'Three are crafts with thread, one uses a car.' },
   { items: [{ label: 'Morning walk', icon: 'icon-sun' }, { label: 'Gardening', icon: 'icon-leaf' }, { label: 'Cooking', icon: 'icon-meal' }, { label: 'Television', icon: 'icon-camera' }], odd: 'Television', hint: 'Three are active hobbies, one is passive watching.' },
+
+  /* Second batch. Local where it can be, because a set that names a hawker
+     dish or a neighbourhood lands differently for the player this is built
+     for than one about generic fruit. Every hint still names the rule in
+     plain words, so a set is never a guess. */
+  { items: [{ label: 'Kopi',     icon: 'icon-kopi'   }, { label: 'Teh',     icon: 'icon-kopi'   }, { label: 'Milo',    icon: 'icon-kopi'   }, { label: 'Rice',    icon: 'icon-meal'   }], odd: 'Rice',    hint: 'Three are drinks, one you eat.' },
+  { items: [{ label: 'Laksa',    icon: 'icon-meal'   }, { label: 'Mee pok',  icon: 'icon-meal'  }, { label: 'Bee hoon', icon: 'icon-meal'  }, { label: 'Kaya',    icon: 'icon-gift'   }], odd: 'Kaya',    hint: 'Three are noodle dishes, one is a spread.' },
+  { items: [{ label: 'Orchid',   icon: 'icon-flower' }, { label: 'Hibiscus', icon: 'icon-flower'}, { label: 'Frangipani', icon: 'icon-flower' }, { label: 'Bamboo', icon: 'icon-leaf'  }], odd: 'Bamboo',  hint: 'Three are flowers, one is a grass.' },
+  { items: [{ label: 'Bus',      icon: 'icon-home'   }, { label: 'MRT',     icon: 'icon-home'   }, { label: 'Taxi',    icon: 'icon-home'   }, { label: 'Bench',   icon: 'icon-garden' }], odd: 'Bench',   hint: 'Three take you places, one you sit on.' },
+  { items: [{ label: 'Spade',    icon: 'icon-pot'    }, { label: 'Rake',    icon: 'icon-pot'    }, { label: 'Hose',    icon: 'icon-water'  }, { label: 'Kettle',  icon: 'icon-meal'   }], odd: 'Kettle',  hint: 'Three are garden tools, one belongs in the kitchen.' },
+  { items: [{ label: 'Monsoon',  icon: 'icon-water'  }, { label: 'Drizzle', icon: 'icon-water'  }, { label: 'Storm',   icon: 'icon-water'  }, { label: 'Haze',    icon: 'icon-sun'    }], odd: 'Haze',    hint: 'Three bring rain, one does not.' },
+  { items: [{ label: 'Grandson', icon: 'icon-profile'}, { label: 'Niece',   icon: 'icon-profile'}, { label: 'Cousin',  icon: 'icon-profile'}, { label: 'Neighbour', icon: 'icon-home' }], odd: 'Neighbour', hint: 'Three are family, one lives next door.' },
+  { items: [{ label: 'Ginger',   icon: 'icon-sprout' }, { label: 'Turmeric', icon: 'icon-sprout'}, { label: 'Lemongrass', icon: 'icon-leaf' }, { label: 'Pebble', icon: 'icon-pot'    }], odd: 'Pebble',  hint: 'Three grow and season food, one is a stone.' },
+  { items: [{ label: 'Sunrise',  icon: 'icon-sun'    }, { label: 'Noon',    icon: 'icon-sun'    }, { label: 'Dusk',    icon: 'icon-clock'  }, { label: 'Tuesday', icon: 'icon-book'   }], odd: 'Tuesday', hint: 'Three are times of day, one is a day of the week.' },
+  { items: [{ label: 'Watering', icon: 'icon-water'  }, { label: 'Weeding', icon: 'icon-leaf'   }, { label: 'Pruning', icon: 'icon-pot'    }, { label: 'Sleeping', icon: 'icon-clock' }], odd: 'Sleeping', hint: 'Three tend a garden, one is rest.' },
+  { items: [{ label: 'Mango',    icon: 'icon-meal'   }, { label: 'Papaya',  icon: 'icon-meal'   }, { label: 'Rambutan', icon: 'icon-meal'  }, { label: 'Pandan',  icon: 'icon-leaf'   }], odd: 'Pandan',  hint: 'Three are fruit, one is a leaf.' },
+  { items: [{ label: 'Letter',   icon: 'icon-book'   }, { label: 'Postcard', icon: 'icon-book'  }, { label: 'Telegram', icon: 'icon-book'  }, { label: 'Garden',  icon: 'icon-garden' }], odd: 'Garden',  hint: 'Three carry a message, one is a place.' },
 ];
 
 function initOddOneOut(level) {
@@ -3513,6 +3530,20 @@ const WORD_PAIR_SETS = [
   [{ word: 'Ocean',   match: 'Wave'     }, { word: 'Forest',  match: 'Tree'     }, { word: 'Desert',  match: 'Sand'     }, { word: 'Mountain',match: 'Peak'     }],
   [{ word: 'Clock',   match: 'Time'     }, { word: 'Scale',   match: 'Weight'   }, { word: 'Ruler',   match: 'Length'   }, { word: 'Thermometer', match: 'Temperature' }],
   [{ word: 'Smile',   match: 'Happy'    }, { word: 'Cry',     match: 'Sad'      }, { word: 'Laugh',   match: 'Joy'      }, { word: 'Hug',     match: 'Love'     }],
+
+  /* Second batch, same shape. Pairs have to be unambiguous: every word must
+     match exactly one partner in its own set, or the exercise has more than
+     one right answer and quietly punishes a player who was not wrong. */
+  [{ word: 'Kopi',    match: 'Kopitiam' }, { word: 'Rice',    match: 'Bowl'     }, { word: 'Chopsticks', match: 'Noodles' }, { word: 'Straw',   match: 'Drink'    }],
+  [{ word: 'Orchid',  match: 'Purple'   }, { word: 'Hibiscus',match: 'Red'      }, { word: 'Jasmine', match: 'White'    }, { word: 'Pandan',  match: 'Green'    }],
+  [{ word: 'Watering can', match: 'Water' }, { word: 'Spade', match: 'Digging'  }, { word: 'Basket',  match: 'Harvest'  }, { word: 'Hat',     match: 'Shade'    }],
+  [{ word: 'Bee',     match: 'Honey'    }, { word: 'Silkworm',match: 'Silk'     }, { word: 'Chicken', match: 'Egg'      }, { word: 'Cow',     match: 'Milk'     }],
+  [{ word: 'Monsoon', match: 'Rain'     }, { word: 'Sunshine',match: 'Warmth'   }, { word: 'Breeze',  match: 'Cool'     }, { word: 'Thunder', match: 'Storm'    }],
+  [{ word: 'Grandchild', match: 'Family'}, { word: 'Neighbour', match: 'Street' }, { word: 'Doctor',  match: 'Clinic'   }, { word: 'Hawker',  match: 'Stall'    }],
+  [{ word: 'Root',    match: 'Ground'   }, { word: 'Branch',  match: 'Sky'      }, { word: 'Petal',   match: 'Flower'   }, { word: 'Vine',    match: 'Trellis'  }],
+  [{ word: 'Morning', match: 'Sunrise'  }, { word: 'Evening', match: 'Sunset'   }, { word: 'Midnight',match: 'Stars'    }, { word: 'Afternoon', match: 'Shade'  }],
+  [{ word: 'Radio',   match: 'Sound'    }, { word: 'Lamp',    match: 'Light'    }, { word: 'Fan',     match: 'Breeze'   }, { word: 'Blanket', match: 'Warmth'   }],
+  [{ word: 'Ginger',  match: 'Spice'    }, { word: 'Sugar',   match: 'Sweet'    }, { word: 'Lime',    match: 'Sour'     }, { word: 'Chilli',  match: 'Hot'      }],
 ];
 
 function initWordPairs(level) {
