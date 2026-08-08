@@ -167,7 +167,43 @@ const MEALS = [
 
 /* ── PLANT SVG GENERATOR ────────────────────────────────────── */
 
+/* ── PLANT ART ──────────────────────────────────────────────────
+   Miora supplied botanical plates for six of the seven seeds, five growth
+   states each, cut out and palette-reduced by tools/process_miora.py into
+   app/art/plants/{seedId}-{state}.png.
+
+   Pandan is not in the drop and it is the seed every new player starts with,
+   so it still draws from the procedural SVG below. That is the one visible
+   inconsistency in the game and it is the top of the next art batch.
+
+   The SVG path is not dead code and should not be deleted: it is the fallback
+   for any seed without a plate, and it is what the app draws if the art fails
+   to load. */
+const PLANT_ART = ['orchid', 'fern', 'hibiscus', 'kopi', 'passion', 'sampaguita'];
+const PLANT_ART_STATES = ['seed', 'sprout', 'grown', 'bloom', 'wilt'];
+
+function plantArtSrc(plant) {
+  if (!plant || PLANT_ART.indexOf(plant.seedId) === -1) return null;
+  const state = PLANT_ART_STATES.indexOf(plant.state) === -1 ? 'grown' : plant.state;
+  return `art/plants/${plant.seedId}-${state}.png`;
+}
+
+/* alt is empty on purpose. Every caller already carries the plant's name and
+   state in the surrounding aria-label, so a description here would make a
+   screen reader say it twice. */
+function plantImg(plant, cls) {
+  const src = plantArtSrc(plant);
+  if (!src) return null;
+  return `<img class="${cls}" src="${src}" alt="" draggable="false">`;
+}
+
 function plantSVG(plant) {
+  const img = plantImg(plant, 'plant-art');
+  if (img) return img;
+  return plantSVGGeometry(plant);
+}
+
+function plantSVGGeometry(plant) {
   const s = SEEDS.find(sd => sd.id === plant.seedId) || SEEDS[0];
   const stage = plant.state;
   const bc = s.bloomColor || '#73875D';
@@ -205,11 +241,18 @@ function plantSVG(plant) {
   return svg;
 }
 
-/* Field renderer. Identical to plantSVG at every stage except bloom, where it
-   draws small hanging fruit instead of the flower disc, a hint that this patch
-   is ready to harvest. plantSVG itself stays untouched since it is still the
-   renderer for the shop icons and the plant detail modal. */
+/* Field renderer. Where a Miora plate exists it is the same image plantSVG
+   uses, marked ready-to-harvest with a class rather than different art, since
+   the plates already draw fruit and open flowers at bloom. Seeds without a
+   plate fall through to the geometry below, which swaps the flower disc for
+   hanging fruit to make the same point. */
 function plantSVGFruit(plant) {
+  const img = plantImg(plant, 'plant-art' + (plant.state === 'bloom' ? ' is-ripe' : ''));
+  if (img) return img;
+  return plantSVGFruitGeometry(plant);
+}
+
+function plantSVGFruitGeometry(plant) {
   const s = SEEDS.find(sd => sd.id === plant.seedId) || SEEDS[0];
   const stage = plant.state;
   const bc = s.bloomColor || '#73875D';
@@ -861,9 +904,10 @@ function renderTodayStrip() {
   const allDone = done === tasks.length;
   strip.hidden = false;
   strip.classList.toggle('all-done', allDone);
+  // Kept short so it holds one line at 390px. The old wording wrapped.
   label.textContent = allDone
     ? 'All done today. Lovely work.'
-    : `Today in the garden: ${done} of ${tasks.length} done`;
+    : `Today's tasks: ${done} of ${tasks.length} done`;
   strip.setAttribute('aria-label', allDone
     ? 'All of today\'s tasks are done. Open the menu.'
     : `${done} of ${tasks.length} tasks done today. Open today's tasks.`);
@@ -972,6 +1016,15 @@ function createFieldPan(screenName, viewportId, fieldId, hintId, opts = {}) {
     if (field) field.style.transform = `translate3d(${pan.x}px, ${pan.y}px, 0)`;
   }
 
+  /* Resets the camera to the corner. Used when the field re-flows to a single
+     column and there is no longer anything to pan to. */
+  function reset() {
+    pan.x = 0;
+    pan.y = 0;
+    measure();
+    apply();
+  }
+
   function hasSlack() {
     return pan.minX < 0 || pan.minY < 0;
   }
@@ -1048,6 +1101,9 @@ function createFieldPan(screenName, viewportId, fieldId, hintId, opts = {}) {
     if (!w || !h) return;
     const mx = Math.min(margin, w / 2);
     const my = Math.min(margin, h / 2);
+
+    // Nothing to follow when the whole field already fits the window.
+    if (pan.minX === 0 && pan.minY === 0) return;
 
     let nextX = pan.x;
     if (x + pan.x < mx) nextX = mx - x;
@@ -1171,7 +1227,7 @@ function createFieldPan(screenName, viewportId, fieldId, hintId, opts = {}) {
     });
   }
 
-  return { pan, bind, measure, panIntoView, hasSlack, follow };
+  return { pan, bind, measure, panIntoView, hasSlack, follow, reset };
 }
 
 /* No centerFirst here any more: the camera follows the gardener, and the
@@ -1329,6 +1385,7 @@ function renderGarden2() {
 
   mountGardener(scene);
   bindGardenerTaps();
+  applyGardenView();
   updateCoinDisplay();
 }
 
@@ -1464,7 +1521,8 @@ function gardenerFrame(now) {
   const previous = avatarFrameStamp || now;
   avatarFrameStamp = now;
 
-  if (currentScreenName !== 'garden2') return;
+  // Nothing walks in simple view: it is a list of patches, not a place.
+  if (currentScreenName !== 'garden2' || simpleView) return;
   const scene = document.getElementById('garden2-scene');
   // Zero while the screen transition still has the tab hidden and unpainted.
   if (!scene || !scene.offsetWidth) return;
@@ -1514,6 +1572,52 @@ function gardenerFrame(now) {
 
 requestAnimationFrame(gardenerFrame);
 
+/* ── SIMPLE VIEW ─────────────────────────────────────────────
+   The roaming field is two columns wide and taller than its window, so at
+   full land some of the player's own patches can only be reached by dragging.
+   Guidance for this audience is consistent that gestures need finer motor
+   control than taps and should never be the only route to anything.
+
+   The fix is a re-flow, not a zoom. Scaling the field down did make every
+   patch visible, but at four rows it shrank them to 40x62px, which is under
+   the 60px tap floor: one accessibility problem traded for another. Dropping
+   to a single column instead keeps every patch full size, removes horizontal
+   panning entirely, and leaves plain vertical scrolling as the only movement,
+   which is the most familiar gesture on a phone by a wide margin.
+
+   View state, not progress, so it is never saved. */
+let simpleView = false;
+
+function applyGardenView() {
+  const label = document.getElementById('btn-fit-view-label');
+  const btn = document.getElementById('btn-fit-view');
+  const scene = document.getElementById('garden2-scene');
+  const viewport = document.getElementById('garden2-viewport');
+  if (!btn || !label || !scene || !viewport) return;
+
+  scene.classList.toggle('is-simple', simpleView);
+  viewport.classList.toggle('is-simple', simpleView);
+  label.textContent = simpleView ? 'Walk in the garden' : 'See all my patches';
+  btn.setAttribute('aria-pressed', String(simpleView));
+
+  const avatar = document.getElementById('garden-avatar');
+  if (avatar) avatar.hidden = simpleView;
+
+  if (simpleView) {
+    patchesFieldPan.reset();
+    viewport.scrollTop = 0;
+  } else {
+    patchesFieldPan.measure();
+    patchesFieldPan.follow(avatarX, avatarY, FOLLOW_MARGIN);
+  }
+}
+
+function toggleGardenView() {
+  simpleView = !simpleView;
+  playSelect();
+  applyGardenView();
+}
+
 /* Bound to the viewport, which survives the re-renders that empty the field,
    and in the bubble phase on purpose. A patch's own click handler has already
    run and opened its panel by the time this fires, so the walk is started
@@ -1528,7 +1632,7 @@ function bindGardenerTaps() {
 
   viewport.addEventListener('click', (e) => {
     const scene = document.getElementById('garden2-scene');
-    if (!scene) return;
+    if (!scene || simpleView) return;
 
     const plot = e.target.closest && e.target.closest('.shelf-plot');
     if (plot && scene.contains(plot)) {
@@ -1912,6 +2016,8 @@ function waterPlant(index, plotEl) {
   saveState();
   renderGarden2();
 }
+
+document.getElementById('btn-fit-view').addEventListener('click', toggleGardenView);
 
 document.getElementById('btn-water-all').addEventListener('click', () => {
   const today = todayStr();

@@ -246,6 +246,12 @@
         <div class="garden2-field" id="garden2-scene"></div>
       </div>
       <div class="garden-actions">
+        <!-- Every patch has to be reachable without a drag. This shrinks the
+             field to fit the window so the whole garden is tappable. -->
+        <button class="btn btn-secondary btn-view" id="btn-fit-view">
+          <svg class="icon" aria-hidden="true"><use href="#icon-garden"/></svg>
+          <span id="btn-fit-view-label">See whole garden</span>
+        </button>
         <button class="btn btn-primary btn-lg" id="btn-water-all">
           <svg class="icon"><use href="#icon-water"/></svg>
           Water all plants
