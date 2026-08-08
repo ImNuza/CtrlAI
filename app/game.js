@@ -570,8 +570,16 @@ function rollDailyTasks() {
   const used = new Set();
   const tasks = pools.map((pool, pi) => {
     const viable = pool.filter(t => taskPossible(t.id) && !used.has(t.id));
-    const finalPool = viable.length ? viable : GENTLE_POOL.filter(t => !used.has(t.id));
-    const picked = finalPool[(h >> (pi * 8)) % finalPool.length];
+    const spare = GENTLE_POOL.filter(t => !used.has(t.id));
+    /* pool itself is the last resort so this is never empty. An empty list
+       here divides by zero, which indexes with NaN and hands back undefined. */
+    const finalPool = viable.length ? viable : (spare.length ? spare : pool);
+    /* Unsigned shift. dayHash() returns a full 32-bit value via >>> 0, but >>
+       is signed, so every hash above 2^31 shifted negative, and a negative
+       modulo stays negative in JS. finalPool[-1] is undefined and reading .id
+       off it threw, which killed init() before the garden was ever drawn.
+       Roughly half of all date pairs hash high enough to hit it. */
+    const picked = finalPool[(h >>> (pi * 8)) % finalPool.length];
     used.add(picked.id);
     // Carry partial progress if the same task was rolled yesterday
     const prev = prevTasks.find(t => t.id === picked.id);
@@ -1329,6 +1337,33 @@ function renderGarden2() {
   if (!scene) return;
   scene.innerHTML = '';
 
+  /* The field is built first, before anything optional. A daily-task bug once
+     threw in renderDailyCard() and took the whole garden down with it: the
+     player got a screen of empty grass with no patches and no gardener. The
+     field is the game, so nothing that is not the field may run ahead of it. */
+  const patchOpts = { onEmptyTap: openSeedMenu, onBloomTap: harvestPlant, plantRenderer: plantSVGFruit };
+  for (let s = 0; s < state.shelves; s++) {
+    scene.appendChild(buildShelf(s, patchOpts));
+  }
+  // The untilled plot at the end, always there so there is always a goal
+  scene.appendChild(buildLockedShelf());
+
+  patchesFieldPan.bind();
+  patchesFieldPan.measure();
+  mountGardener(scene);
+  bindGardenerTaps();
+  applyGardenView();
+  updateCoinDisplay();
+
+  const waterBtn = document.getElementById('btn-water-all');
+  if (waterBtn) {
+    const hasThirsty = state.plants.some(p => p.state === 'wilt');
+    waterBtn.disabled = state.plants.length === 0;
+    waterBtn.innerHTML = hasThirsty
+      ? `<svg class="icon" aria-hidden="true"><use href="#icon-water"/></svg> Water thirsty plants`
+      : `<svg class="icon" aria-hidden="true"><use href="#icon-water"/></svg> Water all plants`;
+  }
+
   const dateEl = document.getElementById('garden-date');
   if (dateEl) {
     dateEl.textContent = new Date().toLocaleDateString('en-SG',
@@ -1363,30 +1398,6 @@ function renderGarden2() {
         .addEventListener('click', () => showScreen('exercises'));
     }
   }
-
-  const patchOpts = { onEmptyTap: openSeedMenu, onBloomTap: harvestPlant, plantRenderer: plantSVGFruit };
-  for (let s = 0; s < state.shelves; s++) {
-    scene.appendChild(buildShelf(s, patchOpts));
-  }
-  // The untilled plot at the end, always there so there is always a goal
-  scene.appendChild(buildLockedShelf());
-
-  patchesFieldPan.bind();
-  patchesFieldPan.measure();
-
-  const waterBtn = document.getElementById('btn-water-all');
-  if (waterBtn) {
-    const hasThirsty = state.plants.some(p => p.state === 'wilt');
-    waterBtn.disabled = state.plants.length === 0;
-    waterBtn.innerHTML = hasThirsty
-      ? `<svg class="icon" aria-hidden="true"><use href="#icon-water"/></svg> Water thirsty plants`
-      : `<svg class="icon" aria-hidden="true"><use href="#icon-water"/></svg> Water all plants`;
-  }
-
-  mountGardener(scene);
-  bindGardenerTaps();
-  applyGardenView();
-  updateCoinDisplay();
 }
 
 /* ════════════════════════════════════════════════════════════
