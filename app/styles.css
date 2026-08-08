@@ -565,79 +565,41 @@ body{
 /* ── The gardener ────────────────────────────────────────────
    A view detail, never saved. pointer-events:none so it can never sit
    between a finger and a patch. */
+/* One 4x8 sprite sheet: four walk frames across, eight facings down. The row
+   is set from JS as backgroundPositionY, the column is stepped by the
+   animation below. Paused, it parks on column 0, which is the standing pose,
+   so idle and walking are the same element in two states. */
 .garden-avatar{
   position:absolute;
   left:0;
   top:0;
-  width:52px;
-  height:52px;
+  width:88px;
+  height:88px;
   z-index:6;
   pointer-events:none;
   will-change:transform;
-  filter:drop-shadow(0 1px 2px rgba(43,33,24,0.35));
+  background-image:url("art/characters/gardener-walk.png");
+  background-repeat:no-repeat;
+  background-position:0 0;
+  /* Pixel art. Smoothing it on the way up turns the hat into porridge. */
+  image-rendering:pixelated;
+  filter:drop-shadow(0 2px 2px rgba(43,33,24,0.32));
 }
-/* Soft ellipse so the gardener reads as standing on the grass, not floating */
-.garden-avatar::before{
-  content:'';
-  position:absolute;
-  left:50%;
-  bottom:0;
-  transform:translateX(-50%);
-  width:34px;
-  height:9px;
-  border-radius:50%;
-  background:rgba(43,33,24,0.28);
+.garden-avatar[hidden]{display:none}
+
+/* steps(4) walks the four columns and never lands between them. The sheet is
+   4 cells wide, so the loop travels exactly one sheet width. */
+@keyframes gardener-walk{
+  from{background-position-x:0}
+  to{background-position-x:-352px}
 }
-.avatar-body{
-  position:absolute;
-  left:50%;
-  bottom:4px;
-  transform:translateX(-50%);
-  width:28px;
-  height:24px;
-  border-radius:14px 14px 8px 8px;
-  background:linear-gradient(180deg,var(--foliage-shadow) 0%,var(--foliage-deep) 100%);
-  border:2px solid var(--bg-surface);
+.garden-avatar.walking{
+  animation:gardener-walk 0.6s steps(4) infinite;
 }
-.avatar-head{
-  position:absolute;
-  left:50%;
-  bottom:23px;
-  transform:translateX(-50%);
-  width:24px;
-  height:24px;
-  border-radius:50%;
-  background:#EFDFC6;
-  border:2px solid var(--bg-surface);
-  box-shadow:0 0 0 1.5px var(--earth-deep);
-}
-.avatar-sprout{
-  position:absolute;
-  left:50%;
-  bottom:48px;
-  transform:translateX(-50%) rotate(-20deg);
-  width:18px;
-  height:12px;
-  border-radius:0 100% 0 100%;
-  background:var(--foliage-muted);
-  border:1.5px solid var(--bg-surface);
-}
-.garden-avatar.facing-left .avatar-sprout{
-  transform:translateX(-50%) rotate(20deg) scaleX(-1);
-}
-.garden-avatar.walking .avatar-head{animation:avatar-bob 0.5s ease-in-out infinite}
-.garden-avatar.walking .avatar-sprout{animation:avatar-sway 0.5s ease-in-out infinite}
-@keyframes avatar-bob{
-  0%,100%{transform:translateX(-50%) translateY(0)}
-  50%{transform:translateX(-50%) translateY(-2px)}
-}
-@keyframes avatar-sway{
-  0%,100%{transform:translateX(-50%) rotate(-20deg)}
-  50%{transform:translateX(-50%) rotate(-8deg) translateY(-2px)}
-}
+/* Standing still is the walk held on its first frame rather than a separate
+   pose, which is what keeps the facing correct when the gardener stops. */
 @media (prefers-reduced-motion:reduce){
-  .garden-avatar.walking .avatar-head,
-  .garden-avatar.walking .avatar-sprout{animation:none}
+  .garden-avatar.walking{animation:none}
 }
 
 @media (max-height:640px){
@@ -1456,15 +1418,30 @@ body{
   transition:all var(--duration-fast) var(--ease-gentle);
 }
 .pattern-dot.active{transform:scale(1.1)}
+/* A fixed row of four rather than a wrapping flex line. Wrapping put three
+   buttons on one row and orphaned the fourth on its own, which reads as a
+   different kind of choice. Equal columns keep the four reading as one set. */
 .pattern-options{
-  display:flex;
-  justify-content:center;
-  gap:0.75rem;
-  flex-wrap:wrap;
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:0.5rem;
+  justify-items:stretch;
 }
+.pattern-options .pattern-opt-btn{min-width:0;width:100%}
+.pattern-opt-label{
+  font-family:var(--font-body);
+  font-size:1rem;
+  font-weight:500;
+  line-height:1.1;
+  color:var(--text-secondary);
+}
+/* Icon over its name. Taller than the tap floor because it now carries two
+   rows, and the name is what makes the choice readable without having to
+   interpret a small line drawing. */
 .pattern-opt-btn{
   min-width:80px;
-  min-height:var(--tap-min);
+  min-height:84px;
+  padding:0.5rem 0.6rem;
   border-radius:var(--radius-lg);
   font-family:var(--font-body);
   font-size:1.5rem;
@@ -1474,8 +1451,10 @@ body{
   cursor:pointer;
   transition:all var(--duration-fast) var(--ease-gentle);
   display:flex;
+  flex-direction:column;
   align-items:center;
   justify-content:center;
+  gap:0.15rem;
   color:var(--text-primary);
 }
 .pattern-opt-btn:active{transform:scale(0.93)}
@@ -2221,12 +2200,15 @@ body{
 }
 
 /* ── Exercise instruction card ── */
+/* Tighter than it was. At 390px the instruction card was pushing the game
+   itself below the fold, so the player had to scroll past how-to-play to
+   reach the thing it describes. */
 .exercise-intro{
   background:var(--bg-surface);
   border:1.5px solid var(--border-light);
   border-radius:var(--radius-lg);
-  padding:1.25rem 1.5rem;
-  margin-bottom:1.25rem;
+  padding:0.9rem 1.1rem;
+  margin-bottom:0.9rem;
 }
 .exercise-intro-title{
   font-family:var(--font-display);

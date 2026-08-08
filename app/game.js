@@ -1417,10 +1417,17 @@ function renderGarden2() {
    written to localStorage. renderGarden2() empties the field on every
    water, harvest and purchase, and these variables are what survive it. */
 
-const AVATAR_SIZE = 52;        // must match .garden-avatar in styles.css
+const AVATAR_SIZE = 88;        // one sprite cell, must match .garden-avatar
 const AVATAR_SPEED = 320;      // px per second
 const AVATAR_ARRIVE = 1.5;     // px, close enough to stop
 const FOLLOW_MARGIN = 96;      // keep the gardener this far inside the viewport
+
+/* Row order in art/characters/gardener-walk.png, clockwise from east. The
+   field's y axis points down, so a positive angle from atan2 turns clockwise
+   on screen and indexes straight into this list. */
+const AVATAR_DIRS = ['east', 'south-east', 'south', 'south-west',
+                     'west', 'north-west', 'north', 'north-east'];
+let avatarDir = 2;             // facing south, toward the player, at rest
 /* Centre offset below a patch's bottom edge. The avatar is 52px tall and
    drawn from its centre, so 0 puts its feet about 26px past the edge, which
    lands in the gap between rows rather than on the row below. */
@@ -1430,7 +1437,6 @@ let avatarX = 0;
 let avatarY = 0;
 let avatarPlaced = false;
 let avatarWalking = false;
-let avatarFacingLeft = false;
 let avatarTarget = null;
 let avatarFrameStamp = 0;
 const walkKeys = { up: false, down: false, left: false, right: false };
@@ -1449,7 +1455,9 @@ function mountGardener(scene) {
     av.className = 'garden-avatar';
     av.id = 'garden-avatar';
     av.setAttribute('aria-hidden', 'true');
-    av.innerHTML = '<span class="avatar-sprout"></span><span class="avatar-head"></span><span class="avatar-body"></span>';
+    /* No child elements. The whole figure is one sprite sheet driven by
+       background-position: the row picks the facing, the CSS animation steps
+       through the four frames, and pausing it parks on the standing frame. */
   }
   scene.appendChild(av);
   if (!avatarPlaced) placeGardenerAtStart(scene);
@@ -1495,9 +1503,23 @@ function clampGardenerToField(scene) {
 function applyAvatarTransform() {
   const av = document.getElementById('garden-avatar');
   if (!av) return;
-  av.style.transform = `translate3d(${avatarX - AVATAR_SIZE / 2}px, ${avatarY - AVATAR_SIZE / 2}px, 0)`;
+  /* Anchored on the feet, not the middle. The sprite stands on the bottom of
+     its cell, so centring it vertically would float the gardener above
+     whatever it is standing next to. */
+  av.style.transform =
+    `translate3d(${avatarX - AVATAR_SIZE / 2}px, ${avatarY - AVATAR_SIZE + 12}px, 0)`;
+  av.style.backgroundPositionY = `${-avatarDir * AVATAR_SIZE}px`;
   av.classList.toggle('walking', avatarWalking);
-  av.classList.toggle('facing-left', avatarFacingLeft);
+}
+
+/* Movement vector to one of eight sprite rows. Returns the current facing
+   unchanged for a vector too small to read, so a gardener easing to a stop
+   does not spin on the spot. */
+function avatarDirFrom(dx, dy) {
+  if (Math.abs(dx) < 0.05 && Math.abs(dy) < 0.05) return avatarDir;
+  const step = Math.PI / 4;
+  let i = Math.round(Math.atan2(dy, dx) / step);
+  return ((i % 8) + 8) % 8;
 }
 
 /* Where to send the gardener for a given field point. Reduced motion gets
@@ -1571,8 +1593,9 @@ function gardenerFrame(now) {
   clampGardenerToField(scene);
 
   const movedX = avatarX - fromX;
-  const moved = Math.abs(movedX) > 0.01 || Math.abs(avatarY - fromY) > 0.01;
-  if (Math.abs(movedX) > 0.01) avatarFacingLeft = movedX < 0;
+  const movedY = avatarY - fromY;
+  const moved = Math.abs(movedX) > 0.01 || Math.abs(movedY) > 0.01;
+  if (moved) avatarDir = avatarDirFrom(movedX, movedY);
 
   if (moved !== avatarWalking || moved) {
     avatarWalking = moved;
@@ -1619,7 +1642,6 @@ function applyGardenView() {
     viewport.scrollTop = 0;
   } else {
     patchesFieldPan.measure();
-    patchesFieldPan.follow(avatarX, avatarY, FOLLOW_MARGIN);
   }
 }
 
@@ -1627,6 +1649,15 @@ function toggleGardenView() {
   simpleView = !simpleView;
   playSelect();
   applyGardenView();
+  /* Only on a deliberate switch back to roaming, and only after layout has
+     settled. Following during renderGarden2() measured a viewport that was
+     still mid-transition and pinned the camera against a height that no
+     longer existed, which parked the view below the plants and left every
+     one of them cropped at the top of the window. The frame loop already
+     follows the gardener whenever it actually moves. */
+  if (!simpleView) {
+    requestAnimationFrame(() => patchesFieldPan.follow(avatarX, avatarY, FOLLOW_MARGIN));
+  }
 }
 
 /* Bound to the viewport, which survives the re-renders that empty the field,
@@ -3122,12 +3153,32 @@ function initTileMatch(level) {
 
 /* ── EXERCISE 2: PATTERN SEQUENCE ──────────────────────────── */
 
+/* Ten symbols, not the original four. Pattern is eight of the forty levels
+   and every round drew from the same four things, which made it far and away
+   the most repetitive exercise in the game.
+
+   Each one has to be tellable from every other at a glance, so they are
+   picked for distinct silhouettes rather than for being garden-themed: a
+   watering can and a raindrop would be a cruel pair. Colour is a second cue
+   on top of shape, never the only one, since colour vision narrows with age.
+   Only the first PATTERN_CHOICES of these are offered in any single round. */
 const PATTERN_ITEMS = [
   { label: 'Leaf',   icon: 'icon-leaf',   color: '#73875D' },
   { label: 'Flower', icon: 'icon-flower', color: '#E07A5F' },
   { label: 'Sun',    icon: 'icon-sun',    color: '#E78F37' },
   { label: 'Water',  icon: 'icon-water',  color: '#7B5371' },
+  { label: 'Seed',   icon: 'icon-seed',   color: '#7A6B5C' },
+  { label: 'Pot',    icon: 'icon-pot',    color: '#AE382B' },
+  { label: 'Coin',   icon: 'icon-coin',   color: '#C87A2A' },
+  { label: 'Book',   icon: 'icon-book',   color: '#44573D' },
+  { label: 'Bell',   icon: 'icon-bell',   color: '#7B5371' },
+  { label: 'Clock',  icon: 'icon-clock',  color: '#5A4A3C' },
 ];
+
+/* How many of the ten are on offer in one round. Four keeps the answer row
+   readable at 390px and the choice gentle; the variety comes from which four,
+   which is re-drawn every round. */
+const PATTERN_CHOICES = 4;
 
 function initPatternSeq(level) {
   const totalRounds = level ? level.rounds : 4;
@@ -3174,9 +3225,25 @@ function updatePatternDots() {
 
 function startPatternRound() {
   const len = playState.lengths[playState.round];
-  playState.sequence = Array.from({ length: len }, () =>
-    PATTERN_ITEMS[Math.floor(Math.random() * PATTERN_ITEMS.length)]
-  );
+
+  /* A fresh handful of symbols each round. Drawing the whole game from one
+     fixed four was what made this exercise feel like the same round over and
+     over. */
+  playState.choices = shuffle(PATTERN_ITEMS).slice(0, PATTERN_CHOICES);
+
+  /* No symbol twice in a row. Independent random picks produced sequences
+     like Water, Water, and with no timer and no counter on screen there is
+     no honest way for the player to tell one long look from two short ones.
+     That is ambiguity, not difficulty. Length is what makes it harder. */
+  const seq = [];
+  for (let i = 0; i < len; i++) {
+    let pick;
+    do {
+      pick = playState.choices[Math.floor(Math.random() * playState.choices.length)];
+    } while (playState.choices.length > 1 && seq.length && pick.label === seq[seq.length - 1].label);
+    seq.push(pick);
+  }
+  playState.sequence = seq;
   playState.userSeq = [];
 
   const btn = document.getElementById('btn-show-pattern');
@@ -3220,12 +3287,17 @@ function renderPatternOptions() {
   const opts = document.getElementById('pattern-options');
   opts.innerHTML = '';
 
-  PATTERN_ITEMS.forEach(item => {
+  /* Only this round's symbols, and each one named. These buttons used to be
+     four bare icons with the word hidden in an aria-label, which asked the
+     player to identify a small line drawing with nothing to read. Naming them
+     costs a line and removes the guesswork. */
+  (playState.choices || PATTERN_ITEMS.slice(0, PATTERN_CHOICES)).forEach(item => {
     const btn = document.createElement('button');
     btn.className = 'pattern-opt-btn';
     btn.setAttribute('aria-label', item.label);
     btn.style.borderColor = item.color;
-    btn.innerHTML = `<svg class="icon icon-lg" style="color:${item.color}" aria-hidden="true"><use href="#${item.icon}"/></svg>`;
+    btn.innerHTML = `<svg class="icon icon-lg" style="color:${item.color}" aria-hidden="true"><use href="#${item.icon}"/></svg>`
+      + `<span class="pattern-opt-label">${item.label}</span>`;
 
     btn.addEventListener('click', () => {
       playState.userSeq.push(item);

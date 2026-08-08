@@ -3,7 +3,7 @@
    Offline-first shell. Bump CACHE_VERSION on every deploy.
    ============================================================ */
 
-const CACHE_VERSION = 'gol-v7';
+const CACHE_VERSION = 'gol-v8';
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
 const FONT_CACHE  = `${CACHE_VERSION}-fonts`;
 
@@ -26,6 +26,8 @@ const SHELL = [
   './art/land/grass.png',
   './art/land/patch-bare.png',
   './art/land/patch-planted.png',
+  // The gardener is on screen the moment the garden is, and it is 12KB.
+  './art/characters/gardener-walk.png',
 ];
 
 /* ── Install: precache the shell ───────────────────────────── */
