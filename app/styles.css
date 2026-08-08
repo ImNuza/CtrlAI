@@ -450,20 +450,104 @@ body{
 
 /* width:max-content makes offsetWidth the true content width, which is what
    the pan bounds are measured from. Two plots of land side by side is what
-   makes the field wider than the phone. */
+   makes the field wider than the phone.
+
+   The generous padding and the min sizes are the walkable margin. Without
+   them the grid is exactly as big as its rows and the gardener has nowhere
+   to stand that is not already a patch. */
 .garden2-field{
   --field-col:300px;
+  position:relative;
   display:grid;
   grid-template-columns:repeat(2,var(--field-col));
   align-content:start;
   justify-content:start;
-  gap:0.25rem 0.75rem;
+  gap:0.75rem 0.75rem;
   width:max-content;
   min-width:100%;
-  padding:0.5rem 1rem 1.5rem;
+  min-height:560px;
+  padding:2.5rem 2.5rem 4rem;
   will-change:transform;
 }
 .garden2-field.pan-glide{transition:transform 420ms var(--ease-gentle)}
+
+/* ── The gardener ────────────────────────────────────────────
+   A view detail, never saved. pointer-events:none so it can never sit
+   between a finger and a patch. */
+.garden-avatar{
+  position:absolute;
+  left:0;
+  top:0;
+  width:52px;
+  height:52px;
+  z-index:6;
+  pointer-events:none;
+  will-change:transform;
+  filter:drop-shadow(0 1px 2px rgba(43,33,24,0.35));
+}
+/* Soft ellipse so the gardener reads as standing on the grass, not floating */
+.garden-avatar::before{
+  content:'';
+  position:absolute;
+  left:50%;
+  bottom:0;
+  transform:translateX(-50%);
+  width:34px;
+  height:9px;
+  border-radius:50%;
+  background:rgba(43,33,24,0.28);
+}
+.avatar-body{
+  position:absolute;
+  left:50%;
+  bottom:4px;
+  transform:translateX(-50%);
+  width:28px;
+  height:24px;
+  border-radius:14px 14px 8px 8px;
+  background:linear-gradient(180deg,var(--foliage-shadow) 0%,var(--foliage-deep) 100%);
+  border:2px solid var(--bg-surface);
+}
+.avatar-head{
+  position:absolute;
+  left:50%;
+  bottom:23px;
+  transform:translateX(-50%);
+  width:24px;
+  height:24px;
+  border-radius:50%;
+  background:#EFDFC6;
+  border:2px solid var(--bg-surface);
+  box-shadow:0 0 0 1.5px var(--earth-deep);
+}
+.avatar-sprout{
+  position:absolute;
+  left:50%;
+  bottom:48px;
+  transform:translateX(-50%) rotate(-20deg);
+  width:18px;
+  height:12px;
+  border-radius:0 100% 0 100%;
+  background:var(--foliage-muted);
+  border:1.5px solid var(--bg-surface);
+}
+.garden-avatar.facing-left .avatar-sprout{
+  transform:translateX(-50%) rotate(20deg) scaleX(-1);
+}
+.garden-avatar.walking .avatar-head{animation:avatar-bob 0.5s ease-in-out infinite}
+.garden-avatar.walking .avatar-sprout{animation:avatar-sway 0.5s ease-in-out infinite}
+@keyframes avatar-bob{
+  0%,100%{transform:translateX(-50%) translateY(0)}
+  50%{transform:translateX(-50%) translateY(-2px)}
+}
+@keyframes avatar-sway{
+  0%,100%{transform:translateX(-50%) rotate(-20deg)}
+  50%{transform:translateX(-50%) rotate(-8deg) translateY(-2px)}
+}
+@media (prefers-reduced-motion:reduce){
+  .garden-avatar.walking .avatar-head,
+  .garden-avatar.walking .avatar-sprout{animation:none}
+}
 
 @media (max-height:640px){
   #screen-garden2{overflow-y:auto;overflow-x:hidden}

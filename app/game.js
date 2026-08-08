@@ -1002,6 +1002,37 @@ function createFieldPan(screenName, viewportId, fieldId, hintId, opts = {}) {
     maybeShowHint();
   }
 
+  /* Keeps a field-space point inside a comfortable inset of the viewport, so
+     the gardener never walks off the edge of what the player can see. A field
+     point x sits at viewport x + pan.x, which is what the two comparisons
+     below are rearranged from. Nudges only when the point is actually outside
+     the inset, so a gardener walking about the middle leaves the view still
+     and the player keeps whatever framing they dragged to. */
+  function follow(x, y, margin) {
+    const viewport = document.getElementById(viewportId);
+    if (!viewport) return;
+    const w = viewport.clientWidth;
+    const h = viewport.clientHeight;
+    if (!w || !h) return;
+    const mx = Math.min(margin, w / 2);
+    const my = Math.min(margin, h / 2);
+
+    let nextX = pan.x;
+    if (x + pan.x < mx) nextX = mx - x;
+    else if (x + pan.x > w - mx) nextX = w - mx - x;
+
+    let nextY = pan.y;
+    if (y + pan.y < my) nextY = my - y;
+    else if (y + pan.y > h - my) nextY = h - my - y;
+
+    nextX = clampPan(nextX, pan.minX, pan.maxX);
+    nextY = clampPan(nextY, pan.minY, 0);
+    if (nextX === pan.x && nextY === pan.y) return;
+    pan.x = nextX;
+    pan.y = nextY;
+    apply();
+  }
+
   /* Used after clearing new land, in place of the scroll the field no longer
      does. Rects are measured after the transform, so the move is expressed as
      a delta from where the element currently sits. */
@@ -1108,10 +1139,13 @@ function createFieldPan(screenName, viewportId, fieldId, hintId, opts = {}) {
     });
   }
 
-  return { pan, bind, measure, panIntoView, hasSlack };
+  return { pan, bind, measure, panIntoView, hasSlack, follow };
 }
 
-const patchesFieldPan = createFieldPan('garden2', 'garden2-viewport', 'garden2-scene', null, { centerFirst: true });
+/* No centerFirst here any more: the camera follows the gardener, and the
+   gardener starts beside the first patch, so the opening framing that
+   centerFirst used to arrange now falls out of the follow on the first frame. */
+const patchesFieldPan = createFieldPan('garden2', 'garden2-viewport', 'garden2-scene', null);
 
 /* The function and data names below still say shelf, because state.shelves,
    SHELF_SLOTS and gardenCapacity() are the saved model and renaming them
@@ -1262,8 +1296,254 @@ function renderGarden2() {
       : `<svg class="icon" aria-hidden="true"><use href="#icon-water"/></svg> Water all plants`;
   }
 
+  mountGardener(scene);
+  bindGardenerTaps();
   updateCoinDisplay();
 }
+
+/* ════════════════════════════════════════════════════════════
+   THE GARDENER
+   ════════════════════════════════════════════════════════════
+
+   A little figure the player walks around the field. Tapping bare grass
+   sends it there; tapping a patch sends it there too, but the patch's own
+   action fires straight away rather than waiting for the walk. That is the
+   whole design rule: walking is something to watch, never something to get
+   through. An earlier build gated every interaction on arrival and was
+   reverted for exactly that reason, so nothing here is allowed to sit
+   between a tap and its result. The keyboard path is untouched: Tab to a
+   patch and press Enter and it acts at once, with no walking at all.
+
+   Position is a view detail, not progress, so it lives here and is never
+   written to localStorage. renderGarden2() empties the field on every
+   water, harvest and purchase, and these variables are what survive it. */
+
+const AVATAR_SIZE = 52;        // must match .garden-avatar in styles.css
+const AVATAR_SPEED = 320;      // px per second
+const AVATAR_ARRIVE = 1.5;     // px, close enough to stop
+const FOLLOW_MARGIN = 96;      // keep the gardener this far inside the viewport
+/* Centre offset below a patch's bottom edge. The avatar is 52px tall and
+   drawn from its centre, so 0 puts its feet about 26px past the edge, which
+   lands in the gap between rows rather than on the row below. */
+const STAND_BELOW_PATCH = 0;
+
+let avatarX = 0;
+let avatarY = 0;
+let avatarPlaced = false;
+let avatarWalking = false;
+let avatarFacingLeft = false;
+let avatarTarget = null;
+let avatarFrameStamp = 0;
+const walkKeys = { up: false, down: false, left: false, right: false };
+
+function prefersReducedMotion() {
+  return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+}
+
+/* Re-appended after every render, because renderGarden2() clears the field.
+   The element is rebuilt but the coordinates are not, so the gardener stays
+   where the player left it across a water or a harvest. */
+function mountGardener(scene) {
+  let av = document.getElementById('garden-avatar');
+  if (!av) {
+    av = document.createElement('div');
+    av.className = 'garden-avatar';
+    av.id = 'garden-avatar';
+    av.setAttribute('aria-hidden', 'true');
+    av.innerHTML = '<span class="avatar-sprout"></span><span class="avatar-head"></span><span class="avatar-body"></span>';
+  }
+  scene.appendChild(av);
+  if (!avatarPlaced) placeGardenerAtStart(scene);
+  applyAvatarTransform();
+}
+
+/* Rect maths rather than offsetLeft/offsetTop. .shelf-unit is position:
+   relative, so it is the offsetParent of every patch and those properties
+   measure from the row rather than from the field. Both rects are read in
+   the same frame and both carry the field's pan transform, so subtracting
+   them cancels it and leaves plain field coordinates. */
+function plotPointInField(scene, plot) {
+  const fr = scene.getBoundingClientRect();
+  const pr = plot.getBoundingClientRect();
+  return {
+    x: pr.left - fr.left + pr.width / 2,
+    y: pr.top - fr.top + pr.height,
+  };
+}
+
+function placeGardenerAtStart(scene) {
+  const firstPlot = scene.querySelector('.shelf-plot');
+  if (firstPlot) {
+    const p = plotPointInField(scene, firstPlot);
+    avatarX = p.x;
+    avatarY = p.y + STAND_BELOW_PATCH;
+  } else {
+    avatarX = scene.offsetWidth / 2;
+    avatarY = scene.offsetHeight / 2;
+  }
+  avatarPlaced = true;
+  clampGardenerToField(scene);
+}
+
+function clampGardenerToField(scene) {
+  const half = AVATAR_SIZE / 2;
+  const maxX = Math.max(half, scene.offsetWidth - half);
+  const maxY = Math.max(half, scene.offsetHeight - half);
+  avatarX = Math.min(Math.max(avatarX, half), maxX);
+  avatarY = Math.min(Math.max(avatarY, half), maxY);
+}
+
+function applyAvatarTransform() {
+  const av = document.getElementById('garden-avatar');
+  if (!av) return;
+  av.style.transform = `translate3d(${avatarX - AVATAR_SIZE / 2}px, ${avatarY - AVATAR_SIZE / 2}px, 0)`;
+  av.classList.toggle('walking', avatarWalking);
+  av.classList.toggle('facing-left', avatarFacingLeft);
+}
+
+/* Where to send the gardener for a given field point. Reduced motion gets
+   the destination immediately rather than a walk it did not ask for. */
+function walkGardenerTo(x, y) {
+  const scene = document.getElementById('garden2-scene');
+  if (!scene) return;
+  if (prefersReducedMotion()) {
+    avatarTarget = null;
+    avatarX = x;
+    avatarY = y;
+    clampGardenerToField(scene);
+    avatarWalking = false;
+    applyAvatarTransform();
+    patchesFieldPan.follow(avatarX, avatarY, FOLLOW_MARGIN);
+    return;
+  }
+  avatarTarget = { x, y };
+}
+
+/* Stand at the near edge of a patch rather than on top of it, so the plant
+   stays visible with the gardener beside it. */
+function walkGardenerToPatch(plot) {
+  const scene = document.getElementById('garden2-scene');
+  if (!plot || !scene) return;
+  const p = plotPointInField(scene, plot);
+  walkGardenerTo(p.x, p.y + STAND_BELOW_PATCH);
+}
+
+function gardenerFrame(now) {
+  requestAnimationFrame(gardenerFrame);
+  const previous = avatarFrameStamp || now;
+  avatarFrameStamp = now;
+
+  if (currentScreenName !== 'garden2') return;
+  const scene = document.getElementById('garden2-scene');
+  // Zero while the screen transition still has the tab hidden and unpainted.
+  if (!scene || !scene.offsetWidth) return;
+  if (!avatarPlaced) { placeGardenerAtStart(scene); applyAvatarTransform(); }
+
+  // Clamped so a backgrounded tab does not teleport the gardener on return.
+  const dt = Math.min((now - previous) / 1000, 0.05);
+  const step = AVATAR_SPEED * dt;
+  const fromX = avatarX;
+  const fromY = avatarY;
+
+  const dirX = (walkKeys.right ? 1 : 0) - (walkKeys.left ? 1 : 0);
+  const dirY = (walkKeys.down ? 1 : 0) - (walkKeys.up ? 1 : 0);
+
+  if (dirX || dirY) {
+    // A key takes over from a walk already in progress, the same way a tap does.
+    avatarTarget = null;
+    const len = Math.hypot(dirX, dirY) || 1;
+    avatarX += (dirX / len) * step;
+    avatarY += (dirY / len) * step;
+  } else if (avatarTarget) {
+    const dx = avatarTarget.x - avatarX;
+    const dy = avatarTarget.y - avatarY;
+    const dist = Math.hypot(dx, dy);
+    if (dist <= Math.max(step, AVATAR_ARRIVE)) {
+      avatarX = avatarTarget.x;
+      avatarY = avatarTarget.y;
+      avatarTarget = null;
+    } else {
+      avatarX += (dx / dist) * step;
+      avatarY += (dy / dist) * step;
+    }
+  }
+
+  clampGardenerToField(scene);
+
+  const movedX = avatarX - fromX;
+  const moved = Math.abs(movedX) > 0.01 || Math.abs(avatarY - fromY) > 0.01;
+  if (Math.abs(movedX) > 0.01) avatarFacingLeft = movedX < 0;
+
+  if (moved !== avatarWalking || moved) {
+    avatarWalking = moved;
+    applyAvatarTransform();
+  }
+  if (moved) patchesFieldPan.follow(avatarX, avatarY, FOLLOW_MARGIN);
+}
+
+requestAnimationFrame(gardenerFrame);
+
+/* Bound to the viewport, which survives the re-renders that empty the field,
+   and in the bubble phase on purpose. A patch's own click handler has already
+   run and opened its panel by the time this fires, so the walk is started
+   alongside the result rather than in front of it. A drag never reaches here:
+   the pan's swallowNextClick() eats that click in the capture phase. */
+let gardenerTapsBound = false;
+
+function bindGardenerTaps() {
+  const viewport = document.getElementById('garden2-viewport');
+  if (!viewport || gardenerTapsBound) return;
+  gardenerTapsBound = true;
+
+  viewport.addEventListener('click', (e) => {
+    const scene = document.getElementById('garden2-scene');
+    if (!scene) return;
+
+    const plot = e.target.closest && e.target.closest('.shelf-plot');
+    if (plot && scene.contains(plot)) {
+      walkGardenerToPatch(plot);
+      return;
+    }
+    // Bare grass, or the locked plank: walk to the spot that was touched.
+    const rect = scene.getBoundingClientRect();
+    walkGardenerTo(e.clientX - rect.left, e.clientY - rect.top);
+  });
+}
+
+/* Arrow keys and WASD are an extra on top of Tab, not a replacement for it.
+   Ignored while a modal is open or a text field has focus. */
+const WALK_KEY_MAP = {
+  ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right',
+  w: 'up', a: 'left', s: 'down', d: 'right',
+  W: 'up', A: 'left', S: 'down', D: 'right',
+};
+
+function walkKeyAllowed() {
+  if (currentScreenName !== 'garden2') return false;
+  const tag = document.activeElement && document.activeElement.tagName;
+  if (tag === 'INPUT' || tag === 'TEXTAREA') return false;
+  const open = ['plant-detail-modal', 'seed-menu-modal', 'menu-modal', 'share-modal']
+    .some(id => { const m = document.getElementById(id); return m && !m.hidden; });
+  return !open;
+}
+
+window.addEventListener('keydown', (e) => {
+  const dir = WALK_KEY_MAP[e.key];
+  if (!dir || !walkKeyAllowed()) return;
+  e.preventDefault();
+  walkKeys[dir] = true;
+});
+
+window.addEventListener('keyup', (e) => {
+  const dir = WALK_KEY_MAP[e.key];
+  if (!dir) return;
+  walkKeys[dir] = false;
+});
+
+// A tab switch mid-stride would otherwise leave a key latched down.
+window.addEventListener('blur', () => {
+  walkKeys.up = walkKeys.down = walkKeys.left = walkKeys.right = false;
+});
 
 function buildLockedShelf() {
   const cost = nextShelfCost();
