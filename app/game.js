@@ -529,7 +529,7 @@ function rollDailyTasks() {
   const tasks = pools.map((pool, pi) => {
     const viable = pool.filter(t => taskPossible(t.id) && !used.has(t.id));
     const finalPool = viable.length ? viable : GENTLE_POOL.filter(t => !used.has(t.id));
-    const picked = finalPool[(h >> (pi * 8)) % finalPool.length];
+    const picked = finalPool[(h >>> (pi * 8)) % finalPool.length];
     used.add(picked.id);
     // Carry partial progress if the same task was rolled yesterday
     const prev = prevTasks.find(t => t.id === picked.id);

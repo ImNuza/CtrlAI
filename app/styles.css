@@ -39,6 +39,9 @@
   --font-display:'Fraunces','Cormorant Garamond',Georgia,serif;
   --font-body:'Work Sans','Karla',system-ui,sans-serif;
   --font-label:'Pinyon Script',cursive;
+  --fs-title:1.875rem;
+  --fs-subtitle:1.125rem;
+  --fs-body:1.125rem;
   --radius-sm:0.375rem;
   --radius-md:0.75rem;
   --radius-lg:1.25rem;
@@ -53,8 +56,8 @@
   --duration-fast:180ms;
   --duration-normal:300ms;
   --duration-slow:500ms;
-  --topbar-height:64px;
-  --nav-height:80px;
+  --topbar-height:60px;
+  --nav-height:60px;
   --game-max-width:430px;
   --tap-min:64px;
 }
@@ -66,7 +69,7 @@ body{
   background:var(--bg-primary);
   color:var(--text-primary);
   font-family:var(--font-body);
-  font-size:1rem;
+  font-size:var(--fs-body);
   line-height:1.55;
   overflow:hidden;
   height:100vh;
@@ -94,11 +97,11 @@ body{
 
 /* ── Top bar ── */
 .topbar{
-  height:var(--topbar-height);
+  min-height:var(--topbar-height);
   display:flex;
   align-items:center;
   justify-content:space-between;
-  padding:0 1rem;
+  padding:0.15rem 1rem;
   background:var(--bg-surface);
   border-bottom:1px solid var(--border-light);
   flex-shrink:0;
@@ -107,6 +110,15 @@ body{
 .topbar-left{display:flex;align-items:center;gap:0.5rem}
 .topbar-right{display:flex;align-items:center;gap:0.5rem}
 
+/* Halved from the accessible 60px+ chip/button sizing used everywhere else
+   in the app: scoped to .topbar only, on the requester's explicit call to
+   override the tap-target floor for this bar. */
+.topbar .coin-chip,.topbar .streak-chip{font-size:0.75rem;padding:0.15rem 0.5rem;gap:0.2rem;border-width:1px}
+.topbar .icon-sm{width:22px;height:22px}
+.topbar .icon-btn{width:30px;height:30px}
+.topbar .icon-btn .icon{width:22px;height:22px}
+.topbar .menu-badge{width:8px;height:8px;top:1px;right:1px;border-width:1px}
+
 .coin-chip,.streak-chip{
   display:inline-flex;
   align-items:center;
@@ -114,12 +126,12 @@ body{
   padding:0.35rem 0.75rem;
   border-radius:var(--radius-pill);
   font-family:var(--font-body);
-  font-size:1rem;
+  font-size:var(--fs-body);
   font-weight:500;
   border:1.5px solid transparent;
 }
 .coin-chip{background:rgba(224,122,95,0.15);color:#7A2F10;border-color:var(--accent-coral)}
-.coin-chip.large{font-size:1.2rem;padding:0.5rem 1rem}
+.coin-chip.large{font-size:var(--fs-body);padding:0.5rem 1rem}
 .streak-chip{background:rgba(174,56,43,0.10);color:var(--accent-red);border-color:var(--accent-red)}
 
 .icon-btn{
@@ -184,7 +196,7 @@ body{
 .screen-header{margin-bottom:1.5rem}
 .screen-title{
   font-family:var(--font-display);
-  font-size:2.5rem;
+  font-size:var(--fs-title);
   font-weight:500;
   line-height:1.1;
   color:var(--text-primary);
@@ -192,13 +204,13 @@ body{
 }
 .screen-subtitle{
   font-family:var(--font-body);
-  font-size:1.05rem;
+  font-size:var(--fs-subtitle);
   color:var(--text-secondary);
   line-height:1.5;
 }
 .subsection-head{
   font-family:var(--font-body);
-  font-size:0.8rem;
+  font-size:var(--fs-subtitle);
   font-weight:500;
   letter-spacing:0.1em;
   text-transform:uppercase;
@@ -229,7 +241,7 @@ body{
 .garden-hint-slot:not(:empty){flex-shrink:0}
 .garden-title{
   font-family:var(--font-display);
-  font-size:2.5rem;
+  font-size:var(--fs-title);
   font-weight:500;
   line-height:1.1;
   margin-bottom:0.2rem;
@@ -238,7 +250,7 @@ body{
    but not on the deeper end of the grass. */
 .garden-subtitle{
   font-family:var(--font-body);
-  font-size:1rem;
+  font-size:var(--fs-subtitle);
   color:var(--text-secondary);
 }
 
@@ -306,7 +318,8 @@ body{
   border:1.5px solid var(--border-mid);
   box-shadow:0 3px 8px rgba(43,33,24,0.22);
   font-family:var(--font-body);
-  font-size:1.15rem;
+  font-size:var(--fs-body);
+  font-style:italic;
   color:var(--text-secondary);
   white-space:nowrap;
   pointer-events:none;
@@ -433,14 +446,14 @@ body{
    same way they pan to their planted land. */
 /* Spans both field columns so it always starts a fresh row below every
    opened patch, regardless of whether the shelf count is odd or even. */
-.shelf-locked-unit{padding:0.75rem 0.5rem 1rem;grid-column:1 / -1}
+.shelf-locked-unit{padding:0.75rem 0 1rem;grid-column:1 / -1}
 .shelf-locked-plank{
   position:relative;
   width:var(--field-col);
   max-width:100%;
   background:transparent;
   border:none;
-  padding:0.5rem 0 0.5rem;
+  padding:0.5rem;
   cursor:pointer;
   font-family:inherit;
 }
@@ -480,7 +493,7 @@ body{
   border-radius:var(--radius-lg);
   box-shadow:0 3px 8px rgba(43,33,24,0.22);
   font-family:var(--font-body);
-  font-size:1.05rem;
+  font-size:var(--fs-body);
   font-weight:500;
   color:var(--text-secondary);
 }
@@ -510,7 +523,8 @@ body{
   margin-top:0.5rem;
   text-align:center;
   font-family:var(--font-body);
-  font-size:0.95rem;
+  font-size:var(--fs-body);
+  font-style:italic;
   color:var(--text-secondary);
 }
 
@@ -598,7 +612,7 @@ body{
 .plant-latin{
   font-family:var(--font-display);
   font-style:italic;
-  font-size:1.05rem;
+  font-size:var(--fs-body);
   color:var(--text-muted);
   margin-top:0.15rem;
 }
@@ -611,7 +625,7 @@ body{
   background:var(--bg-deep);
   border:1.5px solid var(--border-light);
   border-radius:var(--radius-xl);
-  padding:1.5rem 1rem 1.25rem;
+  padding:0.75rem 0.6rem 0.6rem;
   margin-bottom:1rem;
   cursor:pointer;
   width:100%;
@@ -639,9 +653,9 @@ body{
 .plant-touch-hint{
   margin-top:0.75rem;
   font-family:var(--font-body);
-  font-size:0.9rem;
-  color:var(--text-muted);
+  font-size:var(--fs-body);
   font-style:italic;
+  color:var(--text-muted);
 }
 
 .plant-detail-stats{
@@ -656,10 +670,10 @@ body{
   display:inline-flex;
   align-items:center;
   gap:0.4rem;
-  padding:0.45rem 1rem;
+  padding:0.6rem 1.25rem;
   border-radius:var(--radius-pill);
   font-family:var(--font-body);
-  font-size:1rem;
+  font-size:var(--fs-body);
   font-weight:500;
   border:1.5px solid transparent;
 }
@@ -674,7 +688,7 @@ body{
   align-items:center;
   gap:0.4rem;
   font-family:var(--font-body);
-  font-size:1rem;
+  font-size:var(--fs-body);
   color:var(--text-secondary);
 }
 .plant-age .icon{color:var(--text-muted)}
@@ -692,7 +706,7 @@ body{
   align-items:center;
   gap:0.5rem;
   font-family:var(--font-body);
-  font-size:0.85rem;
+  font-size:var(--fs-body);
   font-weight:600;
   letter-spacing:0.08em;
   text-transform:uppercase;
@@ -701,7 +715,7 @@ body{
 }
 .plant-use-text{
   font-family:var(--font-body);
-  font-size:1.05rem;
+  font-size:var(--fs-body);
   line-height:1.6;
   color:var(--text-primary);
 }
@@ -716,13 +730,13 @@ body{
   display:inline-flex;
   align-items:center;
   gap:0.35rem;
-  padding:0.35rem 0.85rem;
+  padding:0.5rem 1.1rem;
   border-radius:var(--radius-pill);
   background:rgba(115,135,93,0.10);
   border:1.5px solid var(--foliage-highlight);
   color:var(--foliage-shadow);
   font-family:var(--font-body);
-  font-size:0.95rem;
+  font-size:var(--fs-body);
   font-weight:500;
 }
 
@@ -742,7 +756,7 @@ body{
   background:var(--bg-surface);
   border:1.5px solid var(--border-light);
   border-radius:var(--radius-xl);
-  padding:1.25rem 1.25rem 1rem;
+  padding:0.6rem 0.75rem 0.5rem;
   box-shadow:var(--shadow-paper);
 }
 /* Inside the menu the sheet already provides the card, so the card drops its
@@ -758,7 +772,7 @@ body{
   align-items:center;
   gap:0.5rem;
   font-family:var(--font-display);
-  font-size:1.35rem;
+  font-size:var(--fs-subtitle);
   font-weight:500;
   color:var(--text-primary);
   margin-bottom:0.75rem;
@@ -768,12 +782,11 @@ body{
 .daily-task{
   display:flex;
   align-items:center;
-  gap:0.75rem;
+  gap:0.5rem;
   width:100%;
-  min-height:var(--tap-min);
-  padding:0.5rem 0.75rem;
+  padding:0.4rem 0.6rem;
   background:var(--bg-inset);
-  border:1.5px solid var(--border-light);
+  border:1px solid var(--border-light);
   border-radius:var(--radius-md);
   cursor:pointer;
   font-family:var(--font-body);
@@ -790,7 +803,7 @@ body{
 }
 .daily-task.done .daily-task-text{text-decoration:line-through;color:var(--text-muted)}
 .daily-task-check{
-  width:32px;height:32px;
+  width:24px;height:24px;
   border-radius:50%;
   display:flex;
   align-items:center;
@@ -799,22 +812,23 @@ body{
   color:var(--foliage-shadow);
 }
 .daily-task-circle{
-  width:22px;height:22px;
+  width:18px;height:18px;
   border-radius:50%;
-  border:2.5px solid var(--border-mid);
+  border:2px solid var(--border-mid);
   display:block;
 }
 .daily-task.done .daily-task-check{background:var(--foliage-mid);color:#F5EFEB}
 .daily-task-text{
   flex:1;
-  font-size:1.1rem;
+  font-size:var(--fs-body);
   font-weight:500;
   color:var(--text-primary);
   line-height:1.3;
 }
 .daily-task-meta{display:flex;align-items:center;gap:0.5rem;flex-shrink:0}
 .daily-task-progress{
-  font-size:0.95rem;
+  font-size:var(--fs-body);
+  font-style:italic;
   font-weight:600;
   color:var(--text-secondary);
 }
@@ -822,19 +836,19 @@ body{
   display:inline-flex;
   align-items:center;
   gap:0.2rem;
-  padding:0.2rem 0.6rem;
+  padding:0.45rem 1rem;
   border-radius:var(--radius-pill);
   background:rgba(224,122,95,0.15);
   border:1.5px solid var(--accent-coral);
   color:#7A2F10;
-  font-size:0.95rem;
+  font-size:var(--fs-body);
   font-weight:600;
 }
 .daily-all-done{
   font-family:var(--font-body);
-  font-size:1.1rem;
-  color:var(--foliage-shadow);
+  font-size:var(--fs-body);
   font-style:italic;
+  color:var(--foliage-shadow);
   padding:0.5rem 0.25rem;
 }
 .daily-week{
@@ -847,7 +861,8 @@ body{
 }
 .daily-week-label{
   font-family:var(--font-body);
-  font-size:0.85rem;
+  font-size:var(--fs-body);
+  font-style:italic;
   font-weight:600;
   letter-spacing:0.06em;
   text-transform:uppercase;
@@ -866,12 +881,13 @@ body{
   justify-content:flex-start;
   flex-wrap:wrap;
 }
-.daily-week-hint{font-size:0.85rem;color:var(--text-muted);white-space:nowrap}
+.daily-week-hint{font-size:var(--fs-body);font-style:italic;color:var(--text-muted);white-space:nowrap}
 .daily-week-done{
   display:inline-flex;
   align-items:center;
   gap:0.3rem;
-  font-size:0.85rem;
+  font-size:var(--fs-body);
+  font-style:italic;
   font-weight:500;
   color:var(--accent-plum);
   white-space:nowrap;
@@ -894,8 +910,8 @@ body{
 .almanac-summary{
   display:flex;
   align-items:center;
-  gap:1rem;
-  padding:1.25rem 1.5rem;
+  gap:0.75rem;
+  padding:0.6rem 0.75rem;
   background:var(--bg-surface);
   border:1.5px solid var(--border-light);
   border-radius:var(--radius-xl);
@@ -905,19 +921,20 @@ body{
 .almanac-summary .icon{color:var(--foliage-shadow)}
 .almanac-summary-num{
   font-family:var(--font-display);
-  font-size:2rem;
+  font-size:var(--fs-subtitle);
   font-weight:500;
   color:var(--text-primary);
   line-height:1.1;
 }
 .almanac-summary-num span{
-  font-size:1.1rem;
+  font-size:var(--fs-body);
   color:var(--text-muted);
   font-weight:400;
 }
 .almanac-summary-sub{
   font-family:var(--font-body);
-  font-size:0.9rem;
+  font-size:var(--fs-body);
+  font-style:italic;
   color:var(--text-secondary);
   margin-top:0.15rem;
 }
@@ -928,7 +945,7 @@ body{
   align-items:center;
   gap:0.5rem;
   font-family:var(--font-body);
-  font-size:0.85rem;
+  font-size:var(--fs-body);
   font-weight:600;
   letter-spacing:0.1em;
   text-transform:uppercase;
@@ -973,13 +990,13 @@ body{
 }
 .plate-figure.mystery-mark{
   font-family:var(--font-display);
-  font-size:2.25rem;
+  font-size:var(--fs-subtitle);
   color:var(--border-mid);
   background:var(--bg-inset);
 }
 .plate-name{
   font-family:var(--font-display);
-  font-size:1.2rem;
+  font-size:var(--fs-subtitle);
   font-weight:500;
   text-align:center;
   color:var(--text-primary);
@@ -987,7 +1004,8 @@ body{
 }
 .plate-desc{
   font-family:var(--font-body);
-  font-size:0.9rem;
+  font-size:var(--fs-body);
+  font-style:italic;
   line-height:1.4;
   text-align:center;
   color:var(--text-secondary);
@@ -1001,19 +1019,20 @@ body{
   flex-wrap:wrap;
 }
 .plate-tier{
-  padding:0.2rem 0.7rem;
+  padding:0.45rem 1.1rem;
   border-radius:var(--radius-pill);
   background:rgba(115,135,93,0.15);
   border:1.5px solid var(--foliage-mid);
   color:var(--foliage-shadow);
   font-family:var(--font-body);
-  font-size:0.8rem;
+  font-size:var(--fs-body);
   font-weight:600;
   letter-spacing:0.04em;
 }
 .plate-progress{
   font-family:var(--font-body);
-  font-size:0.85rem;
+  font-size:var(--fs-body);
+  font-style:italic;
   font-weight:500;
   color:var(--text-muted);
 }
@@ -1053,16 +1072,15 @@ body{
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  min-height:var(--tap-min);
-  padding:0 2rem;
+  padding:0.4rem 0.9rem;
   border-radius:var(--radius-md);
   font-family:var(--font-body);
-  font-size:1.2rem;
+  font-size:0.75rem;
   font-weight:500;
-  border:2px solid transparent;
+  border:1px solid transparent;
   cursor:pointer;
   transition:all var(--duration-fast) var(--ease-gentle);
-  gap:0.5rem;
+  gap:0.2rem;
   letter-spacing:0.01em;
   text-decoration:none;
 }
@@ -1077,8 +1095,8 @@ body{
 .btn-ghost{background:transparent;color:var(--text-secondary);border-color:var(--border-mid)}
 .btn-ghost:hover:not(:disabled){color:var(--text-primary);border-color:var(--border-strong)}
 .btn-danger{background:transparent;color:var(--accent-red);border-color:var(--accent-red)}
-.btn-lg{min-height:80px;font-size:1.35rem;padding:0 2.5rem;border-radius:var(--radius-lg)}
-.btn-sm{min-height:52px;font-size:1rem;padding:0 1.25rem}
+.btn-lg{font-size:0.75rem;padding:0.15rem 0.5rem;border-radius:var(--radius-lg)}
+.btn-sm{font-size:0.75rem;padding:0.15rem 0.5rem}
 
 /* ── Exercise cards ── */
 .exercise-list{display:flex;flex-direction:column;gap:0.875rem}
@@ -1110,21 +1128,22 @@ body{
 .exercise-info{flex:1}
 .exercise-name{
   font-family:var(--font-display);
-  font-size:1.4rem;
+  font-size:var(--fs-subtitle);
   font-weight:500;
   color:var(--text-primary);
   margin-bottom:0.2rem;
 }
 .exercise-desc{
   font-family:var(--font-body);
-  font-size:0.95rem;
+  font-size:var(--fs-body);
+  font-style:italic;
   color:var(--text-secondary);
   line-height:1.4;
   margin-bottom:0.35rem;
 }
 .exercise-reward{
   font-family:var(--font-body);
-  font-size:0.9rem;
+  font-size:var(--fs-body);
   font-weight:500;
   color:#7A2F10;
   display:flex;
@@ -1148,9 +1167,10 @@ body{
 .shop-grid{display:flex;flex-direction:column;gap:0.75rem}
 .shop-item{
   display:flex;
+  flex-wrap:wrap;
   align-items:center;
-  gap:1rem;
-  padding:1rem 1.25rem;
+  gap:0.5rem 0.75rem;
+  padding:0.6rem 0.75rem;
   background:var(--bg-surface);
   border:1.5px solid var(--border-light);
   border-radius:var(--radius-lg);
@@ -1160,7 +1180,7 @@ body{
 .shop-item:hover{border-color:var(--foliage-mid)}
 .shop-item.rare{border-color:var(--accent-plum);background:rgba(123,83,113,0.04)}
 .shop-item-icon{
-  width:72px;height:72px;
+  width:44px;height:44px;
   background:var(--bg-deep);
   border-radius:var(--radius-md);
   display:flex;
@@ -1169,39 +1189,40 @@ body{
   flex-shrink:0;
 }
 .shop-item-icon svg{width:55%;height:55%}
-.shop-item-info{flex:1}
+.shop-item-info{flex:1;min-width:0}
 .shop-item-name{
   font-family:var(--font-display);
-  font-size:1.3rem;
+  font-size:var(--fs-subtitle);
   font-weight:500;
   margin-bottom:0.15rem;
+  overflow-wrap:break-word;
 }
 .shop-item-desc{
   font-family:var(--font-body);
-  font-size:0.9rem;
+  font-size:var(--fs-body);
+  font-style:italic;
   color:var(--text-secondary);
   line-height:1.35;
+  overflow-wrap:break-word;
 }
 .shop-item-price{
   display:flex;
   align-items:center;
   gap:0.3rem;
   font-family:var(--font-body);
-  font-size:1.1rem;
+  font-size:var(--fs-body);
   font-weight:500;
   color:#7A2F10;
   flex-shrink:0;
 }
 .shop-item-price .icon{color:var(--accent-coral)}
 .shop-buy-btn{
-  min-width:80px;
-  min-height:var(--tap-min);
-  padding:0 1.25rem;
+  padding:0.4rem 0.9rem;
   border-radius:var(--radius-md);
   font-family:var(--font-body);
-  font-size:1.05rem;
+  font-size:0.75rem;
   font-weight:500;
-  border:2px solid var(--foliage-mid);
+  border:1px solid var(--foliage-mid);
   background:transparent;
   color:var(--foliage-shadow);
   cursor:pointer;
@@ -1220,14 +1241,14 @@ body{
   background:var(--bg-surface);
   border:1.5px solid var(--border-light);
   border-radius:var(--radius-lg);
-  padding:1.25rem 1.5rem;
+  padding:0.6rem 0.75rem;
   box-shadow:var(--shadow-paper);
   display:flex;
   align-items:center;
-  gap:1rem;
+  gap:0.75rem;
 }
 .profile-card-icon{
-  width:56px;height:56px;
+  width:40px;height:40px;
   border-radius:var(--radius-md);
   background:var(--bg-deep);
   display:flex;
@@ -1238,7 +1259,7 @@ body{
 }
 .profile-card-title{
   font-family:var(--font-body);
-  font-size:0.85rem;
+  font-size:var(--fs-body);
   font-weight:500;
   letter-spacing:0.06em;
   text-transform:uppercase;
@@ -1247,14 +1268,15 @@ body{
 }
 .profile-card-value{
   font-family:var(--font-display);
-  font-size:1.75rem;
+  font-size:var(--fs-subtitle);
   font-weight:500;
   color:var(--text-primary);
   line-height:1.1;
 }
 .profile-card-sub{
   font-family:var(--font-body);
-  font-size:0.85rem;
+  font-size:var(--fs-body);
+  font-style:italic;
   color:var(--text-secondary);
   margin-top:0.15rem;
 }
@@ -1281,13 +1303,14 @@ body{
 .meal-card-body{padding:0.75rem 1rem 1rem}
 .meal-card-name{
   font-family:var(--font-display);
-  font-size:1.1rem;
+  font-size:var(--fs-subtitle);
   font-weight:500;
   margin-bottom:0.2rem;
 }
 .meal-card-ingredients{
   font-family:var(--font-body);
-  font-size:0.8rem;
+  font-size:var(--fs-body);
+  font-style:italic;
   color:var(--text-secondary);
   line-height:1.35;
 }
@@ -1295,10 +1318,10 @@ body{
   display:inline-flex;
   align-items:center;
   gap:0.25rem;
-  padding:0.2rem 0.5rem;
+  padding:0.45rem 0.9rem;
   border-radius:var(--radius-pill);
   font-family:var(--font-body);
-  font-size:0.7rem;
+  font-size:var(--fs-body);
   font-weight:500;
   margin-top:0.4rem;
 }
@@ -1322,7 +1345,7 @@ body{
 }
 .play-title{
   font-family:var(--font-display);
-  font-size:1.6rem;
+  font-size:var(--fs-subtitle);
   font-weight:500;
   color:var(--text-primary);
 }
@@ -1347,7 +1370,7 @@ body{
 /* ── Tile match game ── */
 .tile-grid{
   display:grid;
-  grid-template-columns:repeat(4,1fr);
+  grid-template-columns:repeat(3,1fr);
   gap:0.75rem;
   width:100%;
 }
@@ -1374,11 +1397,15 @@ body{
   position:absolute;
   bottom:4px;
   left:50%;
+  width:90%;
   transform:translateX(-50%);
   font-family:var(--font-body);
-  font-size:0.55rem;
+  font-size:var(--fs-body);
+  font-style:italic;
+  line-height:1.1;
+  text-align:center;
   color:var(--text-muted);
-  white-space:nowrap;
+  white-space:normal;
 }
 
 /* ── Pattern sequence game ── */
@@ -1395,14 +1422,14 @@ body{
   border:1.5px solid var(--border-light);
 }
 .pattern-dot{
-  width:56px;height:56px;
+  width:64px;height:64px;
   border-radius:50%;
   border:2px solid transparent;
   display:flex;
   align-items:center;
   justify-content:center;
   font-family:var(--font-body);
-  font-size:1.5rem;
+  font-size:var(--fs-body);
   font-weight:600;
   color:var(--text-on-dark);
   transition:all var(--duration-fast) var(--ease-gentle);
@@ -1419,7 +1446,7 @@ body{
   min-height:var(--tap-min);
   border-radius:var(--radius-lg);
   font-family:var(--font-body);
-  font-size:1.5rem;
+  font-size:var(--fs-body);
   font-weight:600;
   border:2.5px solid var(--border-mid);
   background:var(--bg-surface);
@@ -1463,7 +1490,8 @@ body{
 .odd-item svg{width:48px;height:48px;color:var(--foliage-shadow)}
 .odd-item-label{
   font-family:var(--font-body);
-  font-size:0.85rem;
+  font-size:var(--fs-body);
+  font-style:italic;
   font-weight:500;
   color:var(--text-secondary);
   text-align:center;
@@ -1482,7 +1510,7 @@ body{
   border:2.5px solid var(--border-mid);
   border-radius:var(--radius-lg);
   font-family:var(--font-display);
-  font-size:1.25rem;
+  font-size:var(--fs-body);
   font-weight:500;
   color:var(--text-primary);
   text-align:center;
@@ -1562,7 +1590,7 @@ body{
 }
 .kaki-question{
   font-family:var(--font-display);
-  font-size:1.75rem;
+  font-size:var(--fs-title);
   font-weight:500;
   line-height:1.2;
   color:var(--text-primary);
@@ -1574,14 +1602,13 @@ body{
 }
 .kaki-chip{
   flex:1 1 auto;
-  min-height:var(--tap-min);
-  padding:0 1.25rem;
-  border:2px solid var(--border-mid);
+  padding:0.4rem 0.9rem;
+  border:1px solid var(--border-mid);
   border-radius:var(--radius-pill);
   background:var(--bg-surface);
   color:var(--text-primary);
   font-family:var(--font-body);
-  font-size:1.2rem;
+  font-size:0.75rem;
   font-weight:500;
   cursor:pointer;
   transition:all var(--duration-fast) var(--ease-gentle);
@@ -1590,19 +1617,18 @@ body{
 .kaki-chip:active{transform:scale(0.97)}
 .kaki-chip:focus-visible{outline:3px solid var(--kopi-accent);outline-offset:3px}
 .kaki-label{
-  font-size:1.05rem;
+  font-size:var(--fs-body);
   color:var(--text-secondary);
 }
 .kaki-input{
   width:100%;
-  min-height:var(--tap-min);
-  padding:0 1.25rem;
-  border:2px solid var(--border-mid);
+  padding:0.4rem 0.9rem;
+  border:1px solid var(--border-mid);
   border-radius:var(--radius-md);
   background:var(--bg-inset);
   color:var(--text-primary);
   font-family:var(--font-body);
-  font-size:1.25rem;
+  font-size:0.75rem;
 }
 .kaki-input:focus{outline:3px solid var(--kopi-accent);outline-offset:2px;border-color:var(--border-strong)}
 .kaki-name-panel .btn-lg{width:100%}
@@ -1639,7 +1665,7 @@ body{
 }
 .kaki-portrait svg{width:100%;height:100%;border-radius:50%}
 .kaki-who{
-  font-size:1.1rem;
+  font-size:var(--fs-body);
   font-weight:500;
   line-height:1.2;
   color:var(--text-primary);
@@ -1685,7 +1711,7 @@ body{
   background:var(--kopi-tint);
   color:var(--text-primary);
   font-family:var(--font-body);
-  font-size:1.2rem;
+  font-size:var(--fs-body);
   line-height:1.5;
   text-align:left;
   opacity:0;
@@ -1700,7 +1726,7 @@ body{
 }
 .kaki-bubble:focus-visible{outline:3px solid var(--kopi-accent);outline-offset:3px}
 .kaki-bubble-name{
-  font-size:1.15rem;
+  font-size:var(--fs-body);
   font-weight:600;
   line-height:1.2;
   color:var(--kopi-accent);
@@ -1847,16 +1873,15 @@ body{
   padding:0.5rem 0.75rem;
   border-radius:var(--radius-md);
   background:var(--bg-inset);
-  font-size:1.15rem;
+  font-size:var(--fs-body);
   line-height:1.2;
 }
 /* The name wins the space fight. It is the whole promise of the game, so it takes
    what it needs and the decoration around it gives way. Tapping it reopens the
-   chooser, which is why it is a button and clears the tap floor. */
+   chooser. */
 .kaki-player-name{
   flex:1 1 auto;
   min-width:9ch;
-  min-height:var(--tap-min);
   padding:0 0.5rem 0 0;
   overflow:hidden;
   white-space:nowrap;
@@ -1941,7 +1966,6 @@ body{
     --kaki-tile-gap:0.375rem;
   }
   .kaki-table{gap:0.5rem}
-  .kaki-who{font-size:1rem}
   .kaki-bubble{padding:0.625rem 1rem}
   .kaki-bubble-slot{padding-top:0.5rem}
   /* Three lines of a long line at a long name still has to be readable, so the
@@ -1988,14 +2012,15 @@ body{
 .notif-text{flex:1}
 .notif-title{
   font-family:var(--font-body);
-  font-size:1rem;
+  font-size:var(--fs-body);
   font-weight:500;
   color:var(--text-primary);
   margin-bottom:0.1rem;
 }
 .notif-body{
   font-family:var(--font-body);
-  font-size:0.875rem;
+  font-size:var(--fs-body);
+  font-style:italic;
   color:var(--text-secondary);
   line-height:1.4;
 }
@@ -2017,11 +2042,13 @@ body{
   border-top:1.5px solid var(--border-light);
   display:flex;
   align-items:stretch;
+  padding:0.15rem 1rem;
   flex-shrink:0;
   z-index:20;
 }
 .nav-item{
   flex:1;
+  min-width:0;
   display:flex;
   flex-direction:column;
   align-items:center;
@@ -2036,8 +2063,13 @@ body{
   font-size:0.75rem;
   font-weight:500;
   letter-spacing:0.02em;
-  padding:0.5rem;
+  line-height:1.15;
+  text-align:center;
+  white-space:normal;
+  padding:0.5rem 0.25rem;
 }
+.nav-item .icon{width:22px;height:22px}
+.nav-item span{width:100%;align-self:stretch;overflow-wrap:break-word}
 .nav-item[hidden]{display:none}
 .nav-item:active{transform:scale(0.95)}
 .nav-item.active{color:var(--foliage-shadow)}
@@ -2075,7 +2107,7 @@ body{
 }
 .modal-title{
   font-family:var(--font-display);
-  font-size:1.75rem;
+  font-size:var(--fs-subtitle);
   font-weight:500;
   color:var(--text-primary);
 }
@@ -2091,7 +2123,7 @@ body{
 .harvest-confirm[hidden]{display:none}
 .harvest-confirm-text{
   font-family:var(--font-body);
-  font-size:1rem;
+  font-size:var(--fs-body);
   line-height:1.5;
   color:var(--text-secondary);
   margin-bottom:0.875rem;
@@ -2118,7 +2150,8 @@ body{
 .share-preview-plant{width:60px;height:75px}
 .share-stats{
   font-family:var(--font-body);
-  font-size:0.95rem;
+  font-size:var(--fs-body);
+  font-style:italic;
   color:var(--text-secondary);
   text-align:center;
   line-height:1.6;
@@ -2177,18 +2210,18 @@ body{
   background:var(--bg-surface);
   border:1.5px solid var(--border-light);
   border-radius:var(--radius-lg);
-  padding:1.25rem 1.5rem;
+  padding:0.6rem 0.75rem;
   margin-bottom:1.25rem;
 }
 .exercise-intro-title{
   font-family:var(--font-display);
-  font-size:1.35rem;
+  font-size:var(--fs-subtitle);
   font-weight:500;
   margin-bottom:0.4rem;
 }
 .exercise-intro-body{
   font-family:var(--font-body);
-  font-size:1rem;
+  font-size:var(--fs-body);
   color:var(--text-secondary);
   line-height:1.55;
 }
@@ -2234,13 +2267,13 @@ body{
 }
 .completion-title{
   font-family:var(--font-display);
-  font-size:2rem;
+  font-size:var(--fs-title);
   font-weight:500;
   color:var(--text-primary);
 }
 .completion-sub{
   font-family:var(--font-body);
-  font-size:1.1rem;
+  font-size:var(--fs-subtitle);
   color:var(--text-secondary);
   line-height:1.5;
 }
@@ -2254,10 +2287,10 @@ body{
   display:inline-flex;
   align-items:center;
   gap:0.3rem;
-  padding:0.4rem 0.875rem;
+  padding:0.6rem 1.2rem;
   border-radius:var(--radius-pill);
   font-family:var(--font-body);
-  font-size:1rem;
+  font-size:var(--fs-body);
   font-weight:500;
   border:1.5px solid transparent;
 }
@@ -2274,7 +2307,7 @@ body{
   padding:0.75rem;
   border-radius:var(--radius-md);
   font-family:var(--font-body);
-  font-size:1.05rem;
+  font-size:var(--fs-body);
   font-weight:500;
   text-align:center;
 }
@@ -2308,8 +2341,8 @@ body{
 .island-header{
   display:flex;
   align-items:center;
-  gap:1rem;
-  padding:1.25rem 1.5rem;
+  gap:0.75rem;
+  padding:0.6rem 0.75rem;
   border-radius:var(--radius-xl);
   margin-bottom:2rem;
   position:relative;
@@ -2352,20 +2385,22 @@ body{
 
 .island-title{
   font-family:var(--font-display);
-  font-size:1.75rem;
+  font-size:var(--fs-subtitle);
   font-weight:500;
   line-height:1.1;
   margin-bottom:0.2rem;
 }
 .island-desc{
   font-family:var(--font-body);
-  font-size:0.95rem;
+  font-size:var(--fs-body);
+  font-style:italic;
   color:var(--text-secondary);
   line-height:1.4;
 }
 .island-progress{
   font-family:var(--font-body);
-  font-size:0.8rem;
+  font-size:var(--fs-body);
+  font-style:italic;
   font-weight:500;
   color:var(--text-muted);
   margin-top:0.3rem;
@@ -2392,7 +2427,7 @@ body{
   transition:transform var(--duration-fast) var(--ease-gentle);
   margin-bottom:1.75rem;
   /* Path zigzag: JS assigns left/right offset */
-  width:100px;
+  width:160px;
 }
 .level-node:active{transform:scale(0.92)}
 .level-node:focus-visible{outline:3px solid var(--foliage-mid);outline-offset:4px;border-radius:var(--radius-lg)}
@@ -2432,8 +2467,8 @@ body{
 /* Node level number badge */
 .node-badge{
   position:absolute;
-  top:-8px;right:-8px;
-  width:28px;height:28px;
+  top:-12px;right:-12px;
+  width:44px;height:44px;
   border-radius:50%;
   background:var(--bg-surface);
   border:2.5px solid var(--node-border, var(--foliage-mid));
@@ -2441,7 +2476,7 @@ body{
   align-items:center;
   justify-content:center;
   font-family:var(--font-body);
-  font-size:0.75rem;
+  font-size:var(--fs-body);
   font-weight:600;
   color:var(--text-primary);
   box-shadow:var(--shadow-sm);
@@ -2452,12 +2487,14 @@ body{
 .node-label{
   margin-top:0.6rem;
   font-family:var(--font-body);
-  font-size:0.8rem;
+  font-size:var(--fs-body);
+  font-style:italic;
   font-weight:500;
   color:var(--text-secondary);
   text-align:center;
   line-height:1.2;
-  max-width:90px;
+  max-width:150px;
+  overflow-wrap:break-word;
 }
 
 /* ── Level states ── */
@@ -2531,8 +2568,8 @@ body{
 .island-complete-banner{
   display:flex;
   align-items:center;
-  gap:1rem;
-  padding:1.25rem 1.5rem;
+  gap:0.75rem;
+  padding:0.6rem 0.75rem;
   background:rgba(115,135,93,0.10);
   border:1.5px solid var(--foliage-mid);
   border-radius:var(--radius-xl);
@@ -2544,13 +2581,14 @@ body{
 }
 .island-complete-text{
   font-family:var(--font-display);
-  font-size:1.3rem;
+  font-size:var(--fs-subtitle);
   font-weight:500;
   color:var(--foliage-shadow);
 }
 .island-complete-sub{
   font-family:var(--font-body);
-  font-size:0.9rem;
+  font-size:var(--fs-body);
+  font-style:italic;
   color:var(--text-secondary);
   margin-top:0.2rem;
 }
@@ -2562,7 +2600,8 @@ body{
   justify-content:center;
   gap:0.2rem;
   margin-top:0.25rem;
-  font-size:0.75rem;
+  font-size:var(--fs-body);
+  font-style:italic;
   color:var(--text-muted);
 }
 .node-reward .icon{width:0.9em;height:0.9em}
@@ -2572,12 +2611,12 @@ body{
   display:flex;
   align-items:center;
   gap:0.5rem;
-  padding:0.6rem 1.25rem;
+  padding:0.8rem 1.5rem;
   background:var(--bg-inset);
   border:1.5px dashed var(--border-mid);
   border-radius:var(--radius-pill);
   font-family:var(--font-body);
-  font-size:0.85rem;
+  font-size:var(--fs-body);
   font-weight:500;
   color:var(--text-muted);
   margin-bottom:2rem;
@@ -2590,14 +2629,17 @@ body{
   bottom:-6px;
   left:50%;
   transform:translateX(-50%);
-  padding:0.2rem 0.6rem;
-  border-radius:var(--radius-pill);
+  padding:0.45rem 1rem;
+  border-radius:var(--radius-lg);
   font-family:var(--font-body);
-  font-size:0.65rem;
+  font-size:var(--fs-body);
   font-weight:600;
   letter-spacing:0.06em;
   text-transform:uppercase;
-  white-space:nowrap;
+  white-space:normal;
+  overflow-wrap:break-word;
+  max-width:150px;
+  text-align:center;
   z-index:2;
 }
 .node-type-tag.tiles{background:var(--foliage-mid);color:#F5EFEB}
@@ -2620,13 +2662,13 @@ body{
 }
 .course-select-title{
   font-family:var(--font-display);
-  font-size:2rem;
+  font-size:var(--fs-title);
   font-weight:500;
   margin-bottom:0.4rem;
 }
 .course-select-sub{
   font-family:var(--font-body);
-  font-size:1rem;
+  font-size:var(--fs-subtitle);
   color:var(--text-secondary);
   line-height:1.5;
 }
@@ -2641,9 +2683,9 @@ body{
   display:flex;
   align-items:center;
   gap:1rem;
-  padding:1.25rem 1.5rem;
+  padding:0.6rem 0.75rem;
   background:var(--bg-surface);
-  border:2px solid var(--border-light);
+  border:1.5px solid var(--border-light);
   border-radius:var(--radius-xl);
   cursor:pointer;
   transition:all var(--duration-normal) var(--ease-gentle);
@@ -2683,7 +2725,7 @@ body{
 }
 
 .course-card-icon{
-  width:72px;height:72px;
+  width:44px;height:44px;
   border-radius:var(--radius-lg);
   background:var(--bg-deep);
   display:flex;
@@ -2692,23 +2734,24 @@ body{
   flex-shrink:0;
   box-shadow:var(--shadow-sm);
 }
-.course-card-icon svg{width:38px;height:38px}
+.course-card-icon svg{width:24px;height:24px}
 .course-card.memory-meadow .course-card-icon{color:var(--foliage-shadow)}
 .course-card.pattern-peaks .course-card-icon{color:#7A4800}
 .course-card.logic-lake .course-card-icon{color:var(--accent-plum)}
 .course-card.word-woods .course-card-icon{color:var(--accent-red)}
 .course-card.kopitiam-corner .course-card-icon{color:var(--kopi-accent)}
 
-.course-card-info{flex:1}
+.course-card-info{flex:1;min-width:0}
 .course-card-name{
   font-family:var(--font-display);
-  font-size:1.5rem;
+  font-size:var(--fs-subtitle);
   font-weight:500;
   margin-bottom:0.2rem;
 }
 .course-card-desc{
   font-family:var(--font-body);
-  font-size:0.95rem;
+  font-size:var(--fs-body);
+  font-style:italic;
   color:var(--text-secondary);
   line-height:1.4;
   margin-bottom:0.5rem;
@@ -2720,14 +2763,18 @@ body{
 }
 .course-badge{
   display:inline-flex;
+  flex-wrap:wrap;
   align-items:center;
   gap:0.3rem;
-  padding:0.25rem 0.75rem;
-  border-radius:var(--radius-pill);
+  padding:0.5rem 1.1rem;
+  border-radius:var(--radius-lg);
   font-family:var(--font-body);
-  font-size:0.85rem;
+  font-size:var(--fs-body);
   font-weight:500;
   border:1.5px solid transparent;
+  white-space:normal;
+  overflow-wrap:break-word;
+  max-width:100%;
 }
 .course-badge.done{background:rgba(68,87,61,0.12);color:var(--success);border-color:var(--success)}
 .course-badge.progress{background:var(--bg-inset);color:var(--text-secondary);border-color:var(--border-mid)}
@@ -2911,12 +2958,12 @@ body{
 .garden-hint-card .icon{color:var(--foliage-mid);flex-shrink:0}
 .garden-hint-title{
   font-family:var(--font-display);
-  font-size:1.3rem;
+  font-size:var(--fs-subtitle);
   font-weight:500;
 }
 .garden-hint-body{
   font-family:var(--font-body);
-  font-size:1rem;
+  font-size:var(--fs-body);
   color:var(--text-secondary);
   line-height:1.4;
 }
@@ -2929,13 +2976,14 @@ body{
 /* Shop lock note */
 .shop-lock-note{
   font-family:var(--font-body);
-  font-size:0.85rem;
+  font-size:var(--fs-body);
+  font-style:italic;
   color:var(--accent-plum);
   margin-top:0.2rem;
 }
 .shop-free-label{
   font-family:var(--font-body);
-  font-size:1rem;
+  font-size:var(--fs-body);
   font-weight:500;
   color:var(--foliage-shadow);
 }
@@ -2944,11 +2992,13 @@ body{
   flex-direction:column;
   align-items:flex-end;
   gap:0.5rem;
-  flex-shrink:0;
+  flex-basis:100%;
+  justify-content:flex-end;
 }
 .rare-tag{
   color:var(--accent-plum);
-  font-size:0.75rem;
+  font-size:var(--fs-body);
+  font-style:italic;
   font-family:var(--font-body);
   font-weight:500;
   letter-spacing:0.06em;
@@ -2957,9 +3007,9 @@ body{
 /* Pattern turn message */
 .pattern-turn-msg{
   font-family:var(--font-body);
-  font-size:1.1rem;
-  color:var(--text-muted);
+  font-size:var(--fs-body);
   font-style:italic;
+  color:var(--text-muted);
 }
 
 /* Reduced motion — degrade to crossfade not zero */
