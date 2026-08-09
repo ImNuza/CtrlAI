@@ -136,6 +136,22 @@ body{
   transition:all var(--duration-fast) var(--ease-gentle);
   flex-shrink:0;
 }
+/* Wide enough to carry its name under the icon. The icon alone was the only
+   unlabelled control left in the app. */
+.menu-btn{
+  width:auto;
+  min-width:var(--tap-min);
+  padding:0 0.6rem;
+  flex-direction:column;
+  gap:0.1rem;
+}
+.menu-btn-label{
+  font-family:var(--font-body);
+  font-size:1rem;
+  font-weight:500;
+  line-height:1;
+}
+
 /* Menu button and its badge: the one mark that says today has tasks left,
    now that the daily card lives inside the menu rather than in the garden. */
 #menu-btn{position:relative}
@@ -620,6 +636,84 @@ body{
 }
 .garden2-field.is-simple .shelf-locked-unit{grid-column:1}
 .garden2-field.is-simple .shelf-locked-plank{width:100%}
+
+/* ── Garden visitors ─────────────────────────────────────────
+   A tappable creature drifting over the grass. Sized to the tap floor even
+   though the drawn shape is smaller, because a butterfly is the hardest
+   thing in the game to put a finger on. */
+/* The button itself never scales. Only what is inside it moves, so the tap
+   area is a flat 64px whether the animation has run, is mid-flight, is
+   throttled by a background tab, or is switched off for reduced motion.
+   Animating the button was scaling its hit box down to 38px. */
+.garden-visitor{
+  position:absolute;
+  width:64px;
+  height:64px;
+  z-index:5;
+  border:none;
+  background:none;
+  padding:0;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  animation:visitor-drift 9s ease-in-out infinite;
+}
+.garden-visitor:focus-visible{outline:3px solid var(--foliage-shadow);outline-offset:3px;border-radius:50%}
+.garden-visitor > *{animation:visitor-arrive 700ms var(--ease-spring)}
+.garden-visitor.leaving > *{animation:visitor-leave 700ms var(--ease-gentle) forwards}
+.visitor-art{width:48px;height:48px;image-rendering:pixelated;display:block}
+
+/* Stand-in until the sprites land. Deliberately simple: a body with two
+   wings, enough to read as alive without pretending to be finished art. */
+.visitor-fallback{
+  position:relative;
+  width:26px;
+  height:26px;
+  border-radius:50%;
+  background:var(--foliage-shadow);
+  box-shadow:0 2px 3px rgba(43,33,24,0.3);
+}
+.visitor-fallback::before,
+.visitor-fallback::after{
+  content:'';
+  position:absolute;
+  top:2px;
+  width:20px;
+  height:22px;
+  border-radius:60% 60% 40% 40%;
+  background:var(--bg-surface);
+  border:2px solid var(--foliage-shadow);
+}
+.visitor-fallback::before{right:16px;transform-origin:right center;animation:visitor-flap 320ms ease-in-out infinite alternate}
+.visitor-fallback::after{left:16px;transform-origin:left center;animation:visitor-flap 320ms ease-in-out infinite alternate-reverse}
+.visitor-fallback[data-kind="cat"]{width:34px;height:24px;border-radius:40% 40% 45% 45%;background:var(--earth-deep)}
+.visitor-fallback[data-kind="cat"]::before,
+.visitor-fallback[data-kind="cat"]::after{display:none}
+
+@keyframes visitor-flap{
+  from{transform:rotateY(0deg) scaleX(1)}
+  to  {transform:rotateY(65deg) scaleX(0.55)}
+}
+@keyframes visitor-arrive{
+  from{opacity:0;transform:translateY(-14px) scale(0.6)}
+  to  {opacity:1;transform:translateY(0) scale(1)}
+}
+@keyframes visitor-leave{
+  from{opacity:1;transform:translateY(0) scale(1)}
+  to  {opacity:0;transform:translateY(-22px) scale(0.7)}
+}
+@keyframes visitor-drift{
+  0%,100%{translate:0 0}
+  25%    {translate:14px -8px}
+  50%    {translate:4px 8px}
+  75%    {translate:-12px -4px}
+}
+@media (prefers-reduced-motion:reduce){
+  .garden-visitor,
+  .garden-visitor > *{animation:none}
+  .visitor-fallback::before,.visitor-fallback::after{animation:none}
+}
 
 /* ── The gardener ────────────────────────────────────────────
    A view detail, never saved. pointer-events:none so it can never sit
@@ -2118,6 +2212,9 @@ body{
 .notif-rare .notif-icon{color:var(--accent-plum)}
 
 /* ── Bottom nav ── */
+/* Inset from both edges. The tabs used to sit flush at 0px, and a control
+   hard against the side of the screen is the easiest one to hit by accident
+   with the hand that is holding the phone. */
 .bottom-nav{
   height:var(--nav-height);
   background:var(--bg-surface);
@@ -2125,6 +2222,7 @@ body{
   display:flex;
   align-items:stretch;
   flex-shrink:0;
+  padding:0 0.5rem;
   z-index:20;
 }
 .nav-item{

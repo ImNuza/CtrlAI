@@ -51,6 +51,10 @@ const DEFAULT_STATE = {
     weekStart: null, weekCompleted: 0, weekClaimed: false,
   },
   absence: { lastStreakBeforeGap: 0, restorePending: false, comebackToday: false, forgivenCount: 0 },
+  /* Ids of garden visitors the player has welcomed. loadState() spreads
+     DEFAULT_STATE under the save, so a v5 file from before visitors existed
+     picks this up as an empty list without needing a schema bump. */
+  visitorsSeen: [],
   /* Kopitiam Corner keeps its own little profile: the kakis remember a name and
      a shared history the garden has no use for. Left null until the player first
      sits down, and normalised through adoptKakis() rather than spread from a
@@ -1357,6 +1361,9 @@ function renderGarden2() {
   updatePlantStates();
   const scene = document.getElementById('garden2-scene');
   if (!scene) return;
+  /* Emptying the field destroys the visitor's element, so the handle has to
+     go with it or the next spawn is blocked by one that no longer exists. */
+  if (activeVisitor) { window.clearTimeout(activeVisitor.timer); activeVisitor = null; }
   scene.innerHTML = '';
 
   /* The field is built first, before anything optional. A daily-task bug once
@@ -1629,6 +1636,121 @@ function gardenerFrame(now) {
 }
 
 requestAnimationFrame(gardenerFrame);
+
+/* ════════════════════════════════════════════════════════════
+   GARDEN VISITORS
+   ════════════════════════════════════════════════════════════
+
+   Creatures that wander into a healthy garden, drift across it, and can be
+   welcomed with a tap. Once welcomed they are kept in the Almanac.
+
+   Deliberately the gentlest thing in the game. A visitor rewards the state of
+   the garden rather than anything the player did today, it never asks for an
+   action, and missing one costs nothing: it wanders off and another comes
+   later. There is no timer on it and no way to fail it, which is the whole
+   point of having something here that is not a task.
+
+   Art is swappable the same way the plants are: a sprite at
+   art/visitors/{id}.png where one exists, and the inline shape below until
+   it does. Nothing here needs to change when the sprites land. */
+
+const VISITORS = [
+  { id: 'butterfly', name: 'Butterfly',  needs: 1, blurb: 'Drawn to the first flower that opens.' },
+  { id: 'sparrow',   name: 'Sparrow',    needs: 2, blurb: 'Comes for the seeds, stays for the quiet.' },
+  { id: 'bee',       name: 'Honey Bee',  needs: 2, blurb: 'Works the blooms from morning on.' },
+  { id: 'dragonfly', name: 'Dragonfly',  needs: 3, blurb: 'Turns up wherever the watering can has been.' },
+  { id: 'sunbird',   name: 'Sunbird',    needs: 3, blurb: 'A flash of colour at the top of a tall stem.' },
+  { id: 'cat',       name: 'Neighbour\'s Cat', needs: 4, blurb: 'Believes the warm patch belongs to him.' },
+];
+
+/* Sprites that exist. Empty until the art lands, at which point add the id
+   here and drop the file in; the fallback shape below stops being used. */
+const VISITOR_ART = [];
+
+const VISITOR_MIN_GAP = 45000;   // ms between visits, so they stay an event
+const VISITOR_STAY = 26000;      // ms before one wanders off again
+
+let activeVisitor = null;
+let lastVisitorAt = 0;
+
+/* Healthy means growing and watered. A wilting garden gets no visitors, which
+   is a nudge rather than a punishment: nothing is taken away, something
+   pleasant simply does not happen until the plants are cared for. */
+function gardenHealth() {
+  const healthy = state.plants.filter(p => p.state === 'grown' || p.state === 'bloom').length;
+  return { healthy, total: state.plants.length };
+}
+
+function visitorPool() {
+  const { healthy } = gardenHealth();
+  return VISITORS.filter(v => healthy >= v.needs);
+}
+
+function visitorShape(v) {
+  if (VISITOR_ART.indexOf(v.id) !== -1) {
+    return `<img class="visitor-art" src="art/visitors/${v.id}.png" alt="" draggable="false">`;
+  }
+  // Placeholder until the sprites arrive. Two wings and a body, enough to
+  // read as something alive at this size without pretending to be finished.
+  return `<span class="visitor-fallback" data-kind="${v.id}" aria-hidden="true"></span>`;
+}
+
+function maybeSpawnVisitor() {
+  if (activeVisitor || simpleView) return;
+  if (currentScreenName !== 'garden2') return;
+  if (Date.now() - lastVisitorAt < VISITOR_MIN_GAP) return;
+  const scene = document.getElementById('garden2-scene');
+  if (!scene || !scene.offsetWidth) return;
+
+  const pool = visitorPool();
+  if (!pool.length) return;
+  const v = pool[Math.floor(Math.random() * pool.length)];
+
+  const el = document.createElement('button');
+  el.className = 'garden-visitor';
+  el.id = 'garden-visitor';
+  el.setAttribute('aria-label', `A ${v.name} has come to visit. Tap to welcome it.`);
+  el.innerHTML = visitorShape(v);
+
+  // Somewhere over the grass, clear of the row the gardener starts on.
+  const w = scene.offsetWidth, h = scene.offsetHeight;
+  el.style.left = `${40 + Math.random() * Math.max(1, w - 120)}px`;
+  el.style.top = `${40 + Math.random() * Math.max(1, h - 140)}px`;
+
+  el.addEventListener('click', (e) => { e.stopPropagation(); welcomeVisitor(v); });
+  scene.appendChild(el);
+  activeVisitor = { id: v.id, el, timer: window.setTimeout(() => dismissVisitor(), VISITOR_STAY) };
+  lastVisitorAt = Date.now();
+  playTone(784, 0.1, 'sine', 0.03);
+}
+
+function dismissVisitor() {
+  if (!activeVisitor) return;
+  const { el, timer } = activeVisitor;
+  window.clearTimeout(timer);
+  activeVisitor = null;
+  if (!el || !el.parentNode) return;
+  el.classList.add('leaving');
+  window.setTimeout(() => { if (el.parentNode) el.remove(); }, 700);
+}
+
+function welcomeVisitor(v) {
+  const firstTime = state.visitorsSeen.indexOf(v.id) === -1;
+  if (firstTime) {
+    state.visitorsSeen.push(v.id);
+    saveState();
+  }
+  playSuccess();
+  showNotif('success', `visitor-${v.id}-${Date.now()}`,
+    firstTime ? `${v.name} came to visit` : `${v.name} is back`,
+    firstTime ? `${v.blurb} Kept in your Almanac.` : v.blurb,
+    'icon-leaf');
+  dismissVisitor();
+}
+
+/* Checked on a slow interval rather than every frame. A visitor is a rare
+   pleasant event, not an animation. */
+window.setInterval(maybeSpawnVisitor, 9000);
 
 /* ── SIMPLE VIEW ─────────────────────────────────────────────
    The roaming field is two columns wide and taller than its window, so at
@@ -2651,6 +2773,34 @@ function renderAlmanac() {
     </div>
   `;
   host.appendChild(summary);
+
+  /* Visitors sit above the achievement plates because they are a record of
+     things that happened to the garden rather than things the player did,
+     and that is a nicer page to open on. */
+  const vis = document.createElement('div');
+  vis.className = 'almanac-section';
+  vis.innerHTML = `
+    <div class="almanac-cat-head">
+      <svg class="icon" aria-hidden="true"><use href="#icon-leaf"/></svg>
+      Visitors
+    </div>
+    <div class="almanac-grid">
+      ${VISITORS.map(v => {
+        const seen = state.visitorsSeen.indexOf(v.id) !== -1;
+        return `<div class="almanac-plate${seen ? ' earned' : ' mystery'}">
+          <div class="plate-figure">${seen
+            ? `<svg class="icon icon-xl" aria-hidden="true"><use href="#icon-leaf"/></svg>`
+            : `<span class="mystery-mark">?</span>`}</div>
+          <div class="plate-name">${seen ? v.name : 'Not yet seen'}</div>
+          <div class="plate-desc">${seen ? v.blurb : 'Keep your garden healthy and one will come.'}</div>
+          ${seen ? `<div class="plate-stamp" aria-hidden="true">
+            <svg class="icon" aria-hidden="true"><use href="#icon-check"/></svg>
+          </div>` : ''}
+        </div>`;
+      }).join('')}
+    </div>
+  `;
+  host.appendChild(vis);
 
   ALMANAC_CATS.forEach(cat => {
     const items = ACHIEVEMENTS.filter(a => a.cat === cat.id);
