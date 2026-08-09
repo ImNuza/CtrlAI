@@ -10,6 +10,16 @@
 const STORAGE_KEY = 'garden-of-life-v1';
 const SCHEMA_VERSION = 5;
 
+/* Visiting ?reset wipes the save and reloads onto a clean garden.
+   Wanted for two reasons: it is the only way to see the first-run experience
+   again once you have played, and a demo needs a fresh garden between takes
+   and between judges. The parameter is stripped on the way out so a reload
+   or a bookmark does not silently wipe the save a second time. */
+if (typeof location !== 'undefined' && /[?&]reset\b/.test(location.search)) {
+  try { localStorage.removeItem(STORAGE_KEY); } catch (e) { /* nothing to clear */ }
+  location.replace(location.pathname);
+}
+
 const DEFAULT_STATE = {
   schemaVersion: SCHEMA_VERSION,
   coins: 20,
@@ -168,18 +178,21 @@ const MEALS = [
 /* ── PLANT SVG GENERATOR ────────────────────────────────────── */
 
 /* ── PLANT ART ──────────────────────────────────────────────────
-   Miora supplied botanical plates for six of the seven seeds, five growth
-   states each, cut out and palette-reduced by tools/process_miora.py into
-   app/art/plants/{seedId}-{state}.png.
+   32x32 pixel sprites, all seven seeds across all five growth states, built
+   by tools/build_pixel_garden.py into app/art/plants/{seedId}-{state}.png.
 
-   Pandan is not in the drop and it is the seed every new player starts with,
-   so it still draws from the procedural SVG below. That is the one visible
-   inconsistency in the game and it is the top of the next art batch.
+   These replaced the watercolour botanical plates. Both sets were good, but
+   the gardener is pixel art and a pixel figure standing on a watercolour
+   hibiscus looked like two games at once. Pixel throughout also took the art
+   from 538KB to 23KB.
 
-   The SVG path is not dead code and should not be deleted: it is the fallback
-   for any seed without a plate, and it is what the app draws if the art fails
-   to load. */
-const PLANT_ART = ['orchid', 'fern', 'hibiscus', 'kopi', 'passion', 'sampaguita'];
+   Pandan is finally included. It is the seed every new player starts with and
+   it was the last thing still drawing as a flat SVG.
+
+   The SVG path below is not dead code and should not be deleted: it is the
+   fallback for any seed without a sprite, and it is what draws if the art
+   fails to load. */
+const PLANT_ART = ['pandan', 'orchid', 'fern', 'hibiscus', 'kopi', 'passion', 'sampaguita'];
 const PLANT_ART_STATES = ['seed', 'sprout', 'grown', 'bloom', 'wilt'];
 
 function plantArtSrc(plant) {
@@ -698,6 +711,9 @@ function playCoin()    { playTone(880, 0.1); setTimeout(() => playTone(1108, 0.1
 function playWater()   { playTone(330, 0.2, 'sine', 0.06); }
 function playWrong()   { playTone(220, 0.2, 'sine', 0.05); }
 function playSelect()  { playTone(440, 0.08, 'sine', 0.04); }
+/* Sowing: a low soft landing, then a smaller one settling after it. Timed to
+   the seed-drop keyframes so the sound lands when the seed meets the soil. */
+function playSow()     { playTone(196, 0.18, 'sine', 0.05); setTimeout(() => playTone(262, 0.22, 'sine', 0.035), 170); }
 
 /* ── WATER ANIMATION ────────────────────────────────────────── */
 
@@ -1277,7 +1293,13 @@ function buildPlot(plantIdx, opts = {}) {
     plot.classList.add('has-plant');
     if (isThirsty) plot.classList.add('thirsty');
     const renderer = plantRenderer || plantSVG;
-    plot.innerHTML = `<div class="plot-plant" aria-hidden="true">${renderer(plant)}</div><div class="plot-pot" aria-hidden="true"></div>`;
+    /* The sowing beat: only the patch just planted, and only once. The soil
+       ring is a sibling rather than a pseudo-element on the plant, so it can
+       expand past the plant's own box. */
+    const sowing = plantIdx === justPlantedIdx;
+    plot.innerHTML = `<div class="plot-plant${sowing ? ' sowing' : ''}" aria-hidden="true">${renderer(plant)}</div>`
+      + `<div class="plot-pot" aria-hidden="true"></div>`
+      + (sowing ? '<div class="sow-puff" aria-hidden="true"></div>' : '');
     const tap = () => {
       if (plant.state === 'bloom' && onBloomTap) onBloomTap(plantIdx);
       else openPlantDetail(plantIdx);
@@ -1354,6 +1376,8 @@ function renderGarden2() {
   bindGardenerTaps();
   applyGardenView();
   updateCoinDisplay();
+  // Consumed. The animation is a one-off, not a property of the plant.
+  justPlantedIdx = null;
 
   const waterBtn = document.getElementById('btn-water-all');
   if (waterBtn) {
@@ -2166,8 +2190,8 @@ const ISLANDS = [
       { id: 4,  type: 'pattern', rounds: 2, coins: 5,  label: 'Word rhythm' },
       { id: 5,  type: 'words',   sets: 4,   coins: 6,  label: 'Tall tales' },
       { id: 6,  type: 'oddone',  rounds: 3, coins: 6,  label: 'Forest eye' },
-      { id: 7,  type: 'words',   sets: 5,   coins: 8,  label: 'Word master' },
-      { id: 8,  type: 'words',   sets: 6,   coins: 10, label: 'Ancient oak' },
+      { id: 7,  type: 'words',   sets: 4,   coins: 8,  label: 'Word master' },
+      { id: 8,  type: 'words',   sets: 5,   coins: 10, label: 'Ancient oak' },
     ],
   },
   /* Kopitiam Corner sits last on purpose. The four islands above form a chain:
@@ -2540,11 +2564,20 @@ function buySeed(seed) {
   state.coins -= seed.cost;
   if (!state.ownedSeeds.includes(seed.id)) state.ownedSeeds.push(seed.id);
   plantSeed(seed.id);
+  /* Coin for the spend, then the seed landing. Delayed to meet the contact
+     frame of seed-drop rather than firing while it is still in the air. */
   playCoin();
+  setTimeout(playSow, 260);
   showNotif('success', 'buy-seed', `${seed.name} planted!`, 'It has been added to your garden.', 'icon-seed');
   renderShop();
   saveState();
 }
+
+/* Index of the patch planted this tick, or null. The next render gives that
+   one plot the sowing animation and then clears this, so the seed drops in
+   once when it is actually planted rather than every time the field is
+   rebuilt, which happens on every water, harvest and land purchase. */
+let justPlantedIdx = null;
 
 function plantSeed(seedId) {
   if (state.plants.length >= gardenCapacity()) return false;
@@ -2557,6 +2590,7 @@ function plantSeed(seedId) {
     state: 'seed',
     exerciseType: seed ? seed.exerciseType : 'any',
   });
+  justPlantedIdx = state.plants.length - 1;
   if (!state.stats.speciesEverGrown.includes(seedId)) {
     state.stats.speciesEverGrown.push(seedId);
     ACHIEVEMENTS.filter(a => a.metric === 'speciesEverGrown').forEach(evaluateAchievement);
@@ -2580,6 +2614,7 @@ document.getElementById('btn-free-seed').addEventListener('click', () => {
     : SEEDS.find(s => s.id === 'pandan');
   if (!state.ownedSeeds.includes(freeSeed.id)) state.ownedSeeds.push(freeSeed.id);
   plantSeed(freeSeed.id);
+  setTimeout(playSow, 260);
   playCoin();
   showNotif('success', 'free-seed', 'Free seed claimed!', `A ${freeSeed.name} has been planted in your garden.`, 'icon-gift');
   saveState();
@@ -2905,11 +2940,15 @@ function completeExercise(coins, exerciseType) {
   const firstClear = currentLevelRef
     ? !isLevelComplete(currentLevelRef.islandId, currentLevelRef.levelIdx)
     : true;
-  const baseCoins = currentLevelRef
-    ? (firstClear ? currentLevelRef.level.coins : Math.max(1, Math.floor(currentLevelRef.level.coins * 0.25)))
-    : coins;
+  /* The practice-run quarter applies to the whole reward, kitchen bonus and
+     all. Adding the kitchen on afterwards made it flat, so a player with the
+     full meal collection earned 8 coins for replaying the cheapest level
+     against the 1 a practice run is meant to pay, and grinding one easy
+     level became the best rate in the game. Reducing the total keeps the
+     collection worth having without turning it into an income source. */
   const kitchen = kitchenBonus();
-  const rewardCoins = baseCoins + kitchen;
+  const fullReward = currentLevelRef ? currentLevelRef.level.coins + kitchen : coins + kitchen;
+  const rewardCoins = firstClear ? fullReward : Math.max(1, Math.floor(fullReward * 0.25));
 
   state.coins += rewardCoins;
   state.totalExercises++;
@@ -2992,7 +3031,7 @@ function completeExercise(coins, exerciseType) {
           <svg class="icon icon-sm" aria-hidden="true"><use href="#icon-coin"/></svg>
           +${rewardCoins} coins
         </span>
-        ${kitchen > 0 ? `<span class="reward-chip kitchen">
+        ${kitchen > 0 && firstClear ? `<span class="reward-chip kitchen">
           <svg class="icon icon-sm" aria-hidden="true"><use href="#icon-meal"/></svg>
           includes +${kitchen} from your kitchen
         </span>` : ''}
@@ -3376,6 +3415,23 @@ const ODD_SETS = [
   { items: [{ label: 'Read',    icon: 'icon-book'   }, { label: 'Write',   icon: 'icon-book'   }, { label: 'Learn',   icon: 'icon-brain'  }, { label: 'Swim',    icon: 'icon-water'  }], odd: 'Swim',    hint: 'Three use the mind, one uses the body in water.' },
   { items: [{ label: 'Knit',    icon: 'icon-leaf'   }, { label: 'Sew',     icon: 'icon-leaf'   }, { label: 'Weave',   icon: 'icon-leaf'   }, { label: 'Drive',   icon: 'icon-home'   }], odd: 'Drive',   hint: 'Three are crafts with thread, one uses a car.' },
   { items: [{ label: 'Morning walk', icon: 'icon-sun' }, { label: 'Gardening', icon: 'icon-leaf' }, { label: 'Cooking', icon: 'icon-meal' }, { label: 'Television', icon: 'icon-camera' }], odd: 'Television', hint: 'Three are active hobbies, one is passive watching.' },
+
+  /* Second batch. Local where it can be, because a set that names a hawker
+     dish or a neighbourhood lands differently for the player this is built
+     for than one about generic fruit. Every hint still names the rule in
+     plain words, so a set is never a guess. */
+  { items: [{ label: 'Kopi',     icon: 'icon-kopi'   }, { label: 'Teh',     icon: 'icon-kopi'   }, { label: 'Milo',    icon: 'icon-kopi'   }, { label: 'Rice',    icon: 'icon-meal'   }], odd: 'Rice',    hint: 'Three are drinks, one you eat.' },
+  { items: [{ label: 'Laksa',    icon: 'icon-meal'   }, { label: 'Mee pok',  icon: 'icon-meal'  }, { label: 'Bee hoon', icon: 'icon-meal'  }, { label: 'Kaya',    icon: 'icon-gift'   }], odd: 'Kaya',    hint: 'Three are noodle dishes, one is a spread.' },
+  { items: [{ label: 'Orchid',   icon: 'icon-flower' }, { label: 'Hibiscus', icon: 'icon-flower'}, { label: 'Frangipani', icon: 'icon-flower' }, { label: 'Bamboo', icon: 'icon-leaf'  }], odd: 'Bamboo',  hint: 'Three are flowers, one is a grass.' },
+  { items: [{ label: 'Bus',      icon: 'icon-home'   }, { label: 'MRT',     icon: 'icon-home'   }, { label: 'Taxi',    icon: 'icon-home'   }, { label: 'Bench',   icon: 'icon-garden' }], odd: 'Bench',   hint: 'Three take you places, one you sit on.' },
+  { items: [{ label: 'Spade',    icon: 'icon-pot'    }, { label: 'Rake',    icon: 'icon-pot'    }, { label: 'Hose',    icon: 'icon-water'  }, { label: 'Kettle',  icon: 'icon-meal'   }], odd: 'Kettle',  hint: 'Three are garden tools, one belongs in the kitchen.' },
+  { items: [{ label: 'Monsoon',  icon: 'icon-water'  }, { label: 'Drizzle', icon: 'icon-water'  }, { label: 'Storm',   icon: 'icon-water'  }, { label: 'Haze',    icon: 'icon-sun'    }], odd: 'Haze',    hint: 'Three bring rain, one does not.' },
+  { items: [{ label: 'Grandson', icon: 'icon-profile'}, { label: 'Niece',   icon: 'icon-profile'}, { label: 'Cousin',  icon: 'icon-profile'}, { label: 'Neighbour', icon: 'icon-home' }], odd: 'Neighbour', hint: 'Three are family, one lives next door.' },
+  { items: [{ label: 'Ginger',   icon: 'icon-sprout' }, { label: 'Turmeric', icon: 'icon-sprout'}, { label: 'Lemongrass', icon: 'icon-leaf' }, { label: 'Pebble', icon: 'icon-pot'    }], odd: 'Pebble',  hint: 'Three grow and season food, one is a stone.' },
+  { items: [{ label: 'Sunrise',  icon: 'icon-sun'    }, { label: 'Noon',    icon: 'icon-sun'    }, { label: 'Dusk',    icon: 'icon-clock'  }, { label: 'Tuesday', icon: 'icon-book'   }], odd: 'Tuesday', hint: 'Three are times of day, one is a day of the week.' },
+  { items: [{ label: 'Watering', icon: 'icon-water'  }, { label: 'Weeding', icon: 'icon-leaf'   }, { label: 'Pruning', icon: 'icon-pot'    }, { label: 'Sleeping', icon: 'icon-clock' }], odd: 'Sleeping', hint: 'Three tend a garden, one is rest.' },
+  { items: [{ label: 'Mango',    icon: 'icon-meal'   }, { label: 'Papaya',  icon: 'icon-meal'   }, { label: 'Rambutan', icon: 'icon-meal'  }, { label: 'Pandan',  icon: 'icon-leaf'   }], odd: 'Pandan',  hint: 'Three are fruit, one is a leaf.' },
+  { items: [{ label: 'Letter',   icon: 'icon-book'   }, { label: 'Postcard', icon: 'icon-book'  }, { label: 'Telegram', icon: 'icon-book'  }, { label: 'Garden',  icon: 'icon-garden' }], odd: 'Garden',  hint: 'Three carry a message, one is a place.' },
 ];
 
 function initOddOneOut(level) {
@@ -3491,6 +3547,20 @@ const WORD_PAIR_SETS = [
   [{ word: 'Ocean',   match: 'Wave'     }, { word: 'Forest',  match: 'Tree'     }, { word: 'Desert',  match: 'Sand'     }, { word: 'Mountain',match: 'Peak'     }],
   [{ word: 'Clock',   match: 'Time'     }, { word: 'Scale',   match: 'Weight'   }, { word: 'Ruler',   match: 'Length'   }, { word: 'Thermometer', match: 'Temperature' }],
   [{ word: 'Smile',   match: 'Happy'    }, { word: 'Cry',     match: 'Sad'      }, { word: 'Laugh',   match: 'Joy'      }, { word: 'Hug',     match: 'Love'     }],
+
+  /* Second batch, same shape. Pairs have to be unambiguous: every word must
+     match exactly one partner in its own set, or the exercise has more than
+     one right answer and quietly punishes a player who was not wrong. */
+  [{ word: 'Kopi',    match: 'Kopitiam' }, { word: 'Rice',    match: 'Bowl'     }, { word: 'Chopsticks', match: 'Noodles' }, { word: 'Straw',   match: 'Drink'    }],
+  [{ word: 'Orchid',  match: 'Purple'   }, { word: 'Hibiscus',match: 'Red'      }, { word: 'Jasmine', match: 'White'    }, { word: 'Pandan',  match: 'Green'    }],
+  [{ word: 'Watering can', match: 'Water' }, { word: 'Spade', match: 'Digging'  }, { word: 'Basket',  match: 'Harvest'  }, { word: 'Hat',     match: 'Shade'    }],
+  [{ word: 'Bee',     match: 'Honey'    }, { word: 'Silkworm',match: 'Silk'     }, { word: 'Chicken', match: 'Egg'      }, { word: 'Cow',     match: 'Milk'     }],
+  [{ word: 'Monsoon', match: 'Rain'     }, { word: 'Sunshine',match: 'Warmth'   }, { word: 'Breeze',  match: 'Cool'     }, { word: 'Thunder', match: 'Storm'    }],
+  [{ word: 'Grandchild', match: 'Family'}, { word: 'Neighbour', match: 'Street' }, { word: 'Doctor',  match: 'Clinic'   }, { word: 'Hawker',  match: 'Stall'    }],
+  [{ word: 'Root',    match: 'Ground'   }, { word: 'Branch',  match: 'Sky'      }, { word: 'Petal',   match: 'Flower'   }, { word: 'Vine',    match: 'Trellis'  }],
+  [{ word: 'Morning', match: 'Sunrise'  }, { word: 'Evening', match: 'Sunset'   }, { word: 'Midnight',match: 'Stars'    }, { word: 'Afternoon', match: 'Shade'  }],
+  [{ word: 'Radio',   match: 'Sound'    }, { word: 'Lamp',    match: 'Light'    }, { word: 'Fan',     match: 'Breeze'   }, { word: 'Blanket', match: 'Warmth'   }],
+  [{ word: 'Ginger',  match: 'Spice'    }, { word: 'Sugar',   match: 'Sweet'    }, { word: 'Lime',    match: 'Sour'     }, { word: 'Chilli',  match: 'Hot'      }],
 ];
 
 function initWordPairs(level) {
