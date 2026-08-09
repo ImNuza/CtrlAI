@@ -1430,25 +1430,39 @@ body{
   gap:0.75rem;
   width:100%;
 }
+/* One rule for the tile. There used to be two: this one, written when a tile
+   was a flat button, and a second further down that added the two-sided flip.
+   The old one set overflow:hidden, and overflow other than visible forces
+   transform-style:preserve-3d to flatten. Flattened, backface-visibility
+   cannot hide the back, so the back stayed painted over the front and every
+   revealed tile showed the same face-down leaf instead of its symbol. The
+   game was unplayable and looked like a content bug.
+
+   The background, border and svg sizing are gone from here too: .tile-back
+   and .tile-front each carry their own now, and having both meant the tile
+   painted a third surface behind the two faces. */
 .tile{
   aspect-ratio:1;
-  border-radius:var(--radius-md);
-  border:2px solid var(--border-mid);
-  background:var(--bg-inset);
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  border:none;
+  background:none;
+  padding:0;
   cursor:pointer;
-  transition:all var(--duration-fast) var(--ease-gentle);
   font-size:0;
   position:relative;
-  overflow:hidden;
+  transform-style:preserve-3d;
+  transition:transform 300ms var(--ease-gentle);
 }
-.tile:active{transform:scale(0.93)}
-.tile svg{width:70%;height:70%;color:var(--foliage-shadow)}
-.tile.flipped{background:var(--bg-surface);border-color:var(--foliage-mid)}
-.tile.matched{background:rgba(115,135,93,0.12);border-color:var(--foliage-mid);opacity:0.7;cursor:default}
-.tile.matched svg{color:var(--foliage-mid)}
+/* Only while face-down. A flipped tile is already holding a rotateY, and a
+   scale here would replace it and flick the tile back over mid-press. */
+.tile:not(.flipped):active{transform:scale(0.93)}
+.tile.flipped{transform:rotateY(180deg)}
+/* The fade goes on the faces, never on .tile. Opacity below 1 is a grouping
+   property: it flattens transform-style:preserve-3d exactly as overflow does.
+   Fading the tile itself re-broke the flip for matched pairs only, so a
+   matched pair kept showing the face-down leaf while an unmatched flip was
+   fine. Same bug as the overflow one, wearing a different hat. */
+.tile.matched{cursor:default}
+.tile.matched .tile-face{opacity:0.75}
 
 /* ── Pattern sequence game ── */
 .pattern-display{
@@ -2811,15 +2825,10 @@ body{
 
 /* ════════════════════════════════════════════════════════════
    TILE FLIP
+   The .tile rule itself lives with the rest of the tile game further up.
+   Splitting it across two places is what hid the overflow:hidden that broke
+   this flip in the first place.
    ════════════════════════════════════════════════════════════ */
-.tile{
-  position:relative;
-  transform-style:preserve-3d;
-  transition:transform 300ms var(--ease-gentle);
-}
-.tile.flipped{
-  transform:rotateY(180deg);
-}
 .tile-face{
   position:absolute;
   inset:0;
