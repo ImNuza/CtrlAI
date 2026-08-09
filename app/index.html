@@ -209,8 +209,11 @@
       </span>
     </div>
     <div class="topbar-right">
-      <button class="icon-btn" id="menu-btn" aria-label="Open menu" aria-haspopup="dialog" aria-expanded="false">
+      <!-- Labelled on purpose. A bare hamburger is exactly the abstract
+           convention that guidance for older users warns against assuming. -->
+      <button class="icon-btn menu-btn" id="menu-btn" aria-label="Open menu" aria-haspopup="dialog" aria-expanded="false">
         <svg class="icon"><use href="#icon-menu"/></svg>
+        <span class="menu-btn-label">Menu</span>
         <span class="menu-badge" id="menu-badge" hidden></span>
       </button>
     </div>

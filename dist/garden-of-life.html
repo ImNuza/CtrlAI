@@ -1,3 +1,3525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#EEE9D9">
+<meta name="description" content="A gentle cognitive wellness game for older adults. Grow your garden by exercising your mind.">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Garden">
+<meta name="format-detection" content="telephone=no">
+<title>Garden of Life</title>
+<link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAIAAAD8GO2jAAAEfElEQVR42rVWS4wUVRS971Ovqvpb3UwPQjAogQFhiJHoxshKTYiJ0Y1iQgIaPyuMGt27MBq3mpC4MCbGhYmJGxKCghoYUAxgHBEYhs/wmZ6e7p7+VXdPd9fn3euikJAM3T1M9K2q6lXeue+ec8+97JndO+H/XHL5vzLGbj8AINF/DMAY83yfiBhjAGQqk5aHIZdzNOfc87yH1z347t7XDWl89s1Xl2/M2KapEYfC8KEAQRh2u92e77+3943r+dlz0xfff/XNIAjcdsv3fQZs5TdgABpxJJtdkxstVSuCc7fVai22GWPbx7Y8kBudmb2ZL85LKQfcgw1QEREpw9j30iurMpl2p2NKY8fmrUk7XnMbllLJRDJfmn/nkw+7vZ4Qoh8GH0pso+mGWgNR1/fy5WKn17WU8sMwDIPiwsJitzvg9OEABHB04rjbdC3THHWyG9asQ0QEyKadwkL5wLdfE9FgEsSG8fUDADRio+lOX7tmWdajY1ucZIoAOGPHTp/69MsDhVLJVGqICPtxgIih1mtHV8csu+Y2ipVyIh7/6O0PGGMff/F5uVZb5TjpVKrneXXXFZzfKcPlqkgIsX/Pa0/teAKAep43Vy5+f+Rwu7MYau04zgu7nnNSaUNKYDB97erRiWP9WLhHihhjodZOMrV/zz7GGCKaSq3JjT775E5hyEantX3L1mQ8yRhE6cplV527NOX5Pud8WSRH6ixVF344eTydSGrEIAg8z79eyJ+fudLxvJ7neb6nERExZtt/TV1sNJv9tNSHZCIhxOTUhXQyNb5psxC863sXblxFIsE5IjLGlDQs05y88PdPJycE5/etIs45EZ3848ytYmFtbrWTSjUW237gA0DMtoGxcnXh519P/Hb2NOec9wcYVMmRMBY7HcuyxjeOjY7kHts2jkQTZ34vVyr5+YIfBJY5xFYHeVFkzslEAhEnpy/WTzcef2S7ADgycSzrZKQQtmUNddMhdq21DoLgdsaVqVEDgDIMznkQhkDEOB9AwBAAREzE45ZpESHn3DBkzLYBYCSbTSWSEdWe77fa7QEcyH7ZD8JwJJPZ/fyLpmlGudKopakA4K09ewUX0ccwDL87dLBYKhmGcc908QHJSafSTjodhAESaq0BoFSvlurVaBcJgyBIJZLZdCbU+v5uENVaoTR/M5/ftP6hIAzv1tWdSKWUt+byt+ZmVZ/wh3iR22qdnfzz5ad39Xx/qZchYtyOHfzxcKVeiwr+/voBEZmGWqhVG60m5xwR6a6FRJyx1mK7WKlYysQVNBwiEkLUm265VpVC0pJtKY2qW680akKutKNxznuely8WjSVtnYgMKQvlUqfbFVyscGxhAEh4ozC7NMDo/ebcXKhDtuK5iAA457PFedNUDADvWgBgW9ZssdCvkS2rJxORFLLedG3LHlu/IWbZyjCUoZRSkoujp04cmvjl32ESVuKmAMCAadQ939u2cXMuk428SHBRbzbOXb6kDCUHzizDzY6ABBeJWHxq5sr5UN+ZEwUXcTsWSXbwCf8AFTWGQ20RzfUAAAAASUVORK5CYII=" sizes="32x32">
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAALQAAAC0CAIAAACyr5FlAAAcn0lEQVR42u19aXAc55ned/TXPd1zAAQIgCDBC7xJiZRIUQfXMu1ItsuR5bg2jp1rvfvDu6kkTrIp50dqU5Xy/knVJrubqr2za6/jPcpe2Y4tWrIO67JISiJ4iJeI+xocM5h7BnN0f/1935sfDUIgRVEUOQCmB/2WSryAmUH30+/3Xs/z4ie/+jgKLLBbGQkuQWABOAILwBFYAI7AAnAEFoAjsAAcgQXgCCwAR2ABOAILwBFYYAE4AgvAEVgAjsCW0bTgEiCEsGfX/6gAEAAE4FjjPz8lRAG4rsuFq5RCCCOEdMaYpmlUU6DWMki0tewtEELFcjlkGB1t7Xt7d7ZEo0oqQNA/NjKXSeeKRSsU0hmTSgXgWEuhFiEO5wTjJx49dvzoY/fv2mOZps4YAACgSq2aSKdeO/PWqQt9s6lULByRSq7F52cNjglSSqu1Wlf7+n/3L3/9kfsfkEo6nEulABRCGCNECNE0zTJCU3OJb//o+2+eOxMLR9cgPmjvfVvXms+o2nZXW/vv/odvHty9tzg/L4Tw4lGCCbkemEopq7bdEok+fuSRuUz6vbFh0wittfhjbYEDY+y6bmd7++9+45tbujeVymWN0iVpyg1fSQgRQgCCTxw5mspmhifGdV1fU/hYa3UOIIT85699vbdnc7la0Shd/AellAIAAO/XRTejlBJS/vavfX33tu0Od26JpAAczZC1zlcqnz32+IP77ivMzy9FBgCELcsKhUKGEbHClNJFfGCMhRA6Y1/7J19WayxtWUPZilQqbFq/cuRhIQQh7z8VgJBphF595/Qv+952pdy1ZduXP/eUGQpx1yUYe/6j5th7e3fu2bZjaHI8pOtqbRwuawUcBOOqY+/e2ntg5+6aY5PrpwMAGLr+Zz/42xOvvYQxxoScvXLxwrUrv/Nv/mNne7uX7nrAao3GHjn0wJXhAdMw0NoAB1k7oaiUcl/vDqZpi0eGArBM86XTb/70lRcjVjhihS3DXNfSOjA++pfP/D0ohZd8O3fdXVt7LdNcOzWxNRRzAMCG9R2UUFjiThzOXzr5BtMZwlgqpUAJIVqisXNXLw1NjIcMw4szMEJKqc729TpbQwnL2spWXCFuDkSk5K5LMb3plgOAzZ2loQlCSAgRpLI+b67im5qsNyQsS/+oAAzd2NDRwQVf/CfvAAqbVmdbuyvE0tchhNz0svj6exJMCCYf9r4BOFYNEN49W2iucs45d13XFQIAvNvm3TBK6bXREVeKG+8e/OunfzVihSu1KiWUEgIAxfL8Vz7/9JaNmxzOve9VAIyx4YmxcrVCKSWEeG8qQXGXO5xX7VrVrjnckVISQugHYBRkK6uADCGEKwTBOBKJxCIRXdcxQg7nUslyuVKzbSklJthgOtNYPDE7Xy4b1wudBGPbcbb3bP5vv/WNP//B307OziCMrVDot778L57+9JPVWm3psYIRGp2Ke99YqVYVKKZpESvSGuvSdS1imoBQpVbL5nK5YkEpZei6ruu+Lo1ovkYG57x9XVvv1i093Rs3dHZFLAtjjBEWSiKEypVKrpCfS6eT6dR4PI4xGpwYfefi+S986sn8fMk7RwghNds+fOD+3/vm71wa7HeFu21Tz57tO6q1mud4vPgjpOvJTPqFk697b33s8EM7t2zbsWVrd8eG1mgrpdjQNQBwBRRLhcHJ8f7R4QvXLk8nEmbIxx0Zv3ZlF3LL7dufeuIzESsspJRCyOuV78VzhFJKCRFSZgu56dnZq4MDbdGW//qb/15nTIHCCC/WzjVNMw0DIewK13ZuCEUBQGf6idd/cerd8//o0ccO7Ny9ZcNGnTEppRBCSIkA1PX31SjVmU41mi0W//f3/qrv0gUzZPrUf/gSHBhjh/Md27Z95ekvCle6rsAE4+uYWHpTvf9jjBljlBBN0wbGRnq7ez5x6KGaYy/9evAMIfKBoBJjLJVKZNO9m7ZohLhCONxRSi2Enzd+tfcyClRINzDTvvVHf3D+yiXLsvyID792ZQkhTz3xmWg46nBO6a3ThKWZi5TSlZJz3tW+3pEuKGiLtcglzuN60nHrdIMx1hZrcZyazblUklyPgj/41QuvQwgXwtSNDZ2dv+x7O8hWVrTWGY1G17W0uK57U3Z6u6QGY0KI7TgY4bHk9FQqqVOGMQb00dPErus6joMxoYSQO0tDNEptx9nY0bV+Xbu4MSUOwIGWtYXW2hK7u7N8IRwhdCwxfS0+5ricEsI07fY37+4KGErJsBld37ZeKl+CQ/PpmVKpVDnnBBNAcNcvMpfPZkuF9lhLW7Q1Fg7rGlOgKKH1ig8IwY5TK5WL5AMV2MBzoGVqkWiUZvP5bCFHtXu66BqlCmAun+2Pj707MjCbS+uGQWh9rokCpTM9npydSSYZYwE4Vqz/Tjjns3NzS1usd4czjJBGNS8caYu1KCFd7tYLxDrTByfGao59h4FRAI56XHcEBJOJqbhQ8h7PcoyxkCJiWUf33m+xUB0jR4Jx1eEXr71HCYEgW1nJk8XQ2cjE+PTsrHEPJWqMsSvcDW0dh3cfQEoJWTdkeFNn740Mnbt60b9FMOLf4jkAOn22TyEgd+W0McKuEG2x1j1beqUQXlGrfiEzrnLxzAvPLtbgA3CsqPPQGRudnDh/+WLY+tiPptdQjZrW/u07QdYZGUKIlmjLs6+9fP69y2Yo5N/eG/H1ZJeh66f6+iamp0Mf8x4oAErIgd6dGiayrsiQUkYjkYsD13784gkrZPp6OIj4nb7muu6zL72QLxUMXb/D6U6vxrqtuyccsty61i6FlJZpzaTn/ue3/9R2nKUUhwAcq1Hz0LRSufyTn//c5o4ZCkkp7yQ9aY1GN63v4o5D6okMEQ1HCpX5//EXf5zO5fw+zNEMk2De4ZLKpJ/52YlUNhMJhz/ylmCEt3Z1k7ryC6SU62Ito9OT3/rjPxyfjlt+DjVQM3FlAYAxlisU4tNTXes72tvaXNdFH3JaKKUs09rRvUVIty4Hiteij0ail4YGfv87fzE6NRkJh5uDvtAkA8ZKKTMUypdK/3Di2dHJ8XDY8sgEHzxTFKiYFSEE18VvSKUIIdFo7MyVd7/1R7+fyKRikchHHm2B51gF/0EpBQRXBwdyhfyu7Tt0xrgnr7DkQFEAm7u6w4Z5j+krAEglI5YlQf3Bd//qez/5IcZY11gz8WmbUIKBUjqdSGRzua7OjraWVinlUhwQSrdt3EQRAYTwPUQYmqa1RGPjiZk/+bvvvtH3lmWaGOMmY7VoTclss0xzaHwsPjtz5OCho4cejFhW1bZBKUwIBiWEwAa7i1a/J9BACWmNxTLF4vd/fuK5N14pVystkWhTciSbU7wFAJimSYCxyYnhsTGm6xs6Ow3DwIBs7rRGW6JWRMmP0bRTSimldKZHwxFA6OW3T/7hd//y1Pk+jVJDN5pVmqFplX28U0PX9WqtNjA8lEilhHCNkL6upVUo1dXWLlwB6HaND286WQFghEzTjFjhqVTi1IWzf/PTH//wxecc7oRNC6FmFixtcgkGj3OgadrEVHxkfCwajT7y4OHurq6Iae7ZvN3jx6mbemPX7zYhhDGm67rj8qsjw++NDJ149cVMPq8zLRaJAEDT0+3XipqgNwTq0eOYpm3o6jq878CTjx3val9v6EwKiRB47mZhyFSjNcfJFQtvnuu7OtTfPzLsuNzQDW+UcI3QqX0MjoXHHRDCd+rbMUIIYwSIC1cIEQmHI+Hwb3zpK59+5Fi5WqGESulKgIgVfqPvrb959sfVaq1YLhFMzFDIS0bWFMte8508OQAsKrt5fw8KPGbzTcyiDwsjEEI6Y4auI4DxqXh8doogpJTCHmlNKYbJdCIxPhVf37ouYoW94+k2sMDvQxXBje/uhT6L9Bnwlaq65g8ePcauEDZ3QAGl1NANTWMGY4BASkUIrtq1WrXmXXVMsM7YAmX+Q4Di/SUlxNB1nelo4RYijDAQgjD20ONx3W6PV6WUVEpICQAIAUbYi1QAgBCCERJSSik5595sANM0TdN84YS0xj84HMfhwu1a3/nIjsOburq3dG/q7uhgLBQ2DaWEK4AQki8VE5k52+bTyelUNjM2NVmp1YrlMiXY0A2mabdHyYd0TODWgEAYYSSkdDkHADMUskyzq6OjJRrraG/XNK2ttdUyLaWUp8XgSuHYTnG+lMnnsrn8dDJRKBY1ShljDZ7saI0s8eYKIaTcva33+MOPHXvg8IaOLowAAKSU14+VBW/e09nxwJ693m0VUmaL+Xyp9MaZtzKF/LWRoblMBmNkMF3XdXSrnsudI9ULaRFCrbFYz/beaCRyYPcey7Ii4TAlBAFGCKRSSkqEF0IhC2McxRs3dGOMEMKFYmFofOza0ODs3BwlpJFnPrSGRQZ33Ug48tWnvvSPH/+Uqeu2Y5fL83DjAf/+g845IOR5dYxxSzjaHmvdt22HQpDMpF9753Q6l39vZGBieoqQ96PLO/8wgBDnXCnV2dGxZdOmaDhy3569LbEYQthj93OHL5Uu/eCLcM6931im9fChB4/cf/DitaunzpypOY7WqPjQGlSEWoiWWOy/f+O/7N/WWyqXitwmmNxmkPim+yGEcIVbtW2MUHus5V994UsI4UK5dPbKxZdPn7w2MsS5EzJCTNdvXyQlhAgpa46jMbZ18+aD+/bv2Lo9bJoA4ApRrdYW3vrDhaY++AmlktWawBgfPfhgT/fGfzjxbK1Wa0z/oTVm9Rtj/J++9pv7tm7LF/OaplFMP3ZqgxYI9Nx1bc4RAoNqn33sk8ePPjYwNvyLt069c/FCab7kRQa3fAUAqNZqlmke2LPn/r37N23oppQ6jlOpVhflpu5u6h0TjBCaL5e72ju+8MRnfvj8zwLPccdbDWq1h+4/9PD9B0vlkqZp9+6HqCc0C+AVLe7bsefgnv3Tc4nTF87/9Y9+UK1VCcE31N0x5tzVNO2Jxz+5a3tvW+s6JaXDuZeAkDrR17zNHr1bt27r6RmZmDAaT3W/ET2HAnX86KMY1VknGCNECUUIVWpVQKijte1rX/zVnq4NSknuuotVCkqIK9z29rZ/9oUvHtp3oFypVKtVfAcHx916SbRv156R8XGMEASe4w4aqqwlElVS4uWhmHqPvuu66Wzm0YMPYEKEkpRSUEqjtOrYg9PjLetaY60thWLxro+PO/RqoJRlhiilKjhW7uySIcZ0WP6w13Ps3gRQSDe4FJNzs6lC1radBZnK5SdAA0JMY6jufrIpZ0g9JbipZIKSlQjgvRiCIjyXz/THR+NzszXbWdQ2XQFGOCUkW8gLIRuQNUkaM1sZnhhbGY6pp/c2lZ0bmp5M57IYYbKSNwkwxnh2LonuYWZxDYEDAEJG6NzVi8n0nL6cmidwfRh9MpWYSM66rqsRurI/KdI0mi8WRicmGGMqOFbukMSWyefevvRuaDnFCyjGjuADMxPT6TmvcQor/ZMqQ9eHx8dLN66NCsDx0QnLK2+dLFUqmqbB8pTnHZcPz8ZzhQJeJY9OCbG5c2XgWsOWzxsUHCHDGJoYfeaF5yzTUnXlCHmnSY071+LjhdI8WSVBJqmUEQq9c+H87FxSb1TFMNKws59h0/rpKy9cHhqMhsN15JARjKWSI4mpcq1CVilB8Ph508nZM++eN3SjYTfGkYbeiCDFn33/e4VyWWd1Y6yDgsl0ojA/TzBZxaDKduyXXn9NStnIuj+kkbknIcMYi0/8r7/+P4RRds9MQ0CIYJItF5LZLFmlOMMbP6Ma/dkvXkqkUkxraAnKhuatePIKkzNTM6m5hw8dZpTetPXzLoLQ0eQ053xpp22FeRKI4Odf/cXgyIhpGA0+KdjopCbPf1wbHkrlMscePGrojHN+F/jw3EY8k8wUC3Q1DhRvPQ/G+LlXX77S32+ZZuMvp/UB422R+zo8Ob5v1+71rets2/64+PDcxuRcYlWOeSmlaZql+dKJl18aHB21TH+IT/qDDun5j8mZ6bcvXtjbu3Pbps22XVskIN1hCyNVzKXyuRV2G96gcjQSmUkmnnnuRDI15yN9Qd9wZQEgpBuVauXk+T7G2AP771dSCCHwHYQPGGEAiKeTtsNX0m1IpTRNs0yz7+KF5199xbZtw/AT69pPRGovCXSFOH/l0sD46MG9+7vWdzjOwkLG24NDKJnIpt2V2nviKYJEwuH5cvnEyy+eu3zR+/D+Isz5jGW/kApSOj4VP3v1Yr5U2rtjV2s06nD+YWPfC2MAgqeKBbn84PBuf9iyhBSnz/a9dvrkVGLW0HVCiO+olH6VYDAMY75cPnvl4tj0VDQS6ero1DWNu+4tIeJNC6cLOdddRnB44YWu65jgien4q6dOXrh8SUpp+HOfhu+J1ISQaq0KAHt7d/32b3x95+at3OE1x1bXqYhLbWB6IlvML0dh1DtEdF1nTEtl0s+/8spMMoEw9maG/cu99rd4i7fThGksmUmdPHdmKjkbDkc2dnZZoZAQ4v2sFSONaIAgVyrWsTbq3XiPg08pmUkmTp098/pbp3OFgq7rfpcvbgZlHwAABLqmc5dfGx35Zd/b740MAYLuzq51sRYAhDBSUilQJtO5lKV767ctriMlhFBKzZDJBR8YHX799KnTZ/umEwmMsO8Cz+YXb1nUOKjZtlJqy6aeTz386ONHHomaVvu6dZ6mYLlaHU1OZ0sFBLC44/7OAeHtFCaUUkrmy2WH8/6R4WtDg+lslmDMGCOENJM+WBMq+3hprcO5w3lbS4sZMh/cf99nf+V4NBzZ1NmhU302l5rNpnLFopBiqbbHInMEI6xAeb9BGFFCPUhIJQulUs22L127Oh6Pc+6WqxVPUqEpxcGaVvbJU/UQUkqlHO6EQxbT2aE9+3Zt39m7afOGji6q4Xx5HjCUSvO260ilQIFHhPcG+CilQkilVM2uZfK5bD4/k0hMTk8JKR3HYYx55IYmlvtpck0wfP288bQiuesKKUK6EbbCne3rzZAZMvTPP/6pPTt25ooFhDClWEqla+zK0MBLp34phOtwt1SedxyHc5fQhQ203srSppeAanI1QbieVHjcVEvTMEIKoGbXRuPjBONcqbizZ8snDz8coowSCgiUUq3R2Jtn3n73vSvrYi1KKUopIcSyzEUn4R06KNAEaybl2sVnnXpGSMQSjDGh5IJuE8ZSKVcISqlpGDpj8roamFIKrTHT0Jq0xQTEU4LD7+vRLei7LcrSrSn5wOZcqRFYAI7AAnAEFoAjsAAcgQXgCCwAR2ABOAILLABHYAE4AgvAEVgAjsBQ0HhDH62BX4/tT7d4wffF7jGub7cvAMcywkIIoZRC9VCDpoRwzqWSt2IySs65t16pXp/eGxTyEUT8tOPNdV0FsL6tLWxZSql7F3ojhLRUy9FI5KZZDaVUNBLZ0tMTtSL3PsYBCGGMpJSpTIZz7i0ECsBRT/E/23F6Nm46duSh7s6uUCgESqF7dvjeYpetXd2Oyxf5Cp5Yw/7de369JcbqRzJQSmXzucv91y5cvaJpGm5AHXw/goMQUrPthx948Pijx3TGuOu6rlsX/4wJEUIAALkxvCAYA4AQwhOur4OWOwDGuGt9x+eOf3rb5i3PvfKyR5ILwFEHKfSe7o3HH3kMI1yz7UVV8nu/uN7Ql1TKcfmi+jgAKFDeJseFPbR10fpHiLsuAOzftTuVSZ/sO9OAC1b85zmkko88eFjXjZpdq69sKABolCay6blc5gM7X6Du2rGec6rZ9pGDh64M9M+Xyw3OjSMN7jaEEG0t6zZt2MBdvkyCsgAgpLzpv+W7Z1JK0wht37xVNLbOpA88h7e4NWQsr1TSCt8kQkgsGm38nJb4i1LQNCb9QHQIyuerR8ULwBEYChpvgQXgWDXhjabUiQjAcc9FMM45582EDwVQrVUb/ycijS88mi3kEumUfs9bExrHZzjcGYtPag0vGuaLmAOfu3RRKOlHKc+bsK6kNEOhK/39uUK+8aXDfFAEM3R9dHLizLvnjx05CgCuECtftrp3nRAFSqOUhULxmZnTZ/s0qgUt+/o0u0OG8eaZt5Op1LGHjrava1OghJC+gQcghJHO9EqlcnVw4O0L5zwxwsb3gpqP9EaHx8eGxscO7Nrzb//5r+mMKVDYD8UkBRAyjOffePUnr7wopdCoRnwyD6b56MD2NvP2jw5TTDZ1dDo+SWGUUpZpDY6NVO1aayQmpIBgEmw58EEwFkqOxCd6NnRzIYgfwEEpTaRT6XwupBu3nFcNwFHPecFEJuWtcG58z+GNjMxXyul8jlKfKRsT32WDTGODY6Pc9cmZ4n3giVGHO5QE5fPlLyJlC3mHc19UoD1L53JSSoxwAI7lfRB1xqZTyalkwmCs8RcsEkIcl18dGmzwFbLN05WVUrrCDT5tAI5b0NQc7lwd9sGzqAAMxmbmkvG5hO4HP9ck8xzpXE4qiX0TITk+ipB8DI6F+H98tPFjUrj+UTnnxIcjB770HJTSYnk+k881+KosjLHD+WwqRQmFIOZYsbJSppDL5HOswUlBGAvhTsxM+XTfG/Hp6DZGOFPIN3IdzFuBWyzP274qyfgfHBhz1x2aGNNo47prr1OYTKfnsmnmz5WAxKcjVUzTppOJSq3WsA8lIEQIGZuJKwAcTJ+v5HWnlM6m5pzGzgIIxtNzicbnxDaf52D5UnFiZspgDTp4TAkpV6sjk5N+LH/5uwhGMK45TrZYaNhjhRBStWv5UpESEpCaVjpjAVCXB/sxJg0696rrI/HJTC6r+7Dl1gx0SNd1G/m6u0IoP3MpiH85IAbTB8ZHC+VSY7KDCKGXB/ulkggH4FiNQ71crRTn5xvwUPcqMdlCjviZxeljz6Fpmpew6A2mvLY4NzoSn9CZ7l+Wnu8lGKaTiQa8+pTSuWy6kWt0awAcgMam46jBXDcA6IzNpuaK5Xmfttx8Dw6veTGdTOYKhUaLSaVSQxNjxOeyEf72HJSQXKnoCrfRvDfBOFPIg4IAHKvZE3ccO56YbRw5AwCglBbm55OZNGMMgjrH6paok5k0baTePSWkUq0kMxmPlheAY/Xas4T2j43Ihul8KgDG2Eh8slqraH6ORpshlcUYp3NZb8NB4/izdCHHXRcHAenq9rcMXZ+cmUpmMg3S3/L02i8P9vt0qLjZdEiFlEKKhoqUXddFgQ7pqptGablavTY63AgzNQCga2wumxmfjhu67nf5Q9IUsp4qVygQQlb9ZiilKCHlaqXq88J5k4ADAOlM77tyMVfMx8IRAFgViACAVMowDJ2xUxfO1bhD/Q8O2nvfVp9ns6BRWizPv9H3TiwS3bVtO2PMcV28gro/UkrGWMQKT8xM/953/vzU+T7d5+WvJgHHYvY4X6m8dfH81ZGh1mhsx+atCIFYfsVSpRQhJBaJJjPp7/7kh9/+0ffjs9NMY6gprEnA4UWmjNJ4YvbkhbPZQqG7o7OzrV0qJZVajgaYAgCEwpZVs+0XT73xJ3//f89ceVej1NCNplkdhJ/86uMINdU2AlCqXKtGrfBXP//0U8efiFjhcq0KoOq6AQdMwyQYne+/+p0f/WAkPmEaIV3XpZTNdDGbDRyL3Q0hZc2xt3Rv+qef+fznPnG8jnLSgIAScnV48O9O/L93B95DgEKGoZpx11hzgsMLNTxui1Ty2ANH9mzf4dalxL7QdC299s7pwvx81LIAoeaDRZOD4/1FPghV7Fp9tdIxxlbIpJQ2x5aPJhGpvZvNkgiFTQujei6P97xFcyOj+cGxmHCiwIIFgIEF4AgsAEdgATgCC8ARWACOwJrF/j+Raa3DJnhlmwAAAABJRU5ErkJggg==">
+<style>
+/* ============================================================
+   GARDEN OF LIFE — Mobile App Styles
+   Muted Botanical Design System · Senior-safe UX floor
+   ============================================================ */
+
+/* ── Tokens ── */
+:root{
+  --bg-primary:#EEE9D9;
+  --bg-surface:#F5EFEB;
+  --bg-deep:#EAE2D0;
+  --bg-inset:#E3DBCA;
+  --foliage-highlight:#B1B8A1;
+  --foliage-mid:#73875D;
+  --foliage-shadow:#44573D;
+  --foliage-muted:#859B6A;
+  --foliage-deep:#31482E;
+  --earth:#958579;
+  --earth-deep:#7A6B5C;
+  --accent-red:#AE382B;
+  --accent-orange:#E78F37;
+  --accent-plum:#7B5371;
+  --accent-crimson:#C82A36;
+  --accent-coral:#E07A5F;
+  --health-full:#73875D;
+  --health-wilt:#B1B8A1;
+  --health-thirsty:#E78F37;
+  --reward-coin:#E07A5F;
+  --reward-rare:#7B5371;
+  --streak:#AE382B;
+  --success:#44573D;
+  --text-primary:#2B2118;
+  --text-secondary:#5A4A3C;
+  --text-muted:#6B5D52;
+  --text-on-dark:#F5EFEB;
+  --text-label:#44573D;
+  --border-light:#D9D0BC;
+  --border-mid:#C6BAA5;
+  --border-strong:#958579;
+  --font-display:'Fraunces','Cormorant Garamond',Georgia,serif;
+  --font-body:'Work Sans','Karla',system-ui,sans-serif;
+  --font-label:'Pinyon Script',cursive;
+  --radius-sm:0.375rem;
+  --radius-md:0.75rem;
+  --radius-lg:1.25rem;
+  --radius-xl:2rem;
+  --radius-pill:9999px;
+  --shadow-sm:0 1px 3px rgba(43,33,24,0.10);
+  --shadow-md:0 4px 12px rgba(43,33,24,0.12);
+  --shadow-lg:0 10px 28px rgba(43,33,24,0.14);
+  --shadow-paper:0 2px 8px rgba(149,133,121,0.20);
+  --ease-gentle:cubic-bezier(0.4,0,0.2,1);
+  --ease-spring:cubic-bezier(0.34,1.56,0.64,1);
+  --duration-fast:180ms;
+  --duration-normal:300ms;
+  --duration-slow:500ms;
+  --topbar-height:64px;
+  --nav-height:80px;
+  --game-max-width:430px;
+  --tap-min:64px;
+}
+
+/* ── Reset ── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:16px;-webkit-text-size-adjust:100%}
+body{
+  background:var(--bg-primary);
+  color:var(--text-primary);
+  font-family:var(--font-body);
+  font-size:1rem;
+  line-height:1.55;
+  overflow:hidden;
+  height:100vh;
+  height:100dvh;
+}
+
+/* ── SVG icon utility ── */
+.icon{width:1.4em;height:1.4em;display:inline-block;vertical-align:middle;flex-shrink:0}
+.icon-sm{width:1em;height:1em}
+.icon-lg{width:2em;height:2em}
+.icon-xl{width:2.5em;height:2.5em}
+
+/* ── App shell ── */
+#app{
+  max-width:var(--game-max-width);
+  margin:0 auto;
+  height:100vh;
+  height:100dvh;
+  display:flex;
+  flex-direction:column;
+  position:relative;
+  overflow:hidden;
+  background:var(--bg-primary);
+}
+
+/* ── Top bar ── */
+.topbar{
+  height:var(--topbar-height);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 1rem;
+  background:var(--bg-surface);
+  border-bottom:1px solid var(--border-light);
+  flex-shrink:0;
+  z-index:20;
+}
+.topbar-left{display:flex;align-items:center;gap:0.5rem}
+.topbar-right{display:flex;align-items:center;gap:0.5rem}
+
+.coin-chip,.streak-chip{
+  display:inline-flex;
+  align-items:center;
+  gap:0.3rem;
+  padding:0.35rem 0.75rem;
+  border-radius:var(--radius-pill);
+  font-family:var(--font-body);
+  font-size:1rem;
+  font-weight:500;
+  border:1.5px solid transparent;
+}
+.coin-chip{background:rgba(224,122,95,0.15);color:#7A2F10;border-color:var(--accent-coral)}
+.coin-chip.large{font-size:1.2rem;padding:0.5rem 1rem}
+.streak-chip{background:rgba(174,56,43,0.10);color:var(--accent-red);border-color:var(--accent-red)}
+
+.icon-btn{
+  width:var(--tap-min);
+  height:var(--tap-min);
+  border-radius:var(--radius-md);
+  background:transparent;
+  border:1.5px solid var(--border-mid);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  color:var(--text-secondary);
+  transition:all var(--duration-fast) var(--ease-gentle);
+  flex-shrink:0;
+}
+/* Wide enough to carry its name under the icon. The icon alone was the only
+   unlabelled control left in the app. */
+.menu-btn{
+  width:auto;
+  min-width:var(--tap-min);
+  padding:0 0.6rem;
+  flex-direction:column;
+  gap:0.1rem;
+}
+.menu-btn-label{
+  font-family:var(--font-body);
+  font-size:1rem;
+  font-weight:500;
+  line-height:1;
+}
+
+/* Menu button and its badge: the one mark that says today has tasks left,
+   now that the daily card lives inside the menu rather than in the garden. */
+#menu-btn{position:relative}
+.menu-badge{
+  position:absolute;
+  top:9px;
+  right:9px;
+  width:14px;
+  height:14px;
+  border-radius:50%;
+  background:var(--accent-red);
+  border:2px solid var(--bg-surface);
+}
+.menu-badge[hidden]{display:none}
+
+/* Full width rows inside the menu sheet */
+.menu-row{
+  width:100%;
+  justify-content:flex-start;
+  padding:0 1.25rem;
+}
+
+.icon-btn:hover{border-color:var(--border-strong);color:var(--text-primary)}
+.icon-btn:active{transform:scale(0.96)}
+.icon-btn:focus-visible{outline:3px solid var(--foliage-mid);outline-offset:2px}
+
+/* ── Screens ── */
+.screens{
+  flex:1;
+  overflow:hidden;
+  position:relative;
+}
+.screen{
+  position:absolute;
+  inset:0;
+  display:none;
+  flex-direction:column;
+  overflow-y:auto;
+  overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  padding:1.5rem 1.25rem calc(var(--nav-height) + 2rem);
+}
+.screen.active{display:flex}
+
+/* ── Screen headers ── */
+.screen-header{margin-bottom:1.5rem}
+.screen-title{
+  font-family:var(--font-display);
+  font-size:2.5rem;
+  font-weight:500;
+  line-height:1.1;
+  color:var(--text-primary);
+  margin-bottom:0.25rem;
+}
+.screen-subtitle{
+  font-family:var(--font-body);
+  font-size:1.05rem;
+  color:var(--text-secondary);
+  line-height:1.5;
+}
+.subsection-head{
+  font-family:var(--font-body);
+  font-size:1rem;
+  font-weight:500;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--text-muted);
+  margin:1.5rem 0 0.75rem;
+}
+
+/* ── One plot of soil patches in the grass ── */
+/* The space above each patch is headroom for a tall plant to grow into, so
+   it stays generous. The strip below is just grass between plots. */
+.shelf-unit{
+  position:relative;
+  padding:0.75rem 0.5rem 1rem;
+}
+.shelf-pots{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:0.5rem;
+  padding:0 0.5rem;
+  align-items:end;
+}
+
+/* The button is the tap target, and the soil tile fills its full width, so the
+   hit area is never smaller than what the eye aims at. At the 300px column
+   this lands near 84x128, well clear of the 64px floor. */
+.shelf-plot{
+  position:relative;
+  height:128px;
+  min-width:var(--tap-min);
+  background:transparent;
+  border:none;
+  cursor:pointer;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:flex-end;
+  padding:0;
+  font-family:inherit;
+  transition:transform var(--duration-fast) var(--ease-gentle);
+}
+.shelf-plot:active{transform:scale(0.94)}
+.shelf-plot:focus-visible{outline:3px solid var(--foliage-mid);outline-offset:2px;border-radius:var(--radius-sm)}
+.shelf-plot.has-plant:hover .plot-plant{transform:translateX(-50%) scale(1.05)}
+.shelf-plot.has-plant .plot-plant{transition:transform 200ms var(--ease-gentle)}
+
+.plot-plant{
+  position:absolute;
+  /* Above the soil rather than behind it. .plot-pot is painted after this in
+     the DOM, so without the stacking order the sprite was hidden by the very
+     patch it is meant to be growing in. The sprite carries its own small
+     mound, so overlapping the top of the patch is what reads as planted. */
+  z-index:2;
+  bottom:26px;
+  left:50%;
+  transform:translateX(-50%);
+  width:84px;
+  pointer-events:none;
+  animation:plant-settle 400ms var(--ease-spring);
+}
+/* 32x32 pixel sprites with the plant on the bottom edge, so they drop into
+   the slot the SVG used without re-anchoring. Scaled by whole numbers only:
+   pixelated rendering at a fractional scale gives some pixels one screen
+   pixel and their neighbours two, which reads as a wobble along every edge. */
+.plant-art{
+  display:block;
+  width:100%;
+  height:auto;
+  image-rendering:pixelated;
+  /* Grounds the sprite on the soil. Without it the plant reads as floating,
+     because the sprite carries no shadow of its own. */
+  filter:drop-shadow(0 2px 0 rgba(43,33,24,0.28));
+}
+/* 2x. 1x would be pixel-perfect against the gardener but leaves a mature
+   bush smaller than a seedling patch; 2x reads clearly at arm's length,
+   which matters more here. */
+.plot-plant .plant-art{width:64px;margin:0 auto -4px}
+/* A ripe patch lifts very slightly. The plates already draw open flowers and
+   fruit at bloom, so this only has to catch the eye, not explain anything. */
+.plant-art.is-ripe{animation:ripe-bob 2.6s ease-in-out infinite}
+@keyframes ripe-bob{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-3px)}
+}
+@media (prefers-reduced-motion:reduce){
+  .plant-art.is-ripe{animation:none}
+}
+/* Shop rows and the seed menu draw the same sprites, at whole scales again. */
+.shop-item-icon .plant-art{width:64px;filter:none}
+.plant-detail-svg .plant-art{width:128px;margin:0 auto}
+@keyframes plant-settle{
+  from{transform:translateX(-50%) translateY(-8px);opacity:0}
+  to{transform:translateX(-50%) translateY(0);opacity:1}
+}
+
+/* ── Sowing ──
+   The seed drops in from above the patch, lands, and the soil takes it with
+   a small settle. Longer and more deliberate than plant-settle, because this
+   one marks something the player chose to do rather than a redraw. */
+.plot-plant.sowing{
+  animation:seed-drop 620ms var(--ease-spring);
+}
+@keyframes seed-drop{
+  0%   {transform:translateX(-50%) translateY(-46px) scale(0.55);opacity:0}
+  45%  {opacity:1}
+  /* Contact with the soil */
+  62%  {transform:translateX(-50%) translateY(2px)  scale(1.06)}
+  78%  {transform:translateX(-50%) translateY(-3px) scale(0.98)}
+  100% {transform:translateX(-50%) translateY(0)    scale(1);opacity:1}
+}
+
+/* Ring of loose earth thrown up as the seed lands. Timed to start at the
+   moment of contact rather than with the drop. */
+.sow-puff{
+  position:absolute;
+  bottom:16px;
+  left:50%;
+  width:26px;
+  height:10px;
+  margin-left:-13px;
+  border-radius:50%;
+  border:2px solid rgba(122,107,92,0.65);
+  opacity:0;
+  pointer-events:none;
+  animation:sow-puff 520ms var(--ease-gentle) 340ms;
+}
+@keyframes sow-puff{
+  0%  {transform:scale(0.3);opacity:0}
+  30% {transform:scale(1);  opacity:0.9}
+  100%{transform:scale(2.1);opacity:0}
+}
+
+/* Reduced motion gets the result, not the performance. */
+@media (prefers-reduced-motion:reduce){
+  .plot-plant.sowing{animation:none}
+  .sow-puff{display:none}
+}
+
+/* ── Soil patch ──
+   A flat rectangular tile of tilled ground lying in the grass, not a pot
+   standing on a shelf. Filling the button width and dropping most of the
+   corner rounding is what turns the row into a field of plots. The furrows
+   are a low-contrast repeating gradient so the patch reads as worked soil
+   without turning into a busy pattern behind the plant. */
+/* The gradient stays underneath the Miora soil plate as the fallback, so a
+   patch is never a blank rectangle if the texture has not loaded yet. */
+.plot-pot{
+  width:100%;
+  height:56px;
+  image-rendering:pixelated;
+  border-radius:8px;
+  background:
+    url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAAoCAMAAACVZWnNAAAAwFBMVEU6IBwAAAAuHBYeEAxQOiwmEg5KMCZPQihcSjxjUTt4WU0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABSqJG1AAAAQHRSTlP///////////////////////////////////////////////////////////////////////////////////8AwnuxRAAAAiZJREFUeNqdVguS7CAIpFA+2UvN/W+13ajJzE7ezvqsSozEhhYRlMfZVB53TVXZiY7R8y+55mS6ishjTH4Ip4tqREAqvfMtQakuhVO59QCYjx+Ho0lmCl5T7oQfcjikmr13m2DtHUNRp8YksEsvc+4JkbsZhqbelUw8HWgtMLBo7WpiZuPLQOkcYNjm4AkMhRMLY5yCzmqEyfhWyCARKuUE/iJTgEFUS7rRmsoFbntY0vhy0tagQ7bB2ctyv7C3OtRvwaRNXy/wvX3TG4UGlynBuklaTzBpN9luZmvNbcPmBRasOVLfwK6fd7rA/Qb8mXXrBJunVECK7vis5QBLbsdIgelty/xbdF6OUG5+D4Id3j7RL9HUX1ai+hpisfbZbnbjU3BLHYxo/+HuAoN7fFpz1/cAQ7KqfRb7c2Atr5hEWZY7cHxwemuBXMJMgu/tNVcWA9h9nAzXPbAW7XmqdNOyPIN/cdKr75mECeE+u+zts1UGF1a2B1bu10a/bek1jh/h6RWev6WSf7BHDkumIZjeD8+ZDFDTUeU2DzRKnc+DwZGttK1MSpPK2TUW3/HVxpt1eliOqrDGKsg6jwmrws7iqZRPHRDDS14Vo+pzRD+D+gtO8ohhaoj9QMkHJx13i6zLg42bARZAPAperJZS1Z8t8AmS0L8EvDy4rjtJI93IMkcojaLkd5KF1uRyKAXdEmAV9nIbWlec0eEBYl12Ro+HItPzOvUNJ7M6s6U6yvAAAAAASUVORK5CYII=) center/cover no-repeat,
+    repeating-linear-gradient(96deg,rgba(43,33,24,0.10) 0 3px,transparent 3px 13px),
+    linear-gradient(180deg,#7A6248 0%,#5A4834 100%);
+  /* The spread ring is the loose earth where the patch meets the grass. It is
+     a shadow rather than a pseudo-element behind the patch, because a
+     negative z-index child can fall behind the screen background once the
+     screen picks up a transform during a transition. */
+  box-shadow:
+    0 0 0 3px rgba(122,107,92,0.32),
+    inset 0 2px 0 rgba(255,255,255,0.10),
+    inset 0 -3px 5px rgba(43,33,24,0.22),
+    0 2px 3px rgba(43,33,24,0.16);
+  position:relative;
+}
+/* Bare soil is pale dry earth, which on its own sits only about 1.3:1 against
+   the grass. The solid earth border is what carries the boundary: it clears
+   3:1 against both the grass and the fill, so the patch stays discernible as
+   something you can tap without darkening it into looking planted. */
+.plot-pot.empty{
+  background:
+    url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAAoCAMAAACVZWnNAAAAwFBMVEW6mosAAAB4WEyAaFpjUDuYh2jVwKSHdm6/pojQroXfvZDozq2delUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABf8r8cAAAAQHRSTlP///////////////////////////////////////////////////////////////////////////////////8AwnuxRAAAAWhJREFUeNqllguShCAMRFMdAjizd+L+t1pY5OeEQVmqLEF4BkmbhMI/Gg0jMEJgzgPmNEq3ANRHCkwAJICIxBGxE2GWNEIcUnye5plj3zlGeVeGExVX0u2GBoMetwrfZ40xZ48L7MpMWWNnrLVHTzcYB5WJyceb1yseoxlgzjOHNNNqYyTYnYtcD3ffMzthnxz4wwNc6PVxIbXOWVd4Zv4tiqcvsFhr1B37K8wKDN1yFGfdW144nPZtYQp6kWSY/U0Y9AHb9zOBX+W5B3/96MkJaqf9yeq+q/DqL9TfLRneCAUNfujoe7BdRrE5fLBd+Yo2d63C7Ye9B/d0DHHebCrMeO+XplmBGTmQ4ZtgxpRR4ajDlUnTSXW0DClRBBM1wxKbiZ9RQw2mucYoIpENdRYYGzBaipUduzW5P6N5qAwCzkwSr1hSyJknS3aJxQk69RZ2LGhSrQGXqw6clUd3d3+9UpB8VEMP2y955HG3ewA7HQAAAABJRU5ErkJggg==) center/cover no-repeat,
+    repeating-linear-gradient(96deg,rgba(43,33,24,0.05) 0 3px,transparent 3px 13px),
+    linear-gradient(180deg,#CFC4B0 0%,#B8AB95 100%);
+  border:2px solid var(--earth-deep);
+  box-shadow:inset 0 -2px 4px rgba(43,33,24,0.16);
+}
+
+/* Thirsty shows in the ground itself, dry and pale, with a droplet resting on
+   the near edge of the patch. Never a fail state, just soil asking for water. */
+.shelf-plot.thirsty .plot-plant{animation:thirsty-sway 3s ease-in-out infinite}
+.shelf-plot.thirsty .plot-pot{
+  background:
+    repeating-linear-gradient(96deg,rgba(43,33,24,0.09) 0 3px,transparent 3px 13px),
+    linear-gradient(180deg,#9A8465 0%,#7C6A50 100%);
+}
+.shelf-plot.thirsty::after{
+  content:'';
+  position:absolute;
+  bottom:7px;right:5px;
+  width:14px;height:18px;
+  background:var(--accent-orange);
+  border:2px solid var(--bg-surface);
+  border-radius:50% 50% 50% 50% / 65% 65% 38% 38%;
+  box-shadow:0 1px 2px rgba(43,33,24,0.30);
+  animation:thirsty-drip 1.6s ease-in-out infinite;
+}
+@keyframes thirsty-drip{
+  0%,100%{opacity:0.55;transform:translateY(0)}
+  50%{opacity:1;transform:translateY(3px)}
+}
+
+/* ── Untilled land, the next plot over ──
+   Ground waiting to be cleared rather than a locked object. It sits in the
+   grid in reading order like any other plot, so the player pans to it the
+   same way they pan to their planted land. */
+/* Spans both field columns so it always starts a fresh row below every
+   opened patch, regardless of whether the shelf count is odd or even. */
+.shelf-locked-unit{padding:0.75rem 0.5rem 1rem;grid-column:1 / -1}
+.shelf-locked-plank{
+  position:relative;
+  width:var(--field-col);
+  max-width:100%;
+  background:transparent;
+  border:none;
+  padding:0.5rem 0 0.5rem;
+  cursor:pointer;
+  font-family:inherit;
+}
+.shelf-locked-plank:disabled{cursor:default}
+
+.patch-locked-row{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:0.5rem;
+  padding:0 0.5rem;
+  justify-items:stretch;
+}
+.patch-locked-slot{
+  width:100%;
+  height:56px;
+  border-radius:8px;
+  border:2px dashed rgba(68,87,61,0.55);
+  background:rgba(122,107,92,0.14);
+}
+.shelf-locked-plank:not(:disabled) .patch-locked-slot{
+  border-color:var(--foliage-shadow);
+  background:rgba(122,107,92,0.22);
+}
+
+/* Sits below the dashed slots, not lapped over them. The old negative top
+   margin tucked it up into the row, and tag-rise lifted it another 4px, so at
+   390px the pill covered the slots it was labelling. */
+.shelf-tag{
+  position:relative;
+  margin:0.65rem auto 0;
+  display:inline-flex;
+  align-items:center;
+  gap:0.5rem;
+  flex-wrap:wrap;
+  justify-content:center;
+  max-width:100%;
+  padding:0.55rem 0.95rem;
+  background:var(--bg-surface);
+  border:1.5px solid var(--border-mid);
+  border-radius:var(--radius-lg);
+  box-shadow:0 3px 8px rgba(43,33,24,0.22);
+  font-family:var(--font-body);
+  font-size:1.05rem;
+  font-weight:500;
+  color:var(--text-secondary);
+}
+.shelf-tag-text{white-space:nowrap}
+.shelf-tag.affordable{
+  border-color:var(--foliage-mid);
+  color:var(--foliage-shadow);
+  animation:tag-rise 2.4s ease-in-out infinite;
+}
+@keyframes tag-rise{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-4px)}
+}
+.shelf-tag-price{
+  display:inline-flex;
+  align-items:center;
+  gap:0.25rem;
+  padding:0.15rem 0.6rem;
+  background:rgba(224,122,95,0.15);
+  border:1.5px solid var(--accent-coral);
+  border-radius:var(--radius-pill);
+  color:#7A2F10;
+  font-weight:600;
+  white-space:nowrap;
+}
+.shelf-tag-hint{
+  margin-top:0.5rem;
+  text-align:center;
+  font-family:var(--font-body);
+  font-size:1rem;
+  color:var(--text-secondary);
+}
+
+/* ════════════════════════════════════════════════════════════
+   PATCHES SCREEN: the garden, on one continuous grass surface
+   The field is dragged under a fixed window instead of the page scrolling,
+   so the header and the water button never move. Two columns of patches side
+   by side, so the field runs past the phone edge and needs a left-right pan.
+
+   The overflow override is scoped to this id on purpose: the shared .screen
+   rule still scrolls every other tab. Here the page itself never scrolls.
+   The padding is tighter than the shared .screen padding, because every pixel
+   taken back is a pixel of field visible without panning.
+   ════════════════════════════════════════════════════════════ */
+/* The Miora grass plate tiles under the whole tab. The gradient stays beneath
+   it so the field still reads as grass if the texture has not loaded, and the
+   overlay keeps the texture quiet enough that the patches and the plants stay
+   the things the eye lands on. */
+#screen-garden2{
+  overflow:hidden;
+  padding:1rem 1.25rem calc(var(--nav-height) + 0.75rem);
+  /* 128px is the 64px tile at exactly 2x, matching the plant sprites. The
+     tile is mirrored into itself in the build, so it repeats without a seam.
+     No wash over it any more: the pixel tile is already quiet, and a
+     translucent layer on top only muddied the palette. */
+  background:
+    url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAYFBMVEXL1rS/y6LDy6XW38QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABnQdgcAAABuUlEQVR42q1XSYLEIAikqv//57HFBVpMMkEPiQvIXqrIRYP7balgKGA7wKD4Wek9pUD5kTpCJy5Tpc/vunbQN4XKJBtxnWP9ahsCiCGARt9BNtc7MbBaZyxxRuumjaAbTEdWVKTqy2AJg3G6KnAwvxvwIj6B+636LJ7SD7DZYs9f1GeTTVYz5Ial2qbBLeTUVk1oXXV0I7vYTP1GqVyqAOsQWCl3uVmDRFG9S58a6JucdrmN4cmebhIkSuwFp5vlgSGJLWEUy1UsvcMk1a7E35vqrOQSTuosW0p7qXTV5r2jdemChj7nfe3515LHfkbMDutCn58mAIGkwfjNO5IRGi7oMuZrdUz+Nc3D8v4tGLvDRhpneBYH0IDqLTyEEBI49XG1RRtPoG8OUTxRRDFpr8fIRquKRYCPux1zWr5BknZGdX40W/vQnEc7KJKJJj25KRNTJAQm7v29AsrT+v1cDh+0f21wzITXTjwZxheJdDCVXxZTvpyzgHIG0pKgmoP19MFy4GjLHq7J4z1/wchecfKXrLPXvJcXzWNX3deX7RPX/cSDI//kOfLoyj37kg/P9NM3//jOPf//ANcnBSUZ2QydAAAAAElFTkSuQmCC) 0 0/128px 128px repeat,
+    linear-gradient(180deg,#DCE4CC 0%,#CBD6B4 100%);
+  image-rendering:pixelated;
+}
+
+/* Header, hint and action dock are fixed furniture; the pan window takes
+   whatever is left. Without flex-shrink they get squeezed as the field grows. */
+/* Tighter than the other tabs on purpose. Here the field is the content, and
+   every pixel the heading gives back is a pixel of garden visible without
+   panning. Still 32px, comfortably above the body-text floor. */
+#screen-garden2 .screen-header{margin-bottom:0.5rem;flex-shrink:0}
+#screen-garden2 .screen-title{font-size:2rem;line-height:1.05;margin-bottom:0.1rem}
+/* One step darker than --text-muted: muted clears 4.5:1 on the cream paper
+   but not on the deeper end of the grass. */
+#screen-garden2 .screen-subtitle{color:var(--text-secondary)}
+.garden-hint-slot:not(:empty){flex-shrink:0}
+
+/* One tappable line above the field. Full width and 64px tall so it clears the
+   tap floor without competing with the water button for attention. */
+.today-strip{
+  display:flex;
+  align-items:center;
+  gap:0.7rem;
+  width:100%;
+  min-height:64px;
+  flex-shrink:0;
+  margin-bottom:0.75rem;
+  padding:0 1rem;
+  background:var(--bg-surface);
+  border:1.5px solid var(--border-mid);
+  border-radius:var(--radius-lg);
+  box-shadow:var(--shadow-paper);
+  font-family:var(--font-body);
+  font-size:1.1rem;
+  font-weight:500;
+  color:var(--text-primary);
+  text-align:left;
+  cursor:pointer;
+}
+.today-strip[hidden]{display:none}
+.today-strip .icon{color:var(--accent-orange);flex-shrink:0}
+.today-strip-text{flex:1}
+.today-strip-arrow{color:var(--text-muted)}
+.today-strip:active{transform:scale(0.99)}
+.today-strip:focus-visible{outline:3px solid var(--foliage-mid);outline-offset:2px}
+.today-strip.all-done{border-color:var(--foliage-mid)}
+.today-strip.all-done .icon{color:var(--foliage-mid)}
+
+.garden2-viewport{
+  position:relative;
+  flex:1;
+  min-height:0;
+  margin:0 -1.25rem;
+  overflow:hidden;
+  touch-action:none;
+  user-select:none;
+  -webkit-user-select:none;
+  -webkit-tap-highlight-color:transparent;
+  cursor:grab;
+}
+.garden2-viewport.panning{cursor:grabbing}
+
+/* width:max-content makes offsetWidth the true content width, which is what
+   the pan bounds are measured from. Two plots of land side by side is what
+   makes the field wider than the phone.
+
+   The generous padding and the min sizes are the walkable margin. Without
+   them the grid is exactly as big as its rows and the gardener has nowhere
+   to stand that is not already a patch. */
+.garden2-field{
+  --field-col:300px;
+  position:relative;
+  display:grid;
+  grid-template-columns:repeat(2,var(--field-col));
+  align-content:start;
+  justify-content:start;
+  gap:0.75rem 0.75rem;
+  width:max-content;
+  min-width:100%;
+  min-height:560px;
+  padding:2.5rem 2.5rem 4rem;
+  will-change:transform;
+}
+.garden2-field.pan-glide{transition:transform 420ms var(--ease-gentle)}
+
+/* ── Simple view ──────────────────────────────────────────────
+   One column, full-size patches, ordinary vertical scrolling. No horizontal
+   panning exists in this mode, and no patch is ever off the side of the
+   screen. The transform is cleared so the scroll container, not the camera,
+   is what moves. */
+.garden2-viewport.is-simple{
+  overflow-y:auto;
+  overflow-x:hidden;
+  touch-action:pan-y;
+  cursor:default;
+}
+.garden2-field.is-simple{
+  grid-template-columns:1fr;
+  width:100%;
+  min-width:0;
+  min-height:0;
+  padding:0.25rem 1.25rem 1.5rem;
+  transform:none !important;
+}
+.garden2-field.is-simple .shelf-locked-unit{grid-column:1}
+.garden2-field.is-simple .shelf-locked-plank{width:100%}
+
+/* ── Garden visitors ─────────────────────────────────────────
+   A tappable creature drifting over the grass. Sized to the tap floor even
+   though the drawn shape is smaller, because a butterfly is the hardest
+   thing in the game to put a finger on. */
+/* The button itself never scales. Only what is inside it moves, so the tap
+   area is a flat 64px whether the animation has run, is mid-flight, is
+   throttled by a background tab, or is switched off for reduced motion.
+   Animating the button was scaling its hit box down to 38px. */
+.garden-visitor{
+  position:absolute;
+  width:64px;
+  height:64px;
+  z-index:5;
+  border:none;
+  background:none;
+  padding:0;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  animation:visitor-drift 9s ease-in-out infinite;
+}
+.garden-visitor:focus-visible{outline:3px solid var(--foliage-shadow);outline-offset:3px;border-radius:50%}
+.garden-visitor > *{animation:visitor-arrive 700ms var(--ease-spring)}
+.garden-visitor.leaving > *{animation:visitor-leave 700ms var(--ease-gentle) forwards}
+.visitor-art{width:48px;height:48px;image-rendering:pixelated;display:block}
+
+/* Stand-in until the sprites land. Deliberately simple: a body with two
+   wings, enough to read as alive without pretending to be finished art. */
+.visitor-fallback{
+  position:relative;
+  width:26px;
+  height:26px;
+  border-radius:50%;
+  background:var(--foliage-shadow);
+  box-shadow:0 2px 3px rgba(43,33,24,0.3);
+}
+.visitor-fallback::before,
+.visitor-fallback::after{
+  content:'';
+  position:absolute;
+  top:2px;
+  width:20px;
+  height:22px;
+  border-radius:60% 60% 40% 40%;
+  background:var(--bg-surface);
+  border:2px solid var(--foliage-shadow);
+}
+.visitor-fallback::before{right:16px;transform-origin:right center;animation:visitor-flap 320ms ease-in-out infinite alternate}
+.visitor-fallback::after{left:16px;transform-origin:left center;animation:visitor-flap 320ms ease-in-out infinite alternate-reverse}
+.visitor-fallback[data-kind="cat"]{width:34px;height:24px;border-radius:40% 40% 45% 45%;background:var(--earth-deep)}
+.visitor-fallback[data-kind="cat"]::before,
+.visitor-fallback[data-kind="cat"]::after{display:none}
+
+@keyframes visitor-flap{
+  from{transform:rotateY(0deg) scaleX(1)}
+  to  {transform:rotateY(65deg) scaleX(0.55)}
+}
+@keyframes visitor-arrive{
+  from{opacity:0;transform:translateY(-14px) scale(0.6)}
+  to  {opacity:1;transform:translateY(0) scale(1)}
+}
+@keyframes visitor-leave{
+  from{opacity:1;transform:translateY(0) scale(1)}
+  to  {opacity:0;transform:translateY(-22px) scale(0.7)}
+}
+@keyframes visitor-drift{
+  0%,100%{translate:0 0}
+  25%    {translate:14px -8px}
+  50%    {translate:4px 8px}
+  75%    {translate:-12px -4px}
+}
+@media (prefers-reduced-motion:reduce){
+  .garden-visitor,
+  .garden-visitor > *{animation:none}
+  .visitor-fallback::before,.visitor-fallback::after{animation:none}
+}
+
+/* ── The gardener ────────────────────────────────────────────
+   A view detail, never saved. pointer-events:none so it can never sit
+   between a finger and a patch. */
+/* One 4x8 sprite sheet: four walk frames across, eight facings down. The row
+   is set from JS as backgroundPositionY, the column is stepped by the
+   animation below. Paused, it parks on column 0, which is the standing pose,
+   so idle and walking are the same element in two states. */
+.garden-avatar{
+  position:absolute;
+  left:0;
+  top:0;
+  width:88px;
+  height:88px;
+  z-index:6;
+  pointer-events:none;
+  will-change:transform;
+  background-image:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAWAAAALACAMAAACaS1gNAAAAwFBMVEVwaV4lGh3Ol27rzKRULxfrv7F4SSyFPymaWUrLzMWAgH6dnZcAAAAWCwLMxq7l28Pu1qohGA4wJhp8dlP747toZEZaVDqSjWyXfE6Ig2Pj172inn7ZtYWskV/myp1VQizc0LX47dY+NCS7tJhHQi5+YD7Ep3S4lXH32ZChfmCPbk5uVTe3hlD528GupovFnF1sQyvzyYvez7JKJhqcYUCsiWnVrXupe1n117+WaT/YuqM6GBTasnvVpoH658QAAADt72PLAAAAQHRSTlP///////////////////////////////////////////////////////////////////////////////////8AwnuxRAAALztJREFUeNrtndmS4ziuhu2spZcJSCJlbdZmS5acXnLfa/P7v9UBpKzqPnfyxM+Y6RggqmruMOiPIEiRNP7ZSc2pzRSBAlbAagpYAStgNQWsgBWwmgJWwGoKWAErYDUFrIAVsJoCVsAKWE0B/28AJiJrHERgiBQwW3N5ebleWyKD5WGD9frZBWJOCHKTD2f5nQq4KS+Dy2AdEGNGxm17HrbgkgeOsNODdgEHbNF87XMQrK8MHLAtg+0lu14bLOCHXrxWwRo9cGa7Xa/Xly/gPDbbgt1enRHqRMAkeNmouAqucBHT/lL8XrJP/gtMYeoKTjWuaux3DfQbi1eeyGuaOnJTAadpenlZGXN5hUw02nHlGThUlwEy06gMnmXkGPAaGDD1zxLt+oWMBI0DTJTudjtqyvWlj+VQpmlRGHrGFggeud3uUpK3ulxbrNuXy8sHKqrLiaVnNo1vKYtn+rLe0hwKmCPe95ZXDizfk2ESKa9xt5frhwYLOH00t5dXkzeX0wDvX3Ylz46AHh6hfPd7oi7tq/XLHJvAFKfpnuyWQybw1o8oWD/QLZ2ggH9ugl8qg60Q5a6o1mTrC+han+5Snhz98/r2Acs3fdn2xQPZl0coYBm5vUd0QS9XwLWeJ9xLEFw987fL89UVcu1My23f8+pmfoN+w9DuZX0lOWyfryz4Q2OYGxdXz1DAh6qqxG9lwID5I2NtDG3NFdIvHYpnCfflmYKrqYTPAnz7Ilth5HfRWNR+e/50hd2lkSzKj5UJoIDf7bEKpvud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);
+  background-repeat:no-repeat;
+  background-position:0 0;
+  /* Pixel art. Smoothing it on the way up turns the hat into porridge. */
+  image-rendering:pixelated;
+  filter:drop-shadow(0 2px 2px rgba(43,33,24,0.32));
+}
+.garden-avatar[hidden]{display:none}
+
+/* steps(4) walks the four columns and never lands between them. The sheet is
+   4 cells wide, so the loop travels exactly one sheet width. */
+@keyframes gardener-walk{
+  from{background-position-x:0}
+  to{background-position-x:-352px}
+}
+.garden-avatar.walking{
+  animation:gardener-walk 0.6s steps(4) infinite;
+}
+/* Standing still is the walk held on its first frame rather than a separate
+   pose, which is what keeps the facing correct when the gardener stops. */
+@media (prefers-reduced-motion:reduce){
+  .garden-avatar.walking{animation:none}
+}
+
+@media (max-height:640px){
+  #screen-garden2{overflow-y:auto;overflow-x:hidden}
+  .garden2-viewport{flex:none;height:230px}
+}
+
+/* ════════════════════════════════════════════════════════════
+   PLANT DETAIL PANEL
+   ════════════════════════════════════════════════════════════ */
+
+#plant-detail-modal{
+  transition:opacity 250ms var(--ease-gentle);
+  opacity:0;
+}
+#plant-detail-modal.open{opacity:1}
+#plant-detail-modal .modal-sheet{
+  transform:translateY(30px);
+  transition:transform 250ms var(--ease-spring);
+}
+#plant-detail-modal.open .modal-sheet{transform:translateY(0)}
+
+.plant-detail-sheet{padding-top:1.25rem}
+
+/* Seed menu (Patches tab: tap an empty patch to plant in place) shares the
+   plant detail modal's fade + slide-up open/close. */
+#seed-menu-modal{
+  transition:opacity 250ms var(--ease-gentle);
+  opacity:0;
+}
+#seed-menu-modal.open{opacity:1}
+#seed-menu-modal .modal-sheet{
+  transform:translateY(30px);
+  transition:transform 250ms var(--ease-spring);
+}
+#seed-menu-modal.open .modal-sheet{transform:translateY(0)}
+
+.plant-latin{
+  font-family:var(--font-display);
+  font-style:italic;
+  font-size:1.05rem;
+  color:var(--text-muted);
+  margin-top:0.15rem;
+}
+
+.plant-detail-figure{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:0;
+  background:var(--bg-deep);
+  border:1.5px solid var(--border-light);
+  border-radius:var(--radius-xl);
+  padding:1.5rem 1rem 1.25rem;
+  margin-bottom:1rem;
+  cursor:pointer;
+  width:100%;
+  font-family:inherit;
+  transition:border-color var(--duration-fast) var(--ease-gentle);
+}
+.plant-detail-figure:hover{border-color:var(--foliage-mid)}
+.plant-detail-figure:active{transform:scale(0.98)}
+.plant-detail-figure:focus-visible{outline:3px solid var(--foliage-mid);outline-offset:2px}
+
+.plant-detail-svg{
+  width:130px;
+  transform-origin:bottom center;
+  margin-bottom:-8px;
+}
+.plant-detail-svg.wiggle{animation:plant-wiggle 600ms var(--ease-gentle)}
+@keyframes plant-wiggle{
+  0%,100%{transform:rotate(0deg)}
+  20%{transform:rotate(-4deg)}
+  40%{transform:rotate(3.5deg)}
+  60%{transform:rotate(-2.5deg)}
+  80%{transform:rotate(1.5deg)}
+}
+
+.plant-touch-hint{
+  margin-top:0.75rem;
+  font-family:var(--font-body);
+  font-size:1rem;
+  color:var(--text-muted);
+  font-style:italic;
+}
+
+.plant-detail-stats{
+  display:flex;
+  align-items:center;
+  gap:0.75rem;
+  flex-wrap:wrap;
+  margin-bottom:1rem;
+}
+
+.plant-state-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:0.4rem;
+  padding:0.45rem 1rem;
+  border-radius:var(--radius-pill);
+  font-family:var(--font-body);
+  font-size:1rem;
+  font-weight:500;
+  border:1.5px solid transparent;
+}
+.plant-state-badge.state-seed{background:var(--bg-inset);color:var(--text-secondary);border-color:var(--border-mid)}
+.plant-state-badge.state-sprout{background:rgba(177,184,161,0.25);color:var(--foliage-shadow);border-color:var(--foliage-highlight)}
+.plant-state-badge.state-grown{background:rgba(115,135,93,0.15);color:var(--foliage-shadow);border-color:var(--foliage-mid)}
+.plant-state-badge.state-bloom{background:rgba(224,122,95,0.15);color:#7A2F10;border-color:var(--accent-coral)}
+.plant-state-badge.state-wilt{background:rgba(231,143,55,0.15);color:#7A4800;border-color:var(--accent-orange)}
+
+.plant-age{
+  display:inline-flex;
+  align-items:center;
+  gap:0.4rem;
+  font-family:var(--font-body);
+  font-size:1rem;
+  color:var(--text-secondary);
+}
+.plant-age .icon{color:var(--text-muted)}
+
+.plant-use-card{
+  background:var(--bg-inset);
+  border:1.5px solid var(--border-light);
+  border-left:4px solid var(--foliage-mid);
+  border-radius:var(--radius-md);
+  padding:1rem 1.25rem;
+  margin-bottom:1rem;
+}
+.plant-use-title{
+  display:flex;
+  align-items:center;
+  gap:0.5rem;
+  font-family:var(--font-body);
+  font-size:1rem;
+  font-weight:600;
+  letter-spacing:0.08em;
+  text-transform:uppercase;
+  color:var(--foliage-shadow);
+  margin-bottom:0.5rem;
+}
+.plant-use-text{
+  font-family:var(--font-body);
+  font-size:1.05rem;
+  line-height:1.6;
+  color:var(--text-primary);
+}
+
+.plant-meals-row{
+  display:flex;
+  flex-wrap:wrap;
+  gap:0.5rem;
+  margin-bottom:1rem;
+}
+.plant-meal-chip{
+  display:inline-flex;
+  align-items:center;
+  gap:0.35rem;
+  padding:0.35rem 0.85rem;
+  border-radius:var(--radius-pill);
+  background:rgba(115,135,93,0.10);
+  border:1.5px solid var(--foliage-highlight);
+  color:var(--foliage-shadow);
+  font-family:var(--font-body);
+  font-size:1rem;
+  font-weight:500;
+}
+
+/* New shelf install animation — applied once by JS after purchase */
+.shelf-unit.installed{animation:shelf-install 500ms var(--ease-spring)}
+@keyframes shelf-install{
+  from{opacity:0;transform:translateY(20px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+/* ════════════════════════════════════════════════════════════
+   DAILY TASKS CARD
+   ════════════════════════════════════════════════════════════ */
+
+#daily-card{margin:1rem 0 0.5rem}
+.daily-card{
+  background:var(--bg-surface);
+  border:1.5px solid var(--border-light);
+  border-radius:var(--radius-xl);
+  padding:1.25rem 1.25rem 1rem;
+  box-shadow:var(--shadow-paper);
+}
+/* Inside the menu the sheet already provides the card, so the card drops its
+   own frame and reads as the first section of the panel. */
+#menu-modal .daily-card{
+  background:transparent;
+  border:none;
+  box-shadow:none;
+  padding:0;
+}
+.daily-card-title{
+  display:flex;
+  align-items:center;
+  gap:0.5rem;
+  font-family:var(--font-display);
+  font-size:1.35rem;
+  font-weight:500;
+  color:var(--text-primary);
+  margin-bottom:0.75rem;
+}
+.daily-card-title .icon{color:var(--accent-orange)}
+.daily-tasks{display:flex;flex-direction:column;gap:0.5rem}
+.daily-task{
+  display:flex;
+  align-items:center;
+  gap:0.75rem;
+  width:100%;
+  min-height:var(--tap-min);
+  padding:0.5rem 0.75rem;
+  background:var(--bg-inset);
+  border:1.5px solid var(--border-light);
+  border-radius:var(--radius-md);
+  cursor:pointer;
+  font-family:var(--font-body);
+  text-align:left;
+  transition:all var(--duration-fast) var(--ease-gentle);
+}
+.daily-task:hover{border-color:var(--foliage-mid)}
+.daily-task:active{transform:scale(0.98)}
+.daily-task:focus-visible{outline:3px solid var(--foliage-mid);outline-offset:2px}
+.daily-task.done{
+  background:rgba(115,135,93,0.10);
+  border-color:var(--foliage-highlight);
+  cursor:default;
+}
+.daily-task.done .daily-task-text{text-decoration:line-through;color:var(--text-muted)}
+.daily-task-check{
+  width:32px;height:32px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+  color:var(--foliage-shadow);
+}
+.daily-task-circle{
+  width:22px;height:22px;
+  border-radius:50%;
+  border:2.5px solid var(--border-mid);
+  display:block;
+}
+.daily-task.done .daily-task-check{background:var(--foliage-mid);color:#F5EFEB}
+.daily-task-text{
+  flex:1;
+  font-size:1.1rem;
+  font-weight:500;
+  color:var(--text-primary);
+  line-height:1.3;
+}
+.daily-task-meta{display:flex;align-items:center;gap:0.5rem;flex-shrink:0}
+.daily-task-progress{
+  font-size:1rem;
+  font-weight:600;
+  color:var(--text-secondary);
+}
+.daily-task-coins{
+  display:inline-flex;
+  align-items:center;
+  gap:0.2rem;
+  padding:0.2rem 0.6rem;
+  border-radius:var(--radius-pill);
+  background:rgba(224,122,95,0.15);
+  border:1.5px solid var(--accent-coral);
+  color:#7A2F10;
+  font-size:1rem;
+  font-weight:600;
+}
+.daily-all-done{
+  font-family:var(--font-body);
+  font-size:1.1rem;
+  color:var(--foliage-shadow);
+  font-style:italic;
+  padding:0.5rem 0.25rem;
+}
+.daily-week{
+  display:flex;
+  align-items:center;
+  gap:0.75rem;
+  margin-top:0.75rem;
+  padding-top:0.75rem;
+  border-top:1px solid var(--border-light);
+}
+.daily-week-label{
+  font-family:var(--font-body);
+  font-size:1rem;
+  font-weight:600;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  color:var(--text-muted);
+  white-space:nowrap;
+}
+/* Label and count on one line, the ten dots on their own line beneath. All
+   three side by side ran past the right edge at phone width. */
+.daily-week{flex-wrap:wrap}
+.daily-week-label{order:1}
+.daily-week-hint,.daily-week-done{order:2;margin-left:auto}
+.daily-week-dots{
+  order:3;
+  flex-basis:100%;
+  margin:0.5rem 0 0;
+  justify-content:flex-start;
+  flex-wrap:wrap;
+}
+.daily-week-hint{font-size:1rem;color:var(--text-muted);white-space:nowrap}
+.daily-week-done{
+  display:inline-flex;
+  align-items:center;
+  gap:0.3rem;
+  font-size:1rem;
+  font-weight:500;
+  color:var(--accent-plum);
+  white-space:nowrap;
+}
+
+/* ════════════════════════════════════════════════════════════
+   THE GARDEN ALMANAC
+   ════════════════════════════════════════════════════════════ */
+
+.almanac-body{
+  flex:1;
+  overflow-y:auto;
+  padding:1.25rem;
+  -webkit-overflow-scrolling:touch;
+}
+/* No display here — `.screen` handles none/flex. An ID selector would outrank
+   `.screen{display:none}` and leave the Almanac painted behind every screen. */
+#screen-almanac{padding:0}
+
+.almanac-summary{
+  display:flex;
+  align-items:center;
+  gap:1rem;
+  padding:1.25rem 1.5rem;
+  background:var(--bg-surface);
+  border:1.5px solid var(--border-light);
+  border-radius:var(--radius-xl);
+  box-shadow:var(--shadow-paper);
+  margin-bottom:1.5rem;
+}
+.almanac-summary .icon{color:var(--foliage-shadow)}
+.almanac-summary-num{
+  font-family:var(--font-display);
+  font-size:2rem;
+  font-weight:500;
+  color:var(--text-primary);
+  line-height:1.1;
+}
+.almanac-summary-num span{
+  font-size:1.1rem;
+  color:var(--text-muted);
+  font-weight:400;
+}
+.almanac-summary-sub{
+  font-family:var(--font-body);
+  font-size:1rem;
+  color:var(--text-secondary);
+  margin-top:0.15rem;
+}
+
+.almanac-section{margin-bottom:1.75rem}
+.almanac-cat-head{
+  display:flex;
+  align-items:center;
+  gap:0.5rem;
+  font-family:var(--font-body);
+  font-size:1rem;
+  font-weight:600;
+  letter-spacing:0.1em;
+  text-transform:uppercase;
+  color:var(--text-muted);
+  margin-bottom:0.75rem;
+}
+.almanac-cat-head .icon{color:var(--foliage-mid)}
+
+.almanac-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:0.75rem;
+}
+
+.almanac-plate{
+  position:relative;
+  background:var(--bg-surface);
+  border:1.5px solid var(--border-light);
+  border-radius:var(--radius-lg);
+  padding:1.25rem 1rem 1rem;
+  box-shadow:var(--shadow-paper);
+  opacity:0.55;
+  transition:opacity var(--duration-normal) var(--ease-gentle);
+}
+.almanac-plate.earned{opacity:1;border-color:var(--foliage-mid)}
+.almanac-plate.mystery{opacity:0.45;border-style:dashed}
+
+.plate-figure{
+  width:72px;height:72px;
+  margin:0 auto 0.75rem;
+  border-radius:50%;
+  background:var(--bg-inset);
+  border:1.5px solid var(--border-light);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--foliage-shadow);
+}
+.almanac-plate.earned .plate-figure{
+  background:rgba(115,135,93,0.12);
+  border-color:var(--foliage-mid);
+}
+.plate-figure.mystery-mark{
+  font-family:var(--font-display);
+  font-size:2.25rem;
+  color:var(--border-mid);
+  background:var(--bg-inset);
+}
+.plate-name{
+  font-family:var(--font-display);
+  font-size:1.2rem;
+  font-weight:500;
+  text-align:center;
+  color:var(--text-primary);
+  margin-bottom:0.3rem;
+}
+.plate-desc{
+  font-family:var(--font-body);
+  font-size:1rem;
+  line-height:1.4;
+  text-align:center;
+  color:var(--text-secondary);
+  margin-bottom:0.6rem;
+}
+.plate-foot{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:0.5rem;
+  flex-wrap:wrap;
+}
+.plate-tier{
+  padding:0.2rem 0.7rem;
+  border-radius:var(--radius-pill);
+  background:rgba(115,135,93,0.15);
+  border:1.5px solid var(--foliage-mid);
+  color:var(--foliage-shadow);
+  font-family:var(--font-body);
+  font-size:1rem;
+  font-weight:600;
+  letter-spacing:0.04em;
+}
+.plate-progress{
+  font-family:var(--font-body);
+  font-size:1rem;
+  font-weight:500;
+  color:var(--text-muted);
+}
+.plate-stamp{
+  position:absolute;
+  top:10px;right:10px;
+  width:32px;height:32px;
+  border-radius:50%;
+  background:var(--foliage-mid);
+  color:#F5EFEB;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 2px 5px rgba(43,33,24,0.25);
+  transform:rotate(8deg);
+}
+
+/* Almanac entry card on profile */
+.almanac-entry{
+  cursor:pointer;
+  border-color:var(--foliage-mid);
+  width:100%;
+  text-align:left;
+  font-family:inherit;
+}
+.almanac-entry:hover{background:rgba(115,135,93,0.06)}
+
+/* Award notification type */
+.notif-award{border-left-color:var(--accent-plum)}
+.notif-award .notif-icon{color:var(--accent-plum)}
+
+/* Pinned below the pan window, never scrolls out of reach */
+.garden-actions{display:flex;flex-direction:column;gap:0.5rem;flex-shrink:0;padding-top:0.5rem}
+/* Secondary to the watering button and shorter than it, but still over the
+   60px tap floor. Sits on grass, so it needs its own surface to stay legible. */
+.btn-view{
+  min-height:60px;
+  font-size:1.05rem;
+  background:rgba(245,239,235,0.92);
+}
+.btn-view[hidden]{display:none}
+
+/* ── Buttons ── */
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:var(--tap-min);
+  padding:0 2rem;
+  border-radius:var(--radius-md);
+  font-family:var(--font-body);
+  font-size:1.2rem;
+  font-weight:500;
+  border:2px solid transparent;
+  cursor:pointer;
+  transition:all var(--duration-fast) var(--ease-gentle);
+  gap:0.5rem;
+  letter-spacing:0.01em;
+  text-decoration:none;
+}
+.btn:active{transform:scale(0.97)}
+.btn:focus-visible{outline:3px solid var(--foliage-mid);outline-offset:3px}
+.btn:disabled{opacity:0.5;cursor:not-allowed;pointer-events:none}
+
+.btn-primary{background:var(--foliage-shadow);color:var(--text-on-dark);border-color:var(--foliage-shadow)}
+.btn-primary:hover:not(:disabled){background:var(--foliage-deep)}
+.btn-secondary{background:transparent;color:var(--foliage-shadow);border-color:var(--foliage-mid)}
+.btn-secondary:hover:not(:disabled){background:rgba(115,135,93,0.10)}
+.btn-ghost{background:transparent;color:var(--text-secondary);border-color:var(--border-mid)}
+.btn-ghost:hover:not(:disabled){color:var(--text-primary);border-color:var(--border-strong)}
+.btn-lg{min-height:80px;font-size:1.35rem;padding:0 2.5rem;border-radius:var(--radius-lg)}
+/* Still the small button, but never below the 60px tap floor. It was 52px,
+   which was the only control on any screen under the floor. */
+.btn-sm{min-height:60px;font-size:1.05rem;padding:0 1.25rem}
+
+/* ── Shop ── */
+/* Wraps rather than squeezing: at 390px the coin chip and the free-seed
+   button together overflowed their row and broke the button label onto two
+   lines. Given the room they sit side by side, otherwise the button takes
+   its own full-width line. */
+.shop-coins-bar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:0.75rem;
+  margin-bottom:1.25rem;
+  padding:0.75rem 1rem;
+  background:var(--bg-inset);
+  border-radius:var(--radius-md);
+  border:1px solid var(--border-light);
+}
+.shop-grid{display:flex;flex-direction:column;gap:0.75rem}
+/* Icon, name and price share the top row; the description and the buy button
+   each span the full card. The old three-column row left the name about 106px
+   at 390px, which broke every two-word seed name across two lines. */
+.shop-item{
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  align-items:center;
+  column-gap:0.85rem;
+  row-gap:0.55rem;
+  padding:1rem 1.25rem;
+  background:var(--bg-surface);
+  border:1.5px solid var(--border-light);
+  border-radius:var(--radius-lg);
+  box-shadow:var(--shadow-paper);
+  transition:all var(--duration-normal) var(--ease-gentle);
+}
+.shop-item:hover{border-color:var(--foliage-mid)}
+.shop-item.rare{border-color:var(--accent-plum);background:rgba(123,83,113,0.04)}
+.shop-item-icon{
+  grid-column:1;
+  width:60px;height:60px;
+  background:var(--bg-deep);
+  border-radius:var(--radius-md);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+}
+.shop-item-icon svg{width:60%;height:60%}
+.shop-item-name{
+  grid-column:2;
+  font-family:var(--font-display);
+  font-size:1.35rem;
+  font-weight:500;
+  line-height:1.15;
+}
+.shop-item-price-slot{grid-column:3;justify-self:end}
+.shop-item-desc{
+  grid-column:1 / -1;
+  font-family:var(--font-body);
+  font-size:1.05rem;
+  color:var(--text-secondary);
+  line-height:1.4;
+}
+.shop-item-action{grid-column:1 / -1}
+.shop-item-action .shop-buy-btn{width:100%}
+.shop-item-price{
+  display:flex;
+  align-items:center;
+  gap:0.3rem;
+  font-family:var(--font-body);
+  font-size:1.1rem;
+  font-weight:500;
+  color:#7A2F10;
+  flex-shrink:0;
+}
+.shop-item-price .icon{color:var(--accent-coral)}
+.shop-buy-btn{
+  min-width:80px;
+  min-height:var(--tap-min);
+  padding:0 1.25rem;
+  border-radius:var(--radius-md);
+  font-family:var(--font-body);
+  font-size:1.05rem;
+  font-weight:500;
+  border:2px solid var(--foliage-mid);
+  background:transparent;
+  color:var(--foliage-shadow);
+  cursor:pointer;
+  transition:all var(--duration-fast) var(--ease-gentle);
+  flex-shrink:0;
+}
+.shop-buy-btn:hover{background:rgba(115,135,93,0.10)}
+.shop-buy-btn:active{transform:scale(0.95)}
+.shop-buy-btn:disabled{opacity:0.4;cursor:not-allowed}
+.shop-buy-btn.owned{border-color:var(--success);color:var(--success);background:rgba(68,87,61,0.08)}
+.shop-buy-btn.locked{border-color:var(--border-mid);color:var(--text-muted);background:transparent}
+
+/* ── Profile ── */
+.profile-cards{display:flex;flex-direction:column;gap:0.75rem}
+.profile-card{
+  background:var(--bg-surface);
+  border:1.5px solid var(--border-light);
+  border-radius:var(--radius-lg);
+  padding:1.25rem 1.5rem;
+  box-shadow:var(--shadow-paper);
+  display:flex;
+  align-items:center;
+  gap:1rem;
+}
+.profile-card-icon{
+  width:56px;height:56px;
+  border-radius:var(--radius-md);
+  background:var(--bg-deep);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--foliage-shadow);
+  flex-shrink:0;
+}
+.profile-card-title{
+  font-family:var(--font-body);
+  font-size:1rem;
+  font-weight:500;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  color:var(--text-muted);
+  margin-bottom:0.2rem;
+}
+.profile-card-value{
+  font-family:var(--font-display);
+  font-size:1.75rem;
+  font-weight:500;
+  color:var(--text-primary);
+  line-height:1.1;
+}
+.profile-card-sub{
+  font-family:var(--font-body);
+  font-size:1rem;
+  color:var(--text-secondary);
+  margin-top:0.15rem;
+}
+
+/* ── Meal cards ── */
+.meal-collection-note{
+  font-family:var(--font-body);
+  font-size:1.05rem;
+  line-height:1.45;
+  color:var(--text-secondary);
+  margin-bottom:0.9rem;
+}
+.meal-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:0.75rem}
+.meal-card{
+  background:var(--bg-surface);
+  border:1.5px solid var(--border-light);
+  border-radius:var(--radius-lg);
+  overflow:hidden;
+  box-shadow:var(--shadow-paper);
+  transition:all var(--duration-normal) var(--ease-gentle);
+}
+.meal-card.locked{opacity:0.45;filter:grayscale(60%)}
+.meal-card-thumb{
+  height:72px;
+  background:var(--bg-deep);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.meal-card-thumb svg{width:44px;height:44px;color:var(--foliage-mid)}
+.meal-card-body{padding:0.75rem 1rem 1rem}
+.meal-card-name{
+  font-family:var(--font-display);
+  font-size:1.1rem;
+  font-weight:500;
+  margin-bottom:0.2rem;
+}
+.meal-card-ingredients{
+  font-family:var(--font-body);
+  font-size:1rem;
+  color:var(--text-secondary);
+  line-height:1.35;
+}
+.meal-card-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:0.25rem;
+  padding:0.2rem 0.5rem;
+  border-radius:var(--radius-pill);
+  font-family:var(--font-body);
+  font-size:1rem;
+  font-weight:500;
+  margin-top:0.4rem;
+}
+.meal-card-badge.unlocked{background:rgba(68,87,61,0.12);color:var(--success)}
+.meal-card-badge.locked{background:var(--bg-inset);color:var(--text-muted)}
+
+/* ── Exercise play screen ── */
+#screen-play{
+  background:var(--bg-primary);
+  z-index:30;
+  padding:0;
+}
+.play-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:1rem 1.25rem;
+  border-bottom:1px solid var(--border-light);
+  background:var(--bg-surface);
+  flex-shrink:0;
+}
+.play-title{
+  font-family:var(--font-display);
+  font-size:1.6rem;
+  font-weight:500;
+  color:var(--text-primary);
+}
+.play-area{
+  flex:1;
+  padding:1.5rem 1.25rem;
+  overflow-y:auto;
+  display:flex;
+  flex-direction:column;
+  gap:1.25rem;
+}
+.play-footer{
+  padding:1.25rem;
+  border-top:1px solid var(--border-light);
+  background:var(--bg-surface);
+  flex-shrink:0;
+  display:flex;
+  flex-direction:column;
+  gap:0.75rem;
+}
+
+/* ── Tile match game ── */
+.tile-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:0.75rem;
+  width:100%;
+}
+/* One rule for the tile. There used to be two: this one, written when a tile
+   was a flat button, and a second further down that added the two-sided flip.
+   The old one set overflow:hidden, and overflow other than visible forces
+   transform-style:preserve-3d to flatten. Flattened, backface-visibility
+   cannot hide the back, so the back stayed painted over the front and every
+   revealed tile showed the same face-down leaf instead of its symbol. The
+   game was unplayable and looked like a content bug.
+
+   The background, border and svg sizing are gone from here too: .tile-back
+   and .tile-front each carry their own now, and having both meant the tile
+   painted a third surface behind the two faces. */
+.tile{
+  aspect-ratio:1;
+  border:none;
+  background:none;
+  padding:0;
+  cursor:pointer;
+  font-size:0;
+  position:relative;
+  transform-style:preserve-3d;
+  transition:transform 300ms var(--ease-gentle);
+}
+/* Only while face-down. A flipped tile is already holding a rotateY, and a
+   scale here would replace it and flick the tile back over mid-press. */
+.tile:not(.flipped):active{transform:scale(0.93)}
+.tile.flipped{transform:rotateY(180deg)}
+/* The fade goes on the faces, never on .tile. Opacity below 1 is a grouping
+   property: it flattens transform-style:preserve-3d exactly as overflow does.
+   Fading the tile itself re-broke the flip for matched pairs only, so a
+   matched pair kept showing the face-down leaf while an unmatched flip was
+   fine. Same bug as the overflow one, wearing a different hat. */
+.tile.matched{cursor:default}
+.tile.matched .tile-face{opacity:0.75}
+
+/* ── Pattern sequence game ── */
+.pattern-display{
+  display:flex;
+  justify-content:center;
+  gap:0.75rem;
+  flex-wrap:wrap;
+  min-height:80px;
+  align-items:center;
+  padding:1rem;
+  background:var(--bg-surface);
+  border-radius:var(--radius-lg);
+  border:1.5px solid var(--border-light);
+}
+.pattern-dot{
+  width:56px;height:56px;
+  border-radius:50%;
+  border:2px solid transparent;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:var(--font-body);
+  font-size:1.5rem;
+  font-weight:600;
+  color:var(--text-on-dark);
+  transition:all var(--duration-fast) var(--ease-gentle);
+}
+.pattern-dot.active{transform:scale(1.1)}
+/* A fixed row of four rather than a wrapping flex line. Wrapping put three
+   buttons on one row and orphaned the fourth on its own, which reads as a
+   different kind of choice. Equal columns keep the four reading as one set. */
+.pattern-options{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:0.5rem;
+  justify-items:stretch;
+}
+.pattern-options .pattern-opt-btn{min-width:0;width:100%}
+.pattern-opt-label{
+  font-family:var(--font-body);
+  font-size:1rem;
+  font-weight:500;
+  line-height:1.1;
+  color:var(--text-secondary);
+}
+/* Icon over its name. Taller than the tap floor because it now carries two
+   rows, and the name is what makes the choice readable without having to
+   interpret a small line drawing. */
+.pattern-opt-btn{
+  min-width:80px;
+  min-height:84px;
+  padding:0.5rem 0.6rem;
+  border-radius:var(--radius-lg);
+  font-family:var(--font-body);
+  font-size:1.5rem;
+  font-weight:600;
+  border:2.5px solid var(--border-mid);
+  background:var(--bg-surface);
+  cursor:pointer;
+  transition:all var(--duration-fast) var(--ease-gentle);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:0.15rem;
+  color:var(--text-primary);
+}
+.pattern-opt-btn:active{transform:scale(0.93)}
+.pattern-opt-btn:hover{border-color:var(--foliage-mid)}
+.pattern-opt-btn.selected{background:rgba(115,135,93,0.15);border-color:var(--foliage-mid)}
+.pattern-opt-btn.correct{background:rgba(68,87,61,0.15);border-color:var(--success);color:var(--success)}
+.pattern-opt-btn.wrong{background:rgba(174,56,43,0.08);border-color:var(--accent-red);color:var(--accent-red)}
+
+/* ── Odd one out game ── */
+.odd-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:0.875rem;
+}
+.odd-item{
+  aspect-ratio:1;
+  background:var(--bg-surface);
+  border:2.5px solid var(--border-mid);
+  border-radius:var(--radius-lg);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  transition:all var(--duration-fast) var(--ease-gentle);
+  gap:0.4rem;
+  padding:0.5rem;
+}
+.odd-item:active{transform:scale(0.94)}
+.odd-item:hover{border-color:var(--foliage-mid)}
+.odd-item.correct{background:rgba(68,87,61,0.12);border-color:var(--success)}
+.odd-item.wrong{background:rgba(174,56,43,0.08);border-color:var(--accent-red)}
+.odd-item svg{width:48px;height:48px;color:var(--foliage-shadow)}
+.odd-item-label{
+  font-family:var(--font-body);
+  font-size:1rem;
+  font-weight:500;
+  color:var(--text-secondary);
+  text-align:center;
+  line-height:1.2;
+}
+
+/* ── Word pairs game ── */
+/* Three columns, not two. This is a matching game, so every card has to be
+   findable from every other, and two columns put the hardest level across
+   four and a half screens of scrolling. A third column takes a third of that
+   away. The cards stay above the tap floor because the row is shorter, not
+   because the cards are. */
+.word-pairs{
+  display:grid;
+  /* minmax(0,1fr), not 1fr. A bare 1fr floors each column at its widest word,
+     so the columns came out different widths and the grid read as ragged. */
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:0.5rem;
+}
+.word-card{
+  padding:0.9rem 0.5rem;
+  background:var(--bg-surface);
+  border:2.5px solid var(--border-mid);
+  border-radius:var(--radius-lg);
+  font-family:var(--font-display);
+  font-size:1.25rem;
+  font-weight:500;
+  color:var(--text-primary);
+  text-align:center;
+  cursor:pointer;
+  transition:all var(--duration-fast) var(--ease-gentle);
+  min-height:72px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.word-card:active{transform:scale(0.94)}
+.word-card:hover{border-color:var(--foliage-mid)}
+.word-card.selected{background:rgba(115,135,93,0.15);border-color:var(--foliage-mid)}
+.word-card.matched{background:rgba(68,87,61,0.10);border-color:var(--success);opacity:0.65;cursor:default}
+
+/* ════════════════════════════════════════════════════════════
+   MAHJONG KAKIS: the kopitiam table
+   ════════════════════════════════════════════════════════════
+
+   Ported from archive/mahjong-kakis/style.css. That sheet ran on the CtrlAI
+   tokens; everything below is remapped onto the Muted Botanical palette, and the
+   three portraits picked up botanical accents in place of the pink, purple and
+   slate they used to wear. Only the skin tone is a new value: the palette has no
+   token for it, and a green one would not do.
+
+   The table lives inside the existing exercise play screen. .play-area holds the
+   name panel and the table, .play-footer holds the player bar. Nothing here is on
+   a timer. Every duration comes from a token, so reduced motion zeroes it.
+   ──────────────────────────────────────────────────────────── */
+
+:root{
+  --kopi-accent:#7A4800;      /* 6.66:1 on bg-surface, 5.91:1 on bg-deep */
+  --kopi-tint:#EAE2D0;
+  --kopi-shade:rgba(122,72,0,0.30);
+  --kaki-dots:#7B5371;        /* was Scam Dojo blue, now plum, 5.53:1 on a tile */
+  --kaki-bamboo:#44573D;      /* was Memory Garden green, now foliage shadow, 6.85:1 */
+  --kaki-wind:#AE382B;        /* was danger red, now brick red, 5.39:1 */
+  --kaki-skin:#E0BC94;
+  --kaki-hair-dark:#2B2118;
+  --kaki-hair-grey:#B1B8A1;
+  --kaki-lily-shirt:#E07A5F;
+  --kaki-lily-flower:#C82A36;
+  --kaki-flower-heart:#E78F37;
+  --kaki-beng-cap:#31482E;
+  --kaki-beng-cup:#EAE2D0;
+  --kaki-rose-shirt:#7B5371;
+  --kaki-kopi:#7A6B5C;
+  --kaki-tile-gap:0.5rem;
+  --kaki-bubble-height:11.5rem;
+  --kaki-portrait-size:4.5rem;
+  /* A tile stops growing here. Without the ceiling a sixteen-tile wall on a
+     430px phone eats enough height that the player bar falls off the bottom, so
+     the grid centres its leftover space instead. */
+  --kaki-tile-max:78px;
+}
+
+/* Both panels are flex, which would otherwise beat the user agent [hidden] rule. */
+.kaki-table[hidden],
+.kaki-name-panel[hidden],
+.kaki-bar[hidden]{display:none}
+
+.kaki-sr{
+  position:absolute;
+  width:1px;height:1px;
+  margin:-1px;padding:0;border:0;
+  overflow:hidden;
+  clip:rect(0 0 0 0);
+  clip-path:inset(50%);
+  white-space:nowrap;
+}
+
+/* ── Name panel ── */
+.kaki-name-panel{
+  display:flex;
+  flex-direction:column;
+  gap:1.25rem;
+}
+.kaki-question{
+  font-family:var(--font-display);
+  font-size:1.75rem;
+  font-weight:500;
+  line-height:1.2;
+  color:var(--text-primary);
+}
+.kaki-chips{
+  display:flex;
+  flex-wrap:wrap;
+  gap:0.75rem;
+}
+.kaki-chip{
+  flex:1 1 auto;
+  min-height:var(--tap-min);
+  padding:0 1.25rem;
+  border:2px solid var(--border-mid);
+  border-radius:var(--radius-pill);
+  background:var(--bg-surface);
+  color:var(--text-primary);
+  font-family:var(--font-body);
+  font-size:1.2rem;
+  font-weight:500;
+  cursor:pointer;
+  transition:all var(--duration-fast) var(--ease-gentle);
+}
+.kaki-chip:hover{border-color:var(--kopi-accent);background:var(--kopi-tint)}
+.kaki-chip:active{transform:scale(0.97)}
+.kaki-chip:focus-visible{outline:3px solid var(--kopi-accent);outline-offset:3px}
+.kaki-label{
+  font-size:1.05rem;
+  color:var(--text-secondary);
+}
+.kaki-input{
+  width:100%;
+  min-height:var(--tap-min);
+  padding:0 1.25rem;
+  border:2px solid var(--border-mid);
+  border-radius:var(--radius-md);
+  background:var(--bg-inset);
+  color:var(--text-primary);
+  font-family:var(--font-body);
+  font-size:1.25rem;
+}
+.kaki-input:focus{outline:3px solid var(--kopi-accent);outline-offset:2px;border-color:var(--border-strong)}
+.kaki-name-panel .btn-lg{width:100%}
+.kaki-name-panel .kaki-label,
+.kaki-name-panel .kaki-input{margin-top:0.25rem}
+
+/* ── The table ── */
+.kaki-table{
+  display:flex;
+  flex-direction:column;
+  gap:0.875rem;
+}
+
+/* ── Kaki row ── */
+.kaki-row{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:0.5rem;
+}
+.kaki{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:0.25rem;
+  text-align:center;
+}
+.kaki-portrait{
+  display:block;
+  width:var(--kaki-portrait-size);
+  height:var(--kaki-portrait-size);
+  border-radius:50%;
+  background:var(--bg-surface);
+  box-shadow:var(--shadow-sm);
+}
+.kaki-portrait svg{width:100%;height:100%;border-radius:50%}
+.kaki-who{
+  font-size:1.1rem;
+  font-weight:500;
+  line-height:1.2;
+  color:var(--text-primary);
+}
+
+/* The ring is declared with its transition here and nowhere else, so it eases in
+   on the kaki who starts talking and vanishes the instant the class leaves the
+   one who stopped. Two portraits can never wear it at once. */
+.kaki.is-speaking .kaki-portrait{
+  transform:translateY(-4px);
+  box-shadow:0 0 0 4px var(--kopi-accent),var(--shadow-md);
+  transition:transform var(--duration-fast) var(--ease-gentle),
+             box-shadow var(--duration-fast) var(--ease-gentle);
+}
+.kaki.is-speaking .kaki-who{font-weight:600;color:var(--kopi-accent)}
+
+/* ── The bubble ── */
+
+/* The slot only ever grows. game.js measures it after every line that lands and
+   writes the tallest it has seen this deal into --kaki-slot-floor, so a shorter
+   line afterwards cannot pull the table back up under the player's finger. The
+   floor is cleared when a new wall is dealt, which is the one moment the player
+   is expecting the table to change. */
+.kaki-bubble-slot{
+  position:relative;
+  z-index:2;
+  display:flex;
+  min-height:max(var(--kaki-bubble-height),var(--kaki-slot-floor,0px));
+  padding-top:0.75rem;
+}
+.kaki-bubble{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+  justify-content:center;
+  gap:0.25rem;
+  width:100%;
+  min-height:calc(var(--kaki-bubble-height) - 0.75rem);
+  padding:0.875rem 1.125rem;
+  border:3px solid var(--kopi-accent);
+  border-radius:var(--radius-md);
+  background:var(--kopi-tint);
+  color:var(--text-primary);
+  font-family:var(--font-body);
+  font-size:1.2rem;
+  line-height:1.5;
+  text-align:left;
+  opacity:0;
+  pointer-events:none;
+  cursor:pointer;
+  transition:opacity var(--duration-normal) var(--ease-gentle);
+}
+.kaki-bubble[data-event]{
+  opacity:1;
+  pointer-events:auto;
+  animation:kaki-bubble-in var(--duration-normal) var(--ease-gentle) 1;
+}
+.kaki-bubble:focus-visible{outline:3px solid var(--kopi-accent);outline-offset:3px}
+.kaki-bubble-name{
+  font-size:1.15rem;
+  font-weight:600;
+  line-height:1.2;
+  color:var(--kopi-accent);
+}
+/* Four lines covers every line in the bank at the longest name the input takes.
+   Clamping the text and not the bubble keeps the pointer, which lives outside the
+   box, from being clipped away. */
+.kaki-bubble-text{
+  display:-webkit-box;
+  -webkit-box-orient:vertical;
+  -webkit-line-clamp:4;
+  line-clamp:4;
+  overflow:hidden;
+  overflow-wrap:break-word;
+}
+/* Two stacked triangles make the pointer: the outer one is the border colour,
+   the inner one the bubble face. Both sit under the speaking portrait. */
+.kaki-bubble::before,
+.kaki-bubble::after{
+  content:"";
+  position:absolute;
+  left:var(--kaki-arrow-x,50%);
+  width:0;height:0;
+  border-left:15px solid transparent;
+  border-right:15px solid transparent;
+  transform:translateX(-50%);
+}
+.kaki-bubble::before{top:-16px;border-bottom:16px solid var(--kopi-accent)}
+.kaki-bubble::after{
+  top:-11px;
+  border-left-width:12px;
+  border-right-width:12px;
+  border-bottom:13px solid var(--kopi-tint);
+}
+@keyframes kaki-bubble-in{
+  from{opacity:0;transform:translateY(6px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+/* ── Tiles ── */
+
+/* Light marble, made of two soft veins and a corner sheen over the surface.
+   Four columns that grow with the phone up to a ceiling and no further. */
+.kaki-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(var(--tap-min),var(--kaki-tile-max)));
+  justify-content:center;
+  gap:var(--kaki-tile-gap);
+  padding:0.5rem;
+  border:5px solid var(--kopi-accent);
+  border-radius:var(--radius-lg);
+  background-color:var(--bg-surface);
+  background-image:
+    linear-gradient(118deg,rgba(122,72,0,0.07) 0 6%,rgba(122,72,0,0) 6% 48%),
+    linear-gradient(296deg,rgba(122,72,0,0.05) 0 4%,rgba(122,72,0,0) 4% 60%),
+    radial-gradient(circle at 26% 18%,rgba(255,255,255,0.9),rgba(255,255,255,0) 62%);
+  box-shadow:var(--shadow-md);
+}
+.kaki-grid:focus{outline:none}
+
+.kaki-tile{
+  position:relative;
+  display:block;
+  width:100%;
+  min-width:var(--tap-min);
+  min-height:var(--tap-min);
+  aspect-ratio:1 / 1.08;
+  padding:0.25rem;
+  border:3px solid var(--border-mid);
+  border-radius:var(--radius-sm);
+  background:var(--bg-surface);
+  box-shadow:
+    inset 0 -10px 0 var(--kopi-tint),
+    0 4px 0 var(--kopi-shade),
+    var(--shadow-sm);
+  cursor:pointer;
+  animation:kaki-deal var(--duration-normal) var(--ease-gentle) backwards;
+  animation-delay:calc(var(--kaki-i,0) * var(--duration-fast) / 6);
+  transition:transform var(--duration-fast) var(--ease-gentle),
+             border-color var(--duration-fast) var(--ease-gentle),
+             background-color var(--duration-fast) var(--ease-gentle);
+}
+.kaki-tile svg{width:100%;height:100%}
+.kaki-tile text{font-family:var(--font-body)}
+.kaki-tile:focus-visible{outline:3px solid var(--kopi-accent);outline-offset:2px}
+
+.kaki-tile[data-state="selected"]{
+  border-color:var(--kopi-accent);
+  background:var(--kopi-tint);
+  transform:translateY(-4px);
+  box-shadow:
+    inset 0 -10px 0 rgba(122,72,0,0.18),
+    0 8px 0 var(--kopi-shade),
+    var(--shadow-md);
+}
+/* Space is kept so the grid never reflows when a pair goes home. */
+.kaki-tile[data-state="cleared"]{
+  visibility:hidden;
+  pointer-events:none;
+  animation:none;
+}
+.kaki-tile.is-clearing{animation:kaki-clear var(--duration-normal) var(--ease-gentle) forwards}
+.kaki-tile.is-wiggle{animation:kaki-wiggle var(--duration-normal) var(--ease-gentle) 1}
+
+/* When a kaki has offered help twice with nothing found in between, one pair
+   breathes for a moment. Nothing on screen calls it a hint and the tile stays an
+   ordinary tap. Reduced motion gets the same news as a steady accent edge. */
+.kaki-tile.is-glow{
+  border-color:var(--kopi-accent);
+  animation:kaki-glow calc(var(--duration-slow) * 2) var(--ease-gentle) 1;
+}
+@keyframes kaki-glow{
+  0%{box-shadow:inset 0 -10px 0 var(--kopi-tint),0 4px 0 var(--kopi-shade),var(--shadow-sm)}
+  50%{box-shadow:inset 0 -10px 0 var(--kopi-tint),0 0 0 6px var(--kopi-tint),0 4px 0 var(--kopi-shade),var(--shadow-md)}
+  100%{box-shadow:inset 0 -10px 0 var(--kopi-tint),0 4px 0 var(--kopi-shade),var(--shadow-sm)}
+}
+@media (prefers-reduced-motion:reduce){
+  .kaki-tile.is-glow{border-width:5px}
+}
+@keyframes kaki-deal{
+  from{opacity:0;transform:translateY(10px) scale(0.94)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+/* A pair pops before it goes home: a small swell in the first third, then the
+   fade out. The whole thing runs inside the 240ms game.js waits before clearing. */
+@keyframes kaki-clear{
+  0%{opacity:1;transform:translateY(-4px) scale(1)}
+  30%{opacity:1;transform:translateY(-7px) scale(1.06)}
+  100%{opacity:0;transform:translateY(-4px) scale(0.62)}
+}
+@keyframes kaki-wiggle{
+  0%{transform:translateY(-4px) rotate(0deg)}
+  25%{transform:translateY(-4px) translateX(-4px) rotate(-3deg)}
+  60%{transform:translateY(-4px) translateX(4px) rotate(3deg)}
+  100%{transform:translateY(-4px) translateX(0) rotate(0deg)}
+}
+
+/* ── Player bar ── */
+.kaki-bar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:0.75rem;
+  padding:0.5rem 0.75rem;
+  border-radius:var(--radius-md);
+  background:var(--bg-inset);
+  font-size:1.15rem;
+  line-height:1.2;
+}
+/* The name wins the space fight. It is the whole promise of the game, so it takes
+   what it needs and the decoration around it gives way. Tapping it reopens the
+   chooser, which is why it is a button and clears the tap floor. */
+.kaki-player-name{
+  flex:1 1 auto;
+  min-width:9ch;
+  min-height:var(--tap-min);
+  padding:0 0.5rem 0 0;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+  border:none;
+  background:none;
+  text-align:left;
+  font-family:var(--font-body);
+  font-size:inherit;
+  font-weight:600;
+  color:var(--kopi-accent);
+  text-decoration:underline;
+  text-decoration-style:dotted;
+  text-underline-offset:4px;
+  cursor:pointer;
+}
+.kaki-player-name:focus-visible{outline:3px solid var(--kopi-accent);outline-offset:2px}
+.kaki-progress{flex:none;color:var(--text-secondary)}
+
+/* One dot per pair, filled as they come home. Decoration only: the row is aria
+   hidden and the sentence beside it carries the same news, which is why it is the
+   row and not the player's name that stands down when width runs out. */
+.kaki-dots{
+  display:flex;
+  flex:none;
+  flex-wrap:nowrap;
+  align-items:center;
+  gap:0.25rem;
+}
+.kaki-dot{
+  flex:none;
+  width:0.5rem;
+  height:0.5rem;
+  border-radius:50%;
+  background:transparent;
+  box-shadow:inset 0 0 0 2px var(--text-muted);
+}
+.kaki-dot.is-found{
+  background:var(--kopi-accent);
+  box-shadow:none;
+  animation:kaki-dot-in var(--duration-fast) var(--ease-gentle) 1;
+}
+@keyframes kaki-dot-in{
+  from{transform:scale(0.4)}
+  to{transform:scale(1)}
+}
+
+/* ── The two biggest walls ── */
+
+/* Fourteen and sixteen tiles are the only deals that need every pixel. game.js
+   flags them and the table closes up a little: smaller ceiling on a tile, tighter
+   gutters, tighter boxes. Every other deal keeps the roomier shape. */
+.kaki-table[data-wall="big"]{
+  --kaki-tile-max:70px;
+  --kaki-bubble-height:10rem;
+  gap:0.5rem;
+}
+.kaki-table[data-wall="big"] .kaki-grid{padding:0.25rem}
+.kaki-table[data-wall="big"] .kaki-bubble-slot{padding-top:0.5rem}
+.kaki-table[data-wall="big"] .kaki-bubble{padding:0.625rem 1rem}
+
+/* Below 24rem the bar cannot hold the name, a dot row and the sentence at once.
+   The dots are aria-hidden decoration repeating "N of M pairs" word for word, and
+   the name is the whole promise of the game, so the name is what stays whole. */
+@media (max-width:24rem){
+  .kaki-dots{display:none}
+}
+
+/* ── Short phones ── */
+
+/* An iPhone SE is 667px tall, and this play screen already spends its header and
+   its player bar before the table gets a say. game.js caps the wall at three rows
+   here (see kakiMaxPairs) and everything vertical gives what it can: the
+   portraits give the most, since they are decoration and the tiles are not, and
+   the bubble drops to two resting lines. It still needs one flick to reach the
+   last row. The second row peeks well past the fold so it is obvious there is
+   more table down there. */
+@media (max-height:43.75rem){
+  :root{
+    --kaki-portrait-size:3rem;
+    --kaki-bubble-height:8rem;
+    --kaki-tile-gap:0.375rem;
+  }
+  .kaki-table{gap:0.5rem}
+  .kaki-who{font-size:1rem}
+  .kaki-bubble{padding:0.625rem 1rem}
+  .kaki-bubble-slot{padding-top:0.5rem}
+  /* Three lines of a long line at a long name still has to be readable, so the
+     clamp tightens rather than the type shrinking. */
+  .kaki-bubble-text{-webkit-line-clamp:3;line-clamp:3}
+  .kaki-table[data-wall="big"]{
+    --kaki-tile-max:66px;
+    --kaki-tile-gap:0.25rem;
+    --kaki-portrait-size:2.75rem;
+    gap:0.375rem;
+  }
+}
+
+/* ── Notification stack ── */
+#notification-stack{
+  position:absolute;
+  top:calc(var(--topbar-height) + 8px);
+  left:1rem;
+  right:1rem;
+  z-index:50;
+  display:flex;
+  flex-direction:column;
+  gap:0.5rem;
+  pointer-events:none;
+}
+.notif{
+  background:var(--bg-surface);
+  border:1.5px solid var(--border-mid);
+  border-left:4px solid var(--foliage-mid);
+  border-radius:var(--radius-md);
+  padding:0.875rem 1rem;
+  box-shadow:var(--shadow-md);
+  display:flex;
+  align-items:flex-start;
+  gap:0.75rem;
+  pointer-events:auto;
+  transform:translateY(-8px);
+  opacity:0;
+  transition:all var(--duration-normal) var(--ease-gentle);
+}
+.notif.show{transform:translateY(0);opacity:1}
+.notif.hide{transform:translateY(-8px);opacity:0;pointer-events:none}
+.notif-icon{color:var(--foliage-mid);flex-shrink:0;margin-top:2px}
+.notif-text{flex:1}
+.notif-title{
+  font-family:var(--font-body);
+  font-size:1rem;
+  font-weight:500;
+  color:var(--text-primary);
+  margin-bottom:0.1rem;
+}
+.notif-body{
+  font-family:var(--font-body);
+  font-size:1rem;
+  color:var(--text-secondary);
+  line-height:1.4;
+}
+.notif-warn{border-left-color:var(--accent-orange)}
+.notif-warn .notif-icon{color:var(--accent-orange)}
+.notif-success{border-left-color:var(--success)}
+.notif-success .notif-icon{color:var(--success)}
+.notif-info{border-left-color:var(--foliage-mid)}
+.notif-info .notif-icon{color:var(--foliage-mid)}
+.notif-streak{border-left-color:var(--streak)}
+.notif-streak .notif-icon{color:var(--streak)}
+.notif-rare{border-left-color:var(--accent-plum)}
+.notif-rare .notif-icon{color:var(--accent-plum)}
+
+/* ── Bottom nav ── */
+/* Inset from both edges. The tabs used to sit flush at 0px, and a control
+   hard against the side of the screen is the easiest one to hit by accident
+   with the hand that is holding the phone. */
+.bottom-nav{
+  height:var(--nav-height);
+  background:var(--bg-surface);
+  border-top:1.5px solid var(--border-light);
+  display:flex;
+  align-items:stretch;
+  flex-shrink:0;
+  padding:0 0.5rem;
+  z-index:20;
+}
+.nav-item{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:0.2rem;
+  background:transparent;
+  border:none;
+  cursor:pointer;
+  color:var(--text-muted);
+  transition:all var(--duration-fast) var(--ease-gentle);
+  font-family:var(--font-body);
+  font-size:1rem;
+  font-weight:500;
+  letter-spacing:0.02em;
+  padding:0.5rem;
+}
+.nav-item[hidden]{display:none}
+.nav-item:active{transform:scale(0.95)}
+.nav-item.active{color:var(--foliage-shadow)}
+.nav-item.active .icon{color:var(--foliage-mid)}
+.nav-item:focus-visible{outline:2px solid var(--foliage-mid);outline-offset:-2px}
+
+/* ── Share modal ── */
+.modal-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(43,33,24,0.45);
+  z-index:100;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  padding:0;
+}
+.modal-overlay[hidden]{display:none}
+.modal-sheet{
+  background:var(--bg-surface);
+  border-radius:var(--radius-xl) var(--radius-xl) 0 0;
+  border:1.5px solid var(--border-mid);
+  border-bottom:none;
+  width:100%;
+  max-width:var(--game-max-width);
+  max-height:85dvh;
+  overflow-y:auto;
+  padding:1.5rem 1.25rem calc(1.5rem + env(safe-area-inset-bottom));
+}
+.modal-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:1.25rem;
+}
+.modal-title{
+  font-family:var(--font-display);
+  font-size:1.75rem;
+  font-weight:500;
+  color:var(--text-primary);
+}
+.modal-actions{display:flex;flex-direction:column;gap:0.75rem;margin-top:1.25rem}
+
+/* ── Harvest confirmation ── */
+.harvest-confirm{
+  background:var(--bg-inset);
+  border:1.5px solid var(--border-mid);
+  border-radius:var(--radius-md);
+  padding:1rem;
+}
+.harvest-confirm[hidden]{display:none}
+.harvest-confirm-text{
+  font-family:var(--font-body);
+  font-size:1rem;
+  line-height:1.5;
+  color:var(--text-secondary);
+  margin-bottom:0.875rem;
+}
+.harvest-confirm-actions{display:flex;gap:0.625rem;flex-wrap:wrap}
+.harvest-confirm-actions .btn{flex:1;min-width:140px;padding:0 1rem}
+
+.share-card{
+  background:var(--bg-deep);
+  border-radius:var(--radius-lg);
+  border:1.5px solid var(--border-light);
+  overflow:hidden;
+}
+.share-card-inner{padding:1.5rem}
+.share-garden-preview{
+  display:flex;
+  justify-content:center;
+  gap:0.5rem;
+  flex-wrap:wrap;
+  margin-bottom:1rem;
+  min-height:60px;
+  align-items:center;
+}
+.share-preview-plant{width:60px;height:75px}
+.share-stats{
+  font-family:var(--font-body);
+  font-size:1rem;
+  color:var(--text-secondary);
+  text-align:center;
+  line-height:1.6;
+}
+.share-stats strong{color:var(--text-primary);font-weight:600}
+
+/* ── Water overlay animation ── */
+#water-overlay{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:200;
+  display:none;
+}
+#water-overlay.active{display:block}
+.water-drop{
+  position:absolute;
+  top:-20px;
+  width:8px;
+  height:16px;
+  background:var(--foliage-mid);
+  border-radius:50% 50% 50% 50% / 60% 60% 40% 40%;
+  opacity:0.7;
+  animation:water-fall 1s ease-in forwards;
+}
+@keyframes water-fall{
+  0%{transform:translateY(0) scale(1);opacity:0.7}
+  100%{transform:translateY(100vh) scale(0.8);opacity:0}
+}
+
+/* ── Celebration overlay ── */
+#celebration-overlay{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:200;
+  display:none;
+}
+#celebration-overlay.active{display:block}
+.confetti-leaf{
+  position:absolute;
+  top:-30px;
+  font-size:0;
+  width:12px;
+  height:20px;
+  border-radius:50%;
+  animation:confetti-fall linear forwards;
+}
+@keyframes confetti-fall{
+  0%{transform:translateY(0) rotate(0deg);opacity:1}
+  100%{transform:translateY(100vh) rotate(720deg);opacity:0}
+}
+
+/* ── Exercise instruction card ── */
+/* Tighter than it was. At 390px the instruction card was pushing the game
+   itself below the fold, so the player had to scroll past how-to-play to
+   reach the thing it describes. */
+.exercise-intro{
+  background:var(--bg-surface);
+  border:1.5px solid var(--border-light);
+  border-radius:var(--radius-lg);
+  padding:0.9rem 1.1rem;
+  margin-bottom:0.9rem;
+}
+.exercise-intro-title{
+  font-family:var(--font-display);
+  font-size:1.35rem;
+  font-weight:500;
+  margin-bottom:0.4rem;
+}
+.exercise-intro-body{
+  font-family:var(--font-body);
+  font-size:1rem;
+  color:var(--text-secondary);
+  line-height:1.55;
+}
+
+/* ── Round tracker ── */
+.round-tracker{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:0.5rem;
+  margin-bottom:0.75rem;
+}
+.round-dot{
+  width:10px;height:10px;
+  border-radius:50%;
+  background:var(--bg-inset);
+  border:1.5px solid var(--border-mid);
+  transition:all var(--duration-fast) var(--ease-gentle);
+}
+.round-dot.done{background:var(--foliage-mid);border-color:var(--foliage-mid)}
+.round-dot.current{background:var(--foliage-shadow);border-color:var(--foliage-shadow)}
+
+/* ── Completion card ── */
+.completion-card{
+  background:var(--bg-surface);
+  border:2px solid var(--foliage-mid);
+  border-radius:var(--radius-xl);
+  padding:2rem 1.5rem;
+  text-align:center;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:1rem;
+}
+.completion-icon{
+  width:96px;height:96px;
+  border-radius:50%;
+  background:rgba(115,135,93,0.15);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:var(--foliage-shadow);
+}
+.completion-title{
+  font-family:var(--font-display);
+  font-size:2rem;
+  font-weight:500;
+  color:var(--text-primary);
+}
+.completion-sub{
+  font-family:var(--font-body);
+  font-size:1.1rem;
+  color:var(--text-secondary);
+  line-height:1.5;
+}
+.completion-rewards{
+  display:flex;
+  flex-wrap:wrap;
+  gap:0.5rem;
+  justify-content:center;
+}
+.reward-chip{
+  display:inline-flex;
+  align-items:center;
+  gap:0.3rem;
+  padding:0.4rem 0.875rem;
+  border-radius:var(--radius-pill);
+  font-family:var(--font-body);
+  font-size:1rem;
+  font-weight:500;
+  border:1.5px solid transparent;
+}
+.reward-chip.coins{background:rgba(224,122,95,0.15);color:#7A2F10;border-color:var(--accent-coral)}
+.reward-chip.seed{background:rgba(115,135,93,0.12);color:var(--foliage-shadow);border-color:var(--foliage-mid)}
+.reward-chip.rare{background:rgba(123,83,113,0.12);color:var(--accent-plum);border-color:var(--accent-plum)}
+
+/* ── Result feedback row ── */
+.result-row{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:0.75rem;
+  padding:0.75rem;
+  border-radius:var(--radius-md);
+  font-family:var(--font-body);
+  font-size:1.05rem;
+  font-weight:500;
+  text-align:center;
+}
+.result-row.correct{background:rgba(68,87,61,0.10);color:var(--success);border:1.5px solid var(--success)}
+.result-row.wrong{background:rgba(174,56,43,0.07);color:var(--accent-red);border:1.5px solid var(--accent-red)}
+
+/* ── Streak bar in profile ── */
+.streak-track{
+  background:var(--bg-inset);
+  border-radius:var(--radius-pill);
+  height:14px;
+  border:1.5px solid var(--border-light);
+  overflow:hidden;
+  margin:0.5rem 0;
+}
+.streak-fill{
+  height:100%;
+  background:linear-gradient(90deg,var(--foliage-mid),var(--foliage-shadow));
+  border-radius:var(--radius-pill);
+  transition:width var(--duration-normal) var(--ease-gentle);
+}
+
+/* ════════════════════════════════════════════════════════════
+   LEVEL PATH — Duolingo-style spiral progression
+   ════════════════════════════════════════════════════════════ */
+
+/* Island section */
+.island-header{
+  display:flex;
+  align-items:center;
+  gap:1rem;
+  padding:1.25rem 1.5rem;
+  border-radius:var(--radius-xl);
+  margin-bottom:2rem;
+  position:relative;
+  overflow:hidden;
+}
+.island-header::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  opacity:0.15;
+  border-radius:var(--radius-xl);
+}
+.island-header.memory-meadow{background:var(--bg-deep);border:1.5px solid var(--foliage-mid)}
+.island-header.memory-meadow::before{background:var(--foliage-mid)}
+.island-header.pattern-peaks{background:rgba(231,143,55,0.08);border:1.5px solid var(--accent-orange)}
+.island-header.pattern-peaks::before{background:var(--accent-orange)}
+.island-header.logic-lake{background:rgba(123,83,113,0.08);border:1.5px solid var(--accent-plum)}
+.island-header.logic-lake::before{background:var(--accent-plum)}
+.island-header.word-woods{background:rgba(174,56,43,0.08);border:1.5px solid var(--accent-red)}
+.island-header.word-woods::before{background:var(--accent-red)}
+.island-header.kopitiam-corner{background:rgba(224,122,95,0.10);border:1.5px solid var(--accent-coral)}
+.island-header.kopitiam-corner::before{background:var(--accent-coral)}
+
+.island-icon{
+  width:72px;height:72px;
+  border-radius:var(--radius-lg);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+  background:var(--bg-surface);
+  box-shadow:var(--shadow-md);
+}
+.island-icon svg{width:40px;height:40px}
+.island-header.memory-meadow .island-icon{color:var(--foliage-shadow)}
+.island-header.pattern-peaks .island-icon{color:#7A4800}
+.island-header.logic-lake .island-icon{color:var(--accent-plum)}
+.island-header.word-woods .island-icon{color:var(--accent-red)}
+.island-header.kopitiam-corner .island-icon{color:var(--kopi-accent)}
+
+.island-title{
+  font-family:var(--font-display);
+  font-size:1.75rem;
+  font-weight:500;
+  line-height:1.1;
+  margin-bottom:0.2rem;
+}
+.island-desc{
+  font-family:var(--font-body);
+  font-size:1rem;
+  color:var(--text-secondary);
+  line-height:1.4;
+}
+.island-progress{
+  font-family:var(--font-body);
+  font-size:1rem;
+  font-weight:500;
+  color:var(--text-muted);
+  margin-top:0.3rem;
+  letter-spacing:0.04em;
+}
+
+/* Path container */
+.path-track{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:0;
+  padding:1rem 0 2rem;
+  position:relative;
+}
+
+/* Level node — 3D pill */
+.level-node{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  cursor:pointer;
+  transition:transform var(--duration-fast) var(--ease-gentle);
+  margin-bottom:1.75rem;
+  /* Path zigzag: JS assigns left/right offset */
+  width:100px;
+}
+.level-node:active{transform:scale(0.92)}
+.level-node:focus-visible{outline:3px solid var(--foliage-mid);outline-offset:4px;border-radius:var(--radius-lg)}
+
+/* 3D pill body */
+.node-pill{
+  width:88px;height:88px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  /* 3D effect: layered shadows */
+  box-shadow:
+    0 6px 0 var(--node-shadow, #44573D),
+    0 10px 20px rgba(43,33,24,0.18),
+    inset 0 2px 0 rgba(255,255,255,0.25);
+  background:var(--node-bg, var(--foliage-mid));
+  border:3px solid var(--node-border, var(--foliage-shadow));
+  transition:all var(--duration-fast) var(--ease-gentle);
+}
+.level-node:active .node-pill{
+  box-shadow:
+    0 2px 0 var(--node-shadow, #44573D),
+    0 4px 8px rgba(43,33,24,0.15),
+    inset 0 2px 0 rgba(255,255,255,0.2);
+  transform:translateY(4px);
+}
+
+/* Node inner icon */
+.node-pill svg{
+  width:40px;height:40px;
+  color:var(--node-icon-color, #F5EFEB);
+  filter:drop-shadow(0 1px 2px rgba(0,0,0,0.2));
+}
+
+/* Node level number badge */
+.node-badge{
+  position:absolute;
+  top:-8px;right:-8px;
+  width:28px;height:28px;
+  border-radius:50%;
+  background:var(--bg-surface);
+  border:2.5px solid var(--node-border, var(--foliage-mid));
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-family:var(--font-body);
+  font-size:1rem;
+  font-weight:600;
+  color:var(--text-primary);
+  box-shadow:var(--shadow-sm);
+  z-index:2;
+}
+
+/* Node label below pill */
+.node-label{
+  margin-top:0.6rem;
+  font-family:var(--font-body);
+  font-size:1rem;
+  font-weight:500;
+  color:var(--text-secondary);
+  text-align:center;
+  line-height:1.2;
+  max-width:90px;
+}
+
+/* ── Level states ── */
+
+/* Completed */
+.level-node.completed .node-pill{
+  --node-bg:var(--foliage-shadow);
+  --node-border:var(--foliage-deep);
+  --node-shadow:var(--foliage-deep);
+  --node-icon-color:#B1B8A1;
+}
+.level-node.completed .node-badge{
+  background:var(--foliage-mid);
+  border-color:var(--foliage-shadow);
+  color:#F5EFEB;
+}
+
+/* Current (next to play) */
+.level-node.current .node-pill{
+  --node-bg:var(--foliage-mid);
+  --node-border:var(--foliage-shadow);
+  --node-shadow:#44573D;
+  --node-icon-color:#F5EFEB;
+  animation:node-pulse 2.5s ease-in-out infinite;
+}
+@keyframes node-pulse{
+  0%,100%{transform:scale(1)}
+  50%{transform:scale(1.06)}
+}
+.level-node.current .node-badge{
+  background:var(--foliage-mid);
+  border-color:var(--foliage-shadow);
+  color:#F5EFEB;
+}
+
+/* Locked */
+.level-node.locked{
+  cursor:default;
+  pointer-events:none;
+}
+.level-node.locked .node-pill{
+  --node-bg:var(--bg-inset);
+  --node-border:var(--border-mid);
+  --node-shadow:var(--border-mid);
+  --node-icon-color:var(--border-mid);
+  box-shadow:
+    0 6px 0 var(--border-mid),
+    0 8px 16px rgba(43,33,24,0.08),
+    inset 0 2px 0 rgba(255,255,255,0.1);
+}
+.level-node.locked .node-badge{
+  background:var(--bg-inset);
+  border-color:var(--border-mid);
+  color:var(--border-mid);
+}
+.level-node.locked .node-label{
+  color:var(--border-mid);
+}
+
+/* ── Path connector line ── */
+
+/* Island completion banner */
+
+/* Level reward preview inside node label */
+.node-reward{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:0.2rem;
+  margin-top:0.25rem;
+  font-size:1rem;
+  color:var(--text-muted);
+}
+.node-reward .icon{width:0.9em;height:0.9em}
+
+/* Path start indicator */
+
+/* Exercise type tag on node */
+.node-type-tag{
+  position:absolute;
+  bottom:-6px;
+  left:50%;
+  transform:translateX(-50%);
+  padding:0.2rem 0.6rem;
+  border-radius:var(--radius-pill);
+  font-family:var(--font-body);
+  font-size:1rem;
+  font-weight:600;
+  letter-spacing:0.06em;
+  text-transform:uppercase;
+  white-space:nowrap;
+  z-index:2;
+}
+.node-type-tag.tiles{background:var(--foliage-mid);color:#F5EFEB}
+.node-type-tag.pattern{background:var(--accent-orange);color:#7A4800}
+.node-type-tag.oddone{background:var(--accent-plum);color:#F5EFEB}
+.node-type-tag.words{background:var(--accent-red);color:#F5EFEB}
+.node-type-tag.kakis{background:var(--accent-coral);color:#3A1F00}
+
+/* Reduced motion — stop pulse */
+@media (prefers-reduced-motion: reduce){
+  .level-node.current .node-pill{animation:none}
+}
+
+/* ════════════════════════════════════════════════════════════
+   COURSE SELECT SCREEN
+   ════════════════════════════════════════════════════════════ */
+
+.course-list{
+  display:flex;
+  flex-direction:column;
+  gap:1rem;
+}
+
+.course-card{
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  align-items:center;
+  column-gap:1rem;
+  row-gap:0.5rem;
+  padding:1.25rem 1.25rem;
+  background:var(--bg-surface);
+  border:2px solid var(--border-light);
+  border-radius:var(--radius-xl);
+  cursor:pointer;
+  transition:all var(--duration-normal) var(--ease-gentle);
+  text-align:left;
+  width:100%;
+  box-shadow:var(--shadow-paper);
+  position:relative;
+  overflow:hidden;
+}
+.course-card::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  opacity:0.06;
+}
+.course-card.memory-meadow::before{background:var(--foliage-mid)}
+.course-card.pattern-peaks::before{background:var(--accent-orange)}
+.course-card.logic-lake::before{background:var(--accent-plum)}
+.course-card.word-woods::before{background:var(--accent-red)}
+.course-card.kopitiam-corner::before{background:var(--accent-coral)}
+
+.course-card:not(.course-locked):hover{
+  border-color:var(--foliage-mid);
+  transform:translateY(-2px);
+  box-shadow:var(--shadow-md);
+}
+.course-card:not(.course-locked):active{transform:scale(0.98)}
+.course-card:focus-visible{outline:3px solid var(--foliage-mid);outline-offset:2px}
+
+.course-card.course-locked{
+  opacity:0.55;
+  cursor:default;
+  pointer-events:none;
+}
+.course-card.course-complete{
+  border-color:var(--foliage-mid);
+}
+
+.course-card-icon{
+  grid-column:1;
+  width:56px;height:56px;
+  border-radius:var(--radius-lg);
+  background:var(--bg-deep);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-shrink:0;
+  box-shadow:var(--shadow-sm);
+}
+.course-card-icon svg{width:38px;height:38px}
+.course-card.memory-meadow .course-card-icon{color:var(--foliage-shadow)}
+.course-card.pattern-peaks .course-card-icon{color:#7A4800}
+.course-card.logic-lake .course-card-icon{color:var(--accent-plum)}
+.course-card.word-woods .course-card-icon{color:var(--accent-red)}
+.course-card.kopitiam-corner .course-card-icon{color:var(--kopi-accent)}
+
+/* 1.35rem rather than 1.5rem: at 390px the longest course name, "Memory
+   Meadow", broke onto a second line at the larger size once the icon and
+   arrow had taken their columns. */
+.course-card-name{
+  grid-column:2;
+  font-family:var(--font-display);
+  font-size:1.35rem;
+  font-weight:500;
+  line-height:1.15;
+}
+.course-card-desc{
+  grid-column:1 / -1;
+  font-family:var(--font-body);
+  font-size:1.05rem;
+  color:var(--text-secondary);
+  line-height:1.45;
+}
+.course-card-progress{grid-column:1 / -1}
+.course-card-progress{
+  display:flex;
+  align-items:center;
+  gap:0.5rem;
+}
+.course-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:0.3rem;
+  padding:0.25rem 0.75rem;
+  border-radius:var(--radius-pill);
+  font-family:var(--font-body);
+  font-size:1rem;
+  font-weight:500;
+  border:1.5px solid transparent;
+}
+.course-badge.done{background:rgba(68,87,61,0.12);color:var(--success);border-color:var(--success)}
+.course-badge.progress{background:var(--bg-inset);color:var(--text-secondary);border-color:var(--border-mid)}
+.course-badge.locked{background:var(--bg-inset);color:var(--text-muted);border-color:var(--border-mid)}
+
+.course-arrow{
+  color:var(--foliage-mid);
+  flex-shrink:0;
+  width:1.5em;height:1.5em;
+}
+.course-lock{
+  color:var(--border-mid);
+  flex-shrink:0;
+}
+
+/* ── PATH BACK BAR ── */
+.path-back-bar{
+  margin-bottom:1.25rem;
+}
+
+/* ── PATH SVG CONNECTORS ── */
+.path-wrap{
+  position:relative;
+}
+.path-svg{
+  position:absolute;
+  top:0;left:0;
+  width:100%;height:100%;
+  pointer-events:none;
+  z-index:0;
+  overflow:visible;
+}
+.path-track{
+  position:relative;
+  z-index:1;
+}
+
+/* ── NODE BODY (tag + label + reward in flow) ── */
+.node-body{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:0.2rem;
+  margin-top:0.5rem;
+}
+
+/* ════════════════════════════════════════════════════════════
+   TILE FLIP
+   The .tile rule itself lives with the rest of the tile game further up.
+   Splitting it across two places is what hid the overflow:hidden that broke
+   this flip in the first place.
+   ════════════════════════════════════════════════════════════ */
+.tile-face{
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  backface-visibility:hidden;
+  border-radius:var(--radius-md);
+}
+.tile-back{
+  background:var(--bg-inset);
+  border:2px solid var(--border-mid);
+}
+.tile-back svg{
+  width:50%;height:50%;
+  color:var(--border-mid);
+}
+.tile-front{
+  background:var(--bg-surface);
+  border:2px solid var(--foliage-mid);
+  transform:rotateY(180deg);
+}
+.tile-front svg{
+  width:70%;height:70%;
+  color:var(--foliage-shadow);
+}
+.tile.matched .tile-front{
+  border-color:var(--foliage-mid);
+  background:rgba(115,135,93,0.10);
+}
+.tile.matched .tile-front svg{
+  color:var(--foliage-mid);
+}
+
+/* ════════════════════════════════════════════════════════════
+   SCREEN TRANSITIONS
+   ════════════════════════════════════════════════════════════ */
+.screen{
+  transition:opacity 220ms var(--ease-gentle),transform 220ms var(--ease-gentle);
+}
+.screen.exit-forward{
+  opacity:0;
+  transform:translateX(-16px);
+  pointer-events:none;
+}
+.screen.exit-back{
+  opacity:0;
+  transform:translateX(16px);
+  pointer-events:none;
+}
+.screen.enter-forward{
+  opacity:0;
+  transform:translateX(16px);
+}
+.screen.enter-back{
+  opacity:0;
+  transform:translateX(-16px);
+}
+.screen.enter-forward.active,
+.screen.enter-back.active{
+  opacity:1;
+  transform:translateX(0);
+}
+
+/* ════════════════════════════════════════════════════════════
+   COIN FLY ANIMATION
+   ════════════════════════════════════════════════════════════ */
+
+/* ════════════════════════════════════════════════════════════
+   STAGGER ENTRY
+   ════════════════════════════════════════════════════════════ */
+.stagger-item{
+  opacity:0;
+  transform:translateY(10px);
+  animation:stagger-in 300ms var(--ease-gentle) forwards;
+}
+@keyframes stagger-in{
+  to{opacity:1;transform:translateY(0)}
+}
+
+/* ════════════════════════════════════════════════════════════
+   THIRSTY PLANT SWAY (keyframe shared with shelf plots)
+   ════════════════════════════════════════════════════════════ */
+@keyframes thirsty-sway{
+  0%,100%{transform:translateX(-50%) rotate(-1.5deg)}
+  50%{transform:translateX(-50%) rotate(1.5deg)}
+}
+
+/* ════════════════════════════════════════════════════════════
+   GARDEN HINT CARD (first visit)
+   ════════════════════════════════════════════════════════════ */
+/* Stacked and compact: it sits above the pan window, where every pixel it
+   takes is a pixel of field the player loses. */
+.garden-hint-card{
+  display:flex;
+  flex-direction:column;
+  gap:0.5rem;
+  padding:0.9rem 1rem;
+  background:var(--bg-surface);
+  border:1.5px solid var(--foliage-mid);
+  border-radius:var(--radius-lg);
+  margin-bottom:0.6rem;
+}
+.garden-hint-head{display:flex;align-items:center;gap:0.6rem}
+.garden-hint-card .icon{color:var(--foliage-mid);flex-shrink:0}
+.garden-hint-title{
+  font-family:var(--font-display);
+  font-size:1.3rem;
+  font-weight:500;
+}
+.garden-hint-body{
+  font-family:var(--font-body);
+  font-size:1rem;
+  color:var(--text-secondary);
+  line-height:1.4;
+}
+.garden-hint-card .btn{width:100%}
+
+/* ════════════════════════════════════════════════════════════
+   MISC FIXES
+   ════════════════════════════════════════════════════════════ */
+
+/* Shop lock note */
+.shop-lock-note{
+  grid-column:1 / -1;
+  font-family:var(--font-body);
+  font-size:1rem;
+  color:var(--accent-plum);
+}
+.shop-free-label{
+  font-family:var(--font-body);
+  font-size:1.1rem;
+  font-weight:500;
+  color:var(--foliage-shadow);
+  white-space:nowrap;
+}
+.rare-tag{
+  color:var(--accent-plum);
+  font-size:1rem;
+  font-family:var(--font-body);
+  font-weight:500;
+  letter-spacing:0.06em;
+  white-space:nowrap;
+}
+
+/* Pattern turn message */
+.pattern-turn-msg{
+  font-family:var(--font-body);
+  font-size:1.1rem;
+  color:var(--text-muted);
+  font-style:italic;
+}
+
+/* Reduced motion — degrade to crossfade not zero */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{
+    animation-duration:0ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:0ms !important;
+  }
+  .screen.exit-forward,.screen.exit-back,
+  .screen.enter-forward,.screen.enter-back{
+    transition:opacity 100ms ease !important;
+    transform:none !important;
+  }
+  .shelf-plot.thirsty .plot-plant{animation:none}
+  .shelf-tag.affordable{animation:none}
+}
+
+/* ── Safe area ── */
+@supports(padding:max(0px)){
+  .topbar{padding-top:max(0.5rem, env(safe-area-inset-top))}
+  .bottom-nav{padding-bottom:max(0.5rem, env(safe-area-inset-bottom))}
+}
+
+</style>
+</head>
+<body>
+
+<!-- ══ SVG ICON DEFS — defined once, referenced everywhere ══ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="icon-seed" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 2c-1.5 0-3 1-3 3 0 3 3 5 3 5s3-2 3-5c0-2-1.5-3-3-3z"/>
+      <path d="M12 10v2"/>
+      <path d="M9 15c-2 0-4 2-4 4h14c0-2-2-4-4-4H9z"/>
+      <path d="M12 15v2"/>
+    </symbol>
+    <symbol id="icon-sprout" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 22V14"/>
+      <path d="M12 14c0-3-2-5-5-5 0 3 2 5 5 5z"/>
+      <path d="M12 14c0-3 2-5 5-5 0 3-2 5-5 5z"/>
+      <path d="M12 14V6"/>
+    </symbol>
+    <symbol id="icon-bloom" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="10" r="3"/>
+      <path d="M12 7c0-2 1-4 2-5 1 1 1 3-2 5z"/>
+      <path d="M12 7c0-2-1-4-2-5-1 1-1 3 2 5z"/>
+      <path d="M12 13c0 2 1 4 2 5 1-1 1-3-2-5z"/>
+      <path d="M12 13c0 2-1 4-2 5-1-1-1-3 2-5z"/>
+      <path d="M9 10c-2 0-4 1-5 2 1 1 3 1 5-2z"/>
+      <path d="M15 10c2 0 4 1 5 2-1 1-3 1-5-2z"/>
+      <path d="M12 13v4"/>
+      <path d="M9 19c0 2 1.5 3 3 3s3-1 3-3"/>
+    </symbol>
+    <symbol id="icon-water" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 3c-2 3-5 6-5 9 0 3 2 5 5 5s5-2 5-5c0-3-3-6-5-9z"/>
+      <path d="M9 14c0 2 1 3 3 3"/>
+    </symbol>
+    <symbol id="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="4"/>
+      <path d="M12 2v2"/><path d="M12 20v2"/>
+      <path d="M4.22 4.22l1.42 1.42"/><path d="M18.36 18.36l1.42 1.42"/>
+      <path d="M2 12h2"/><path d="M20 12h2"/>
+      <path d="M4.22 19.78l1.42-1.42"/><path d="M18.36 5.64l1.42-1.42"/>
+    </symbol>
+    <symbol id="icon-camera" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+      <circle cx="12" cy="13" r="4"/>
+    </symbol>
+    <symbol id="icon-pot" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M5 10h14"/>
+      <path d="M6 10l1.5 9c.3 1.5 1.5 2 3 2h3c1.5 0 2.7-.5 3-2l1.5-9"/>
+      <path d="M8 10V8c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/>
+      <path d="M10 6V5"/><path d="M14 6V5"/>
+    </symbol>
+    <symbol id="icon-coin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="9"/>
+      <path d="M12 7v10"/>
+      <path d="M9 9.5c0-1 1.5-2 3-2s3 1 3 2-1 2-3 2-3 1-3 2 1.5 2 3 2 3-1 3-2"/>
+    </symbol>
+    <symbol id="icon-shop" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+      <path d="M9 22V12h6v10"/>
+      <path d="M3 9h18"/>
+    </symbol>
+    <symbol id="icon-streak" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 2c0 3-2 4-2 6 0 1 .5 2 1.5 2.5C10 11 9 12 9 14c0 3 2 5 5 5s4-2 4-4c0-2-1-3-1.5-3.5.5.5 1 1 1 2 0 1-1 2-2 2s-2-1-2-2c0-2 2-3 2-5s-1.5-4.5-3.5-6z"/>
+      <path d="M12 22v-2"/>
+    </symbol>
+    <symbol id="icon-meal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M2 12h20c0 5-4 9-10 9S2 17 2 12z"/>
+      <path d="M8 8c1-1 2-2 2-4"/>
+      <path d="M12 8c1-1 2-2 2-4"/>
+      <path d="M16 8c1-1 2-2 2-4"/>
+      <path d="M4 12c0-4 3-7 8-7s8 3 8 7"/>
+    </symbol>
+    <symbol id="icon-kopi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M6 9h12l-1.4 7.8c-.25 1.3-1.3 2.2-2.6 2.2h-3.9c-1.3 0-2.35-.9-2.6-2.2z"/>
+      <path d="M5 9h14"/>
+      <path d="M4 21h16"/>
+      <path d="M9.5 6c0-1.1 1-1.6 1-2.7"/>
+      <path d="M13.5 6c0-1.1 1-1.6 1-2.7"/>
+    </symbol>
+    <symbol id="icon-gift" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="8" width="18" height="4" rx="1"/>
+      <path d="M12 8v13"/>
+      <path d="M5 12v9h14v-9"/>
+      <path d="M8 8c-1.5 0-3-1.5-3-3s1.5-3 3-3c2 0 3 2 4 6-1-1-2-2-4-2z"/>
+      <path d="M16 8c1.5 0 3-1.5 3-3s-1.5-3-3-3c-2 0-3 2-4 6 1-1 2-2 4-2z"/>
+    </symbol>
+    <symbol id="icon-book" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+      <path d="M9 7h6"/><path d="M9 11h4"/>
+    </symbol>
+    <symbol id="icon-brain" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M9.5 2a3 3 0 0 1 3 3v1a3 3 0 0 1 3-3 3 3 0 0 1 3 3c0 1-.5 2-1 2.5.5.5 1 1.5 1 2.5 0 2-1.5 3.5-3.5 3.5H14"/>
+      <path d="M9.5 2a3 3 0 0 0-3 3v1a3 3 0 0 0-3-3 3 3 0 0 0-3 3c0 1 .5 2 1 2.5C4 9 3 10.5 3 11.5c0 2 1.5 3.5 3.5 3.5H8"/>
+      <path d="M12 6v12"/><path d="M9 12h6"/><path d="M8 16h8"/>
+    </symbol>
+    <symbol id="icon-garden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 12l9-9 9 9"/>
+      <path d="M5 12v9h14v-9"/>
+      <path d="M12 16c0-2 1-3 2-4 1 1 1 2 0 4"/>
+      <path d="M12 16c0-2-1-3-2-4-1 1-1 2 0 4"/>
+      <path d="M12 16v4"/>
+    </symbol>
+    <symbol id="icon-share" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="18" cy="5" r="3"/>
+      <circle cx="6" cy="12" r="3"/>
+      <circle cx="18" cy="19" r="3"/>
+      <path d="M8.59 10.49l6.83-3.97"/>
+      <path d="M8.59 13.51l6.83 3.97"/>
+    </symbol>
+    <symbol id="icon-mute" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+      <path d="M22 9l-6 6"/><path d="M16 9l6 6"/>
+    </symbol>
+    <symbol id="icon-sound" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M11 5L6 9H2v6h4l5 4V5z"/>
+      <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+      <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+    </symbol>
+    <symbol id="icon-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+      <path d="M9 22V12h6v10"/>
+    </symbol>
+    <symbol id="icon-profile" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+      <circle cx="12" cy="7" r="4"/>
+    </symbol>
+    <symbol id="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20 6L9 17l-5-5"/>
+    </symbol>
+    <symbol id="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M18 6L6 18"/><path d="M6 6l12 12"/>
+    </symbol>
+    <symbol id="icon-arrow-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M5 12h14"/><path d="M12 5l7 7-7 7"/>
+    </symbol>
+    <symbol id="icon-arrow-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/>
+    </symbol>
+    <symbol id="icon-tiles" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="3" width="7" height="7" rx="1"/>
+      <rect x="14" y="3" width="7" height="7" rx="1"/>
+      <rect x="3" y="14" width="7" height="7" rx="1"/>
+      <rect x="14" y="14" width="7" height="7" rx="1"/>
+    </symbol>
+    <symbol id="icon-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+      <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+    </symbol>
+    <symbol id="icon-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="9"/>
+      <path d="M12 7v5l3 3"/>
+    </symbol>
+    <symbol id="icon-leaf" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10z"/>
+      <path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>
+    </symbol>
+    <symbol id="icon-flower" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="2"/>
+      <path d="M12 10c0-2-1-3-2-4-1 1-1 2 0 4"/>
+      <path d="M12 10c0-2 1-3 2-4 1 1 1 2 0 4"/>
+      <path d="M12 14c0 2-1 3-2 4-1-1-1-2 0-4"/>
+      <path d="M12 14c0 2 1 3 2 4 1-1 1-2 0-4"/>
+      <path d="M10 12c-2 0-3-1-4-2 1-1 2-1 4 0"/>
+      <path d="M14 12c2 0 3-1 4-2-1-1-2-1-4 0"/>
+      <path d="M12 14v8"/>
+      <path d="M9 19c0 2 1 3 3 3s3-1 3-3"/>
+    </symbol>
+    <symbol id="icon-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 7h16"/>
+      <path d="M4 12h16"/>
+      <path d="M4 17h16"/>
+    </symbol>
+  </defs>
+</svg>
+
+<!-- ══ APP ROOT ══ -->
+<div id="app">
+
+  <!-- Top bar -->
+  <header class="topbar" role="banner">
+    <div class="topbar-left">
+      <span class="coin-chip" id="coin-display" aria-label="Coins">
+        <svg class="icon icon-sm"><use href="#icon-coin"/></svg>
+        <span id="coin-count">0</span>
+      </span>
+      <span class="streak-chip" aria-label="Streak">
+        <svg class="icon icon-sm"><use href="#icon-streak"/></svg>
+        <span id="streak-count">0</span>
+      </span>
+    </div>
+    <div class="topbar-right">
+      <!-- Labelled on purpose. A bare hamburger is exactly the abstract
+           convention that guidance for older users warns against assuming. -->
+      <button class="icon-btn menu-btn" id="menu-btn" aria-label="Open menu" aria-haspopup="dialog" aria-expanded="false">
+        <svg class="icon"><use href="#icon-menu"/></svg>
+        <span class="menu-btn-label">Menu</span>
+        <span class="menu-badge" id="menu-badge" hidden></span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Notification stack -->
+  <div id="notification-stack" aria-live="polite" aria-atomic="false"></div>
+
+  <!-- ══ SCREENS ══ -->
+  <main class="screens" role="main">
+
+    <!-- ── PATCHES SCREEN — the garden itself ── -->
+    <section class="screen active" id="screen-garden2" role="tabpanel" aria-labelledby="nav-garden2">
+      <div class="screen-header">
+        <h1 class="screen-title">Your Patches</h1>
+        <p class="screen-subtitle" id="garden-date"></p>
+      </div>
+      <!-- Today's tasks, in one line. The full list still lives in the menu;
+           this is here so a player who never opens the menu still knows there
+           is something waiting today. -->
+      <button class="today-strip" id="today-strip" hidden>
+        <svg class="icon" aria-hidden="true"><use href="#icon-sun"/></svg>
+        <span class="today-strip-text" id="today-strip-text"></span>
+        <svg class="icon icon-sm today-strip-arrow" aria-hidden="true"><use href="#icon-arrow-right"/></svg>
+      </button>
+      <!-- First-visit hint. It lives above the pan window, not inside the
+           field, so it cannot be dragged out of sight. -->
+      <div class="garden-hint-slot" id="garden-hint-slot"></div>
+      <!-- Bounded pan window: the field is larger than the phone, so it is
+           dragged under this fixed window instead of the page scrolling. The
+           header and the water button never move. -->
+      <div class="garden2-viewport" id="garden2-viewport">
+        <div class="garden2-field" id="garden2-scene"></div>
+      </div>
+      <div class="garden-actions">
+        <!-- Every patch has to be reachable without a drag. This shrinks the
+             field to fit the window so the whole garden is tappable. -->
+        <button class="btn btn-secondary btn-view" id="btn-fit-view">
+          <svg class="icon" aria-hidden="true"><use href="#icon-garden"/></svg>
+          <span id="btn-fit-view-label">See whole garden</span>
+        </button>
+        <button class="btn btn-primary btn-lg" id="btn-water-all">
+          <svg class="icon"><use href="#icon-water"/></svg>
+          Water all plants
+        </button>
+      </div>
+    </section>
+
+    <!-- ── EXERCISES SCREEN — LEVEL PATH ── -->
+    <section class="screen" id="screen-exercises" role="tabpanel" aria-labelledby="nav-exercises">
+      <div class="screen-header">
+        <h1 class="screen-title">Brain Exercises</h1>
+        <p class="screen-subtitle">Each course trains a different part of your mind. Start anywhere you like, no timers and no pressure.</p>
+      </div>
+      <div id="level-path-container"></div>
+    </section>
+
+    <!-- ── SHOP SCREEN ── -->
+    <section class="screen" id="screen-shop" role="tabpanel" aria-labelledby="nav-shop">
+      <div class="screen-header">
+        <h1 class="screen-title">Seed Shop</h1>
+        <p class="screen-subtitle">Fixed prices, no randomness. One free seed every day.</p>
+      </div>
+      <div class="shop-coins-bar">
+        <span class="coin-chip large">
+          <svg class="icon"><use href="#icon-coin"/></svg>
+          <span id="shop-coin-count">0</span> coins
+        </span>
+        <button class="btn btn-ghost btn-sm" id="btn-free-seed">
+          <svg class="icon icon-sm"><use href="#icon-gift"/></svg>
+          Free daily seed
+        </button>
+      </div>
+      <div class="shop-grid" id="shop-grid"></div>
+    </section>
+
+    <!-- ── PROFILE SCREEN ── -->
+    <section class="screen" id="screen-profile" role="tabpanel" aria-labelledby="nav-profile">
+      <div class="screen-header">
+        <h1 class="screen-title">Your Profile</h1>
+      </div>
+      <div class="profile-cards" id="profile-cards"></div>
+
+      <!-- Meal cards section -->
+      <div class="subsection-head" style="margin-top:2rem">Meal Collection</div>
+      <p class="meal-collection-note" id="meal-collection-note"></p>
+      <div class="meal-grid" id="meal-grid"></div>
+    </section>
+
+    <!-- ── ALMANAC SCREEN ── -->
+    <section class="screen" id="screen-almanac" aria-label="Garden Almanac">
+      <div class="play-header">
+        <button class="icon-btn" id="btn-back-from-almanac" aria-label="Back to profile">
+          <svg class="icon" aria-hidden="true"><use href="#icon-arrow-left"/></svg>
+        </button>
+        <div class="play-title">The Garden Almanac</div>
+        <div style="width:44px"></div>
+      </div>
+      <div class="almanac-body" id="almanac-body"></div>
+    </section>
+
+    <!-- ── EXERCISE PLAY SCREEN ── -->
+    <section class="screen" id="screen-play" role="dialog" aria-modal="true" aria-label="Exercise">
+      <div class="play-header">
+        <button class="icon-btn" id="btn-back-from-play" aria-label="Back to exercises">
+          <svg class="icon"><use href="#icon-arrow-left"/></svg>
+        </button>
+        <div class="play-title" id="play-title"></div>
+        <div style="width:44px"></div>
+      </div>
+      <div class="play-area" id="play-area"></div>
+      <div class="play-footer" id="play-footer"></div>
+    </section>
+
+  </main>
+
+  <!-- ══ BOTTOM NAV ══ -->
+  <nav class="bottom-nav" role="navigation" aria-label="Main navigation">
+    <button class="nav-item active" id="nav-garden2" data-screen="garden2" role="tab" aria-selected="true" aria-controls="screen-garden2" aria-label="Your patches">
+      <svg class="icon" aria-hidden="true"><use href="#icon-leaf"/></svg>
+      <span>Patches</span>
+    </button>
+    <button class="nav-item" id="nav-exercises" data-screen="exercises" role="tab" aria-selected="false" aria-controls="screen-exercises" aria-label="Brain exercises">
+      <svg class="icon" aria-hidden="true"><use href="#icon-brain"/></svg>
+      <span>Exercises</span>
+    </button>
+    <button class="nav-item" id="nav-shop" data-screen="shop" role="tab" aria-selected="false" aria-controls="screen-shop" aria-label="Seed shop">
+      <svg class="icon" aria-hidden="true"><use href="#icon-shop"/></svg>
+      <span>Shop</span>
+    </button>
+    <button class="nav-item" id="nav-profile" data-screen="profile" role="tab" aria-selected="false" aria-controls="screen-profile" aria-label="Profile">
+      <svg class="icon" aria-hidden="true"><use href="#icon-profile"/></svg>
+      <span>Profile</span>
+    </button>
+  </nav>
+
+  <!-- ══ SHARE MODAL ══ -->
+  <div class="modal-overlay" id="share-modal" role="dialog" aria-modal="true" aria-labelledby="share-title" hidden>
+    <div class="modal-sheet">
+      <div class="modal-header">
+        <h2 class="modal-title" id="share-title">Share Your Garden</h2>
+        <button class="icon-btn" id="btn-close-share" aria-label="Close">
+          <svg class="icon"><use href="#icon-close"/></svg>
+        </button>
+      </div>
+      <div class="share-card">
+        <div class="share-card-inner">
+          <div class="share-garden-preview" id="share-preview"></div>
+          <div class="share-stats" id="share-stats"></div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-primary btn-lg" id="btn-share-native">
+          <svg class="icon"><use href="#icon-share"/></svg>
+          Share
+        </button>
+        <button class="btn btn-secondary" id="btn-copy-share">
+          <svg class="icon"><use href="#icon-arrow-right"/></svg>
+          Copy text
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ PLANT DETAIL MODAL ══ -->
+  <div class="modal-overlay" id="plant-detail-modal" role="dialog" aria-modal="true" aria-label="Plant details" hidden></div>
+
+  <!-- ══ SEED MENU MODAL (Patches tab: tap an empty patch to plant) ══ -->
+  <div class="modal-overlay" id="seed-menu-modal" role="dialog" aria-modal="true" aria-label="Choose a seed to plant" hidden></div>
+
+  <!-- ══ MENU ══
+       Today's tasks, sound and sharing, all behind one button so the top bar
+       stays quiet. The daily card host lives here now, not in the garden. -->
+  <div class="modal-overlay" id="menu-modal" role="dialog" aria-modal="true" aria-labelledby="menu-title" hidden>
+    <div class="modal-sheet" role="document">
+      <div class="modal-header">
+        <h2 class="modal-title" id="menu-title">Menu</h2>
+        <button class="icon-btn" id="btn-close-menu" aria-label="Close menu">
+          <svg class="icon"><use href="#icon-close"/></svg>
+        </button>
+      </div>
+      <div id="daily-card"></div>
+      <div class="modal-actions">
+        <button class="btn btn-secondary menu-row" id="mute-btn" aria-pressed="false">
+          <svg class="icon" id="mute-icon"><use href="#icon-sound"/></svg>
+          <span id="mute-label">Sound is on</span>
+        </button>
+        <button class="btn btn-secondary menu-row" id="share-btn">
+          <svg class="icon"><use href="#icon-share"/></svg>
+          Share your garden
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ WATER ANIMATION OVERLAY ══ -->
+  <div id="water-overlay" aria-hidden="true"></div>
+
+  <!-- ══ CONFETTI / CELEBRATION ══ -->
+  <div id="celebration-overlay" aria-hidden="true"></div>
+
+</div><!-- /app -->
+
+<script>
+const __ART__={"art/characters/gardener-walk.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAWAAAALACAMAAACaS1gNAAAAwFBMVEVwaV4lGh3Ol27rzKRULxfrv7F4SSyFPymaWUrLzMWAgH6dnZcAAAAWCwLMxq7l28Pu1qohGA4wJhp8dlP747toZEZaVDqSjWyXfE6Ig2Pj172inn7ZtYWskV/myp1VQizc0LX47dY+NCS7tJhHQi5+YD7Ep3S4lXH32ZChfmCPbk5uVTe3hlD528GupovFnF1sQyvzyYvez7JKJhqcYUCsiWnVrXupe1n117+WaT/YuqM6GBTasnvVpoH658QAAADt72PLAAAAQHRSTlP///////////////////////////////////////////////////////////////////////////////////8AwnuxRAAALztJREFUeNrtndmS4ziuhu2spZcJSCJlbdZmS5acXnLfa/P7v9UBpKzqPnfyxM+Y6RggqmruMOiPIEiRNP7ZSc2pzRSBAlbAagpYAStgNQWsgBWwmgJWwGoKWAErYDUFrIAVsJoCVsAKWE0B/28AJiJrHERgiBQwW3N5ebleWyKD5WGD9frZBWJOCHKTD2f5nQq4KS+Dy2AdEGNGxm17HrbgkgeOsNODdgEHbNF87XMQrK8MHLAtg+0lu14bLOCHXrxWwRo9cGa7Xa/Xly/gPDbbgt1enRHqRMAkeNmouAqucBHT/lL8XrJP/gtMYeoKTjWuaux3DfQbi1eeyGuaOnJTAadpenlZGXN5hUw02nHlGThUlwEy06gMnmXkGPAaGDD1zxLt+oWMBI0DTJTudjtqyvWlj+VQpmlRGHrGFggeud3uUpK3ulxbrNuXy8sHKqrLiaVnNo1vKYtn+rLe0hwKmCPe95ZXDizfk2ESKa9xt5frhwYLOH00t5dXkzeX0wDvX3Ylz46AHh6hfPd7oi7tq/XLHJvAFKfpnuyWQybw1o8oWD/QLZ2ggH9ugl8qg60Q5a6o1mTrC+han+5Snhz98/r2Acs3fdn2xQPZl0coYBm5vUd0QS9XwLWeJ9xLEFw987fL89UVcu1My23f8+pmfoN+w9DuZX0lOWyfryz4Q2OYGxdXz1DAh6qqxG9lwID5I2NtDG3NFdIvHYpnCfflmYKrqYTPAnz7Ilth5HfRWNR+e/50hd2lkSzKj5UJoIDf7bEKpvud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","art/land/grass.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAMAAACdt4HsAAAAYFBMVEXL1rS/y6LDy6XW38QAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABnQdgcAAABuUlEQVR42q1XSYLEIAikqv//57HFBVpMMkEPiQvIXqrIRYP7balgKGA7wKD4Wek9pUD5kTpCJy5Tpc/vunbQN4XKJBtxnWP9ahsCiCGARt9BNtc7MbBaZyxxRuumjaAbTEdWVKTqy2AJg3G6KnAwvxvwIj6B+636LJ7SD7DZYs9f1GeTTVYz5Ial2qbBLeTUVk1oXXV0I7vYTP1GqVyqAOsQWCl3uVmDRFG9S58a6JucdrmN4cmebhIkSuwFp5vlgSGJLWEUy1UsvcMk1a7E35vqrOQSTuosW0p7qXTV5r2jdemChj7nfe3515LHfkbMDutCn58mAIGkwfjNO5IRGi7oMuZrdUz+Nc3D8v4tGLvDRhpneBYH0IDqLTyEEBI49XG1RRtPoG8OUTxRRDFpr8fIRquKRYCPux1zWr5BknZGdX40W/vQnEc7KJKJJj25KRNTJAQm7v29AsrT+v1cDh+0f21wzITXTjwZxheJdDCVXxZTvpyzgHIG0pKgmoP19MFy4GjLHq7J4z1/wchecfKXrLPXvJcXzWNX3deX7RPX/cSDI//kOfLoyj37kg/P9NM3//jOPf//ANcnBSUZ2QydAAAAAElFTkSuQmCC","art/land/patch-bare.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAAoCAMAAACVZWnNAAAAwFBMVEW6mosAAAB4WEyAaFpjUDuYh2jVwKSHdm6/pojQroXfvZDozq2delUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABf8r8cAAAAQHRSTlP///////////////////////////////////////////////////////////////////////////////////8AwnuxRAAAAWhJREFUeNqllguShCAMRFMdAjizd+L+t1pY5OeEQVmqLEF4BkmbhMI/Gg0jMEJgzgPmNEq3ANRHCkwAJICIxBGxE2GWNEIcUnye5plj3zlGeVeGExVX0u2GBoMetwrfZ40xZ48L7MpMWWNnrLVHTzcYB5WJyceb1yseoxlgzjOHNNNqYyTYnYtcD3ffMzthnxz4wwNc6PVxIbXOWVd4Zv4tiqcvsFhr1B37K8wKDN1yFGfdW144nPZtYQp6kWSY/U0Y9AHb9zOBX+W5B3/96MkJaqf9yeq+q/DqL9TfLRneCAUNfujoe7BdRrE5fLBd+Yo2d63C7Ye9B/d0DHHebCrMeO+XplmBGTmQ4ZtgxpRR4ajDlUnTSXW0DClRBBM1wxKbiZ9RQw2mucYoIpENdRYYGzBaipUduzW5P6N5qAwCzkwSr1hSyJknS3aJxQk69RZ2LGhSrQGXqw6clUd3d3+9UpB8VEMP2y955HG3ewA7HQAAAABJRU5ErkJggg==","art/land/patch-planted.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAAoCAMAAACVZWnNAAAAwFBMVEU6IBwAAAAuHBYeEAxQOiwmEg5KMCZPQihcSjxjUTt4WU0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABSqJG1AAAAQHRSTlP///////////////////////////////////////////////////////////////////////////////////8AwnuxRAAAAiZJREFUeNqdVguS7CAIpFA+2UvN/W+13ajJzE7ezvqsSozEhhYRlMfZVB53TVXZiY7R8y+55mS6ishjTH4Ip4tqREAqvfMtQakuhVO59QCYjx+Ho0lmCl5T7oQfcjikmr13m2DtHUNRp8YksEsvc+4JkbsZhqbelUw8HWgtMLBo7WpiZuPLQOkcYNjm4AkMhRMLY5yCzmqEyfhWyCARKuUE/iJTgEFUS7rRmsoFbntY0vhy0tagQ7bB2ctyv7C3OtRvwaRNXy/wvX3TG4UGlynBuklaTzBpN9luZmvNbcPmBRasOVLfwK6fd7rA/Qb8mXXrBJunVECK7vis5QBLbsdIgelty/xbdF6OUG5+D4Id3j7RL9HUX1ai+hpisfbZbnbjU3BLHYxo/+HuAoN7fFpz1/cAQ7KqfRb7c2Atr5hEWZY7cHxwemuBXMJMgu/tNVcWA9h9nAzXPbAW7XmqdNOyPIN/cdKr75mECeE+u+zts1UGF1a2B1bu10a/bek1jh/h6RWev6WSf7BHDkumIZjeD8+ZDFDTUeU2DzRKnc+DwZGttK1MSpPK2TUW3/HVxpt1eliOqrDGKsg6jwmrws7iqZRPHRDDS14Vo+pzRD+D+gtO8ohhaoj9QMkHJx13i6zLg42bARZAPAperJZS1Z8t8AmS0L8EvDy4rjtJI93IMkcojaLkd5KF1uRyKAXdEmAV9nIbWlec0eEBYl12Ro+HItPzOvUNJ7M6s6U6yvAAAAAASUVORK5CYII=","art/land/patch-tilled.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAAoCAMAAACVZWnNAAAAwFBMVEVcSjxKMCYuHBYAAAA6IRxQOixPQikAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA8MsxcAAAAQHRSTlP///////////////////////////////////////////////////////////////////////////////////8AwnuxRAAAASBJREFUeNq1llsShSAIhv0daFvuf1dHxQuWlpc5PJgMfpYIgXFJKIhT2m1KBLibmGwwQRDFL/dzP15pmh6GKayUFRmOhlWxAmeWUE1Q81axeUIahlVrrFJs3xDhwtr6Bq0MDeQMmV0Yh/DSZ6MPYx2uZx7CGMIe/YLH5/Ho3Jlx4rAezG9Xhb17xtyZ8QZjEcaKtzEZnj0HBG9fJ/BcbP8BngxPdMPzLLYhXt/6DbUwr+WzM7twOXPvs3kW1muY51KyOEzvOQvDncHPWOjByymJZz6Dd1Jy8OavxGhvh29BQrV4NrCuqt16S7o+6xpOo/pMxMXZujNY7ytMaoSCRmFj2T71D6mRkWdeE1TvidwNxQ1sGGQnUaXlyS2WH6jaRX5roCntuozH9gAAAABJRU5ErkJggg==","art/plants/fern-bloom.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAwFBMVEUBAQAXJxJ1kFmDn2IgMhxOMCplflFadEomOSQSFwwIFgdFWz6xoHc3VzYeGxBOcEQrQiw0Jx08SDEnGBlIZ0I0MR9cOzQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC7nN2+AAAAQHRSTlP///////////////////////////////////////////////////////////////////////////////////8AwnuxRAAAAXlJREFUeNqNk1l6wjAMhKWxkOywL+11uP+tOjIxhK9A6xeCPfpHiy3XP5a8P1D9JGhFi6qeUqB20z7FWzFKinRBSe3zeVEYkLtpoZq8hZmAG9grcCMQwYhyV8illCh7qrazhapjo0MhtI+NOw3kOgjAfg2dumAqVnEyI3aUyRzpR9/WE8j8wOPpMAs6AQi6MGaCltB7XXcCkZGCifkimPacksy2XJ7YTBkd0J5mkQRzWG+QOw03mweh9U4wDzKMgggi7JFDyz4RoEyeP/BL1oQ6ptkYFTkO4OBuqFkR5RyFzGNHQnM07B4pToylSy8kO8kzJBTqSkT0z9xwv80CXWIJMVLWVtkU/im4CRqmjvA1khBh6ZNXIFsvoxJKiNc8Z/QBOeOijzvJZBnOKsJowhTBYQ/CUJjXLtgGxXMFi1st1evWrca6okwL9Pg4f53qFl0QbSW/Ho4cd7vdEbVGlXY8vxCsxupfnwSrN4Kl4lvkxeOVxfrH6x7rB6M5c6jPp/ZYAAAAAElFTkSuQmCC","art/plants/fern-grown.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAwFBMVEUAAAArQix1kFlOMComOSRlflFOcERbc0uDn2I8SDFFWz4gMhxIZ0J2U0xjTj80MR9cOzSxoHcSFww3VzYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABxkgqAAAAQHRSTlP///////////////////////////////////////////////////////////////////////////////////8AwnuxRAAAAUhJREFUeNrFU0t2wzAIFBiEfrbT9kC5/606yHYiJ+7r66p4EYUZBhjZ4f5LhP8kEA2EiucVZhbnBD8LS6p8hkFgTgKCKE4a0y7Z8URI5szkhLuQxNgpByEnjVyYaZ+hMlFUVssbLgkFhM6PIcWbaOONIBxT9hmHLUBHpmw5CCTI09mHzsDou4APeCJUdoE+p3DzDenFyQpXMn9Qx7/kufPDaozJhjri2AaBfQuEz6lwhtjoiIMg3VXgpCrAUd9Th1HCmjlagr9ZqXvUR86dEbyeUOjeukhU4MUaki4FAi6Okvjfwr0LYQ/yLn6nXUHueESjqbkGNzUTTxJvt7kZYWRFndCaim1JGl85QVZ9Oasq9eKdDOu0GnoUyN8+3wlhQqyQKKufwiVhdmjB73JFWG7TM+afFJbZZebLFmEQmEK4+LLCEH/4Nr8BQ2qK+RUFkaMAAAAASUVORK5CYII=","art/plants/fern-seed.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAwFBMVEUAAABPMCtcOzSJUTd2U0yhcFJjTj80Jx0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACEOAnfAAAAQHRSTlP///////////////////////////////////////////////////////////////////////////////////8AwnuxRAAAAGtJREFUeNrt0UsOgCAMBNCZFvFY3v9WjlWDRsC4cEcDgWQev4DlpTDAAP8CAF0A9wkdoLwLlOc20OmYsjtu1yhTkMRs0YknUG5mWrwNVsQVMFko8yrIChNDiNZ3UBDNWdthF0cBjWee9eGzVt0W2oxJBOxFAAAAAElFTkSuQmCC","art/plants/fern-sprout.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAwFBMVEUAAABPMCt1kFlcOzR2U0yDn2ISFQsIFgcgMhxliFAtHRmJUTdFWz4eGxA3VzYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABuXJgKAAAAQHRSTlP///////////////////////////////////////////////////////////////////////////////////8AwnuxRAAAAJRJREFUeNrtkkkOwzAMA6nFdrp+Kf//VSijSFBAjlH00Et58YEjaoGxToQ/8EMA1BkA1VIwBlAIpAmtNfT6N/8AlmeJ5ACQDXkPhx4UGGwRw+tFcbomdAKQaDOgfgGgj1lRB6eGUNxSjEpOTd/FmCBu5oIMMHe5PujfLANsF1t5msAezPB4s4To0av7sBit+dIHf3IDoTPPO8mUiuAAAAAASUVORK5CYII=","art/plants/fern-wilt.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAwFBMVEUAAAA0MR94bk5/gVeUhlo0Jx1LMypkZEYfKRhjTj8tHRkeGxATEwpcOzSDn2KxoHd2U0xFWz4gMhwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAvBi7CAAAAQHRSTlP///////////////////////////////////////////////////////////////////////////////////8AwnuxRAAAAYtJREFUeNqNUwt2wjAMi3+xnbRl24V6/1tNSSljjLG571FAsiIrSdn/qPI7YPaKsGgotT4JYRE/cFISUi2TIBIPlA7YWCmOJYgEev0eV1LJ0TkVQkWIt+WGvyuzpkhH1yBsRg49vRpesDirq8W+HCZDVNVd4tDoQlUqwSKdYxrhJxRl+Ogspo4ei7wSDAIikrCKbNrA0RF3SdIs8dDYmxosiujV0vEZ4w8XGIMcBMza1dAZdTQzyxEPpuFM98vlS8EICqNYGBFrMmPFdlOIbdvMpgumSuxpxuBYHISuFYsrYKmORCvzVGC2PgkNdEdMOvqOXqJaoSBybDe42FpYUEtzY4eVRHLok2USBkoypDEKLAw7qhyIoxyEjwsxEE82J3hEA0T72O05Jl7GDSAeAwnaK+btXePrTNLeciBDAkEBx2Zrvzu0HXk5MR5fE3IDXL6d6sXqGK56tsy+98d7UVprJwHDlP0ZAZkR+fzyhFDParbW+opQ8zmh1HVdM+vbeJXy5PKWu/rH7T7rE6PzdmhOAeQLAAAAAElFTkSuQmCC","art/plants/hibiscus-bloom.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAwFBMVEUBAQCzMDVPMCuDIil1kFkiFBlOcERZeUpliFBIZ0JFWz7HhWFLKCpcOzR2BwsVEAo8SDErQixlflE3VzZQKi6hcFJjTj8gMhzYnGYWKhKDn2IIFgcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADPafnZAAAAQHRSTlP///////////////////////////////////////////////////////////////////////////////////8AwnuxRAAAAQ1JREFUeNq9k+luhDAMhCd2DhJgF9ij18P0/d+qNixLCa6q/ulIkaz4YzwJCj5/Ef4fgMgGln0E566wANxuUsKpTKANbcDSd8F0CK4NHOb+LsZWBvEIzI73U7aQ8mnbKrHPga0vxOuR2AEsHqcfACFOJ+bAAqgJDoB6MEtfuiznSDiG1CHLgO4lNg1MwK1A9CYQHoAYvNcAxP6M2YKv2099hk1F9nIRjNm4anhf8phzwllUSn3V2vcxKTAMw1jShBq4eB/1aLjEOErlUTuoAEJKacpa7wHgTRYRyRWm6HMNaEGzoGZNkw2gI+rvhEkQG+iJuvvDpZgjuo5W4QOlBgb0IurXKMbLwjf94W1+AZlimHsEaTimAAAAAElFTkSuQmCC","art/plants/hibiscus-grown.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAwFBMVEUBAgF1kFlZeUpliFBPMCtlflE3VzaDn2JIZ0JFWz5OcEQ8SDEXKBIIFgcgMhyUlZQrQiw0Jx0TFAsmOSRcOzR2U0zgw6+xoHf5+fMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAARtDMVAAAAQHRSTlP///////////////////////////////////////////////////////////////////////////////////8AwnuxRAAAAVRJREFUeNq9k1lywzAMQ0EqpCV5ydL1Nrn/rQp6iyZJ2+lP+WFPoicSgCVcfyn8GwAgHj8ASXCF4ntAJCE1wN5tfy8A1kUkLGNvAKCKnENKLBrQCdoR5r0R0EXPoJPdd+AMq0jHAAR9MrNo0cpCjc1wl+z8JTIuANbivlr5cpTiIsM+Ig1FXkJftHhHIgBwAjab1N+7j+yfgE+aGQs+sAUR+amnlE4SMwwvMCXadS0Ar9CskOl0Kn0kooFtAHWVI2qGpXDBPqxSiu45zB4URQOoFxLuvdaUrM2BfZRUFwG6d900+27OQ3SmMuobofRpHHiLmrJM3Ydh4uCc3ZnKsWs+96yCTiqdRJjSq+H+TJJwN36zcCGuj4CVWOxEDJf1MLQAshaGEEoNh3MT9QaoCneez+Hl8IqHewHh/3OB64cnAOb1t/XxCFzX/WuXZ1cPTf3hbn4BYLKDgfjWFkwAAAAASUVORK5CYII=","art/plants/hibiscus-seed.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAwFBMVEUAAABPMCt2U0xcOzSxoHdjTj/HhWF4bk4VEAqUhlqJUTehcFIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB+LaZrAAAAQHRSTlP///////////////////////////////////////////////////////////////////////////////////8AwnuxRAAAAGNJREFUeNrt0EsKwCAMBNCZJNrfoXr/W1VFMFBt6a4LBxdBHiMR50swwQR/B8AzgBlGADlmxwrf0kaQRIzbUoY7SNdCiAioqk14wKCpndS9C5Quod+QX6mnA+AbgNGaNR+++gL7c94nMjyB1wAAAABJRU5ErkJggg==","art/plants/hibiscus-sprout.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAwFBMVEUAAABOMCpkZEZjTj9cOzR2U0x4bk5LKCoiFBk0Jx1/gVcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAARsIIBAAAAQHRSTlP///////////////////////////////////////////////////////////////////////////////////8AwnuxRAAAAJVJREFUeNrt0sEOwjAMA1A7SduNn+L//wqvm4BqWRE3Dviwi9+itCruH4I/+GUAYApQqyEDx4+o7jUHVjcCD7sCNM2GD/0AzN3UDzu+L7kJAVwfU8IMs3vQQWYAWBaBnnRJMgI36MvAGWAVcE0gWYI4g2iFroYuEilgIdetZssmaMCRwtISsDeF3SWgi2eQ38MrXzy5B/FJy/S7Ik4AAAAAAElFTkSuQmCC","art/plants/hibiscus-wilt.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAwFBMVEUCAQF4bk6UhlpLMypjTj9/gVfHhWGhcFJkZEYtHRkUEgpcOzQ0MR92U0yxoHdLKCoeGxA0Jx08SDH5+fNFWz7gw68AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAxdYNGAAAAQHRSTlP///////////////////////////////////////////////////////////////////////////////////8AwnuxRAAAAWdJREFUeNqVkwlywyAMRb8WwEu8JGnP4/vfqpLAdjxtphPNhLA8pM8HY/sn8AkA4D1gi0gp4R0AZgaG4T0AlAQ6Mxzl6h8mzVlODYDucLSgKedMBGqT1CW0QZspOcOBm4/RKeCaLoAlJcABdFbLMha8isxbpFyxobffdDfiAqAC1jwrUK6ARXiAEArBvVV4AeB9mBmmQDDhF7DBcphAMhGdYLsa5UeCjH74XqPGxWpQnBoisT86x1qsW13zZhsceBhQG5zU98zceWoDbg9ETbLAqeHJ0CASvtwTuyvE8ziMGlmVzWpyMUwqXrcB1mEa2d+MhA2gUVnSLtI16sjE4Lhk80JZmW7cRNoOz+77E4TcTB+Ra2oatAKCAMhZA+Zu2H1QnW3NCiSK23ItDu3HhM5zvHpgxUK2Kku8KK5APPlw4L5IhJrViLkKpNXbfu2XpRSRUka/CxzX3V476tYa+OvbxEt88HX/AAdiezkKVeDNAAAAAElFTkSuQmCC","art/plants/kopi-bloom.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAwFBMVEUCAwFOMCqDIik3VzZIZ0JOcERZekorQixFWz5liFAiFBlcOzQVEAqzMDV2Bws8SDF1kFlLKCrHhWEUJRCDn2JjTj8gMhwmOSQIFgd2U0zgw6/m1KFQKi75+fMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIkP8XAAAAQHRSTlP///////////////////////////////////////////////////////////////////////////////////8AwnuxRAAAAXxJREFUeNqVk4lywjAMRNeW5SvOydXzW/j/v6pkkgCBtoNmCAN+Xq9WDs7/FF4AIPU3kFzCA3oLBEceurzfH58BZ3hyOCNGImyOQBXFycsKKLiqgysAGsjr5hACMpQC+1sAjkRd/+9hraoQ484DnEOrK40C8istncyAbB8FAEojD6Ldm0vDgKtJ4gQ7ghmmSlBgItJYliO894AP5AWYbBEZ5upzNvm5O540Bl8VbG5bzCbqJw2iF5DkHDQRyG1nce0CiSQ7wuAGWZcgo9oItOaAufbic8pCOHxlecabNpEn7RFdh8YA3xoYauKzyZJVNPSaQ+2zxzRhBTTGcUQopUTpotUglGLGCoh1GVPNsrU5Z/uRcQfoJPtsO7EiPkqxdWRYAJ0j9w62qxq8o7JOark6AshtsbI9EO/66HF/5aDBX4pZhhTJYwscYYxBUzB4SZziBpAy5t3gUAxSwghgc6t1vygc5FvZx2t/AZYanwA4mEbqAuC3d3OpF97uH96weHX+ly2AAAAAAElFTkSuQmCC","art/plants/kopi-grown.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAwFBMVEUAAAB1kFlPMCsmOSQZJxQgMhxlflFbc0tOcEQSFwxIZ0JFWz48SDGDn2I3VzYrQixjTj/5+fN2U0wIFgdliFBcOzTgw6/m1KE0Jx0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADfniwMAAAAQHRSTlP///////////////////////////////////////////////////////////////////////////////////8AwnuxRAAAARVJREFUeNrdk11uxCAMhD3BGAzZ7G67/blN7n+rDkkjJVmqqq+dB4jkD9uDicy/SP4jEGNbVfvAXWcFCblctAvgXQGdBakDvKrPuEdkc4xdAIghEIDGlPMzIGBsAUAgubp/HHtwoOIaMREIAZT0gYJwBUo+AiKudBASAR6vNW3xFRADLCrGGAOBVGFa9gBbrJZSZOlWPiJB5ehCGAnMwyqr32pyshnCI7fQCjyC2cmFNmu2VDCoNR9yvKgcdZzGwF4Livp2EVul3C55mqxW2i1tZNShSUo5KhudyeDnWTRAOGe2NnCHywlwcRkGAePchNTTg1kiaOttaJ9dYFgW6uUn4Fu3XoZGvLWzw+c+vn+0stMffpwvHtCe3ntMU2cAAAAASUVORK5CYII=","art/plants/kopi-seed.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAwFBMVEUAAABPMCtcOzR2U0yxoHdjTj9LKCp4bk6hcFKUhlotHRkeGxDHhWEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACDHsbZAAAAQHRSTlP///////////////////////////////////////////////////////////////////////////////////8AwnuxRAAAAGxJREFUeNrtkF0KgDAMg5NudfPnTt7/VrYiKmxTfPNhodBCPlJarC9CBzrwdwB4BhBHtAC4YswT7inXCJLmL3n2oQTMD0QKCSKiA0pgIFUt3fzAGiCWTHP3rqitoDKILfKqAE6cAlpnHvrw6g0iXN5Xv1BwVwAAAABJRU5ErkJggg==","art/plants/kopi-sprout.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAwFBMVEUAAAChcFJOMCqxoHfHhWF2U0w0Jx1LKCpjTj8tHRmUhlqJUTdcOzTBkqjgw694bk4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABQITwCAAAAQHRSTlP///////////////////////////////////////////////////////////////////////////////////8AwnuxRAAAAK5JREFUeNrtksESgjAMRNlsQqEU+ST+/69MYEZRMjqOFw/mkOm0r5tN0259E90f+GVAPDJA2r4vM8k7cgOEnOnbclEF2ScKfnGWtVbl4fzoYdeodeNSk26OrI8en7sQyus2vwNKVGekUjKgAKCwTWpA0mYxDLDmAODLcgZcAFMki3QGegz+xtgK6JABrutDUNVY2HkWo5lfbO7DGUzJsJyI4giJJR3WGNHv8cGXuwJ53s0QvP9Z4wAAAABJRU5ErkJggg==","art/plants/kopi-wilt.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAwFBMVEUAAAAeGxCUhlp4bk4TEgpOMCpjTj9kZEYtHRlcOzR/gVc0MR8fKRixoHc0Jx0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD0KWfMAAAAQHRSTlP///////////////////////////////////////////////////////////////////////////////////8AwnuxRAAAAONJREFUeNrt0lFuxDAIBNABxmBn217J979VsdPtVmzUav/LR+RoXkhMjPlH4R+8Dtg7fwMwEVuCIlcg88yCkx4hzwA2Zj7pnB7dngEOV1oXDwnM1lAAzENl9Nk9czGrgNlApRl3d1ntKshcbhvIFZCVmyjzYsy7fGEBNIsMmCCbqBWQI1wNQhHuYcL32mHyBHRRP3J9QxkUI2i6Qai+GZ8GZdQFYoPHLL9BziYBhn/sLdQOiBNweENu2d0LAIFD0VZhg/qRmeHMc+ES99/xAL33Nr5EE2YVgJF1B7g8cj/qhVP9CR6drY0ipOi8AAAAAElFTkSuQmCC","art/plants/orchid-bloom.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAwFBMVEUBAQDBkqgVEApPMCvgw692U0wnGBlbc0tcOzQ0Jx1lflGDn2J4bk5LKCp/gVc8SDGxoHcrQiweGxB1kFmUhlpOcERIZ0KJUTc3VzbHhWFFWz5jTj80MR+hcFImOSQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABO51ZDAAAAQHRSTlP///////////////////////////////////////////////////////////////////////////////////8AwnuxRAAAAT1JREFUeNp9kwmShCAMRX/Cjrj3OttVvP+tJtgzrQ70pMoCyRPyPxHLLoCliP0S6H8ARBXiuQK2AjDjBZA/vxoirVEFcp6u9wqBLU+tfs/DkdgA7/3VqBdAJloiQ/YHQFmkaoWgYEnh4MjvRMpjsWGVuiy8OfIcxWZZZGv5aBmO9aDjxYJ8JlAAeRsBoOkR+HsXOHUphZw3g7mLHD4ATMMJKSnJe/M5mDqgUharBmPElPWMnSM0YEHKCrKfZExZgzxJbr0lpbX3RZHraxRAM7FcakXmSkxrz6BiFLKbiPZha9mTOLvYgeM0jc6h2rRwLrKbYoz1HS7n261/Gy/j2F+ACtCd53mWbNe53RnbxDVN8/HV9z3mptmIDQjAFKwNwYqIpikBDsH7YEwISllUfIBSyrdqDf9C5hb1v7sa3zalnVQsCY5pAAAAAElFTkSuQmCC","art/plants/orchid-grown.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAwFBMVEUAAQB1kFladEoVJhBPMCsmOSSDn2IgMhxlflEIFgcrQixOcEQSFQtcOzRIZ0JLKCo8SDF2U0yxoHc0Jx1FWz5jTj9liFB/gVcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADDGqz7AAAAQHRSTlP///////////////////////////////////////////////////////////////////////////////////8AwnuxRAAAAShJREFUeNqV0wmOwyAMBdBvmzWBpJ31OL3/rcYmId3QVEVRFvwAGxFcXjS8C/ILUIL8D8RAHgKRA8gYfMgOhGTnV5A7KBuQkO+B5D6YgjBJoAcAHREb4BCZ4j2w9UDZQGygx1E2kIMSUEwUDfgdIAfsSyAQiA8wUWpztviWA4gys6dkYGqgx3uSRMKxg5QkE+Fuo1TEuFzBET92UofERfOwHJLl8nsDikjbo6h5bBexXEpp+41tfq00/XTgSYF2Eo4q7EtS8geIFsZtkqwlqDDg9Zn4oQqdxLp3oHfg6USB55knBbOfZ4yOHDS8A4zOJAr4tJym2S/6+gywOgc28NVen8GnM3GaGO5cR6AqcOvqWvsegBao1Z2dXQOAWqvrDRiVedPe+Lv/AA6TksCzXtLeAAAAAElFTkSuQmCC","art/plants/orchid-seed.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAwFBMVEUAAABPMCt2U0xcOzQ0Jx1jTj+JUTcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADCs6YiAAAAQHRSTlP///////////////////////////////////////////////////////////////////////////////////8AwnuxRAAAAGlJREFUeNrt0V0KgCAQBOCZ3bVrdf9bNQZi0Wr00JuLiDiff4j9pbDAAv8CAFMAM8ME1HwGzjxGQKdX4HG7Rh+CJNyVk44n0HRxRCiXIjKgRLur35gB56VKvgNprSUAfX09avDMVh8+6wDB9tp2giJOgAAAAABJRU5ErkJggg==","art/plants/orchid-sprout.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAwFBMVEUAAABPMCtcOzR2U0xZe0pOcERliFBlflFjTj9IZ0J1kFmDn2KJUTc3VzYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACs+8URAAAAQHRSTlP///////////////////////////////////////////////////////////////////////////////////8AwnuxRAAAAJNJREFUeNrtkEEOwyAMBMc2ENK0b+L/vwpQqSqKCcdeuleP17umLMQf+CEA3AJsW8IDeG9SxyFwBUgpPWgABQ8oxBgqUYFjd4FGxMTBmJIx/re524K0AvYV8Ircf/ISgjFjS8mkBdJERFTV+6SISZbqYKomeIBoFm3zp3pA7ie0S8x3MDHTfsFz4GPQsjKtybTmRCeceM4ztWXhmwAAAABJRU5ErkJggg==","art/plants/orchid-wilt.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAwFBMVEUBAABOMCp4bk5/gVeUhlqhcFLHhWFkZEZlflEpGhlFWz6Dn2JjTj80Jx1LKCoVEApcOzR1kFl2U0weGxA8SDEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADe5+HUAAAAQHRSTlP///////////////////////////////////////////////////////////////////////////////////8AwnuxRAAAAO9JREFUeNq1k0d2wzAMRAeFVSUuuY/uf6uAUhTZISk/LzwbLfA5HAAilhfCJwCYzgCIDAP6AKIZXAUNYLW2+urSAMAistUXNK4AsznEiE4XECbFo/czAA6O/C/QahPq2BWguATVKgNuzlQcxMxCUJwAFpcP4u+71rcJFKIC9mR7SvRGDc4432YIPQCbMa7ojFpFAlvCYU1ZZYCaxI7Hb0ByHqo21VqHHY/0BZ8z14BDut+RJRhgg/Co5pDIBBl7QKL5cilASvCuAdA0kgE8zQTvm8BMI3S7yPt6F2Zw6FjGAcz0qNZf3az/fxe73ni8P4FeqAYLdw8bAAAAAElFTkSuQmCC","art/plants/pandan-bloom.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAwFBMVEUAAQCDn2JadkoVJxF1kFlPMCsgMhxOcEQmOSQIFgdlflErQixcOzQSFwxliFBLKCpjTj9FWz43VzZ2U0xIZ0I0Jx08SDGUlZQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACc5NGCAAAAQHRSTlP///////////////////////////////////////////////////////////////////////////////////8AwnuxRAAAAVNJREFUeNqVk1d6hDAMhEfFHbM1yXG4/60i22xJINlv/YCB+SWNhMHyYuFtAC+eK8n/gPwFiO9CohVI8hsgQq8wANAO0AjbfNc3gEl6B6BKG5OJAiUhNiDZFU9ArehZ56C+AUJ5/gGk4c/i+AaMFyIySrQOsKR5BVTnLyxoRjCAZCFUF7kBQaX57PowCWUmeQK8KA997QJWn9Q3IGpgn5Vp9bm6bYQKe+XIgR/xtxJJbQKW2bMBXReZ070ESHOW5sOfuXB3yXm+m7TB12RxOTNFLrGZvHJOYz5tkm2vwjFmK1DOOfsQJLXIDtSxWZfB6seSczR9bR9NWe/NYoghFnMRbZrjLR5fEyEEH7kBkXPF9kwC12AJSmFmYHto4Q6wLBYegMltM+DDOYfT6fQJN+0CRwPcwZbp07QDNN1djm5y08XtZTCiJzlaAYedLgx5rDf+7m8xnIvSG2LyIAAAAABJRU5ErkJggg==","art/plants/pandan-grown.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAwFBMVEUAAQB1kFlPMCsVJhFlflFadEqDn2IgMhwmOSQrQiwIFgcSFAtcOzROcER2U0xIZ0I8SDE3VzZLKCo0Jx1liFBjTj9FWz4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABcb7AQAAAAQHRSTlP///////////////////////////////////////////////////////////////////////////////////8AwnuxRAAAARNJREFUeNqt0wuOhCAMANCWtpafo/u9ztz/VkuRURxJJrtZYkiQB20R4f6iwb+D9ALQRH8FAA3oNowXMEEH2ugUIk5xDwEI1xzAQEIkmx+B8jreyUCsKhE9gfgAtYOppbH1MdWNSVEmWlDL/CMKHDUQvhnQhXVfv4cwUYA3MDN1WcKRIiFvQPFzVCazGkBfAJ9BIIomRCoIyLVM9doAlfNJpUbWA5SasJ5Eq6KkHRVRcUbPJZgdJjwliboyzbMoczEAgyQ9f3sDnmX4LVgCe/EioZvvbxQ0cJrvd0jASwhBgk9pdFDOuSokgMvv1xsFHyZkXQXczY1Adtnt7QuGIUrLZbk9A2DilvO2DcCozK794uf9AQxKo6W4Z4JlAAAAAElFTkSuQmCC","art/plants/pandan-seed.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAwFBMVEUAAABPMCt2U0xcOzSxoHdjTj/HhWF4bk4VEAqUhlqJUTehcFIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB+LaZrAAAAQHRSTlP///////////////////////////////////////////////////////////////////////////////////8AwnuxRAAAAGNJREFUeNrt0EsKwCAMBNCZJNrfoXr/W1VFMFBt6a4LBxdBHiMR50swwQR/B8AzgBlGADlmxwrf0kaQRIzbUoY7SNdCiAioqk14wKCpndS9C5Quod+QX6mnA+AbgNGaNR+++gL7c94nMjyB1wAAAABJRU5ErkJggg==","art/plants/pandan-sprout.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAwFBMVEUAAABOMCp1kFlcOzSDn2JZe0oIFgcUJBBjTj8SFwx2U0xLKCoeGxBliFBlflE3VzZIZ0KJUTcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADtNIaJAAAAQHRSTlP///////////////////////////////////////////////////////////////////////////////////8AwnuxRAAAAK1JREFUeNrtkkkSAyEIRT8IOHR3hhP1/W8VzGiqNV3ZZREWgv6HCCXWHcMf+EHAYn6EOca4ASAi2a6kCUsPUBXxrcvKkrclwKzKth5dZ6xdwCWzRaXR2y4qcVLTpdXf2kStYgfDeA6ALvg8KPAukIcAqkWO1fUATEQUIs/uqDMH11MFxIEUJvQACiXMNFMpXaDmh0A3Sx3Ajwul5Audm0e8AjzT/SZg1ObdvvhyF6bAy5oX3ViQAAAAAElFTkSuQmCC","art/plants/pandan-wilt.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAwFBMVEUAAAA0MR9KNCp4bk6Dn2J/gVceKBeUhlpkZEaxoHceGxATFAsgMhxjTj8tHRl2U0x1kFk0Jx08SDHm1KEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD5wlOAAAAAQHRSTlP///////////////////////////////////////////////////////////////////////////////////8AwnuxRAAAATFJREFUeNqdkwlywjAMRa1dztJCeyDuf6tKcZJxiikz1ZAJ6L98LQ7l8SbKr98A7wCGfwObOXADVP8GlKcBkFIDJtZrif3h27ID2gBdDkAZIrMINEAlgWna6rQSypFaRABqfHPZXHjuetAbKwSA1Tnveuhnk4WNUBArVQgj5mOOc4rZzD0BBkpdn8ZU4wSiRK8nABl5Y3aojlDNYE/uQK0V4BswZgyAzVYgiuT93IOa2RdCPClIlSxN7u08ynEQlmqMEG0SVqEY1qDrIQgiIAkwtbwUTiC6tiggAWBwSKnP/WGpSCyJHMMh9fiU6x5UIxuLSgfs9W6TjQiEwqsMXrnSvOVqcAE2c3ePdgdAwSQc3D+IZiwDAKfVG4A4Bvp4AXy2ax0BV4vRFI/Sxev/5lP8ANcsjPLMiEAIAAAAAElFTkSuQmCC","art/plants/passion-bloom.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAwFBMVEUBAgF1kFnccSVPMCtadkqDn2JlflFliFBOcEShcFJFWz48SDE3VzZcOzRIZ0Lm1KHYnGaxoHcUJBAgMhwIFgc0MR+JUTcrQiyzMDUSFwyUlZRLKCoeGxBkZEYiFBkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABc3B6wAAAAQHRSTlP///////////////////////////////////////////////////////////////////////////////////8AwnuxRAAAAVhJREFUeNqVk1l2wzAIRR+2ZtlOM3buVrT/XRWQ7Vh1zmnLTxS4hgdIKL8Y/giAreyOKwAQW3XD2uMRLQBLhs3pmUHgjJ8ZEEKYLJgdUmiUzXkpBHLwoMF7+0CDNYZOjhMJkKzdafDGInuuYMh7b4xtNYDEA1LgTDjuAWkRAmkTRUQs00BZz9IDE/wvZ52M+ptRC8BV6HDQyRGJrHsaLjXxHKHmc7ZrBpFXng/S5JtWM2YYCHn5WOPIkjZVn/MpEZJuR4FXVHHLvj6vUTQuQKmKy+B8TdCxfY32Dsx9TvBVbdc9MVLHUTbXZJo/0QwCNDdKXB/GoJxmIjbAktXoYBBjHFEeAB0cXN0DdkC3AmIV2wCxq3U5EoicQ67rvYuMGu/nFFPABeXStHl7uaHvewTHP7xTsS0gwnoFSDlsL0w99BqnkOT0jv3bZP84jleNj3j0eLGxf7zub3/pggKDxZFFAAAAAElFTkSuQmCC","art/plants/passion-grown.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAwFBMVEUAAAAXJxKDn2J1kFlPMCtadEplflESFwwgMhwmOSRcOzROcERliFAIFgdIZ0IrQixjTj92U0xFWz5LKCqxoHc0Jx0eGxA3VzY0MR8tHRnm1KEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC2wFOwAAAAQHRSTlP///////////////////////////////////////////////////////////////////////////////////8AwnuxRAAAAVZJREFUeNrNk9lywzAIRbkgISwvcZYmbX+m//9XBS910rjT6VsZvwgOFxAyffxi9K8BlA0AnsCCjhGMB2BgcP+g656LuJEDYOZOhvdyFxfP7wwZfSgUQDo+MTZ9YY38svTgCfAjVqLnVhXLcWqOvIqI8lylcMuHZs5fx/QqXmaYqxSHmVe9dbwg2gnwAjIAF3oAokjWHAQ4uwCXbzdJIRFAxIGvhrcbjLkCMM7ZBR4BTGYWoxrrcpqXQUsDnmPis3mFU3CTi2aA2PtvvTGTm5hmNfNrOckgQVCMDSkXVmXkbP55G6ruBEs/LQvEvr5G/aI0AJczQeHiiZNC7JQOom5m2cTz2xIhmta9TEoKPWjTuMYtI9M64/aS6JoDaHKGEj2/SXo5v0I0gGtJiXaAlMa3AEo6pvMOUNOdjTuAu2uqNY3pBwWq9RjJtY7pSLTz49Cd/eHX+wSzZ5DZDfdV4AAAAABJRU5ErkJggg==","art/plants/passion-seed.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAwFBMVEUAAABPMCtcOzSJUTd2U0yhcFJjTj80Jx0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACEOAnfAAAAQHRSTlP///////////////////////////////////////////////////////////////////////////////////8AwnuxRAAAAGtJREFUeNrt0UsOgCAMBNCZFvFY3v9WjlWDRsC4cEcDgWQev4DlpTDAAP8CAF0A9wkdoLwLlOc20OmYsjtu1yhTkMRs0YknUG5mWrwNVsQVMFko8yrIChNDiNZ3UBDNWdthF0cBjWee9eGzVt0W2oxJBOxFAAAAAElFTkSuQmCC","art/plants/passion-sprout.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAwFBMVEUAAABPMCt1kFlcOzQVJhGDn2JliFB2U0wTFAtOcERLKCpZe0otHRkrQiwIFgceGxBjTj8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA1OSsBAAAAQHRSTlP///////////////////////////////////////////////////////////////////////////////////8AwnuxRAAAAKRJREFUeNrtkksOAyEMQ01IAsy3N+L+t2pAlTqVAqMuuqu3fjhxBOqN8Ad+CGRmngEgkWMCgKgIxgCECpED2FzOPWC9+m8AIt3Ap38BiLRZIMCvCVIlBWF4B8uQKVCBvO+C6SWZb4B6zHZoWpWRAbdFMEELxxiDc0nzUwfOZMQCDwjRkGzvU/CARxsRWr4pOcCybS2jpRgDb8nY1YMwrPnSF5/2CUlczJNoVJ2rAAAAAElFTkSuQmCC","art/plants/passion-wilt.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAwFBMVEUBAQGUhlp4bk4eGxBKNCpkZEYTEgp/gVdjTj80Jx0fKRhcOzQ0MR8tHRl2U0yxoHdLKCoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB7P8QGAAAAQHRSTlP///////////////////////////////////////////////////////////////////////////////////8AwnuxRAAAAVxJREFUeNqVkwuOwjAMRMd27HxKgRtx/1vtOC3frcRuJKSqfhk/hxS3Lwt/B4BvQH15jngD5mZUwT3L5APQSehGQC6/gJrxOwARq/HhsMWzhB2wm+0a97ZZC2VysC4tTHYjbIozwhKwCXBDfQKsERAQEAyR4hHtPvSmBUBUTF1C3EtcwvE+piYQG9DicrF3gITPCGd/p8XwoFpYCtwiaAkGE2gEhjgBM+HhTIDCdNCWisaYLmqNKap4jEkkCDCias9Wz/r9z+LLJSNOG1ClKW4fJ9lyygmMU11YR67HfUB1HwmsVJSimI0Fm0NEmNXhpSiPWbqmZKo/pshlunIn+5iOsc84HbJTQKoa2zOjFBscAR93koOk3Aa4P2/wy0VVL7Wc2L+91J8AOlKye28NKL8TUAqUx6C98fEQaH1d196v11KWQ2DhxvP5vOS6HgAZ3JLhb8HRx4uX9Y+v+wdVtn2ETJvlMwAAAABJRU5ErkJggg==","art/plants/sampaguita-bloom.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAwFBMVEUAAAD6+vUmOSQ8SDFOMCoaJxV1kFladUqDn2IrQiwgMhwSFwxIZ0JFWz5liFBOcERlflE0MR+xoHfm1KHHhWHgw69kZEYeGxAIFgd4bk5cOzSUhlp2U0xjTj8tHRkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADd/st4AAAAQHRSTlP///////////////////////////////////////////////////////////////////////////////////8AwnuxRAAAAUNJREFUeNrdk1luwzAMRLmYpFavSbr3Kr7/rUq1KWA7DYr+lrD0YT3NcAQJ1l8K/iHA07rG6T4giBMh0n0FXz0vC62VjwCzf/434dIUGCPzFuhcG7FSQhRM6ELx2wmuAuiVFhHR5AyeHNkoROTTCSnyaMOYMDkxv9AGmBjPGBvApagkIzdB2VgQSYpuw8jKcSRNROkYky6tEaqVo0mS4zmAuOyMiVu/8WIGewD60awF4WLNCWsPWwB0MCaURGY0z45UVdgDqpGoUOv/jESqV+Jr0hAklqoNQS7eq0iGDQCQh2HwhFUsRnsaR4FjiiGoSt+LWS3M43CTQoPkfuhzMMtBqxbYAxbAN/chQzAfWsLjHgCYZOwDdO8QshNB8+GooXsIvu7VJsj58RbIueteG/LmxM2dhM/drZ6bAvxwaWFTf3g4HwzZnPZ5wvFfAAAAAElFTkSuQmCC","art/plants/sampaguita-grown.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAwFBMVEUAAQBIZ0JPMCt1kFlFWz4XJhJZeEpOcEQgMhxliFASFwwIFgcmOSRlflGDn2I3VzZ2U0wrQiw8SDFcOzQtHRljTj80Jx0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABRE3OvAAAAQHRSTlP///////////////////////////////////////////////////////////////////////////////////8AwnuxRAAAAQlJREFUeNrtkllSAzEMRFvW5m1msgDXyf1vhZyCZJYUFP/0h+0qPUttWbj9IvwDBwCt4WfAiXEH8SR3wCC+tgMA3Cg0g8it7ksAYEbOHIBccnbVihUA91mEmNU79c5cSmFsM8jI7zZnyuP0cPHwoHGP3ckyhUkpsgOgqtM5kABEwg92Js2ms0ruYSCsNly2GWAuEs6jduZsUrjZsjIZ90OqQi4jgUWNamsAaBFWcVs4i5Zp2QJ3tQDIrHdR4njG/hXRYak05W5CqkwHYDRKR7+iFdHnYwYp5EgJKG6aUq1tB0xTrSn0FoRe0+G7tWGET0HUOL0f5+E7ntLHWF8AuKan8GrksNIfxv4TgsGl0kQLpa0AAAAASUVORK5CYII=","art/plants/sampaguita-seed.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAwFBMVEUAAABPMCt2U0xcOzQ0Jx1jTj+JUTcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADCs6YiAAAAQHRSTlP///////////////////////////////////////////////////////////////////////////////////8AwnuxRAAAAGlJREFUeNrt0V0KgCAQBOCZ3bVrdf9bNQZi0Wr00JuLiDiff4j9pbDAAv8CAFMAM8ME1HwGzjxGQKdX4HG7Rh+CJNyVk44n0HRxRCiXIjKgRLur35gB56VKvgNprSUAfX09avDMVh8+6wDB9tp2giJOgAAAAABJRU5ErkJggg==","art/plants/sampaguita-sprout.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAwFBMVEUAAABPMCt1kFkXJxJcOzQTFAtliFBjTj92U0xOcEQeGxAIFgc0Jx1Ze0plflEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB65RyOAAAAQHRSTlP///////////////////////////////////////////////////////////////////////////////////8AwnuxRAAAAJlJREFUeNrtkjsOwzAMQ2l9/E17pdz/VpXdAg4QOUW3DuFgDXqiRMDYvwg38NeAMl8CILoEQGUBmLO++6Qe0CgSYW/j9QAb7b1nBBYpQDFGPLCOaeeXctx/StHszkvAxFSXAKC1MrGqwk0Rupi2XnAGrJ86ELcUJE3iCIjk4ZKyeIANioSPsusQcl+TR3UAiEwLwI059cOXewH0vtBSovOUGwAAAABJRU5ErkJggg==","art/plants/sampaguita-wilt.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAwFBMVEUAAACUhlpOMCoeGxB4bk4tHRlkZEYTEwpjTj80Jx1/gVc0MR9cOzQfKRj5+fM8SDGxoHcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABwFAVrAAAAQHRSTlP///////////////////////////////////////////////////////////////////////////////////8AwnuxRAAAAOpJREFUeNrt0ltywzAIBVCuAAlsp+2OtP9d5TpOMqry6OS/fHg0wzEYLOl/hPyDj4Ge9C1otdb2BohVqMlL0My+lE/WUE9/BrAmk9o1woZK15Oa4dTdPTRytUHcwfLjbuYRWbxvD8AXaK5p7jUyFAGfAJS9EwReqwLIqQU4QjhwAIXlPAXnUNQrcO3+uChrBFodYSw370GWZS9wAGjMQBYUhwGNgMys/QKsb+CXQUrZR6DQEVzy7gcoAqzctg6AmxX+IlzypTRs1CMo3zzw1SPPLkqANo3JRJZbcBNtBrvYbkDkyZ2UIT641Wf8B7AJHJLcVQAAAABJRU5ErkJggg=="};
 /* ============================================================
    GARDEN OF LIFE — Game Logic
    Cognitive exercises + garden tending · Mobile-first PWA
@@ -202,7 +3724,7 @@ const PLANT_ART_STATES = ['seed', 'sprout', 'grown', 'bloom', 'wilt'];
 function plantArtSrc(plant) {
   if (!plant || PLANT_ART.indexOf(plant.seedId) === -1) return null;
   const state = PLANT_ART_STATES.indexOf(plant.state) === -1 ? 'grown' : plant.state;
-  return `art/plants/${plant.seedId}-${state}.png`;
+  return __ART__[`art/plants/${plant.seedId}-${state}.png`] || `art/plants/${plant.seedId}-${state}.png`;
 }
 
 /* alt is empty on purpose. Every caller already carries the plant's name and
@@ -1688,7 +5210,7 @@ function visitorPool() {
 
 function visitorShape(v) {
   if (VISITOR_ART.indexOf(v.id) !== -1) {
-    return `<img class="visitor-art" src="art/visitors/${v.id}.png" alt="" draggable="false">`;
+    return `<img class="visitor-art" src="${__ART__[`art/visitors/${v.id}.png`] || `art/visitors/${v.id}.png`}" alt="" draggable="false">`;
   }
   // Placeholder until the sprites arrive. Two wings and a body, enough to
   // read as something alive at this size without pretending to be finished.
@@ -5228,27 +8750,8 @@ init();
 /* Registered after load so it never competes with first paint. Requires a
    secure context: https:// or localhost. Over plain http on a LAN IP the
    registration is skipped by the browser and the game still runs online. */
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').then((reg) => {
-      // A new version is waiting: activate it, then reload once so the
-      // player never gets stuck on a stale build between deploys.
-      reg.addEventListener('updatefound', () => {
-        const sw = reg.installing;
-        if (!sw) return;
-        sw.addEventListener('statechange', () => {
-          if (sw.state === 'installed' && navigator.serviceWorker.controller) {
-            sw.postMessage('SKIP_WAITING');
-          }
-        });
-      });
-    }).catch(() => { /* offline support unavailable — game still works */ });
+/* service worker removed for the single-file build */
 
-    let reloaded = false;
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
-      if (reloaded) return;
-      reloaded = true;
-      window.location.reload();
-    });
-  });
-}
+</script>
+</body>
+</html>
