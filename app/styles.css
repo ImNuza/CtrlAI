@@ -93,8 +93,12 @@ body{
 }
 
 /* ── Top bar ── */
+/* min-height, not height: safe-area padding is added below, and a fixed height
+   plus that padding squeezed the chips past the bottom border on notched
+   phones. Ported from latest-cleanmobile without the type-scale shrink that
+   would cut under the senior body-text and tap floors. */
 .topbar{
-  height:var(--topbar-height);
+  min-height:var(--topbar-height);
   display:flex;
   align-items:center;
   justify-content:space-between;
@@ -2216,7 +2220,7 @@ body{
    hard against the side of the screen is the easiest one to hit by accident
    with the hand that is holding the phone. */
 .bottom-nav{
-  height:var(--nav-height);
+  min-height:var(--nav-height);
   background:var(--bg-surface);
   border-top:1.5px solid var(--border-light);
   display:flex;
