@@ -596,6 +596,58 @@ body{
 }
 .garden2-viewport.panning{cursor:grabbing}
 
+/* ── Thumbstick ───────────────────────────────────────────────
+   Bottom-left of the garden window, where the field has grass rather than
+   patches, and translucent so it never fully hides what is under it. 116px
+   across, well over the tap floor, because a thumb resting on a moving
+   surface needs more room than a button that stays still. */
+.joystick{
+  position:absolute;
+  /* Bottom right. On the left it landed on the Clear new land button, which
+     is centred over the first locked row, and half of it hung off the edge. */
+  right:0.75rem;
+  bottom:0.75rem;
+  width:104px;
+  height:104px;
+  border-radius:50%;
+  z-index:8;
+  background:rgba(245,239,235,0.42);
+  border:2px solid rgba(122,107,92,0.45);
+  box-shadow:0 2px 8px rgba(43,33,24,0.18);
+  /* The pad owns its gesture. Without this the browser tries to scroll the
+     page and the pan handler underneath tries to move the camera. */
+  touch-action:none;
+  -webkit-tap-highlight-color:transparent;
+  transition:background var(--duration-fast) var(--ease-gentle),
+             border-color var(--duration-fast) var(--ease-gentle);
+}
+.joystick[hidden]{display:none}
+.joystick.active{
+  background:rgba(245,239,235,0.72);
+  border-color:var(--foliage-mid);
+}
+.joystick-thumb{
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:52px;
+  height:52px;
+  margin:0;
+  border-radius:50%;
+  transform:translate(-50%,-50%);
+  background:var(--bg-surface);
+  border:2.5px solid var(--foliage-mid);
+  box-shadow:0 2px 5px rgba(43,33,24,0.28);
+  pointer-events:none;
+}
+/* Snaps home on release; follows the thumb without lag while held. */
+.joystick:not(.active) .joystick-thumb{
+  transition:transform 180ms var(--ease-gentle);
+}
+@media (prefers-reduced-motion:reduce){
+  .joystick,.joystick-thumb{transition:none}
+}
+
 /* width:max-content makes offsetWidth the true content width, which is what
    the pan bounds are measured from. Two plots of land side by side is what
    makes the field wider than the phone.

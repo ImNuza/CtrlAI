@@ -247,6 +247,13 @@
            header and the water button never move. -->
       <div class="garden2-viewport" id="garden2-viewport">
         <div class="garden2-field" id="garden2-scene"></div>
+        <!-- Optional thumbstick. Tapping a spot still walks the gardener
+             there, so this is never the only way to move. Sits inside the
+             viewport so it travels with the garden, not the page. -->
+        <div class="joystick" id="joystick" role="application"
+             aria-label="Walking stick. Drag to walk the gardener. You can also tap anywhere in the garden to send them there.">
+          <div class="joystick-thumb" id="joystick-thumb" aria-hidden="true"></div>
+        </div>
       </div>
       <div class="garden-actions">
         <!-- Every patch has to be reachable without a drag. This shrinks the

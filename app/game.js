@@ -1381,6 +1381,7 @@ function renderGarden2() {
   patchesFieldPan.measure();
   mountGardener(scene);
   bindGardenerTaps();
+  bindJoystick();
   applyGardenView();
   updateCoinDisplay();
   // Consumed. The animation is a one-off, not a property of the plant.
@@ -1471,6 +1472,17 @@ let avatarWalking = false;
 let avatarTarget = null;
 let avatarFrameStamp = 0;
 const walkKeys = { up: false, down: false, left: false, right: false };
+
+/* Thumbstick output as a unit vector, or nulls when nobody is holding it.
+   A third way to move, on top of tapping a spot and the arrow keys, for
+   players who would rather steer than pick a destination.
+
+   It is deliberately an addition and never the only route. Guidance for this
+   audience is consistent that a drag needs finer motor control than a tap, so
+   walking has to stay fully playable without ever touching this. */
+let joyVec = null;
+const JOY_RADIUS = 40;     // travel from centre at full tilt
+const JOY_DEADZONE = 0.18; // ignore the wobble of a resting thumb
 
 function prefersReducedMotion() {
   return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -1598,13 +1610,21 @@ function gardenerFrame(now) {
   const fromX = avatarX;
   const fromY = avatarY;
 
-  const dirX = (walkKeys.right ? 1 : 0) - (walkKeys.left ? 1 : 0);
-  const dirY = (walkKeys.down ? 1 : 0) - (walkKeys.up ? 1 : 0);
+  /* Steering beats a queued destination, whichever device it came from. The
+     stick wins over the keys only because a thumb already on screen is the
+     more deliberate of the two; they are never both live in practice. */
+  const keyX = (walkKeys.right ? 1 : 0) - (walkKeys.left ? 1 : 0);
+  const keyY = (walkKeys.down ? 1 : 0) - (walkKeys.up ? 1 : 0);
+  const dirX = joyVec ? joyVec.x : keyX;
+  const dirY = joyVec ? joyVec.y : keyY;
 
   if (dirX || dirY) {
-    // A key takes over from a walk already in progress, the same way a tap does.
+    // Steering takes over from a walk already in progress, as a tap does.
     avatarTarget = null;
-    const len = Math.hypot(dirX, dirY) || 1;
+    /* The stick arrives pre-normalised and carries its own magnitude, so a
+       half push is a half step. Keys are all-or-nothing and need the
+       diagonal taken out of them here. */
+    const len = joyVec ? 1 : (Math.hypot(dirX, dirY) || 1);
     avatarX += (dirX / len) * step;
     avatarY += (dirY / len) * step;
   } else if (avatarTarget) {
@@ -1782,6 +1802,10 @@ function applyGardenView() {
 
   const avatar = document.getElementById('garden-avatar');
   if (avatar) avatar.hidden = simpleView;
+  /* Simple view is a list of patches with nobody walking in it, so the stick
+     has nothing to steer and is put away rather than left there inert. */
+  const joy = document.getElementById('joystick');
+  if (joy) { joy.hidden = simpleView; if (simpleView) joyVec = null; }
 
   if (simpleView) {
     patchesFieldPan.reset();
@@ -1831,6 +1855,75 @@ function bindGardenerTaps() {
     const rect = scene.getBoundingClientRect();
     walkGardenerTo(e.clientX - rect.left, e.clientY - rect.top);
   });
+}
+
+/* ── THUMBSTICK ──────────────────────────────────────────────
+   Bound once to an element that outlives every re-render. Pointer capture
+   keeps the drag alive when the thumb slides off the pad, which on a small
+   screen it always does. Every event is stopped here so the viewport's own
+   pan handler never sees it: without that, steering the gardener would drag
+   the camera at the same time. */
+let joyBound = false;
+
+function bindJoystick() {
+  const pad = document.getElementById('joystick');
+  const thumb = document.getElementById('joystick-thumb');
+  if (!pad || !thumb || joyBound) return;
+  joyBound = true;
+  let activeId = null;
+
+  function place(dx, dy) {
+    const dist = Math.hypot(dx, dy);
+    const clamped = Math.min(dist, JOY_RADIUS);
+    const nx = dist ? dx / dist : 0;
+    const ny = dist ? dy / dist : 0;
+    thumb.style.transform =
+      `translate(calc(-50% + ${nx * clamped}px), calc(-50% + ${ny * clamped}px))`;
+    /* Magnitude is carried through so a small push is a slow walk. Below the
+       deadzone the stick reads as centred rather than as a very slow crawl. */
+    const mag = clamped / JOY_RADIUS;
+    joyVec = mag < JOY_DEADZONE ? null : { x: nx * mag, y: ny * mag };
+  }
+
+  function release() {
+    activeId = null;
+    joyVec = null;
+    thumb.style.transform = 'translate(-50%, -50%)';
+    pad.classList.remove('active');
+  }
+
+  pad.addEventListener('pointerdown', (e) => {
+    if (activeId !== null) return;
+    activeId = e.pointerId;
+    pad.classList.add('active');
+    try { pad.setPointerCapture(activeId); } catch (err) { /* still tracked */ }
+    const r = pad.getBoundingClientRect();
+    place(e.clientX - (r.left + r.width / 2), e.clientY - (r.top + r.height / 2));
+    e.preventDefault();
+    e.stopPropagation();
+  });
+
+  pad.addEventListener('pointermove', (e) => {
+    if (e.pointerId !== activeId) return;
+    const r = pad.getBoundingClientRect();
+    place(e.clientX - (r.left + r.width / 2), e.clientY - (r.top + r.height / 2));
+    e.preventDefault();
+    e.stopPropagation();
+  });
+
+  ['pointerup', 'pointercancel', 'pointerleave'].forEach(type => {
+    pad.addEventListener(type, (e) => {
+      if (e.pointerId !== activeId) return;
+      release();
+      e.preventDefault();
+      e.stopPropagation();
+    });
+  });
+
+  // A tap on the pad must never also be read as a tap on the grass behind it.
+  pad.addEventListener('click', (e) => e.stopPropagation());
+  // Leaving the tab mid-push would otherwise latch the gardener walking.
+  window.addEventListener('blur', release);
 }
 
 /* Arrow keys and WASD are an extra on top of Tab, not a replacement for it.
