@@ -1557,13 +1557,20 @@ body{
 }
 
 /* ── Word pairs game ── */
+/* Three columns, not two. This is a matching game, so every card has to be
+   findable from every other, and two columns put the hardest level across
+   four and a half screens of scrolling. A third column takes a third of that
+   away. The cards stay above the tap floor because the row is shorter, not
+   because the cards are. */
 .word-pairs{
   display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:0.75rem;
+  /* minmax(0,1fr), not 1fr. A bare 1fr floors each column at its widest word,
+     so the columns came out different widths and the grid read as ragged. */
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:0.5rem;
 }
 .word-card{
-  padding:1.25rem 1rem;
+  padding:0.9rem 0.5rem;
   background:var(--bg-surface);
   border:2.5px solid var(--border-mid);
   border-radius:var(--radius-lg);

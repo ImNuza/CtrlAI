@@ -2190,8 +2190,8 @@ const ISLANDS = [
       { id: 4,  type: 'pattern', rounds: 2, coins: 5,  label: 'Word rhythm' },
       { id: 5,  type: 'words',   sets: 4,   coins: 6,  label: 'Tall tales' },
       { id: 6,  type: 'oddone',  rounds: 3, coins: 6,  label: 'Forest eye' },
-      { id: 7,  type: 'words',   sets: 5,   coins: 8,  label: 'Word master' },
-      { id: 8,  type: 'words',   sets: 6,   coins: 10, label: 'Ancient oak' },
+      { id: 7,  type: 'words',   sets: 4,   coins: 8,  label: 'Word master' },
+      { id: 8,  type: 'words',   sets: 5,   coins: 10, label: 'Ancient oak' },
     ],
   },
   /* Kopitiam Corner sits last on purpose. The four islands above form a chain:
@@ -2940,11 +2940,15 @@ function completeExercise(coins, exerciseType) {
   const firstClear = currentLevelRef
     ? !isLevelComplete(currentLevelRef.islandId, currentLevelRef.levelIdx)
     : true;
-  const baseCoins = currentLevelRef
-    ? (firstClear ? currentLevelRef.level.coins : Math.max(1, Math.floor(currentLevelRef.level.coins * 0.25)))
-    : coins;
+  /* The practice-run quarter applies to the whole reward, kitchen bonus and
+     all. Adding the kitchen on afterwards made it flat, so a player with the
+     full meal collection earned 8 coins for replaying the cheapest level
+     against the 1 a practice run is meant to pay, and grinding one easy
+     level became the best rate in the game. Reducing the total keeps the
+     collection worth having without turning it into an income source. */
   const kitchen = kitchenBonus();
-  const rewardCoins = baseCoins + kitchen;
+  const fullReward = currentLevelRef ? currentLevelRef.level.coins + kitchen : coins + kitchen;
+  const rewardCoins = firstClear ? fullReward : Math.max(1, Math.floor(fullReward * 0.25));
 
   state.coins += rewardCoins;
   state.totalExercises++;
@@ -3027,7 +3031,7 @@ function completeExercise(coins, exerciseType) {
           <svg class="icon icon-sm" aria-hidden="true"><use href="#icon-coin"/></svg>
           +${rewardCoins} coins
         </span>
-        ${kitchen > 0 ? `<span class="reward-chip kitchen">
+        ${kitchen > 0 && firstClear ? `<span class="reward-chip kitchen">
           <svg class="icon icon-sm" aria-hidden="true"><use href="#icon-meal"/></svg>
           includes +${kitchen} from your kitchen
         </span>` : ''}
